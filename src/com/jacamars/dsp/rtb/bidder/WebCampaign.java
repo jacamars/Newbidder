@@ -644,7 +644,7 @@ public class WebCampaign {
 		String crid = (String) m.get("impid");
 		String user = (String) m.get("name");
 		for (Campaign campaign : Configuration.getInstance().getCampaignsList()) {
-			if (campaign.owner.equals(user) && campaign.adId.equals(adid)) {
+			if ( campaign.adId.equals(adid)) {
 				for (Creative c : campaign.creatives) {
 					if (c.impid.equals(crid)) {
 						rets.put("creative", c.createSample(campaign));

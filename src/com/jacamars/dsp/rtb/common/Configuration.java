@@ -1622,7 +1622,7 @@ public class Configuration {
 	 */
 	public boolean isRunning(String owner, String name) {
 		for (Campaign c : campaignsList) {
-			if (c.owner.equals(owner) && c.adId.equals(name)) {
+			if (c.adId.equals(name)) {
 				return true;
 			}
 		}

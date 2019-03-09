@@ -405,7 +405,7 @@ public enum Controller {
 
             Configuration.getInstance().deleteCampaign(camp.adId);
             Configuration.getInstance().addCampaign(camp);
-            m.msg = "Campaign " + camp.owner + "/" + camp.adId + " loaded ok";
+            m.msg = "Campaign " + camp.adId + " loaded ok";
             m.name = "AddCampaign Response";
             responseQueue.add(m);
         }

@@ -32,8 +32,6 @@ public class Campaign implements Comparable, com.hazelcast.nio.serialization.Dat
 	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
 	public boolean isAdx;
 	/** points back to the name of the owner of the campaign */
-	public String owner = null;
-	/** The id of the campaign */
 	public String adId = "default-campaign";
 	/** The campaign name */
 	public String name;
@@ -92,7 +90,6 @@ public class Campaign implements Comparable, com.hazelcast.nio.serialization.Dat
 		this.date = camp.date;
 		this.adId = camp.adId;
 		this.name = camp.name;
-		this.owner = camp.owner;
 		this.forensiq = camp.forensiq;
 		this.frequencyCap = camp.frequencyCap;
 		if (camp.category != null)
