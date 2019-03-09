@@ -1,0 +1,10 @@
+******************  TestFrequencyCapping
+*** F:{"capSpecification":["device.ip"],"capFrequency":1,"capTimeout":300,"capKey":"capped_block-test166.137.138.18"}
+------->{"adtype":"banner","SPEC0":"capped_block-test166.137.138.18","PRICE":"1.0","EXPIRY0":300}
+http://localhost:8080/rtb/win/junk1.com/SITE/index/.0001/42.378/-71.227/block-test/blocker/123
+*** F:{"capSpecification":["device.ip"],"capFrequency":3,"capTimeout":300,"capKey":"capped_block-test166.137.138.18"}
+------->{"adtype":"banner","SPEC0":"capped_block-test166.137.138.18","PRICE":"1.0","EXPIRY0":300}
+*** F:{"capSpecification":["device.ip"],"capFrequency":3,"capTimeout":300,"capKey":"capped_block-test166.137.138.18"}
+------->{"adtype":"banner","SPEC0":"capped_block-test166.137.138.18","PRICE":"1.0","EXPIRY0":300}
+*** F:{"capSpecification":["device.ip"],"capFrequency":3,"capTimeout":300,"capKey":"capped_block-test166.137.138.18"}
+------->{"adtype":"banner","SPEC0":"capped_block-test166.137.138.18","PRICE":"1.0","EXPIRY0":300}
