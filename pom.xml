@@ -268,20 +268,6 @@
             <version>RELEASE</version>
         </dependency>
         
-        <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api-parent -->
-		<!-- https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
-		<dependency>
-    		<groupId>com.sun.xml.bind</groupId>
-    		<artifactId>jaxb-impl</artifactId>
-    		<version>2.4.0-b180830.0438</version>
-		</dependency>
-        <dependency>
-    		<groupId>org.glassfish.jaxb</groupId>
-    		<artifactId>jaxb-runtime</artifactId>
-    		<version>2.3.1</version>
-    		<scope>runtime</scope>
-		</dependency>
-		
 		<dependency>
             <groupId>org.elasticsearch.client</groupId>
             <artifactId>elasticsearch-rest-client</artifactId>
@@ -313,11 +299,11 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				    <configuration>
-        		<release>10</release>
-                    <source>1.10</source>
+				<configuration>
+        			<release>10</release>
+                   	<source>1.10</source>
                     <target>1.10</target>
-    </configuration>
+    				</configuration>
 			</plugin>
 
 			<plugin>

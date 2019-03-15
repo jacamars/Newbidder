@@ -1,0 +1,1 @@
+{"version":3,"file":"MembershipEvent.js","sourceRoot":"","sources":["../../src/core/MembershipEvent.ts"],"names":[],"mappings":";AAAA;;;;;;;;;;;;;;GAcG;;AAIH;;;GAGG;AACH;IAgBI,yBAAY,MAAc,EAAE,SAAiB,EAAE,OAAiB;QAC5D,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;IAC3B,CAAC;IAEL,sBAAC;AAAD,CAAC,AAtBD,IAsBC;AAtBY,0CAAe"}

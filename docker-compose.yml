@@ -25,11 +25,10 @@ services:
       - zookeeper
 
   bidder:
-    image: "rtb4free"
+    image: "rtb4free:J11"
     environment:
       GDPR_MODE: "false"
       BROKERLIST: "kafka:9092"
-      PUBSUB: "zerospike"
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
       S3BUCKET: ""
@@ -46,19 +45,30 @@ services:
       ADMINPORT: "0"
     ports:
       - "8080:8080"
+      - "5701:5701"
       - "8155:8155"
       - "7379:7379"
       - "7000:7000"
-    #volumes:
-    #  - "./database.json:/database.json"
+    volumes:
+      - "./database.json:/database.json"
     #  - "./payday.json:/Campaigns/payday.json"
     networks:
       - rtb_net
     depends_on:
       - kafka
-      - zerospike
-    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh zerospike:6000 --t 120 && sleep 1; ./rtb4free"
+    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh && sleep 1; ./rtb4free"
     #command:  bash -c "./wait-for-it.sh kafka:9092 --timeout=120 && ./wait-for-it.sh zerospike:6000 --timeout 120 && sleep 1; ./rtb4free-jmx"
+
+  postgres:
+    image: postgres
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - "5432:5432"
+    networks:
+      - rtb_net
+    volumes:
+      - /tmp/data:/var/lib/postgresql/data
 
 
 networks:

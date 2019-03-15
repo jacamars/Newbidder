@@ -17,24 +17,8 @@ services:
     depends_on:
       - zookeeper
 
-  zerospike:
-    image: "jacamars/zerospike:v1"
-    environment:
-      BROKERLIST: "kafka:9092"
-    #ports:
-     # - "6000:6000"
-     #- "6001:6001"
-     # - "6002:6002"
-     # - "7001:7001"
-    restart: always
-    #volumes:
-    #  - "./cache.db:/cache.db"
-    depends_on:
-      - kafka
-    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./zerospike"
-
   bidder:
-    image: "jacamars/rtb4free:v1"
+    image: "jacamars/rtb4free:J11"
     environment:
       GDPR_MODE: "true"
       BROKERLIST: "kafka:9092"
@@ -48,6 +32,7 @@ services:
     ports:
       - "8080:8080"
       - "8155:8155"
+      - "5701:5701"
     #  - "7379:7379"
     #  - "7000:7000"
     restart: always
@@ -57,8 +42,8 @@ services:
     depends_on:
       - kafka
       - zerospike
-    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free"
-    #command:  bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh zerospike:6000 -t 120 && sleep 1; ./rtb4free-jmx"
+    command: bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./rtb4free"
+    #command:  bash -c "sleep 5 && ./wait-for-it.sh kafka:9092 -t 120 && sleep 1; ./rtb4free-jmx"
 
   simulator:
     image: "jacamars/rtb4free:v1"

@@ -717,8 +717,7 @@ public class RTBServer implements Runnable {
         redisupdater = () -> {
             try {
                 while (true) {
-                    Echo e = getStatus();
-                    Controller.getInstance().setMemberStatus(e);
+                    Controller.getInstance().setMemberStatus();
                     Controller.getInstance().reportNoBidReasons();
 
                     CampaignProcessor.probe.reset();
@@ -943,6 +942,7 @@ public class RTBServer implements Runnable {
         setSummaryStats();
         Echo e = new Echo();
         e.from = Configuration.getInstance().instanceName;
+        e.leader = isLeader();
         e.percentage = percentage.intValue();
         e.stopped = stopped;
         e.request = request;

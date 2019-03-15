@@ -671,51 +671,14 @@ public enum Controller {
         responseQueue.add(new BasicCommand());
     }
 
-    private void load(Map values, Map<String, String> m, String key, Object def) {
-        String value = null;
-        if (m.get(key) != null) {
-            try {
-
-                if (def instanceof String) {
-                    value = m.get(key);
-                    values.put(key, value);
-                } else if (def instanceof Long) {
-                    value = m.get(key);
-                    values.put(key, Long.parseLong(value));
-                } else if (def instanceof Boolean) {
-                    value = m.get(key);
-                    values.put(key, Boolean.parseBoolean(value));
-                } else if (def instanceof Integer) {
-                    value = m.get(key);
-                    values.put(key, Integer.parseInt(value));
-                }
-                if (def instanceof Double) {
-                    value = m.get(key);
-                    values.put(key, Double.parseDouble(value));
-                }
-                if (def instanceof List) {
-                    values.put(key, def);
-                }
-            } catch (Exception error) {
-                System.err.println("---------->" + key + ", " + value);
-                values.put(key, 0);
-            }
-        } else {
-            // System.err.println("-----------> Unknown type: " + key + ", "
-            // + value);
-            values.put(key, def);
-        }
-    }
-
     /**
-     * Retrieve a member RTB status from Aerospike
+     * Retrieve a member RTB status from Hazelcast
      *
      * @param member String. The member's instance name.
      * @return Map. A Hash,ap of data.
      */
-    public Map getMemberStatus(String member) {
-        Map values = new HashMap();
-        Map<String, String> m = null;
+    public Echo getMemberStatus(String member) {
+        Echo m = null;
 
         try {
             m = bidCachePool.getMemberStatus(member);
@@ -723,72 +686,17 @@ public enum Controller {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        if (m != null) {
-            load(values, m, "total", new Long(0));
-            load(values, m, "request", new Long(0));
-            load(values, m, "bid", new Long(0));
-            load(values, m, "nobid", new Long(0));
-            load(values, m, "win", new Long(0));
-            load(values, m, "clicks", new Long(0));
-            load(values, m, "pixels", new Long(0));
-            load(values, m, "errors", new Long(0));
-            load(values, m, "adspend", new Double(0));
-            load(values, m, "qps", new Double(0));
-            load(values, m, "avgx", new Double(0));
-            load(values, m, "fraud", new Long(0));
-            load(values, m, "stopped", new Boolean(true));
-            load(values, m, "ncampaigns", new Long(0));
-            load(values, m, "bid", new Long(0));
-            load(values, m, "loglevel", new Long(-3));
-            load(values, m, "nobidreason", new Boolean(false));
-            load(values, m, "exchanges", m.get("exchanges"));
-        }
-        return values;
+        return m;
     }
 
     /**
-     * Record the member stats in Aerospike
+     * Record the member stats in Hazelcasr
      *
      * @param e Echo. The status of this campaign.
      */
-    public void setMemberStatus(Echo e) throws Exception {
+    public void setMemberStatus() throws Exception {
         String member = Configuration.instanceName;
-        Map m = new HashMap();
-        m.put("leader", RTBServer.isLeader());
-        m.put("lastupdate", System.currentTimeMillis());
-        m.put("total", "" + e.handled);
-        m.put("request", "" + e.request);
-        m.put("bid", "" + e.bid);
-        m.put("nobid", "" + e.nobid);
-        m.put("win", "" + e.win);
-        m.put("clicks", "" + e.clicks);
-        m.put("pixels", "" + e.pixel);
-        m.put("errors", "" + e.error);
-        m.put("adspend", "" + e.adspend);
-        m.put("qps", "" + e.qps);
-        m.put("avgx", "" + e.avgx);
-        m.put("fraud", "" + e.fraud);
-        m.put("exchanges", BidRequest.getExchangeCounts());
-        m.put("ipaddress", e.ipaddress);
-
-        m.put("time", "" + System.currentTimeMillis());
-
-        m.put("cpu", Performance.getCpuPerfAsString());
-        m.put("diskpctfree", Performance.getPercFreeDisk());
-        m.put("threads", "" + Performance.getThreadCount());
-        m.put("cores", "" + Performance.getCores());
-
-        m.put("stopped", "" + RTBServer.stopped);
-        m.put("ncampaigns", "" + Configuration.getInstance().getCampaignsListReal().size());
-        m.put("ecampaigns", "" + Configuration.getInstance().getCampaignsList().size());
-        m.put("loglevel", "" + Configuration.getInstance().logLevel);
-        m.put("nobidreason", "" + Configuration.getInstance().printNoBidReason);
-        List<String> campaigns = new ArrayList();
-        for (Campaign c : Configuration.getInstance().getCampaignsList()) {
-            campaigns.add(c.adId);
-        }
-        m.put("campaigns", campaigns);
-
+        Echo m = RTBServer.getStatus();
         bidCachePool.setMemberStatus(member, m);
 
     }

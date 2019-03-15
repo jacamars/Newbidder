@@ -1,0 +1,35 @@
+import { ClassDefinition, FieldDefinition } from './ClassDefinition';
+export declare class ClassDefinitionBuilder {
+    private readonly factoryId;
+    private readonly classId;
+    private readonly version;
+    private fieldDefinitions;
+    private index;
+    private done;
+    constructor(factoryId: number, classId: number, version?: number);
+    getFactoryId(): number;
+    getClassId(): number;
+    getVersion(): number;
+    addByteField(fieldName: string): ClassDefinitionBuilder;
+    addBooleanField(fieldName: string): ClassDefinitionBuilder;
+    addCharField(fieldName: string): ClassDefinitionBuilder;
+    addShortField(fieldName: string): ClassDefinitionBuilder;
+    addIntField(fieldName: string): ClassDefinitionBuilder;
+    addLongField(fieldName: string): ClassDefinitionBuilder;
+    addFloatField(fieldName: string): ClassDefinitionBuilder;
+    addDoubleField(fieldName: string): ClassDefinitionBuilder;
+    addUTFField(fieldName: string): ClassDefinitionBuilder;
+    addPortableField(fieldName: string, def: ClassDefinition): ClassDefinitionBuilder;
+    addByteArrayField(fieldName: string): ClassDefinitionBuilder;
+    addBooleanArrayField(fieldName: string): ClassDefinitionBuilder;
+    addCharArrayField(fieldName: string): ClassDefinitionBuilder;
+    addShortArrayField(fieldName: string): ClassDefinitionBuilder;
+    addIntArrayField(fieldName: string): ClassDefinitionBuilder;
+    addLongArrayField(fieldName: string): ClassDefinitionBuilder;
+    addFloatArrayField(fieldName: string): ClassDefinitionBuilder;
+    addDoubleArrayField(fieldName: string): ClassDefinitionBuilder;
+    addUTFArrayField(fieldName: string): ClassDefinitionBuilder;
+    addPortableArrayField(fieldName: string, def: ClassDefinition): ClassDefinitionBuilder;
+    addField(fieldDefinition: FieldDefinition): ClassDefinitionBuilder;
+    build(): ClassDefinition;
+}

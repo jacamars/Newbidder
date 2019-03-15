@@ -1,26 +1,17 @@
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.openrtb.OpenRtb.BidRequest;
-import com.google.openrtb.json.OpenRtbJsonFactory;
-import com.google.openrtb.json.OpenRtbJsonReader;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleBidRequest;
 import com.jacamars.dsp.rtb.exchanges.openx.OpenXWinObject;
 import com.jacamars.dsp.rtb.exchanges.openx.SsRtbCrypter;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 public class Test {
 
@@ -37,7 +28,9 @@ public class Test {
 					.decode(ByteBuffer
 							.wrap(Files.readAllBytes(Paths.get("./SampleBids/nositedomain.proto"))))
 					.toString();
-			byte[] data = DatatypeConverter.parseBase64Binary(proto);
+			
+			byte[] data = Base64.getDecoder().decode(proto);
+			//byte[] data = DatatypeConverter.parseBase64Binary(proto);
 			InputStream is = new ByteArrayInputStream(data);
 			GoogleBidRequest r = new GoogleBidRequest(is);
 			System.out.println(r.getInternal());

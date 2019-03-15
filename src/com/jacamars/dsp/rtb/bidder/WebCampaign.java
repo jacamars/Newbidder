@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.rtb.commands.AddCampaign;
 import com.jacamars.dsp.rtb.commands.DeleteCampaign;
+import com.jacamars.dsp.rtb.commands.Echo;
 import com.jacamars.dsp.rtb.commands.LogLevel;
 import com.jacamars.dsp.rtb.commands.NobidReason;
 import com.jacamars.dsp.rtb.commands.StartBidder;
@@ -725,6 +726,8 @@ public class WebCampaign {
 		List core = new ArrayList();
 
 		List<String> members = getMembers();
+		
+		System.out.println(members);
 		for (String member : members) {
 			Map entry = new HashMap();
 			HttpPostGet http = new HttpPostGet();
@@ -735,11 +738,11 @@ public class WebCampaign {
 				values.put("loglevel", Configuration.getInstance().logLevel);
 				values.put("nobidreason", Configuration.getInstance().printNoBidReason);
 			} else {
-				Map info = Controller.getInstance().getMemberStatus(member);
-				values.put("stopped", info.get("stopped"));
-				values.put("ncampaigns", info.get("ncampaigns"));
-				values.put("loglevel", info.get("loglevel"));
-				values.put("nobidreason", info.get("nobidreason"));
+				Echo info = Controller.getInstance().getMemberStatus(member);
+				values.put("stopped", info.stopped);
+				values.put("ncampaigns", info.ncampaigns);
+				values.put("loglevel", info.loglevel);
+				values.put("nobidreason", info.nobidreason);
 
 			}
 			entry.put("name", member);
@@ -780,26 +783,8 @@ public class WebCampaign {
 		for (String member : members) {
 			Map entry = new HashMap();
 			HttpPostGet http = new HttpPostGet();
-			Map values = new HashMap();
-			if (member.equals(Configuration.getInstance().instanceName)) {
-				RTBServer.getStatus();
-				values.put("total", RTBServer.handled);
-				values.put("bid", RTBServer.bid);
-				values.put("request", RTBServer.request);
-				values.put("nobid", RTBServer.nobid);
-				values.put("win", RTBServer.win);
-				values.put("clicks", RTBServer.clicks);
-				values.put("pixels", RTBServer.pixels);
-				values.put("fraud", RTBServer.fraud);
-				values.put("errors", RTBServer.error);
-				values.put("adspend", RTBServer.adspend);
-				values.put("qps", RTBServer.qps);
-				values.put("avgx", RTBServer.avgx);
-				values.put("exchanges", BidRequest.getExchangeCounts());
-				values.put("cperf", CampaignProcessor.probe.getMap());
-			} else {
-				values = Controller.getInstance().getMemberStatus(member);
-			}
+			Echo values = Controller.getInstance().getMemberStatus(member);
+			
 			entry.put("name", member);
 			entry.put("values", values);
 			core.add(entry);

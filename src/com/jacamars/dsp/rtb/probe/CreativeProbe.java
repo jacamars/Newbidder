@@ -151,6 +151,31 @@ public class CreativeProbe {
 
         return list;
     }
+    
+    public List<Reason> getReasons() {
+        List<Reason> list = new ArrayList();
+
+        /**
+         * Sort the list first
+         */
+        List<EntryField> values = new ArrayList<EntryField>();
+        for (Map.Entry<String, LongAdder> entry : probes.entrySet()) {
+            EntryField ef = new EntryField(entry.getKey(), entry.getValue().sum());
+            values.add(ef);
+        }
+        Collections.sort(values, Collections.reverseOrder());
+
+        // Now create the map
+        for (EntryField e : values) {
+            Reason x = new Reason();
+            x.name = e.key;
+            x.count = e.value;
+            list.add(x);
+        }
+
+        return list;
+    }
+
 
     public String getTable() {
         double nobids = total.sum() - bid.sum();

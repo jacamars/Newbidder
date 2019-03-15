@@ -138,8 +138,10 @@ public class Commands {
 		}
 
 		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.setProperty("hazelcast.logging.type", "slf4j");
-		// clientConfig.getGroupConfig().setName("dev").setPassword("dev-pass");
+		clientConfig.getSerializationConfig()
+			.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+		//clientConfig.setProperty("hazelcast.logging.type", "slf4j");
+
 		clientConfig.addAddress(cluster);
 		HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 
@@ -149,7 +151,7 @@ public class Commands {
 			List<String> list = BidCachePool.getClientInstance(client).getMembersNames();
 			System.out.println("Members = " + list);
 			for (String member : list) {
-				Map m = BidCachePool.getClientInstance(client).getMemberStatus(member);
+				Echo m = BidCachePool.getClientInstance(client).getMemberStatus(member);
 				str = member + ":\n" + DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(m)
 						+ "\n**************";
 				System.out.println(str);

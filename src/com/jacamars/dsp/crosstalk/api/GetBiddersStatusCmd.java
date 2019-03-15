@@ -4,12 +4,13 @@ package com.jacamars.dsp.crosstalk.api;
 import java.util.ArrayList;
 
 import java.util.List;
-import java.util.Map;
+
 
 import com.jacamars.dsp.rtb.bidder.RTBServer;
-import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.commands.Echo;
+
 import com.jacamars.dsp.rtb.shared.BidCachePool;
-import com.jacamars.dsp.rtb.tools.DbTools;
+
 
 /**
  * Get all the bidders status'es and put into a list
@@ -19,7 +20,7 @@ import com.jacamars.dsp.rtb.tools.DbTools;
 public class GetBiddersStatusCmd extends ApiCommand {
 
 	/** the list of bidders */
-	public List<Map> entries;
+	public List<Echo> entries;
 
 	/**
 	 * Default constructor
@@ -55,12 +56,12 @@ public class GetBiddersStatusCmd extends ApiCommand {
 	@Override
 		public void execute() {
 			super.execute();
-			entries = new ArrayList<Map>();
+			entries = new ArrayList<Echo>();
 			try {
 				var hz = RTBServer.getSharedInstance();
 				List<String> list = BidCachePool.getClientInstance(hz).getMembersNames();
 				for (String member : list) {
-					Map m = BidCachePool.getClientInstance(hz).getMemberStatus(member);
+					Echo m = BidCachePool.getClientInstance(hz).getMemberStatus(member);
 					entries.add(m);
 				}
 				return;

@@ -61,11 +61,11 @@ If you want to modify the code.
    
 5. Make the docker images locally:
 
-   $docker build -t rtb4free: -f Docker.bidder .
+   $docker build -t rtb4free:J11 -f Docker.bidder .
    
 6. If you need to push to the repo:
 
-   $docker push rtb4free
+   $docker push rtb4free:J11
    
 Changing Operational Parameters
 -------------------------------------

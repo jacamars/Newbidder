@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,8 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.commands.Echo;
+import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.RecordedBid;
@@ -42,7 +45,7 @@ public enum BidCachePool {
 
 	/** The cache to contain the general context */
 	static private volatile IMap<String, RecordedBid> bidCache;
-	static private volatile IMap<String, ObjectNode> memberCache;
+	static private volatile IMap<String, Echo> memberCache;
 	static private volatile IMap<String, RecordedVideo> videoCache;
 	static private volatile IMap<String, RecordedMisc> miscCache;
 
@@ -59,7 +62,7 @@ public enum BidCachePool {
 			MapStoreConfig mapStoreCfg;
 
 			Config config = inst.getConfig();
-
+			
 			String name = "BIDCACHE";
 			bidCache = RTBServer.getSharedInstance().getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
@@ -87,9 +90,24 @@ public enum BidCachePool {
 			}
 			//////////////////////////////////////////////////
 
+	        config.getSerializationConfig()
+            	.addPortableFactory(SamplePortableFactory.FACTORY_ID, new SamplePortableFactory())
+            	.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+	        name = "CUSTOMERS";
+			IMap<String,Customer> junk = RTBServer.getSharedInstance().getMap(name);
+			Customer crud = new Customer();
+			crud.name = "Ben";
+			crud.id = 123;
+			crud.lastOrder = new Date();
+			crud.list = new ArrayList();
+			crud.list.add("Heidi");
+			crud.list.add("Hodaka");
+			junk.put("Ben", crud);
+			
 			name = "MEMBER";
 			memberCache = RTBServer.getSharedInstance().getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		
 
 			name = "VIDEO";
 			videoCache = RTBServer.getSharedInstance().getMap(name);
@@ -147,18 +165,21 @@ public enum BidCachePool {
 	public static BidCachePool getClientInstance(HazelcastInstance inst) {
 		if (bidCache == null) {
 			Config config = inst.getConfig();
+		//	config.getSerializationConfig()
+		//		.addPortableFactory(SamplePortableFactory.FACTORY_ID, new SamplePortableFactory())
+		//		.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
 
 			String name = "BIDCACHE";
-			bidCache = RTBServer.getSharedInstance().getMap(name);
+			bidCache = inst.getMap(name);
 
 			name = "MEMBER";
-			memberCache = RTBServer.getSharedInstance().getMap(name);
+			memberCache = inst.getMap(name);
 
 			name = "VIDEO";
-			videoCache = RTBServer.getSharedInstance().getMap(name);
+			videoCache = inst.getMap(name);
 
 			name = "MISC";
-			miscCache = RTBServer.getSharedInstance().getMap(name);
+			miscCache = inst.getMap(name);
 		}
 		return INSTANCE;
 	}
@@ -167,16 +188,15 @@ public enum BidCachePool {
 		return INSTANCE;
 	}
 
-	public void setMemberStatus(String key, Map map) {
-		ObjectNode member = mapper.valueToTree(map);
+	public void setMemberStatus(String key, Echo member) {
 		memberCache.set(key, member, 60, TimeUnit.SECONDS);
 	}
 
-	public Map getMemberStatus(String key) {
-		ObjectNode oj = memberCache.get(key);
+	public Echo getMemberStatus(String key) {
+		Echo oj = memberCache.get(key);
 		if (oj == null)
 			return null;
-		return mapper.convertValue(oj, Map.class);
+		return mapper.convertValue(oj, Echo.class);
 	}
 
 	public int getMembersSize() {
