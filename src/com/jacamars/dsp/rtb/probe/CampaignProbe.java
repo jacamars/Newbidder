@@ -129,19 +129,16 @@ public class CampaignProbe {
 		return list;
 	}
 	
-	public List<CreativePerformance> getCreativePerformance() {
-		List<CreativePerformance> list = new ArrayList();
+	public CampaignPerformance getCampaignPerformance() {
+		CampaignPerformance x = new CampaignPerformance();
+		x.campaign =  campaign;
+		x.bids = this.getBids();
+		x.total = this.getTotal();
 		
 		for (Map.Entry<String, CreativeProbe> entry : probes.entrySet()) {
-			CreativePerformance x = new CreativePerformance();
-			String key = entry.getKey();
-			x.creative =  key;
-			x.reasons =  entry.getValue().getMap();
-			x.total = entry.getValue().total.sum();
-			x.bids = entry.getValue().bid.sum();
-			list.add(x);
+			x.creatives.add(entry.getValue().getCreativePerformance());
 		}
-		return list;
+		return x;
 	}
 	
 	public String getTable() {

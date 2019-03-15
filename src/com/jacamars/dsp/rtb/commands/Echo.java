@@ -14,6 +14,7 @@ import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.probe.CreativePerformance;
+import com.jacamars.dsp.rtb.probe.ExchangePerformance;
 import com.jacamars.dsp.rtb.shared.SamplePortableFactory;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
@@ -72,7 +73,7 @@ public class Echo extends BasicCommand implements Portable {
 	/** Summary stats by exchanges */
 	public List<Map>exchanges;
 	/** Campaign/creative performance map */
-	public List<CreativePerformance> cperform = new ArrayList();
+	public List<ExchangePerformance> eperform = new ArrayList();
 	/** ip address */
 	public String ipaddress;
 	/** is the leader */
@@ -168,10 +169,10 @@ public class Echo extends BasicCommand implements Portable {
 		writer.writeInt("ecampaigns", ecampaigns);
 		writer.writeBoolean("nobidreason",nobidreason);
 
-		writer.writeInt("Ncperform", cperform.size());
-		for (int i=0;i<cperform.size();i++) {
-			CreativePerformance p = cperform.get(i);
-			p.writePortable(i, writer);
+		writer.writeInt("Nperformance", eperform.size());
+		for (int i=0;i<eperform.size();i++) {
+			ExchangePerformance e = eperform.get(i);
+			e.writePortable(i, writer);
 		}
 
 		/** Summary stats by exchanges */
@@ -217,11 +218,11 @@ public class Echo extends BasicCommand implements Portable {
 		ecampaigns = reader.readInt("ecampaigns");
 		nobidreason = reader.readBoolean("nobidreason");
 		
-		var n = reader.readInt("Ncperform");
+		var n = reader.readInt("Nperformance");
 		for (int i=0;i<n;i++) {
-			CreativePerformance p = new CreativePerformance();
+			ExchangePerformance p = new ExchangePerformance();
 			p.readPortable(i, reader);
-			cperform.add(p);
+			eperform.add(p);
 		}
 	}
 }

@@ -17,13 +17,13 @@ public class CreativePerformance {
 		
 	}
 	
-	public void writePortable(int index, PortableWriter writer) throws IOException {
-		StringBuilder key  = getKey(index);
-		StringBuilder prefix = getPrefix(index);
+	public void writePortable(int eindex, int cindex, int index, PortableWriter writer) throws IOException {
+		StringBuilder key  = getKey(eindex,cindex,index);
+		StringBuilder prefix = getPrefix(eindex,cindex,index);
 		
 		StringBuilder sb = new StringBuilder();
 		
-		writer.writeUTF(sb.append(key).append("-creative").toString(),creative);
+		writer.writeUTF(sb.append(key).append("-name").toString(),creative);
 		sb.setLength(0);
 		writer.writeLong(sb.append(key).append("-total").toString(),total);
 		sb.setLength(0);;
@@ -43,19 +43,23 @@ public class CreativePerformance {
 		
 	}
 	
-	public StringBuilder getKey(int index) {
-		StringBuilder k = new StringBuilder("cperf:").append(index);
+	public StringBuilder getKey(int eindex, int cindex, int index) {
+		StringBuilder k = new StringBuilder("exchange:").append(eindex)
+				.append("campaign:").append(cindex)
+				.append("creative:").append(index);
 		return k;
 	}
 	
-	public StringBuilder getPrefix(int index) {
-		StringBuilder k = new StringBuilder("cerf:").append(index).append("-reason");
+	public StringBuilder getPrefix(int eindex, int cindex, int index) {
+		StringBuilder k = new StringBuilder("exchange:").append(eindex)  
+								.append("campaign:").append(cindex)
+								.append("cperf:").append(index);
 		return k;
 	}
 	
-	public void readPortable(int index, PortableReader reader) throws IOException {
-		StringBuilder key  = getKey(index);
-		StringBuilder prefix = getPrefix(index);
+	public void readPortable(int eindex,int cindex,  int index, PortableReader reader) throws IOException {
+		StringBuilder key  = getKey(eindex,cindex,index);
+		StringBuilder prefix = getPrefix(eindex,cindex,index);
 		
 		StringBuilder sb = new StringBuilder();
 		

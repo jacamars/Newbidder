@@ -967,7 +967,7 @@ public class RTBServer implements Runnable {
         e.exchanges = BidRequest.getExchangeCounts();
         e.timestamp = System.currentTimeMillis();
         if (CampaignProcessor.probe != null) {
-            e.cperform = CampaignProcessor.probe.getMap();
+            e.eperform = CampaignProcessor.probe.getPerformance();
         }
 
         String perf = Performance.getCpuPerfAsString();

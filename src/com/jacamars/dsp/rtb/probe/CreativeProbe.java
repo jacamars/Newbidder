@@ -175,6 +175,30 @@ public class CreativeProbe {
 
         return list;
     }
+    
+    public CreativePerformance getCreativePerformance() {
+    	CreativePerformance cp = new CreativePerformance();
+    	cp.bids = this.getSumBids();
+    	cp.creative = creative;
+    	cp.total = this.getSumTotal();
+    	
+        List<EntryField> values = new ArrayList<EntryField>();
+        for (Map.Entry<String, LongAdder> entry : probes.entrySet()) {
+            EntryField ef = new EntryField(entry.getKey(), entry.getValue().sum());
+            values.add(ef);
+        }
+        Collections.sort(values, Collections.reverseOrder());
+
+        // Now create the map
+        for (EntryField e : values) {
+            Reason x = new Reason();
+            x.name = e.key;
+            x.count = e.value;
+            cp.reasons.add(x);
+        }
+
+    	return cp;
+    }
 
 
     public String getTable() {
