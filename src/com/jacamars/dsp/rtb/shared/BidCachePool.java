@@ -90,9 +90,9 @@ public enum BidCachePool {
 			}
 			//////////////////////////////////////////////////
 
-	        config.getSerializationConfig()
-            	.addPortableFactory(SamplePortableFactory.FACTORY_ID, new SamplePortableFactory())
-            	.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+	        //config.getSerializationConfig()
+           // 	.addPortableFactory(SamplePortableFactory.FACTORY_ID, new SamplePortableFactory())
+            //	.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
 	        name = "CUSTOMERS";
 			IMap<String,Customer> junk = RTBServer.getSharedInstance().getMap(name);
 			Customer crud = new Customer();

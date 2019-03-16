@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
 
-public class CreativePerformance {
+public class CreativePerformance implements Portable {
+	public static final int CLASS_ID = 5;
 	public String creative;
 	public List<Reason> reasons = new ArrayList();
 	public long total;
@@ -17,70 +20,44 @@ public class CreativePerformance {
 		
 	}
 	
-	public void writePortable(int eindex, int cindex, int index, PortableWriter writer) throws IOException {
-		StringBuilder key  = getKey(eindex,cindex,index);
-		StringBuilder prefix = getPrefix(eindex,cindex,index);
+	@Override
+	public int getFactoryId() {
+		return PortableEchoFactory.FACTORY_ID;
+	}
+
+	@Override
+	public int getClassId() {
+		// TODO Auto-generated method stub
+		return CLASS_ID;
+	}
+
+	@Override
+	public void writePortable(PortableWriter writer) throws IOException {
+		writer.writeUTF("creative",creative);
+		writer.writeLong("total",total);
+		writer.writeLong("bids",bids);	
 		
-		StringBuilder sb = new StringBuilder();
-		
-		writer.writeUTF(sb.append(key).append("-name").toString(),creative);
-		sb.setLength(0);
-		writer.writeLong(sb.append(key).append("-total").toString(),total);
-		sb.setLength(0);;
-		writer.writeLong(sb.append(key).append("-bids").toString(),bids);
-		sb.setLength(0);
-		writer.writeInt(sb.append(key).append("-Nreasons").toString(),reasons.size());
-		sb.setLength(0);
-		for (var i = 0; i< reasons.size();i++) {
-			String skey = sb.append(prefix).append("-").append(i).append("-name").toString();
-			Reason r = reasons.get(i);
-			writer.writeUTF(skey, r.name);
-			sb.setLength(0);
-			skey = sb.append(prefix).append("-").append(i).append("-count").toString();
-			writer.writeLong(skey, r.count);
-			sb.setLength(0);
-		}
+		 if(!reasons.isEmpty()) {
+			 writer.writePortableArray("reasons", reasons.toArray(new Portable[reasons.size()]));
+	         writer.writeBoolean("_has__reasons", true);
+	     } else {
+	    	 writer.writeBoolean("_has__reasons", false);
+	     }
 		
 	}
-	
-	public StringBuilder getKey(int eindex, int cindex, int index) {
-		StringBuilder k = new StringBuilder("exchange:").append(eindex)
-				.append("campaign:").append(cindex)
-				.append("creative:").append(index);
-		return k;
-	}
-	
-	public StringBuilder getPrefix(int eindex, int cindex, int index) {
-		StringBuilder k = new StringBuilder("exchange:").append(eindex)  
-								.append("campaign:").append(cindex)
-								.append("cperf:").append(index);
-		return k;
-	}
-	
-	public void readPortable(int eindex,int cindex,  int index, PortableReader reader) throws IOException {
-		StringBuilder key  = getKey(eindex,cindex,index);
-		StringBuilder prefix = getPrefix(eindex,cindex,index);
+
+	@Override
+	public void readPortable(PortableReader reader) throws IOException {
+		creative = reader.readUTF("creative");
+		total = reader.readLong("total");
+		bids = reader.readLong("bids");
 		
-		StringBuilder sb = new StringBuilder();
-		
-		creative = reader.readUTF(sb.append(key).append("-creative").toString());
-		sb.setLength(0);
-		total = reader.readLong(sb.append(key).append("-total").toString());
-		sb.setLength(0);;
-		bids = reader.readLong(sb.append(key).append("-bids").toString());
-		sb.setLength(0);
-		var n = reader.readInt(sb.append(key).append("-Nreasons").toString());
-		sb.setLength(0);
-		for (var i = 0; i< reasons.size();i++) {
-			String skey = sb.append(prefix).append("-").append(i).append("-name").toString();
-			Reason r = new Reason();
-			r.name = reader.readUTF(skey);
-			sb.setLength(0);
-			skey = sb.append(prefix).append("-").append(i).append("-count").toString();
-			r.count = reader.readLong(skey);
-			reasons.add(r);
-			sb.setLength(0);
-		}
+		if(reader.readBoolean("_has__reasons")) {
+			Portable[] carray = reader.readPortableArray("reasons");
+	        for (Portable p:carray) {
+	        	reasons.add((Reason) p);  
+	        }
+	     }
 		
 	}
 }

@@ -5,17 +5,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.nio.serialization.ClassDefinition;
+import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
 import com.jacamars.dsp.rtb.bidder.Controller;
-import com.jacamars.dsp.rtb.common.Campaign;
+
 import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.probe.CampaignPerformance;
 import com.jacamars.dsp.rtb.probe.CreativePerformance;
 import com.jacamars.dsp.rtb.probe.ExchangePerformance;
-import com.jacamars.dsp.rtb.shared.SamplePortableFactory;
+import com.jacamars.dsp.rtb.probe.Reason;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
 /**
@@ -53,7 +57,7 @@ public class Echo extends BasicCommand implements Portable {
 	/** The number of clicks */
 	public long clicks;
 	/** The number of pixels */
-	public long pixel;
+	public long pixels;
 	/** the adpsend */
 	public double adspend;
 	/** relative qps */
@@ -91,10 +95,165 @@ public class Echo extends BasicCommand implements Portable {
 	/** no bid readon flag */
 	public boolean nobidreason;
 	
+	public static void registerWithHazelCast(ClientConfig config) {
+		
+        config.getSerializationConfig().addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+        
+		ClassDefinitionBuilder nestedPortableClassBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, Reason.CLASS_ID);
+		nestedPortableClassBuilder.addLongField("count");
+		nestedPortableClassBuilder.addUTFField("name");
+		ClassDefinition nestedPortableClassDefinition = nestedPortableClassBuilder.build();
+	    config.getSerializationConfig().addClassDefinition(nestedPortableClassDefinition);
+		
+		ClassDefinitionBuilder creativeClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, CreativePerformance.CLASS_ID);
+		creativeClassDefinitionBuilder.addUTFField("creative");
+		creativeClassDefinitionBuilder.addBooleanField("_has__reasons");
+		creativeClassDefinitionBuilder.addPortableArrayField("reasons",nestedPortableClassDefinition);
+		creativeClassDefinitionBuilder.addLongField("total");
+		creativeClassDefinitionBuilder.addLongField("bids");
+		ClassDefinition creativeClassDefinition = creativeClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(creativeClassDefinition);
+		
+		ClassDefinitionBuilder campaignClassDefinitioBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, CampaignPerformance.CLASS_ID);
+		campaignClassDefinitioBuilder.addUTFField("campaign");
+		campaignClassDefinitioBuilder.addBooleanField("_has__creatives");
+		campaignClassDefinitioBuilder.addPortableArrayField("creatives",creativeClassDefinition);
+		campaignClassDefinitioBuilder.addLongField("total");
+		campaignClassDefinitioBuilder.addLongField("bids");
+		ClassDefinition campaignClassDefinition = campaignClassDefinitioBuilder.build();
+		config.getSerializationConfig().addClassDefinition(campaignClassDefinition);
+		
+		ClassDefinitionBuilder exchangeClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, ExchangePerformance.CLASS_ID);
+		exchangeClassDefinitionBuilder.addBooleanField("_has__campaigns");
+		exchangeClassDefinitionBuilder.addPortableArrayField("campaigns",campaignClassDefinition);
+		exchangeClassDefinitionBuilder.addUTFField("exchange");
+		exchangeClassDefinitionBuilder.addLongField("total");
+		exchangeClassDefinitionBuilder.addLongField("bids");
+		ClassDefinition exchangeClassDefinition = exchangeClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(exchangeClassDefinition);
+		
+		ClassDefinitionBuilder echoClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, Echo.CLASS_ID);
+		echoClassDefinitionBuilder.addUTFField("name");
+		echoClassDefinitionBuilder.addBooleanField("_has__campaigns");
+		echoClassDefinitionBuilder.addUTFArrayField("campaigns");
+		echoClassDefinitionBuilder.addIntField("percentage");
+		echoClassDefinitionBuilder.addBooleanField("stopped");
+		echoClassDefinitionBuilder.addLongField("request");
+		echoClassDefinitionBuilder.addLongField("bid");
+		echoClassDefinitionBuilder.addLongField("nobid");
+		echoClassDefinitionBuilder.addLongField("win");
+		echoClassDefinitionBuilder.addLongField("error");
+		echoClassDefinitionBuilder.addLongField("handled");
+		echoClassDefinitionBuilder.addLongField("unknown");
+		echoClassDefinitionBuilder.addIntField("loglevel");
+		echoClassDefinitionBuilder.addLongField("clicks");
+		echoClassDefinitionBuilder.addLongField("pixels");
+		echoClassDefinitionBuilder.addDoubleField("adspend");
+		echoClassDefinitionBuilder.addDoubleField("qps");
+		echoClassDefinitionBuilder.addDoubleField("avgx");
+		echoClassDefinitionBuilder.addLongField("fraud");
+		echoClassDefinitionBuilder.addIntField("threads");
+		echoClassDefinitionBuilder.addUTFField("memory");
+		echoClassDefinitionBuilder.addUTFField("freeDisk");
+		echoClassDefinitionBuilder.addUTFField("cpu");
+		/** Summary stats by exchanges */
+		// public List<Map>exchanges;
+		echoClassDefinitionBuilder.addBooleanField("_has__eperform");
+		echoClassDefinitionBuilder.addPortableArrayField("eperform",exchangeClassDefinition);
+		echoClassDefinitionBuilder.addUTFField("ipaddress");
+		echoClassDefinitionBuilder.addBooleanField("leader");
+		echoClassDefinitionBuilder.addLongField("lastupdate");
+		echoClassDefinitionBuilder.addLongField("total");
+		echoClassDefinitionBuilder.addIntField("cores");
+		echoClassDefinitionBuilder.addIntField("ncampaigns");
+		echoClassDefinitionBuilder.addIntField("ecampaigns");
+		echoClassDefinitionBuilder.addBooleanField("nobidreason");	
+		ClassDefinition echoClassDefinition = echoClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(echoClassDefinition);	
+	}
+	
+	public static void registerWithHazelCast(Config config) {
+        config.getSerializationConfig().addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+        
+		ClassDefinitionBuilder nestedPortableClassBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, Reason.CLASS_ID);
+		nestedPortableClassBuilder.addLongField("count");
+		nestedPortableClassBuilder.addUTFField("name");
+		ClassDefinition nestedPortableClassDefinition = nestedPortableClassBuilder.build();
+	    config.getSerializationConfig().addClassDefinition(nestedPortableClassDefinition);
+		
+		ClassDefinitionBuilder creativeClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, CreativePerformance.CLASS_ID);
+		creativeClassDefinitionBuilder.addUTFField("creative");
+		creativeClassDefinitionBuilder.addBooleanField("_has__reasons");
+		creativeClassDefinitionBuilder.addPortableArrayField("reasons",nestedPortableClassDefinition);
+		creativeClassDefinitionBuilder.addLongField("total");
+		creativeClassDefinitionBuilder.addLongField("bids");
+		ClassDefinition creativeClassDefinition = creativeClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(creativeClassDefinition);
+		
+		ClassDefinitionBuilder campaignClassDefinitioBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, CampaignPerformance.CLASS_ID);
+		campaignClassDefinitioBuilder.addUTFField("campaign");
+		campaignClassDefinitioBuilder.addBooleanField("_has__creatives");
+		campaignClassDefinitioBuilder.addPortableArrayField("creatives",creativeClassDefinition);
+		campaignClassDefinitioBuilder.addLongField("total");
+		campaignClassDefinitioBuilder.addLongField("bids");
+		ClassDefinition campaignClassDefinition = campaignClassDefinitioBuilder.build();
+		config.getSerializationConfig().addClassDefinition(campaignClassDefinition);
+		
+		ClassDefinitionBuilder exchangeClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, ExchangePerformance.CLASS_ID);
+		exchangeClassDefinitionBuilder.addBooleanField("_has__campaigns");
+		exchangeClassDefinitionBuilder.addPortableArrayField("campaigns",campaignClassDefinition);
+		exchangeClassDefinitionBuilder.addUTFField("exchange");
+		exchangeClassDefinitionBuilder.addLongField("total");
+		exchangeClassDefinitionBuilder.addLongField("bids");
+		ClassDefinition exchangeClassDefinition = exchangeClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(exchangeClassDefinition);
+		
+		ClassDefinitionBuilder echoClassDefinitionBuilder = new ClassDefinitionBuilder(PortableEchoFactory.FACTORY_ID, Echo.CLASS_ID);
+		echoClassDefinitionBuilder.addUTFField("name");
+		echoClassDefinitionBuilder.addBooleanField("_has__campaigns");
+		echoClassDefinitionBuilder.addUTFArrayField("campaigns");
+		echoClassDefinitionBuilder.addIntField("percentage");
+		echoClassDefinitionBuilder.addBooleanField("stopped");
+		echoClassDefinitionBuilder.addLongField("request");
+		echoClassDefinitionBuilder.addLongField("bid");
+		echoClassDefinitionBuilder.addLongField("nobid");
+		echoClassDefinitionBuilder.addLongField("win");
+		echoClassDefinitionBuilder.addLongField("error");
+		echoClassDefinitionBuilder.addLongField("handled");
+		echoClassDefinitionBuilder.addLongField("unknown");
+		echoClassDefinitionBuilder.addIntField("loglevel");
+		echoClassDefinitionBuilder.addLongField("clicks");
+		echoClassDefinitionBuilder.addLongField("pixels");
+		echoClassDefinitionBuilder.addDoubleField("adspend");
+		echoClassDefinitionBuilder.addDoubleField("qps");
+		echoClassDefinitionBuilder.addDoubleField("avgx");
+		echoClassDefinitionBuilder.addLongField("fraud");
+		echoClassDefinitionBuilder.addIntField("threads");
+		echoClassDefinitionBuilder.addUTFField("memory");
+		echoClassDefinitionBuilder.addUTFField("freeDisk");
+		echoClassDefinitionBuilder.addUTFField("cpu");
+		/** Summary stats by exchanges */
+		// public List<Map>exchanges;
+		echoClassDefinitionBuilder.addBooleanField("_has__eperform");
+		echoClassDefinitionBuilder.addPortableArrayField("eperform",exchangeClassDefinition);
+		echoClassDefinitionBuilder.addUTFField("ipaddress");
+		echoClassDefinitionBuilder.addBooleanField("leader");
+		echoClassDefinitionBuilder.addLongField("lastupdate");
+		echoClassDefinitionBuilder.addLongField("total");
+		echoClassDefinitionBuilder.addIntField("cores");
+		echoClassDefinitionBuilder.addIntField("ncampaigns");
+		echoClassDefinitionBuilder.addIntField("ecampaigns");
+		echoClassDefinitionBuilder.addBooleanField("nobidreason");	
+		ClassDefinition echoClassDefinition = echoClassDefinitionBuilder.build();
+		config.getSerializationConfig().addClassDefinition(echoClassDefinition);	
+	}
+	
+	// https://github.com/codeset-projects/portable-tricks/blob/master/src/test/java/codeset/portable/tips/Case2Test.java
 	public Echo() {
 		super();
 		cmd = Controller.ECHO;
 		status = "ok";
+		
 	}
 	
 	public Echo(String s) {
@@ -135,11 +294,11 @@ public class Echo extends BasicCommand implements Portable {
 
 	@Override
 	public void writePortable(PortableWriter writer) throws IOException {
-		writer.writeInt("Lcampaigns",campaigns.size());
-		for (var i=0;i<campaigns.size();i++){
-			writer.writeUTF("campaigns:"+i, campaigns.get(i));
+		if (!(campaigns.size() == 0)) {
+			writer.writeUTFArray("campaigns",campaigns.toArray(new String[campaigns.size()]));
+			writer.writeBoolean("_has__campaigns", true);
 		}
-		writer.writeUTF("name", Configuration.getInstance().instanceName);
+		writer.writeUTF("name",this.name);
 		writer.writeInt("percentage",percentage);
 		writer.writeBoolean("stopped",stopped);
 		writer.writeLong("request",request);
@@ -151,7 +310,7 @@ public class Echo extends BasicCommand implements Portable {
 		writer.writeLong("unknown",unknown);
 		writer.writeInt("loglevel",loglevel);
 		writer.writeLong("clicks",clicks);
-		writer.writeLong("pixel",pixel);
+		writer.writeLong("pixels",pixels);
 		writer.writeDouble("adspend",adspend);
 		writer.writeDouble("qps",qps);
 		writer.writeDouble("avgx",avgx);
@@ -168,24 +327,23 @@ public class Echo extends BasicCommand implements Portable {
 		writer.writeInt("ncampaigns", ncampaigns);
 		writer.writeInt("ecampaigns", ecampaigns);
 		writer.writeBoolean("nobidreason",nobidreason);
-
-		writer.writeInt("Nperformance", eperform.size());
-		for (int i=0;i<eperform.size();i++) {
-			ExchangePerformance e = eperform.get(i);
-			e.writePortable(i, writer);
-		}
+		
+		if(!eperform.isEmpty()) {
+			writer.writePortableArray("eperform", eperform.toArray(new Portable[eperform.size()]));
+			writer.writeBoolean("_has__eperform", true);
+	    } 
 
 		/** Summary stats by exchanges */
 		//public List<Map>exchanges;
-		/** Campaign/creative performance map */
-		//public List cperform;
 	}
 
 	@Override
 	public void readPortable(PortableReader reader) throws IOException {
-		var size = reader.readInt("Lcampaigns");
-		for (var i=0; i < size; i++) {
-			campaigns.add(reader.readUTF("campaigns:"+i));
+		if(reader.readBoolean("_has__campaigns")) {
+			String [] c = reader.readUTFArray("campaigns");
+			for (String campaign : c) {
+				campaigns.add(campaign);
+			}
 		}
 		
 		name = reader.readUTF("name");
@@ -200,7 +358,7 @@ public class Echo extends BasicCommand implements Portable {
 		unknown = reader.readLong("unknown");
 		loglevel = reader.readInt("loglevel");
 		clicks = reader.readLong("clicks");
-		pixel = reader.readLong("pixel");
+		pixels = reader.readLong("pixels");
 		adspend = reader.readDouble("adspend");
 		qps = reader.readDouble("qps");
 		avgx = reader.readDouble("avgx");
@@ -218,11 +376,11 @@ public class Echo extends BasicCommand implements Portable {
 		ecampaigns = reader.readInt("ecampaigns");
 		nobidreason = reader.readBoolean("nobidreason");
 		
-		var n = reader.readInt("Nperformance");
-		for (int i=0;i<n;i++) {
-			ExchangePerformance p = new ExchangePerformance();
-			p.readPortable(i, reader);
-			eperform.add(p);
-		}
+		if(reader.readBoolean("_has__eperform")) {
+			Portable[] carray = reader.readPortableArray("eperform");
+	        for (Portable p:carray) {
+	        	eperform.add((ExchangePerformance) p);  
+	        }
+	     }
 	}
 }

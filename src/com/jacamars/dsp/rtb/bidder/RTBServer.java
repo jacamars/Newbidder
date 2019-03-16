@@ -50,6 +50,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.SerializerConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.nio.serialization.Portable;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.commands.Echo;
@@ -378,6 +379,7 @@ public class RTBServer implements Runnable {
     	        //    config.setManagementCenterConfig( new ManagementCenterConfig().setEnabled(true).setUrl(url));
 
     	        logger.info("*** Server STARTING ***");
+    			Echo.registerWithHazelCast(config);
     	        hz = Hazelcast.newHazelcastInstance(config);
     	}
         return hz;
@@ -953,7 +955,7 @@ public class RTBServer implements Runnable {
         e.handled = handled;
         e.unknown = unknown;
         e.clicks = clicks;
-        e.pixel = pixels;
+        e.pixels = pixels;
         e.fraud = fraud;
         e.adspend = adspend;
         e.loglevel = Configuration.getInstance().logLevel;

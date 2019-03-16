@@ -3,12 +3,14 @@ package com.jacamars.dsp.rtb.probe;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.LongAdder;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
 
-public class CampaignPerformance {
+public class CampaignPerformance implements Portable {
+	public static final int CLASS_ID = 4;
 	public String campaign;
 	public long total;
 	public long bids;
@@ -18,45 +20,40 @@ public class CampaignPerformance {
 		
 	}
 	
-	public void writePortable(int eindex, int index, PortableWriter writer) throws IOException {
-		StringBuilder key  = getKey(eindex,index);
-		StringBuilder sb = new StringBuilder();
-		
-		writer.writeUTF(sb.append(key).append("-campaign").toString(),campaign);
-		sb.setLength(0);
-		writer.writeLong(sb.append(key).append("-total").toString(),total);
-		sb.setLength(0);;
-		writer.writeLong(sb.append(key).append("-bids").toString(),bids);
-		sb.setLength(0);
-		writer.writeInt(sb.append(key).append("-Ncreatives").toString(),creatives.size());
-		sb.setLength(0);
-		for (var i = 0; i< creatives.size();i++) {
-			CreativePerformance cp = creatives.get(i);
-			cp.writePortable(eindex,index,i, writer);
-		}
+	@Override
+	public int getFactoryId() {
+		return PortableEchoFactory.FACTORY_ID;
 	}
-	
-	public void readPortable(int eindex, int index, PortableReader reader) throws IOException {
-		StringBuilder key  = getKey(eindex,index);
-		StringBuilder sb = new StringBuilder();
-		
-		campaign = reader.readUTF(sb.append(key).append("-campaign").toString());
-		sb.setLength(0);
-		total = reader.readLong(sb.append(key).append("-total").toString());
-		sb.setLength(0);;
-		bids = reader.readLong(sb.append(key).append("-bids").toString());
-		sb.setLength(0);
-		var n = reader.readInt(sb.append(key).append("-Ncreatives").toString());
-		sb.setLength(0);
-		for (var i = 0; i< n;i++) {
-			CreativePerformance cp = new CreativePerformance();
-			cp.readPortable(eindex,index,i,reader);
-			creatives.add(cp);
-		}
+
+	@Override
+	public int getClassId() {
+		// TODO Auto-generated method stub
+		return CLASS_ID;
 	}
-	
-	public StringBuilder getKey(int eindex, int index) {
-		StringBuilder k = new StringBuilder("exchange:").append(eindex).append("campaign:").append(index);
-		return k;
+
+	@Override
+	public void writePortable(PortableWriter writer) throws IOException {
+		writer.writeUTF("campaign",campaign);
+		writer.writeLong("total",total);
+		writer.writeLong("bids",bids);	
+		
+		 if(!creatives.isEmpty()) {
+			 writer.writePortableArray("creatives", creatives.toArray(new Portable[creatives.size()]));
+			 writer.writeBoolean("_has__creatives", true);
+	     }
+	}
+
+	@Override
+	public void readPortable(PortableReader reader) throws IOException {
+		campaign = reader.readUTF("campaign");
+		total = reader.readLong("total");
+		bids = reader.readLong("bids");
+		
+		if(reader.readBoolean("_has__creatives")) {
+			Portable[] carray = reader.readPortableArray("creatives");
+	        for (Portable p:carray) {
+	        	creatives.add((CreativePerformance) p);  
+	        }
+	     }
 	}
 }

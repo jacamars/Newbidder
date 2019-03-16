@@ -140,6 +140,7 @@ public class Commands {
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.getSerializationConfig()
 			.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+		Echo.registerWithHazelCast(clientConfig);
 		//clientConfig.setProperty("hazelcast.logging.type", "slf4j");
 
 		clientConfig.addAddress(cluster);

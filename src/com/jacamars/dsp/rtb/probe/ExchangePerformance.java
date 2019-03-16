@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
 
-public class ExchangePerformance {
+public class ExchangePerformance implements Portable {
+	public static final int CLASS_ID = 3;
 	public String exchange;
 	public long total;
 	public long bids;
@@ -16,46 +19,42 @@ public class ExchangePerformance {
 	public ExchangePerformance() {
 		
 	}
-	
-	public StringBuilder getKey(int index) {
-		StringBuilder k = new StringBuilder("exchange:").append(index);
-		return k;
+
+	@Override
+	public int getFactoryId() {
+		return PortableEchoFactory.FACTORY_ID;
 	}
-	
-	public void writePortable(int index, PortableWriter writer) throws IOException {
-		StringBuilder key  = getKey(index);
-		StringBuilder sb = new StringBuilder();
-		
-		writer.writeUTF(sb.append(key).append("-name").toString(),exchange);
-		sb.setLength(0);
-		writer.writeLong(sb.append(key).append("-total").toString(),total);
-		sb.setLength(0);;
-		writer.writeLong(sb.append(key).append("-bids").toString(),bids);
-		sb.setLength(0);
-		writer.writeInt(sb.append(key).append("-Ncampaigns").toString(),campaigns.size());
-		sb.setLength(0);
-		for (var i = 0; i< campaigns.size();i++) {
-			CampaignPerformance cp = campaigns.get(i);
-			cp.writePortable(index,i, writer);
-		}
+
+	@Override
+	public int getClassId() {
+		// TODO Auto-generated method stub
+		return CLASS_ID;
 	}
-	
-	public void readPortable(int index, PortableReader reader) throws IOException {
-		StringBuilder key  = getKey(index);
+
+	@Override
+	public void writePortable(PortableWriter writer) throws IOException {
 		
-		StringBuilder sb = new StringBuilder();
-		exchange = reader.readUTF(sb.append(key).append("-name").toString());
-		sb.setLength(0);
-		total = reader.readLong(sb.append(key).append("-total").toString());
-		sb.setLength(0);;
-		bids = reader.readLong(sb.append(key).append("-bids").toString());
-		sb.setLength(0);
-		var n = reader.readInt(sb.append(key).append("-Ncampaigns").toString());
-		sb.setLength(0);
+		writer.writeUTF("exchange",exchange);
+		writer.writeLong("total",total);
+		writer.writeLong("bids",bids);
 		
-		for (var i = 0; i< n;i++) {
-			CampaignPerformance cp = new CampaignPerformance(); 
-			cp.readPortable(index,i, reader);
-		}
+		if(!campaigns.isEmpty()) {
+			writer.writePortableArray("campaigns", campaigns.toArray(new Portable[campaigns.size()]));
+			writer.writeBoolean("_has__campaigns", true);
+	    } 
+	}
+
+	@Override
+	public void readPortable(PortableReader reader) throws IOException {
+		exchange = reader.readUTF("exchange");
+		total = reader.readLong("total");
+		bids = reader.readLong("bids");
+		
+		if(reader.readBoolean("_has__campaigns")) {
+			Portable[] carray = reader.readPortableArray("campaigns");
+	        for (Portable p:carray) {
+	        	campaigns.add((CampaignPerformance) p);  
+	        }
+	     } 
 	}
 }
