@@ -297,8 +297,6 @@ public class RTBServer implements Runnable {
      */
     public static void main(String[] args) {
 
-        getSharedInstance();
-        
         String fileName = "Campaigns/payday.json";
         String exchanges = null;
         String shard = "";
@@ -975,6 +973,9 @@ public class RTBServer implements Runnable {
         e.memory = mem;
         e.freeDisk = pf;
         e.cpu = perf;
+        e.cores = Performance.getCores();
+        e.ncampaigns =  Configuration.getInstance().getCampaignsList().size();
+        e.lastupdate = System.currentTimeMillis();
 
         return e;
     }

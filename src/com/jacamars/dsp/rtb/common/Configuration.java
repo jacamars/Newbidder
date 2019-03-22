@@ -500,11 +500,14 @@ public class Configuration {
 			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
 		}
 		
+		//////////////////// LOAD HAZELCAST PARAMETERS THEN INITIALIZE HAZELCAST ////////////////////
 		if (m.get("hazelcast") != null) {
 			Map<String,String> hazel = (Map)m.get("hazelcast");
 			mapstoredriver = hazel.get("mapstoredriver");
 			mapstorejdbc = hazel.get("mapstorejdbc");
 		}
+        RTBServer.getSharedInstance();
+        //////////////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Create forensiq

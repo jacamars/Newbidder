@@ -567,7 +567,7 @@ public enum BudgetController {
 		try {
 			if (hourly != null) {
 				budget = hourly.getDoubleValue();
-				spend = getCampaignDailySpend(id);
+				spend = getCampaignHourlySpend(id);
 				logger.debug("HOURLY {} budget: {} vs spend: {}", id, budget, spend);
 				if (spend >= budget) {
 					return true;
