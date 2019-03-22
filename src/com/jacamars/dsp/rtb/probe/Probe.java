@@ -171,17 +171,6 @@ public class Probe {
 		return list;
 	}
 	
-	public List<ExchangePerformance> getPerformance() {
-		List<ExchangePerformance> lep = new ArrayList();
-		
-		for (Map.Entry<String, ExchangeProbe> entry : probes.entrySet()) {
-			ExchangePerformance ep =entry.getValue().getExchangePeformance(); 
-			lep.add(ep);
-		}		
-		
-		return lep;
-	}
-	
 	public String getTable() {
 		StringBuilder table = new StringBuilder();
 		

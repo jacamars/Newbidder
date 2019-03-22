@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
+import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
 
 public class Reason implements Portable {
 	public static final int CLASS_ID = 6;
@@ -18,7 +18,7 @@ public class Reason implements Portable {
 
 	@Override
 	public int getFactoryId() {
-		return PortableEchoFactory.FACTORY_ID;
+		return PortableJsonFactory.FACTORY_ID;
 	}
 
 	@Override

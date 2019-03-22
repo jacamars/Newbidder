@@ -87,19 +87,6 @@ public class ExchangeProbe {
 		return report.toString();
 	}
 	
-	public ExchangePerformance getExchangePeformance() {
-		ExchangePerformance ep = new ExchangePerformance();
-		ep.exchange = exchange;;
-		ep.bids = getBids();
-		ep.total = getTotal();
-		
-		for (Map.Entry<String, CampaignProbe> entry : probes.entrySet()) {
-			ep.campaigns.add(entry.getValue().getCampaignPerformance());
-		}
-		
-		return ep;
-	}
-	
 	public void reportCsv(StringBuilder sb, long ztotal) {
 		String pre = System.currentTimeMillis() + "," + ztotal + ","  + exchange + "," + bids.sum()+",";
 		for (Map.Entry<String, CampaignProbe> entry : probes.entrySet()) {

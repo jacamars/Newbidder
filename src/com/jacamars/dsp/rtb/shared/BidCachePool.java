@@ -24,7 +24,6 @@ import com.hazelcast.core.ITopic;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.Echo;
-import com.jacamars.dsp.rtb.commands.PortableEchoFactory;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.RecordedBid;

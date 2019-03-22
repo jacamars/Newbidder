@@ -61,8 +61,6 @@ import com.jacamars.dsp.rtb.fraud.ForensiqClient;
 
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
-import com.jacamars.dsp.rtb.shared.CustomCampaignSmileSerializer;
-import com.jacamars.dsp.rtb.shared.CustomSmileSerializer;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.Env;
@@ -299,6 +297,8 @@ public class RTBServer implements Runnable {
      */
     public static void main(String[] args) {
 
+        getSharedInstance();
+        
         String fileName = "Campaigns/payday.json";
         String exchanges = null;
         String shard = "";
@@ -369,10 +369,7 @@ public class RTBServer implements Runnable {
     	if (hz == null) {
     		 Config config = new Config();
     	        config.setProperty("hazelcast.logging.type", "slf4j");
-    	        config.getSerializationConfig().getSerializerConfigs().add(
-    	                new SerializerConfig().
-    	                        setTypeClass(ObjectNode.class).
-    	                        setImplementation(new CustomSmileSerializer()));
+    	     
 
     	        // TBD: Move to configuration processor
     	        //if (url != null)
@@ -380,6 +377,7 @@ public class RTBServer implements Runnable {
 
     	        logger.info("*** Server STARTING ***");
     			Echo.registerWithHazelCast(config);
+    			Campaign.registerWithHazelCast(config);
     	        hz = Hazelcast.newHazelcastInstance(config);
     	}
         return hz;
@@ -405,7 +403,6 @@ public class RTBServer implements Runnable {
         hook.attachShutDownHook();
 
         Configuration.getInstance(fileName);
-        getSharedInstance();
         campaigns = CampaignSelector.getInstance(); // used to
 
         kickStart();
@@ -968,9 +965,7 @@ public class RTBServer implements Runnable {
         e.ipaddress = Performance.getInternalAddress();
         e.exchanges = BidRequest.getExchangeCounts();
         e.timestamp = System.currentTimeMillis();
-        if (CampaignProcessor.probe != null) {
-            e.eperform = CampaignProcessor.probe.getPerformance();
-        }
+        e.probe = CampaignProcessor.probe;
 
         String perf = Performance.getCpuPerfAsString();
         int threads = Performance.getThreadCount();

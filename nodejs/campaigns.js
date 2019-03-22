@@ -2,24 +2,24 @@ var Client = require('hazelcast-client').Client;
 var Config = require('hazelcast-client').Config;
 var CircularJSON = require('circular-json');
 
-function Member(json) {
+function Campaign(json) {
 	this.json = json;
 }
 
-Member.prototype.readPortable = function(reader) {
+Campaign.prototype.readPortable = function(reader) {
 	this.json = reader.readUTF("json");
 };
 
-Member.prototype.writePortable = function(writer) {
-
+Campaign.prototype.writePortable = function(writer) {
+	writer.writePortable("json",this.json);
 };
 
-Member.prototype.getFactoryId = function() {
+Campaign.prototype.getFactoryId = function() {
 	return 2;
 };
 
-Member.prototype.getClassId = function() {
-	return 2;
+Campaign.prototype.getClassId = function() {
+	return 3;
 };
 
 function PortableFactory() {
@@ -27,30 +27,30 @@ function PortableFactory() {
 }
 
 PortableFactory.prototype.create = function(classId) {
-	if (classId === 2) {
-		return new Member();
+	if (classId === 3) {
+		return new Campaign();
 	}
 	return null;
 };
 
 let cfg = new Config.ClientConfig();
 cfg.serializationConfig.portableFactories[2] = new PortableFactory();
-getMembers(cfg);
+getCampaigns(cfg);
 
-async function getMembers(config) {
+async function getCampaigns(config) {
 	let client = await Client.newHazelcastClient(config);
-	let members = await client.getMap('MEMBER');
-	let keyset = await members.keySet();
+	let campaigns = await client.getMap('CONTEXT');
+	let keyset = await campaigns.keySet();
 	for ( var key in keyset) {
 		let name = keyset[key];
-		await printMember(members, name)
+		await printCampaign(campaigns, name)
 		
 	}
 	//console.log("MEMBERS = " + CircularJSON.stringify(members, null, 2));
 }
 
-async function printMember(members, name) {
-	let member = await members.get(name);
+async function printCampaign(campaigns, name) {
+	let member = await campaigns.get(name);
 	console.log("*******************************************");
-	console.log("Member: " + name + "\n" + JSON.stringify(JSON.parse(member.json),null,2));
+	console.log("Campaign: " + name + "\n" + JSON.stringify(JSON.parse(member.json),null,2));
 }

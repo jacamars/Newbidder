@@ -11,6 +11,10 @@ public class EntryField implements Comparable<EntryField> {
     /** The numeric value */
     public long value;
 
+    public EntryField() {
+    	
+    }
+    
     /**
      * Create a sortable reasons key
      * @param key String. The reason.

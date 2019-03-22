@@ -10,13 +10,22 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.config.Config;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.ClassDefinition;
+import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
+import com.jacamars.dsp.rtb.commands.Echo;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
+import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
 /**
@@ -26,8 +35,8 @@ import com.jacamars.dsp.rtb.tools.DbTools;
  * @author Ben M. Faul
  *
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
-public class Campaign implements Comparable, com.hazelcast.nio.serialization.DataSerializable  {
+public class Campaign implements Comparable, Portable  {
+	public static final int CLASS_ID = 3;
 	
 	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
 	public boolean isAdx;
@@ -69,12 +78,41 @@ public class Campaign implements Comparable, com.hazelcast.nio.serialization.Dat
 	public CampaignBudget budget;
 
     private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
+    
+    
+    /**
+	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+	 * @param config ClientConfig. The configuration for the user.
+	 */
+	public static void registerWithHazelCast(ClientConfig config) {
+        config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
+        ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, Campaign.CLASS_ID);
+		portableCampaignClassBuilder.addUTFField("json");
+
+		ClassDefinition portablCampaignClassDefinition = portableCampaignClassBuilder.build();
+	    config.getSerializationConfig().addClassDefinition(portablCampaignClassDefinition);
+	}
+	
+	/**
+	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+	 * @param config ClientConfig. The configuration for the member.
+	 */
+	public static void registerWithHazelCast(Config config) {
+		config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
+	    ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, Campaign.CLASS_ID);
+	    portableCampaignClassBuilder.addUTFField("json");
+
+		ClassDefinition portableCampaignClassDefinition = portableCampaignClassBuilder.build();
+		config.getSerializationConfig().addClassDefinition(portableCampaignClassDefinition);
+	}
+	
 	/**
 	 * Empty constructor, simply takes all defaults, useful for testing.
 	 */
 	public Campaign() {
 
 	}
+
 	
 	public Campaign(String data) throws Exception {
 		
@@ -393,20 +431,33 @@ public class Campaign implements Comparable, com.hazelcast.nio.serialization.Dat
 	}
 
 	@Override
-	public void readData(ObjectDataInput arg) throws IOException {
-		String buf = arg.readUTF();
-		Campaign camp = DbTools.mapper.readValue(buf,Campaign.class);
-		try {
-			init(camp);
-		} catch (Exception error) {
-			throw (IOException)error;
-		}
+	public int getFactoryId() {
+		return PortableJsonFactory.FACTORY_ID;
+	}
+
+	@Override
+	public int getClassId() {
+		
+		return CLASS_ID;
+	}
+
+	@Override
+	public void writePortable(PortableWriter writer) throws IOException {
+		String json = DbTools.mapper.writeValueAsString(this);
+		writer.writeUTF("json", json);
 		
 	}
 
 	@Override
-	public void writeData(ObjectDataOutput arg) throws IOException {
-		String buf = DbTools.mapper.writeValueAsString(this);
-		arg.writeUTF(buf);
+	public void readPortable(PortableReader reader) throws IOException {
+		String json = reader.readUTF("json");
+		Campaign c = DbTools.mapper.readValue(json, Campaign.class);
+		try {
+			init(c);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
 }

@@ -31,6 +31,7 @@ import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FreqSetCache;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
+import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
 
 /**
  * A simple class that sends and receives commands from RTB4FREE bidders.
@@ -139,8 +140,9 @@ public class Commands {
 
 		ClientConfig clientConfig = new ClientConfig();
 		clientConfig.getSerializationConfig()
-			.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
+			.addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
 		Echo.registerWithHazelCast(clientConfig);
+		Campaign.registerWithHazelCast(clientConfig);
 		//clientConfig.setProperty("hazelcast.logging.type", "slf4j");
 
 		clientConfig.addAddress(cluster);
@@ -166,7 +168,6 @@ public class Commands {
 			else
 				str = key + " = " + DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(x);
 			System.out.println(str);
-			;
 			break;
 
 		case "getbid":
@@ -196,7 +197,7 @@ public class Commands {
 
 		case "show-campaigns":
 			clist = CampaignCache.getClientInstance(client).getCampaigns();
-			str = key + " = " + DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(clist);
+			str = DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(clist);
 			System.out.println(str);
 			break;
 
