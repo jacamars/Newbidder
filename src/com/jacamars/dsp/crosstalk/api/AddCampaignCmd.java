@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
-import com.jacamars.dsp.crosstalk.budget.Configuration;
+import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -110,7 +110,7 @@ public class AddCampaignCmd extends ApiCommand {
 			Date now = new Date();
 			Timestamp update = new Timestamp(now.getTime());
 
-			Configuration config = Configuration.getInstance();
+			CrosstalkConfig config = CrosstalkConfig.getInstance();
 			//String select = "select * from campaigns where  status = 'runnable' and activate_time <= ? and expire_time > ?";
 			String select = "select * from campaigns where status='runnable'";
 
@@ -126,7 +126,7 @@ public class AddCampaignCmd extends ApiCommand {
 			Date now = new Date();
 			Timestamp update = new Timestamp(now.getTime());
 
-			Configuration config = Configuration.getInstance();
+			CrosstalkConfig config = CrosstalkConfig.getInstance();
 
 			String select = "select * from campaigns where id = " + id;
 
@@ -147,7 +147,7 @@ public class AddCampaignCmd extends ApiCommand {
 		public static void handleNodes(ArrayNode nodes) throws Exception {
 
 			ResultSet rs;
-			Configuration config = Configuration.getInstance();
+			CrosstalkConfig config = CrosstalkConfig.getInstance();
 			Statement stmt = config.getStatement();
 			List<Integer> list = new ArrayList<Integer>();
 

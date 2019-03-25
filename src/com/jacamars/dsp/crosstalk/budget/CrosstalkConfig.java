@@ -5,7 +5,7 @@ import java.sql.Statement;
 import java.sql.Connection;
 import java.util.Map;
 
-public enum Configuration {
+public enum CrosstalkConfig {
 
 	CONFIGURATION;
 	
@@ -14,19 +14,18 @@ public enum Configuration {
 	static String region;
 	static Elk elk;
 	
-	public static Configuration getInstance(Map crosstalk) throws Exception {
-		/**
-		 * Now connect to SQL
-		 */
-		// load the MySQL driver
-		Class.forName("com.mysql.jdbc.Driver");
-		DriverManager.setLoginTimeout(20);
+	public static CrosstalkConfig getInstance(Map crosstalk) throws Exception {
+
+		Map sql = (Map)crosstalk.get("sql");
 		
-		String driver = (String)crosstalk.get("jdbcdriver");
+		var driver = sql.get("jdbcdriver");
 		if (driver == null)
 			throw new Exception("Crosstalk subsystem requires a jdbcdriver");
 		
-		String jdbc = (String)crosstalk.get("login");
+		Class.forName((String)driver);
+		DriverManager.setLoginTimeout(20);
+		
+		var jdbc = sql.get("login");
 		if (jdbc == null)
 			throw new Exception("Crosstalk subsystem requires jdbc login configuration");
 		
@@ -34,7 +33,7 @@ public enum Configuration {
 		if (region == null)
 			throw new Exception("Crosstalk subsystem requires a region");
 		
-		connect = DriverManager.getConnection(jdbc);
+		connect = DriverManager.getConnection((String)jdbc);
 		statement = connect.createStatement();
 		
 		if (crosstalk.get("elk")==null) 
@@ -44,7 +43,7 @@ public enum Configuration {
 		return CONFIGURATION;
 	}
 	
-	public static Configuration getInstance() {
+	public static CrosstalkConfig getInstance() {
 		return CONFIGURATION;
 	}
 	

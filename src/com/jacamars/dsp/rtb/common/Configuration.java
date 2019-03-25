@@ -39,6 +39,7 @@ import com.amazonaws.services.s3.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.google.common.collect.Sets;
+import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.DeadmanSwitch;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 
@@ -500,6 +501,15 @@ public class Configuration {
 			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
 		}
 		
+		/////////////////// INIIIALIZE CROSSTALK ///////////////////////////////////////////////////
+		if (m.get("crosstalk")==null) {
+			logger.error("No crosstalk is defined, not allowed.");
+			RTBServer.panicStop();
+			return;
+		}
+		CrosstalkConfig.getInstance((Map)m.get("crosstalk"));
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		
 		//////////////////// LOAD HAZELCAST PARAMETERS THEN INITIALIZE HAZELCAST ////////////////////
 		if (m.get("hazelcast") != null) {
 			Map<String,String> hazel = (Map)m.get("hazelcast");
@@ -775,7 +785,7 @@ public class Configuration {
 		if (winUrl.contains("localhost")) {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
 		}
-
+		
 		printEnvironment();
 	}
 

@@ -160,7 +160,7 @@ public class AccountingCampaign {
 		campaignid = getMyNode().get(CAMPAIGN_ID).asInt();
 		campaign.adId = "" + campaignid;
 
-		adomain = getMyNode().get("ad_domain").asText();
+		campaign.adomain = getMyNode().get("ad_domain").asText();
 
 	}
 	

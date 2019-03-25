@@ -382,6 +382,9 @@ public class RTBServer implements Runnable {
     }
     
     public static boolean isLeader() {
+    	if (!hz.getLifecycleService().isRunning())
+    		return false;
+    	
         return hz.getCluster().getMembers().iterator().next().localMember();
     }
 
