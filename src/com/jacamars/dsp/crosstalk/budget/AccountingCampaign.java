@@ -5,7 +5,10 @@ import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Creative;
 
 import com.jacamars.dsp.rtb.tools.DbTools;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.slf4j.Logger;
@@ -80,12 +83,89 @@ public class AccountingCampaign {
 	static final Logger logger = LoggerFactory.getLogger(AccountingCampaign.class);
 	
 	public CampaignBudget budget;
+	
+	/** The exchanges this campaign can be used with */
+	protected List<String> exchanges = new ArrayList<String>();
 
+	/** blocked categories */
+	protected List<String> bcat = new ArrayList<String>();
+
+	transient JsonNode myNode;
 	/**
 	 * Default constructor.
 	 */
 	public AccountingCampaign() {
 
+	}
+	
+	public AccountingCampaign(JsonNode myNode) throws Exception {
+		
+		campaignid = getMyNode().get(CAMPAIGN_ID).asInt();
+		budget.cost = new AtomicBigDecimal(getMyNode().get("cost").asDouble());
+		budget.dailyCost = new AtomicBigDecimal(getMyNode().get("daily_cost").asDouble(0.0));
+		budget.hourlyCost = new AtomicBigDecimal(getMyNode().get("hourly_cost").asDouble(0.0));
+		budget.expire_time = getMyNode().get(EXPIRE_TIME).asLong();
+		budget.activate_time = getMyNode().get(ACTIVATE_TIME).asLong();
+		budget.total_budget = new AtomicBigDecimal(getMyNode().get(TOTAL_BUDGET).asDouble());
+
+		if (getMyNode().get(DAYPART) != null && getMyNode().get(DAYPART) instanceof MissingNode == false) {
+				String parts = getMyNode().get(DAYPART).asText();
+				if (parts.equals("null") || parts.length()==0)
+					budget.daypart = null;
+			else
+				budget.daypart = new DayPart(parts);
+		} else
+			budget.daypart = null;
+
+		if (getMyNode().get("bcat") != null) {
+			String str = getMyNode().get("bcat").asText();
+			if (str.trim().length() != 0) {
+				if (str.equals("null")==false)
+					Targeting.getList(bcat, str);
+			}
+		}
+
+		if (getMyNode().get("exchanges") != null && getMyNode().get("exchanges").asText().length() != 0) {
+			exchanges.clear();
+			String str = getMyNode().get("exchanges").asText(null);
+			if (str != null) {
+				Targeting.getList(exchanges, str);
+			}
+		}
+
+		Object x = getMyNode().get(DAILY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			if (budget.dailyBudget == null || (budget.dailyBudget.doubleValue() != getMyNode().get(DAILY_BUDGET).asDouble())) {
+				budget.dailyBudget = new AtomicBigDecimal(getMyNode().get(DAILY_BUDGET).asDouble());
+			}
+		} else
+			budget.dailyBudget = null;
+
+		x = getMyNode().get(HOURLY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			if (budget.hourlyBudget == null || (budget.hourlyBudget.doubleValue() != getMyNode().get(HOURLY_BUDGET).asDouble())) {
+				budget.hourlyBudget = new AtomicBigDecimal(getMyNode().get(HOURLY_BUDGET).asDouble());
+			}
+		} else
+			budget.hourlyBudget = null;
+
+		x = getMyNode().get("targetting");
+		if (x instanceof NullNode) {
+			if (!isActive())
+				return;
+			throw new Exception("Can't have null targetting for campaign " + campaignid);
+		}
+
+		campaign = new Campaign();
+		campaignid = getMyNode().get(CAMPAIGN_ID).asInt();
+		campaign.adId = "" + campaignid;
+
+		adomain = getMyNode().get("ad_domain").asText();
+
+	}
+	
+	JsonNode getMyNode() {
+		return myNode;
 	}
 	
 	public AccountingCampaign(Campaign c) throws Exception {
@@ -354,5 +434,9 @@ public class AccountingCampaign {
 	
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public String toJson() throws Exception {
+		return DbTools.mapper.writeValueAsString(this);
 	}
 }
