@@ -9,6 +9,23 @@
     "db" : "local/GeoIP2-ISP.mmdb",
     "watchlist" : [ "Hetzner", "Amazon web services", "Linode", "Digital Ocean", "Vultr" ]
   },
+  "hazelcast": {
+  	"mapstoredriver": "org.postgresql.Driver",
+  	"mapstorejdbc": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres"
+  },
+  "crosstalk": {
+  	"sql": {
+  		"jdbcdriver": "org.postgresql.Driver",
+  		"login": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres"
+  	},
+  	"elk": {
+    	"XsimFile": "simdata/debug.sim",
+    	"host": "$GHOST",
+    	"agghost": "$AHOST",
+    	"port": "$ESPORT"
+    },
+  	"region": "US"
+  },
   "app" : {
     "indexPage": "$INDEXPAGE",
     "concurrency" : "3",

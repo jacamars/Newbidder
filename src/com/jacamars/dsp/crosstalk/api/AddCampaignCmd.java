@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
+import com.jacamars.dsp.crosstalk.budget.Configuration;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -23,7 +24,7 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
  *
  */
 public class AddCampaignCmd extends ApiCommand {
-	public static Map<Integer, JsonNode> gloablRtbSpecification;
+	public static Map<Integer, JsonNode> globalRtbSpecification;
 	public static ArrayNode campaignRtbStd;
 	public static ArrayNode bannerRtbStd;
 	public static ArrayNode videoRtbStd;
@@ -155,7 +156,7 @@ public class AddCampaignCmd extends ApiCommand {
 				int campaignid = x.get("id").asInt();
 				String regions = x.get("regions").asText();
 				regions = regions.toLowerCase();
-				if (regions.contains(Configuration.getInstance().config.region.toLowerCase())) {
+				if (regions.contains(config.getRegion().toLowerCase())) {
 					int targetid = x.get("target_id").asInt();
 					rs = stmt.executeQuery("select * from targets where id = " + targetid);
 					ArrayNode inner = ResultSetToJSON.convert(rs);
@@ -179,13 +180,13 @@ public class AddCampaignCmd extends ApiCommand {
 				return;
 
 			// /////////////////////////// GLOBAL rtb_spec
-			gloablRtbSpecification = new HashMap<Integer, JsonNode>();
+			globalRtbSpecification = new HashMap<Integer, JsonNode>();
 			rs = stmt.executeQuery("select * from " + RTB_STD);
 			ArrayNode std = ResultSetToJSON.convert(rs);
 			Iterator<JsonNode> it = std.iterator();
 			while (it.hasNext()) {
 				JsonNode child = it.next();
-				gloablRtbSpecification.put(child.get("id").asInt(), child);
+				globalRtbSpecification.put(child.get("id").asInt(), child);
 			}
 
 			campaignRtbStd = ResultSetToJSON.factory.arrayNode();

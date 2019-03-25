@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jacamars.dsp.crosstalk.api.AddCampaignCmd;
 import com.jacamars.dsp.rtb.common.Node;
 
 /**
@@ -89,7 +90,7 @@ public class RtbStandard {
 			for (String v : values) {
 				v = v.trim();
 				Integer key = new Integer(v);
-				JsonNode x = Scanner.gloablRtbSpecification.get(key);
+				JsonNode x = AddCampaignCmd.globalRtbSpecification.get(key);
 				if (x != null) {
 					String m_spec = x.get("rtbspecification").asText(null);
 					String m_operator = x.get("operator").asText(null);
