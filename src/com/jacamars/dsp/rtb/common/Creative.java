@@ -7,12 +7,27 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.fasterxml.jackson.core.util.BufferRecyclers;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
+import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
+import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.crosstalk.budget.RtbStandard;
+import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.exchanges.Nexage;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
@@ -145,13 +160,101 @@ public class Creative  {
 	/** A sorter for the campaign/creative attributes, who is most likely to cause a false will bubble up */
 	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
 	
-	public CreativeBudget budget;
+	/** The budget for this creative */
+	public Budget budget;
+	
+	/** This class's logger */
+	static final Logger logger = LoggerFactory.getLogger(Creative.class);
+	
+	/**
+	 * Components used for creating creatives from JSON derived from SQL
+	 */
+	/** The campaign this creative belongs to */
+	transient int campaignid;	
+	/** The id of the cre4ative, as a string */
+	transient String bannerid; 
+	/** Width of the creative */
+	transient int width = 0;	
+	/** Height of the creative */
+	transient int height = 0;
+	/** The type, as in 'banner' or 'video' */
+	transient String type;
+	/** The json node derived from SQL */
+	transient JsonNode node;
+	// //////////////// BANNER SPECIFIC TARGETING	
+	/** When true, this is a banner, else it is a video. Will need updating for native and audio support */
+	transient boolean isBanner;
+	/** The content type of the banner template */
+	transient String contenttype = "";
+	/** The HTML snippet for the banner */
+	transient String htmltemplate = "";
+	// ////////////// VIDEO SPECIFIC TARGETTING	
+	/** The video duration */
+	transient int video_duration = 0;	
+	/** The video width */
+	transient int video_width = 0;
+	/** The video height */
+	transient int video_height = 0;	
+	/** The video type */
+	transient String video_type = "";
+	/** The video XML */
+	transient String video_data = null;
+	/** The video VAST protcol */
+	transient int video_protocol = 2;	
+	/** The video linearity */
+	transient int video_linearity = 1;
+	/** The bitrate of the video */
+	transient Integer video_bitrate;
+	/** The mime type of the video */
+	transient String video_mimetype = null;
+	/** The table name where this thing is stored in sql */
+	transient String tableName = null;
+	/** The position on the page for the creative */
+	transient String position;
+	transient AtomicBigDecimal bid_ecpm = new AtomicBigDecimal(0);
+	transient boolean interstitialOnly = false;
+	private final String INTERSTITIAL = "interstitial";
+	/** SQL name for the total cost attribute */
+	private static final String TOTAL_COST = "total_cost";	
+	/** SQL name for the hourly cost attribute */
+	private static final String HOURLY_COST = "hourly_cost";	
+	/** SQL name for the daily cost attribute */
+	private static final String DAILY_COST = "daily_cost";	
+	/** SQL name for the id of this creative */
+	private static final String BANNER_ID = "id";	
+	/** SQL name for the campaign that owns this record */
+	private static final String CAMPAIGN_ID = "campaign_id";	
+	/** SQL name for the image URL attribute */
+	private static final String IMAGE_URL = "iurl";	
+	/** SQL name for the updated attribute */
+	private static final String UPDATED = "updated_at";	
+	/** SQL name for the content type attribute */
+	private static final String CONTENT_TYPE = "contenttype";	
+	/** SQL name for the html snippet for this banner */
+	private static final String HTML_TEMPLATE = "htmltemplate";	
+	/** SQL name for the daily budget of this creative */
+	private static final String DAILY_BUDGET = "daily_budget";	
+	/** SQL name for the hourly budget */
+	private static final String HOURLY_BUDGET = "hourly_budget";
+	/** SQL name for the vast data attribute */
+	private static final  String VAST_DATA = "vast_video_outgoing_file";
+
+
 
 	/**
 	 * Empty constructor for creation using json.
 	 */
 	public Creative() {
 
+	}
+	
+	public Creative(JsonNode node, boolean isBanner) throws Exception {
+		this.isBanner = isBanner;
+		if (isBanner)
+			tableName = "banners";
+		else
+			tableName = "banner_videos";
+		update(node);
 	}
 
 	/**
@@ -680,5 +783,490 @@ public class Creative  {
 				return n;
 		}
 		return null;
+	}
+	
+	////////////////////////
+	
+	public boolean runUsingElk(String cid) {
+
+		try {
+			budget.totalCost.set(BudgetController.getInstance().getCreativeTotalSpend(cid, impid, getType()));
+			budget.dailyCost.set(BudgetController.getInstance().getCreativeDailySpend(cid, impid, getType()));
+			budget.hourlyCost.set(BudgetController.getInstance().getCreativeHourlySpend(cid, impid, getType()));
+		
+			logger.debug("*** ELK TEST: Updating budgets: {}/{}/{}",cid, impid, getType());
+			logger.debug("Total cost: {} hourly cost: {}, daily_cost: {}",budget.totalCost.getDoubleValue(),
+					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
+		} catch (Exception error) {
+			error.printStackTrace();
+		}
+		return true;
+	}
+	
+	String getType() {
+		if (isNative())
+			return "native";
+		if (isVideo())
+			return "video";
+		return "banner";
+	}
+	
+	public boolean isActive(String cid) throws Exception {
+
+		if (budgetExceeded(cid))
+			return false;
+		return true;
+	}
+
+	public void stop() {
+
+	}
+
+	String clean(String data) {
+		String[] lines = data.split("\n");
+		String rc = "";
+		for (String s : lines) {
+			rc += s.trim();
+		}
+		return rc;
+	}
+
+	/**
+	 * Determine if the budget was exceeded.
+	 * @return boolean. Returns true if the budget was exceeded.
+	 * @throws Exception on Elk errors.
+	 */
+	public boolean budgetExceeded(String cid) throws Exception {
+			logger.debug("********* CHECKING BUDGET FOR CREATIVE {} of campaign {}",impid, cid);
+			if (budget == null)
+				return false;
+			return BudgetController.getInstance().checkCreativeBudgets(cid, impid, getType(),
+						budget.totalBudget, budget.dailyBudget, budget.hourlyBudget);
+	}
+
+
+	protected List<String> getList(String text) {
+		List<String> temp = new ArrayList<String>();
+		if (text != null && text.length() > 0) {
+			String[] parts = text.split(",");
+			for (String part : parts) {
+				temp.add(part);
+			}
+		}
+		return temp;
+
+	}
+
+	/**
+	 * Set the new total budget. Used by the api.
+	 * @param amount double. The value to set.
+	 */
+	public void setTotalBudget(double amount) {
+		budget.totalBudget.set(amount);
+	}
+
+	/**
+	 * Set the new total daily. Used by the api.
+	 * @param amount double. The value to set.
+	 */
+	public void setDailyBudget(double amount) {
+		budget.dailyBudget.set(amount);
+	}
+
+	/**
+	 * Set the new hourly budget. Used by the api.
+	 * @param amount double. The value to set.
+	 */
+	public void setHourlyBudget(double amount) {
+		budget.hourlyBudget.set(amount);
+	}
+	
+	/**
+	 * Compile the class into the JSON that will be loaded into Aerospike.
+	 * @return Creative. The actual RTB4FREE creative.
+	 * @throws Exception on JSON errors.
+	 */
+	public void compile() throws Exception {
+		attributes.clear();
+
+		price = bid_ecpm.doubleValue();
+		impid = "" + bannerid;
+
+		if (isBanner) {
+			if (contenttype != null && (contenttype.equalsIgnoreCase("OVERRIDE"))) {
+				adm_override = true;
+			} else {
+				adm_override = false;
+				contenttype = MimeTypes.determineType(htmltemplate);
+				if (contenttype != null) {
+					Node n = new Node("contenttype", "imp.0.banner.mimes", Node.MEMBER, contenttype);
+					n.notPresentOk = true;
+					attributes.add(n);
+				}
+			}
+
+			///////// Handle the height and width ///////////////////////////
+			if (width == 0 || height == 0) {
+				addDimensions();
+			} else {
+				w = width;
+				h = height;
+			}
+
+			forwardurl = htmltemplate;
+
+			if (position != null && position.length() > 0) {
+				String[] data = position.split(",");
+				List<Integer> positions = new ArrayList<Integer>();
+				for (String s : data) {
+					s = s.trim();
+					positions.add(Integer.parseInt(s));
+				}
+				if (positions.size() > 0) {
+					if ((positions.size() == 1 && positions.get(0) != 0) || positions.size() > 0) {
+						Node n = new Node("position", "imp.0.banner.pos", Node.INTERSECTS, positions);
+						attributes.add(n);
+						n.notPresentOk = true;
+					}
+				}
+
+			}
+
+		} else
+			compileVideo();
+
+		if (interstitialOnly) {
+			Node n = new Node(INTERSTITIAL, "imp.0.instl", Node.EQUALS, 1);
+			n.notPresentOk = false;
+			attributes.add(n);
+		}
+
+		compileExchangeAttributes();
+		handleDeals();
+		doStandardRtb();
+	}
+	
+	/**
+	 * Compiles the exchange specific attributes, like for Stroer and Adx.
+	 * 
+	 * @param creative
+	 *            Creative. The creative we are attaching the extensions for.
+	 */
+	public void compileExchangeAttributes() throws Exception {
+		String theKey = "banner_id";
+
+		extensions = new HashMap();
+		AdxCreativeExtensions x = null;
+
+		if (!isBanner)
+			theKey = "banner_video_id";
+
+		for (JsonNode node : Crosstalk.getInstance().exchangeAttributes) {
+			String id;
+			if ((id = node.get(theKey).asText("-1")).equals(bannerid)) {
+				String key = node.get("name").asText(null);
+				String value = node.get("value").asText(null);
+				String exchange = node.get("exchange").asText("");
+
+				if (exchange.equalsIgnoreCase("adx")) {
+					if (x == null) {
+						x = new AdxCreativeExtensions();
+						adxCreativeExtensions = x;
+					}
+					switch (key) {
+					case "click_thru_url":
+						x.adxClickThroughUrl = value;
+						break;
+					case "tracking_url":
+						x.adxTrackingUrl = value;
+						break;
+					case "categories":
+						value = value.replaceAll("\"", "");
+						value = value.replaceAll("\\[", "");
+						value = value.replaceAll("\\]", "");
+						x.adxCategory = new Integer(value);
+						break;
+					case "vendor_type":
+						try {
+							x.adxVendorType = new Integer(value);
+						} catch (Exception error) {
+							x.adxVendorType = 0;
+							logger.error("{}/{}, creative  has bad vendor_type: ", bannerid, getType(),value);
+						}
+						break;
+					case "attributes":
+						value = value.substring(1, value.length() - 1);
+						value = value.replaceAll("\"", "");
+						List<String> list = getList(value);
+						x.attributes = new ArrayList<Integer>();
+						for (String s : list) {
+							x.attributes.add(Integer.parseInt(s));
+						}
+						break;
+					}
+				} else {
+					extensions.put(key, value);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Compile the video specific components of a creative.
+	 * 
+	 * @param c
+	 *            Campaign. The campaign to attach to.
+	 * @throws Exception
+	 *             on JSON parsing errors.
+	 */
+	protected void compileVideo() throws Exception {
+		videoDuration = video_duration;
+		videoMimeType = video_type;
+
+		///////////// Handle width and height /////////////////////////////
+		if (video_width == 0 || video_height == 0) {
+			addDimensions();
+		} else {
+			// Old Style
+			w = video_width;
+			h = video_height;
+		}
+		//////////////////////////////////////////////////////////////////
+
+		videoProtocol = video_protocol;
+		attributes = new ArrayList<Node>();
+
+		if (video_bitrate != null) {
+			Node n = new Node("contenttype", "imp.0.video.bitrate", Node.GREATER_THAN_EQUALS, video_bitrate);
+			n.notPresentOk = true;
+			attributes.add(n);
+		}
+
+		String theVideo;
+
+		videoLinearity = video_linearity;
+		if (video_data.startsWith("http")) {
+			HttpPostGet hp = new HttpPostGet();
+			theVideo = hp.sendGet(video_data, 5000, 5000);
+		} else if (video_data.startsWith("file")) {
+			String fname = video_data.substring(7);
+			theVideo = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
+		} else {
+			theVideo = video_data;
+		}
+
+		StringBuilder sb = new StringBuilder(theVideo);
+		xmlEscapeEncoded(sb);
+		theVideo = sb.toString();
+
+		adm = new ArrayList<String>();
+		adm.add(theVideo);
+	}
+
+	void addDimensions() {
+		String[] parts = null;
+		Dimension d = null;
+		String key = null;
+
+		// Is this a width dimension?
+		if (node.get("width_range") != null) {
+			key = node.get("width_range").asText(null);
+			if (key != null) {
+				dimensions = new Dimensions();
+				parts = key.split("-");
+				int leftX = Integer.parseInt(parts[0].trim());
+				int rightX = Integer.parseInt(parts[1].trim());
+				d = new Dimension(leftX, rightX, -1, -1);
+				dimensions.add(d);
+				return;
+			}
+		}
+
+		// Is this a height dimension
+		if (node.get("height_range") != null) {
+			key = node.get("height_range").asText(null);
+			if (key != null) {
+				dimensions = new Dimensions();
+				parts = key.split("-");
+				int leftY = Integer.parseInt(parts[0].trim());
+				int rightY = Integer.parseInt(parts[1].trim());
+				d = new Dimension(-1, -1, leftY, rightY);
+				dimensions.add(d);
+				return;
+			}
+		}
+
+		// Is this WxH, ... list
+		if (node.get("width_height_list") != null) {
+			key = node.get("width_height_list").asText(null);
+			if (key != null && key.length() > 0) {
+				dimensions = new Dimensions();
+				String[] elements = key.split(",");
+				for (String s : elements) {
+					parts = s.split("x");
+					int w = Integer.parseInt(parts[0].trim());
+					int h = Integer.parseInt(parts[1].trim());
+					d = new Dimension(w, h);
+					dimensions.add(d);
+				}
+			}
+		}
+	}
+
+	/**
+	 * XML Escape a stringbuilder budder.
+	 * 
+	 * @param sb
+	 *            StringBuilder. The data escape.
+	 */
+	private void xmlEscapeEncoded(StringBuilder sb) {
+		int i = 0;
+		while (i < sb.length()) {
+			i = sb.indexOf("%26", i);
+			if (i == -1)
+				return;
+			if (!(sb.charAt(i + 3) == 'a' && sb.charAt(i + 4) == 'm' && sb.charAt(i + 5) == 'p'
+					&& sb.charAt(i + 6) == ';')) {
+
+				sb.insert(i + 3, "amp;");
+			}
+			i += 7;
+		}
+	}
+
+	/**
+	 * Attach any defined deals to the creative. deal,deal,deal. Where
+	 * deal=id:price, thus id:price,id:price...
+	 * 
+	 * @param c
+	 *            Campaign. The RTB campaign using the dealsl.
+	 */
+	void handleDeals() {
+		deals.clear();
+		if (node.get("deals") == null)
+			return;
+
+		String spec = node.get("deals").asText(null);
+		if (spec == null || spec.trim().length() == 0)
+			return;
+		deals = new Deals();
+		String[] parts = spec.split(",");
+		for (String part : parts) {
+			Deal d = new Deal();
+			String[] subpart = part.split(":");
+			d.id = subpart[0].trim();
+			d.price = Double.parseDouble(subpart[1].trim());
+			deals.add(d);
+		}
+	}
+	
+	/**
+	 * Call after you compile!
+	 * @param creative Creative. The RTB4FREE campaign to send out to the bidders.
+	 * @throws Exception
+	 *             on JSON errors
+	 */
+	void doStandardRtb() throws Exception {
+		ArrayNode array = ResultSetToJSON.factory.arrayNode();
+		ArrayNode list;
+		String rkey;
+		int theId = Integer.parseInt(bannerid);
+		if (isBanner) {
+			list = Crosstalk.getInstance().bannerRtbStd;
+			rkey = "banner_id";
+		} else {
+			list = Crosstalk.getInstance().videoRtbStd;
+			rkey = "banner_video_id";
+
+		}
+		for (int i = 0; i < list.size(); i++) {
+			JsonNode node = list.get(i);
+			if (theId == node.get(rkey).asInt()) {
+				Integer key = node.get("rtb_standard_id").asInt();
+				JsonNode x = Crosstalk.getInstance().globalRtbSpecification.get(key);
+				array.add(x);
+			}
+		}
+		RtbStandard.processStandard(array, attributes);
+	}
+	
+	public void update(JsonNode myNode) throws Exception {
+		node = myNode;
+		budget = new Budget();
+		double dt = myNode.get(TOTAL_COST).asDouble(0);
+		budget.totalCost.set(dt);
+		budget.hourlyCost = new AtomicBigDecimal(myNode.get(HOURLY_COST).asDouble(0.0));
+		budget.dailyCost = new AtomicBigDecimal(myNode.get(DAILY_COST).asDouble(0.0));
+
+		Object x = myNode.get(DAILY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			budget.dailyBudget = new AtomicBigDecimal(myNode.get(DAILY_BUDGET).asDouble());
+		}
+
+		x = myNode.get(HOURLY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			budget.hourlyBudget = new AtomicBigDecimal(myNode.get(HOURLY_BUDGET).asDouble());
+		}
+
+		process();
+	}
+
+	public void process() throws Exception {
+		bannerid = node.get(BANNER_ID).asText();
+		campaignid = node.get(CAMPAIGN_ID).asInt();
+		if (isBanner) {
+			imageurl = node.get(IMAGE_URL).asText(null);
+		}
+		budget = new Budget();
+		budget.totalBudget.set(node.get("total_basket_value").asDouble());
+		budget.activate_time = node.get("interval_start").asLong();
+		budget.expire_time = node.get("interval_end").asLong();
+
+		bid_ecpm.set(node.get("bid_ecpm").asDouble());
+
+		if (isBanner) {
+			width = node.get("width").asInt();
+			height = node.get("height").asInt();
+
+			contenttype = node.get(CONTENT_TYPE).asText();
+
+			htmltemplate = node.get(HTML_TEMPLATE).asText();
+
+			htmltemplate = htmltemplate.replaceAll("\n", "");
+			htmltemplate = htmltemplate.replaceAll("\r", "");
+
+			if (node.get("position") != null)
+				position = node.get("position").asText(null);
+		} else {
+			video_duration = node.get("vast_video_duration").asInt();
+			video_width = node.get("vast_video_width").asInt();
+			video_height = node.get("vast_video_height").asInt();
+
+			video_type = node.get("mime_type").asText();
+			video_linearity = node.get("vast_video_linerarity").asInt();
+
+			video_data = node.get(this.VAST_DATA).asText();
+			if (node.get("vast_video_protocol") != null) {
+				video_protocol = node.get("vast_video_protocol").asInt();
+			}
+			video_data = clean(video_data.trim());
+
+			if (node.get("bitrate") != null) {
+				video_bitrate = new Integer(node.get("bitrate").asInt());
+			}
+		}
+
+		if (node.get(INTERSTITIAL) != null && node.get(INTERSTITIAL) instanceof MissingNode == false) {
+			int x = node.get(INTERSTITIAL).asInt();
+			if (x == 1)
+				interstitialOnly = true;
+			else
+				interstitialOnly = false;
+		} else
+			interstitialOnly = false;
+
+		if (node.get("status") != null && node.get("status") instanceof MissingNode == false) {
+			status = node.get("status").asText();
+		}
 	}
 }

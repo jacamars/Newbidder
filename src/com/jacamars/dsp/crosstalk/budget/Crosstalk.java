@@ -1,10 +1,13 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,20 +20,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hazelcast.config.Config;
-import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.IMap;
-import com.hazelcast.map.listener.EntryAddedListener;
-import com.hazelcast.map.listener.EntryEvictedListener;
-import com.hazelcast.map.listener.EntryRemovedListener;
-import com.hazelcast.map.listener.EntryUpdatedListener;
 
+import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
-import com.jacamars.dsp.rtb.tools.Performance;
+import com.jacamars.dsp.rtb.tools.DbTools;
 
 public enum Crosstalk {
 
@@ -45,10 +43,17 @@ public enum Crosstalk {
 	}
 
 	/** The cache to contain the general context info on runing campaigns */
-	public static volatile IMap<String, AccountingCampaign> campaigns;
+	public static volatile IMap<String, Campaign> campaigns;
 
 	/** The cache to contain the general context info on runing campaigns */
-	public static volatile IMap<String, AccountingCampaign> deletedCampaigns;
+	public static volatile IMap<String, Campaign> deletedCampaigns;
+	
+	/**
+	 * creatives in a map, for fast lookup on win notifications and rollups.
+	 * Note creatives are not deleted
+	 */
+	public static volatile Map<String, Creative> creativesMap = new ConcurrentHashMap<String, Creative>();
+
 
 	/** The default backup count if you dont set it */
 	static public int backupCount = 3;
@@ -56,14 +61,32 @@ public enum Crosstalk {
 	/** The default value to read backups, is true */
 	static public boolean readBackup = true;
 	
+	public static Map<Integer, JsonNode> globalRtbSpecification;
+	public static ArrayNode campaignRtbStd;
+	public static ArrayNode bannerRtbStd;
+	public static ArrayNode videoRtbStd;
+	public static ArrayNode exchangeAttributes;
+	
+	/**
+	 * The list of RTB rules not specified in campaigns, creatives and targets.
+	 */
+	public static final String RTB_STD = "rtb_standards";
+	public static final String CAMP_RTB_STD = "campaigns_rtb_standards";
+	public static final String BANNER_RTB_STD = "banners_rtb_standards";
+	public static final String VIDEO_RTB_STD = "banner_videos_rtb_standards";
+	
+	
+	static ResultSet rs;
 	/**
      * The /log in memory queues
      */
     public static final List<Deque<String>> deqeues = new ArrayList<Deque<String>>();
 
-	public static Crosstalk getInstance() {
+	public static Crosstalk getInstance() throws Exception {
 		if (campaigns != null)
 			return INSTANCE;
+		
+		initialize();
 		
 		// Start the connection to elastic search
 		BudgetController.getInstance();
@@ -105,6 +128,54 @@ public enum Crosstalk {
 		logger.info("CROSSTALK budgeting has completed");
 	}
 	
+	static void initialize() throws Exception {
+		// /////////////////////////// GLOBAL rtb_spec
+		globalRtbSpecification = new HashMap<Integer, JsonNode>();
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + RTB_STD);
+		ArrayNode std = ResultSetToJSON.convert(rs);
+		Iterator<JsonNode> it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			globalRtbSpecification.put(child.get("id").asInt(), child);
+		}
+
+		campaignRtbStd = ResultSetToJSON.factory.arrayNode();
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + CAMP_RTB_STD);
+		std = ResultSetToJSON.convert(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			campaignRtbStd.add(child);
+		}
+
+		bannerRtbStd = ResultSetToJSON.factory.arrayNode();
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + BANNER_RTB_STD);
+		std = ResultSetToJSON.convert(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			bannerRtbStd.add(child);
+		}
+
+		videoRtbStd = ResultSetToJSON.factory.arrayNode();
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + VIDEO_RTB_STD);
+		std = ResultSetToJSON.convert(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			videoRtbStd.add(child);
+		}
+
+		exchangeAttributes = ResultSetToJSON.factory.arrayNode();
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from exchange_attributes");
+		std = ResultSetToJSON.convert(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			exchangeAttributes.add(child);
+		}
+	}
+	
 	////////////////////////////////////
 	
 	/**
@@ -124,7 +195,7 @@ public enum Crosstalk {
 	}
 
 	public List<String> deleteCampaign(String campaign) throws Exception {
-		AccountingCampaign c = getKnownCampaign(campaign);
+		Campaign c = getKnownCampaign(campaign);
 		c.setStatus("offline");
 		parkCampaign(c);	
 		return null;
@@ -136,12 +207,12 @@ public enum Crosstalk {
 	 * @return boolean. Returns true.
 	 * @throws Exception if there was an error.
 	 */
-	boolean parkCampaign(AccountingCampaign camp) throws Exception {
-		if (camp.campaign == null || deletedCampaigns.get(camp.campaign.adId) != null)
+	boolean parkCampaign(Campaign camp) throws Exception {
+		if (camp == null || deletedCampaigns.get(camp.adId) != null)
 			return false;
 
-		CampaignCache.getClientInstance(RTBServer.getSharedInstance()).deleteCampaign(camp.campaign.adId);
-		deletedCampaigns.put(camp.campaign.adId, camp); // add to the deleted campaigns map
+		CampaignCache.getClientInstance(RTBServer.getSharedInstance()).deleteCampaign(camp.adId);
+		deletedCampaigns.put(camp.adId, camp); // add to the deleted campaigns map
 		campaigns.remove(camp);							// remove from the campaigns set, used on refresh
 		return true;
 	}
@@ -151,16 +222,16 @@ public enum Crosstalk {
 	 * 
 	 * @return List. The deleted campaign.
 	 */
-	public List<AccountingCampaign> getDeletedCampaigns() {
-		List<AccountingCampaign> list = new ArrayList<AccountingCampaign>();
-		for (Map.Entry<String, AccountingCampaign> entry : deletedCampaigns.entrySet()) {
+	public List<Campaign> getDeletedCampaigns() {
+		List<Campaign> list = new ArrayList<Campaign>();
+		for (Map.Entry<String, Campaign> entry : deletedCampaigns.entrySet()) {
 			list.add(entry.getValue());
 		}
 		return list;
 	}
 
-	public AccountingCampaign getKnownCampaign(String id) {
-		AccountingCampaign camp = deletedCampaigns.get(id);
+	public Campaign getKnownCampaign(String id) {
+		Campaign camp = deletedCampaigns.get(id);
 		if (camp != null)
 			return camp;
 
@@ -171,7 +242,7 @@ public enum Crosstalk {
 	public String update(Campaign campaign, boolean add) throws Exception {
 		String msg = null;
 		
-		AccountingCampaign c = getKnownCampaign(campaign.adId);
+		Campaign c = getKnownCampaign(campaign.adId);
 
 		// New campaign
 		if (c == null) {
@@ -198,7 +269,7 @@ public enum Crosstalk {
 				try {
 					c.addToRTB(); // notifies the bidder
 				} catch (Exception err) {
-					logger.error("Failed to load campaign {} into bidders, reason: {}", c.campaignid,err.toString());
+					logger.error("Failed to load campaign {} into bidders, reason: {}", c.adId,err.toString());
 				}
 			} else {
 				logger.info("New campaign going inactive:{}, reason: {}", campaign, c.report());
@@ -210,8 +281,9 @@ public enum Crosstalk {
 		return msg;
 	}
 	
-	public AccountingCampaign makeNewCampaign(Campaign node) throws Exception {
-		AccountingCampaign ac = new AccountingCampaign(node);
+	public Campaign makeNewCampaign(Campaign node) throws Exception {
+		String str = DbTools.mapper.writeValueAsString(node);
+		Campaign ac = new Campaign(str);
 		return ac;
 		
 	}
@@ -228,7 +300,7 @@ public enum Crosstalk {
 	public String update(String json) throws Exception {
 		Campaign x = new Campaign(json);
 		
-		AccountingCampaign c = getKnownCampaign(x.adId);
+		Campaign c = getKnownCampaign(x.adId);
 		if (c == null) {
 			throw new Exception("No such campaign: " + x.adId);
 		}

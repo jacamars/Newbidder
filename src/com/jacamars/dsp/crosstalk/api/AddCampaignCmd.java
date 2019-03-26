@@ -14,8 +14,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
+
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -24,18 +25,6 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
  *
  */
 public class AddCampaignCmd extends ApiCommand {
-	public static Map<Integer, JsonNode> globalRtbSpecification;
-	public static ArrayNode campaignRtbStd;
-	public static ArrayNode bannerRtbStd;
-	public static ArrayNode videoRtbStd;
-	public static ArrayNode exchangeAttributes;
-
-	public static final String RTB_STD = "rtb_standards";
-	public static final String CAMP_RTB_STD = "campaigns_rtb_standards";
-	public static final String BANNER_RTB_STD = "banners_rtb_standards";
-	public static final String VIDEO_RTB_STD = "banner_videos_rtb_standards";
-	
-	
 	
 	ResultSet rs = null;
 	/** The returned results from the campaign. */
@@ -94,7 +83,7 @@ public class AddCampaignCmd extends ApiCommand {
 				campaign = campaign.trim();
 				if (!campaign.startsWith("{")) {
 					ArrayNode node = createJson(campaign);
-					AccountingCampaign c =  new AccountingCampaign(node.get(0));
+					Campaign c =  new Campaign(node.get(0));
 					campaign = c.toJson();
 				}
 				updated = Crosstalk.getInstance().add(campaign);
@@ -179,51 +168,6 @@ public class AddCampaignCmd extends ApiCommand {
 			if (nodes.size() == 0)
 				return;
 
-			// /////////////////////////// GLOBAL rtb_spec
-			globalRtbSpecification = new HashMap<Integer, JsonNode>();
-			rs = stmt.executeQuery("select * from " + RTB_STD);
-			ArrayNode std = ResultSetToJSON.convert(rs);
-			Iterator<JsonNode> it = std.iterator();
-			while (it.hasNext()) {
-				JsonNode child = it.next();
-				globalRtbSpecification.put(child.get("id").asInt(), child);
-			}
-
-			campaignRtbStd = ResultSetToJSON.factory.arrayNode();
-			rs = stmt.executeQuery("select * from " + CAMP_RTB_STD);
-			std = ResultSetToJSON.convert(rs);
-			it = std.iterator();
-			while (it.hasNext()) {
-				JsonNode child = it.next();
-				campaignRtbStd.add(child);
-			}
-
-			bannerRtbStd = ResultSetToJSON.factory.arrayNode();
-			rs = stmt.executeQuery("select * from " + BANNER_RTB_STD);
-			std = ResultSetToJSON.convert(rs);
-			it = std.iterator();
-			while (it.hasNext()) {
-				JsonNode child = it.next();
-				bannerRtbStd.add(child);
-			}
-
-			videoRtbStd = ResultSetToJSON.factory.arrayNode();
-			rs = stmt.executeQuery("select * from " + VIDEO_RTB_STD);
-			std = ResultSetToJSON.convert(rs);
-			it = std.iterator();
-			while (it.hasNext()) {
-				JsonNode child = it.next();
-				videoRtbStd.add(child);
-			}
-
-			exchangeAttributes = ResultSetToJSON.factory.arrayNode();
-			rs = stmt.executeQuery("select * from exchange_attributes");
-			std = ResultSetToJSON.convert(rs);
-			it = std.iterator();
-			while (it.hasNext()) {
-				JsonNode child = it.next();
-				exchangeAttributes.add(child);
-			}
 			// ////////////////////////////////////////////////////////////////////////////
 			// Banner
 			for (int i = 0; i < nodes.size(); i++) {
@@ -242,6 +186,7 @@ public class AddCampaignCmd extends ApiCommand {
 				ArrayNode inner = ResultSetToJSON.convert(rs);
 				x.set("banner_video", inner);
 			}
+	
 		}
 
 }

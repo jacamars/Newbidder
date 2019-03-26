@@ -172,42 +172,6 @@ class Handler extends AbstractHandler {
 			return;
 		}
 		
-		if (target.equals("/log")) {
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("text/html;charset=utf-8");
-			baseRequest.setHandled(true);
-			
-			Deque<String> logDeck = new ArrayDeque<String>();
-			Crosstalk.getInstance().deqeues.add(logDeck);
-			String contents = null;
-			response.getWriter().println("<html><h1>Web Logging Starting...</h1>");
-			response.flushBuffer();
-			while(true) {
-				contents = logDeck.poll();
-				if (contents != null) { 
-					
-					try {
-						response.getWriter().println(contents);
-						response.flushBuffer();
-					} catch (Exception error) {
-						error.printStackTrace();
-						synchronized(Crosstalk.getInstance().deqeues) {
-							Crosstalk.getInstance().deqeues.remove(logDeck);
-						}
-						return;
-					}
-				} else {
-					try {
-						Thread.sleep(250);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		
-
 		baseRequest.setHandled(true);
 		response.setStatus(404);
 	}

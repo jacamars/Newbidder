@@ -90,7 +90,7 @@ public class RtbStandard {
 			for (String v : values) {
 				v = v.trim();
 				Integer key = new Integer(v);
-				JsonNode x = AddCampaignCmd.globalRtbSpecification.get(key);
+				JsonNode x = Crosstalk.globalRtbSpecification.get(key);
 				if (x != null) {
 					String m_spec = x.get("rtbspecification").asText(null);
 					String m_operator = x.get("operator").asText(null);

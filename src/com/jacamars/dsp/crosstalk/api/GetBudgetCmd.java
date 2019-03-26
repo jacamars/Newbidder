@@ -1,15 +1,10 @@
 package com.jacamars.dsp.crosstalk.api;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
-import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
-import com.jacamars.dsp.crosstalk.budget.AccountingCreative;
+
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
-import com.jacamars.dsp.rtb.bidder.RTBServer;
-import com.jacamars.dsp.rtb.commands.Echo;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Creative;
 
 /**
  * Get the assigned budget for campaign/creatives
@@ -96,31 +91,38 @@ public class GetBudgetCmd extends ApiCommand {
 	 */
 	void executeCampaignLevel() {
 		
-		AccountingCampaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
+		Campaign c = null;
+		try {
+			c = Crosstalk.getInstance().getKnownCampaign(campaign);
 		if (c == null) {
 			error = true;
 			message = "No campaign defined: " + campaign;
 			return;
+		} } catch (Exception e) {
+			error = true;
+			message = e.getMessage();
 		}
 		
 		budget_limit_daily = c.budget.dailyBudget.getDoubleValue(); 
 		budget_limit_hourly = c.budget.hourlyBudget.getDoubleValue();  
-		total_budget = c. budget.total_budget.getDoubleValue();
+		total_budget = c. budget.totalBudget.getDoubleValue();
 	}
 	
 	/**
 	 * Execute at the creative level.
 	 */
 	void executeCreativeLevel() {
-		
-		AccountingCampaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
+		Campaign c = null;
+		Creative cr = null;
+		try {
+		c = Crosstalk.getInstance().getKnownCampaign(campaign);
 		if (c == null) {
 			error = true;
 			message = "No campaign defined: " + campaign;
 			return;
 		}
 		
-		AccountingCreative cr = c.getCreative(this.creative);
+		 cr = c.getCreative(this.creative);
 		if (cr == null) {
 			error = true;
 			message = "No creative defined: " + creative + " in " + campaign;
@@ -130,7 +132,12 @@ public class GetBudgetCmd extends ApiCommand {
 			
 		budget_limit_daily = cr.budget.dailyBudget.getDoubleValue();  
 		budget_limit_hourly = cr.budget.hourlyBudget.getDoubleValue();
-		total_budget = cr.budget.total_budget.getDoubleValue(); 
+		total_budget = cr.budget.totalBudget.getDoubleValue(); 
+		} catch (Exception e) {
+			error = true;
+			message = "No creative defined: " + creative + " in " + campaign;
+			return;
+		}
 			
 	}
 }

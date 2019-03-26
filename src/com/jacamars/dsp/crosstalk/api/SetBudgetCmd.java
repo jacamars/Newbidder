@@ -2,18 +2,19 @@ package com.jacamars.dsp.crosstalk.api;
 
 import java.util.Random;
 
-import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
-import com.jacamars.dsp.crosstalk.budget.AccountingCreative;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Creative;
 
 /**
  * Wen API to set the price of a campaign/creative
+ * 
  * @author Ben M. Faul
  *
  */
 public class SetBudgetCmd extends ApiCommand {
 
-	/** THe price to set.*/
+	/** THe price to set. */
 	public double hourly;
 	public double daily;
 	public double total;
@@ -30,6 +31,7 @@ public class SetBudgetCmd extends ApiCommand {
 
 	/**
 	 * Basic form of the command.
+	 * 
 	 * @param username String. The username to use for authorization.
 	 * @param password String. The password to use for authorization.
 	 */
@@ -41,15 +43,17 @@ public class SetBudgetCmd extends ApiCommand {
 
 	/**
 	 * Targeted form of the command.
+	 * 
 	 * @param username String. The user authorization.
 	 * @param password String. THe password authorization.
 	 * @param campaign String. The target campaign.
 	 * @param creative String. The target creative.
-	 * @param hourly double. The hourly limit to set.
-	 * @param daily double. The daily limit to set.
-	 * @param total double. The total limit to set.
+	 * @param hourly   double. The hourly limit to set.
+	 * @param daily    double. The daily limit to set.
+	 * @param total    double. The total limit to set.
 	 */
-	public SetBudgetCmd(String username, String password, String campaign, String creative, double hourly, double daily, double total) {
+	public SetBudgetCmd(String username, String password, String campaign, String creative, double hourly, double daily,
+			double total) {
 		super(username, password);
 		this.campaign = campaign;
 		this.creative = creative;
@@ -61,6 +65,7 @@ public class SetBudgetCmd extends ApiCommand {
 
 	/**
 	 * Targeted form of the command.
+	 * 
 	 * @param username String. The user authorization.
 	 * @param password String. THe password authorization.
 	 * @param campaign String. The target campaign.
@@ -75,7 +80,6 @@ public class SetBudgetCmd extends ApiCommand {
 		type = SetBudget;
 	}
 
-
 	/**
 	 * Convert to JSON
 	 */
@@ -89,36 +93,36 @@ public class SetBudgetCmd extends ApiCommand {
 	@Override
 	public void execute() {
 		super.execute();
-		
-		try {
-		AccountingCampaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
-		if (c == null) {
-			error = true;
-			message = "No campaign defined: " + campaign;
-			return;
-		}
-		
-		if (creative == null) {
-			c.setTotalBudget(total);
-			c.setDailyBudget(daily);
-			c.setHourlyBudget(hourly);
-			
-			Crosstalk.getInstance().update(c.campaign,true);
-			return;
-		}
-		
-		AccountingCreative cc = c.getCreative(this.creative);
-		if (cc == null) {
-			error = true;
-			message = "No creative defined: " + creative + " in " + campaign;
-			return;
-		}
 
-		cc.setTotalBudget(total);
-		cc.setDailyBudget(daily);
-		cc.setHourlyBudget(hourly);
-		
-		Crosstalk.getInstance().update(c.campaign,true);
+		try {
+			Campaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
+			if (c == null) {
+				error = true;
+				message = "No campaign defined: " + campaign;
+				return;
+			}
+
+			if (creative == null) {
+				c.budget.setTotalBudget(total);
+				c.budget.setDailyBudget(daily);
+				c.budget.setHourlyBudget(hourly);
+
+				Crosstalk.getInstance().update(c, true);
+				return;
+			}
+
+			Creative cc = c.getCreative(this.creative);
+			if (cc == null) {
+				error = true;
+				message = "No creative defined: " + creative + " in " + campaign;
+				return;
+			}
+
+			cc.setTotalBudget(total);
+			cc.setDailyBudget(daily);
+			cc.setHourlyBudget(hourly);
+
+			Crosstalk.getInstance().update(c, true);
 		} catch (Exception error) {
 			message = error.getMessage();
 			this.error = true;

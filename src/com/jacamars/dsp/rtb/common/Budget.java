@@ -3,10 +3,13 @@ package com.jacamars.dsp.rtb.common;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.DayPart;
 
-public class CampaignBudget {
+public class Budget {
 
 	/** The current cost incurred by this campaign */
-	public volatile AtomicBigDecimal cost = new AtomicBigDecimal(0); 
+	public volatile AtomicBigDecimal totalCost = new AtomicBigDecimal(0); 
+	
+	/** Total budget of this object */
+	public AtomicBigDecimal totalBudget;
 	
 	/** The daily budget of this campaign */
 	public AtomicBigDecimal dailyBudget = null;
@@ -14,11 +17,10 @@ public class CampaignBudget {
 	/** The hourly budget of this campaign */
 	public AtomicBigDecimal hourlyBudget = null;
 	
-	public AtomicBigDecimal total_budget;
-	
 	public long expire_time ;
 	public long activate_time;
 	
+	// Not used in Creatives
 	public DayPart daypart;
 
 	/** The current daily cost */
@@ -27,7 +29,19 @@ public class CampaignBudget {
 	/** The current hourly cost */
 	public transient AtomicBigDecimal hourlyCost = new AtomicBigDecimal(0);
 
-	public CampaignBudget() {
+	public Budget() {
 		
+	}
+	
+	public void setTotalBudget(double d) {
+		totalBudget = new AtomicBigDecimal(d);
+	}
+	
+	public void setHourlyBudget(double d) {
+		hourlyBudget = new AtomicBigDecimal(d);
+	}
+	
+	public void setDailyBudget(double d) {
+		dailyBudget = new AtomicBigDecimal(d);
 	}
 }

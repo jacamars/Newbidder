@@ -68,16 +68,13 @@ public class Targeting {
 	protected String TRANSPARENCY = "pagetransparency";
 	protected String RTB_STANDARD = "rtb_standard";
 
-	protected AccountingCampaign parent;
-
 	public Targeting() {
 
 	}
 
-	public Targeting(AccountingCampaign parent, ObjectNode myNode)
+	public Targeting(ObjectNode myNode)
 			throws Exception {
 		this.myNode = myNode;
-		this.parent = parent;
 		process();
 	}
 
@@ -217,7 +214,7 @@ public class Targeting {
 		return delta;
 	}
 
-	protected List<Node> compile() throws Exception {
+	public List<Node> compile() throws Exception {
 		nodes = new ArrayList<Node>();
 		Node n = null;
 

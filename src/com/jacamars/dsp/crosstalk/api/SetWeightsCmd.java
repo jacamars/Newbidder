@@ -1,10 +1,8 @@
 package com.jacamars.dsp.crosstalk.api;
 
-import com.jacamars.dsp.crosstalk.budget.AccountingCampaign;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
-import com.jacamars.dsp.rtb.commands.SetWeights;
-import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.common.Campaign;
 
 /**
  * Get the assigned price of a Campaign/creative
@@ -65,16 +63,23 @@ public class SetWeightsCmd extends ApiCommand {
 	public void execute() {
 		super.execute();
 
-		AccountingCampaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
-		if (c == null) {
+		Campaign c = null;
+		try {
+			c = Crosstalk.getInstance().getKnownCampaign(campaign);
+			if (c == null) {
+				error = true;
+				message = "No campaign defined: " + campaign;
+				return;
+			}
+		} catch (Exception e) {
 			error = true;
-			message = "No campaign defined: " + campaign;
+			message = e.getMessage();
 			return;
 		}
 
-		c.campaign.weights = pe;
+		c.weights = pe;
 		try {
-			Crosstalk.getInstance().update(c.campaign, true);
+			Crosstalk.getInstance().update(c, true);
 		} catch (Exception e) {
 			error = true;
 			message = e.getMessage();

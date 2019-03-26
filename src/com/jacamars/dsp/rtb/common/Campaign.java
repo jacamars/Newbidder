@@ -1,27 +1,43 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.Config;
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
+
 import com.hazelcast.nio.serialization.ClassDefinition;
 import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
+import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
+import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
+import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.crosstalk.budget.DayPart;
+import com.jacamars.dsp.crosstalk.budget.RtbStandard;
+import com.jacamars.dsp.crosstalk.budget.Targeting;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
-import com.jacamars.dsp.rtb.commands.Echo;
+
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
@@ -57,7 +73,7 @@ public class Campaign implements Comparable, Portable  {
 	/** encoded IAB category */
 	public transient StringBuilder encodedIab;	
 	/** Should you do forensiq fingerprinting for this campaign? */
-	public boolean forensiq = false;
+	public Boolean forensiq = false;
 
 	/** The spend rate of the campaign, default is $1/minute/second in micros. */
 	public long assignedSpendRate = 16667;
@@ -73,11 +89,63 @@ public class Campaign implements Comparable, Portable  {
 	public List<String> algorithmKeys;
 
 	public String weightAssignment;
+	
+	/** Set to runnable to make it actually loadable in the bidder. */
+	public String status;
+	
 	public transient volatile ProportionalEntry weights;
 	
-	public CampaignBudget budget;
+	public Budget budget;
+	
+	/** The SQL name for this campaign id */
+	protected final String CAMPAIGN_ID = "id";
+	
+	/** Thew SQL name for the updated flag */
+	protected final String UPDATED = "updated_at";
+	
+	/** The SQL name for the total budget */
+	protected final String TOTAL_BUDGET = "total_budget";
+	
+	/** SQL name for the descriptive name */
+	protected final String CAMPAIGN_NAME = "name";
+	
+	/** SQL name of Datetime of expiration */
+	protected final String EXPIRE_TIME = "expire_time";
+	
+	/** SQL name for the date time to activate */
+	protected final String ACTIVATE_TIME = "activate_time";
+	
+	/** The SQL name for the budget limit daily */
+	protected final String DAILY_BUDGET = "budget_limit_daily";
+	
+	/** The SQL name for the hourly budget */
+	protected final String HOURLY_BUDGET = "budget_limit_hourly";
+
+	protected final String DAYPART = "day_parting_utc";
+	
+	transient Set<Creative> parkedCreatives = new HashSet<Creative>();
+	
+	/** This class's logger */
+	static final Logger logger = LoggerFactory.getLogger(Campaign.class);
 
     private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
+    
+    /**
+     * Resources used to create campaign from JSON based SQL
+     */
+    transient JsonNode myNode;
+    transient Targeting targeting;
+	/** The exchanges this campaign can be used with */
+	transient List<String> exchanges = new ArrayList<String>();
+	transient List<String> bcat = new ArrayList<String>();
+	transient String capSpec;	
+	/** Number of seconds before the frequency cap expires */
+	transient int capExpire;	
+	/** The count limit of the frequency cap */
+	transient int capCount;
+	/** cap time unit **/
+	transient String capTimeUnit;
+	//////////////////////////////////////////////////////////////////////
     
     
     /**
@@ -112,14 +180,43 @@ public class Campaign implements Comparable, Portable  {
 	public Campaign() {
 
 	}
+	
+	/**
+	 * Constructor using a JSON Node. Crosstalk uses this to create this object from SQL
+	 * @param node JsonNode. The object as defined by SQL, and interpreted as JSON.
+	 */
+	public Campaign(JsonNode node) throws Exception {
+		myNode = node;
+		setup();
+		process();
+		doTargets();
+	}
 
 	
+	/**
+	 * Constructor using a string JSON. This is used by file readers.
+	 * @param data
+	 * @throws Exception
+	 */
 	public Campaign(String data) throws Exception {
 		
 		Campaign camp = DbTools.mapper.readValue(data, Campaign.class);
 		init(camp);
 	}
 	
+	/**
+	 * Crosstalk updates a campaign using this.
+	 * @param camp Campaign.
+	 */
+	public void update(Campaign camp) throws Exception {
+		init(camp);
+	}
+	
+	/** 
+	 * An iniitializer from a copy.
+	 * @param camp
+	 * @throws Exception
+	 */
 	private void init(Campaign camp) throws Exception {
 		this.isAdx = camp.isAdx;
 		this.adomain = camp.adomain;
@@ -130,6 +227,7 @@ public class Campaign implements Comparable, Portable  {
 		this.name = camp.name;
 		this.forensiq = camp.forensiq;
 		this.frequencyCap = camp.frequencyCap;
+		this.budget = camp.budget;
 		if (camp.category != null)
 			this.category = camp.category;
 		
@@ -457,6 +555,390 @@ public class Campaign implements Comparable, Portable  {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	////////////////////////////
+	
+	public void runUsingElk() {
+		try {
+
+			budget.totalCost.set(BudgetController.getInstance().getCampaignTotalSpend(adId));
+			budget.dailyCost.set(BudgetController.getInstance().getCampaignDailySpend(adId));
+			budget.hourlyCost.set(BudgetController.getInstance().getCampaignHourlySpend(adId));
+
+			logger.debug("*** ELK TEST: Updating budgets CAMPAIGN:{}", adId);
+			logger.debug("Total cost: {}, daily cost: {}, hourly cost: {}", budget.totalCost.getDoubleValue(),
+					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
+
+			for (Creative c : creatives) {
+				c.runUsingElk(adId);
+			}
+
+		} catch (Exception error) {
+			error.printStackTrace();
+		}
+	}
+
+	public double costAsDouble() {
+		return budget.totalCost.doubleValue();
+	}
+	
+
+	protected void park(Creative c) {
+		creatives.remove(c);
+		parkedCreatives.add(c);
+	}
+
+	protected void unpark(Creative c) {
+		parkedCreatives.remove(c);
+		creatives.add(c);
+	}
+
+	public boolean isExpired() {
+		Date date = new Date();
+		boolean expired = date.getTime() > budget.expire_time;
+		if (expired)
+			return expired;
+		expired = date.getTime() < budget.activate_time;
+		if (expired)
+			return expired;
+		return false;
+
+	}
+
+	public boolean isActive() throws Exception {
+		Date date = new Date();
+
+		if (creatives.size() == 0) {
+			return false;
+		}
+
+		if (budgetExceeded()) {
+			logger.debug("BUDGET EXCEEDED: {}", adId);
+			return false;
+		}
+
+		if ((date.getTime() >= budget.activate_time) && (date.getTime() <= budget.expire_time)) {
+
+			if (budget.daypart != null) {
+				if (budget.daypart.isActive() != true) {
+					logger.debug("Daypart is not active: {}", adId);
+					return false;
+				}
+			}
+
+			logger.debug("IS ACTIVE: {}", adId);
+			return true;
+		} else {
+			logger.debug("ACTIVATION TIME NOT IN RANGE: {}", adId);
+			return false;
+		}
+	}
+
+
+
+	public boolean budgetExceeded() throws Exception {
+		if (budget == null)
+			return false;
+
+		return BudgetController.getInstance().checkCampaignBudgets(adId,budget.totalBudget, 
+				budget.dailyBudget, budget.hourlyBudget);
+	}
+
+	public boolean compareTo(Campaign t) {
+		return false;
+	}
+
+	/**
+	 * Check and see if this campaign is deletable fron the system
+	 * @return boolean. If campaign is expired or the total spend has been reached.
+	 * @throws Exception on errors computing budgets.
+	 */
+	public boolean canBePurged() throws Exception {
+		if (isExpired())
+			return true;
+		return BudgetController.getInstance().checkCampaignTotalBudgetExceeded(adId, budget.totalBudget);
+	}
+
+	public boolean addToRTB() throws Exception {
+		return true;
+	}
+
+	public boolean addToRTB(String bidder) throws Exception {
+		return true;
+	}
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	void setup() throws Exception {
+		// process
+		adId = myNode.get(CAMPAIGN_ID).asText();
+		budget = new Budget();
+		
+		budget.totalCost = new AtomicBigDecimal(myNode);
+		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost").asDouble(0.0));
+		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost").asDouble(0.0));
+		budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
+		budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
+		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET).asDouble());
+
+		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
+				String parts = myNode.get(DAYPART).asText();
+				if (parts.equals("null") || parts.length()==0)
+					budget.daypart = null;
+			else
+				budget.daypart = new DayPart(parts);
+		} else
+			budget.daypart = null;
+
+		if (myNode.get("bcat") != null) {
+			String str = myNode.get("bcat").asText();
+			if (str.trim().length() != 0) {
+				if (str.equals("null")==false)
+					Targeting.getList(bcat, str);
+			}
+		}
+
+		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
+			exchanges.clear();
+			String str = getMyNode().get("exchanges").asText(null);
+			if (str != null) {
+				Targeting.getList(exchanges, str);
+			}
+		}
+
+		Object x = myNode.get(DAILY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			if (budget.dailyBudget == null || (budget.dailyBudget.doubleValue() != myNode.get(DAILY_BUDGET).asDouble())) {
+				budget.dailyBudget = new AtomicBigDecimal(myNode.get(DAILY_BUDGET).asDouble());
+			}
+		} else
+			budget.dailyBudget = null;
+
+		x = myNode.get(HOURLY_BUDGET);
+		if (x != null && !(x instanceof NullNode)) {
+			if (budget.hourlyBudget == null || (budget.hourlyBudget.doubleValue() != myNode.get(HOURLY_BUDGET).asDouble())) {
+				budget.hourlyBudget = new AtomicBigDecimal(myNode.get(HOURLY_BUDGET).asDouble());
+			}
+		} else
+			budget.hourlyBudget = null;
+
+		x = myNode.get("targetting");
+		if (x instanceof NullNode) {
+			if (!isActive())
+				return;
+			throw new Exception("Can't have null targetting for campaign " + adId);
+		}
+
+		adomain = myNode.get("ad_domain").asText();
+	}
+	
+	public boolean process() throws Exception {
+		boolean change = false;
+		int n = creatives.size();
+		List<Creative> list = new ArrayList<Creative>();
+
+		for (Creative c : parkedCreatives) {
+			if (!c.budgetExceeded(adId)) {
+				unpark(c);
+				change = true;
+			}
+		}
+
+		for (Creative creative : creatives) {
+			if (creative.budgetExceeded(adId)) {
+				list.add(creative);
+				change = true;
+			}
+		}
+
+		for (Creative c : list) {
+			park(c);
+		}
+
+		return change;
+	}
+	
+	JsonNode getMyNode() {
+		return myNode;
+	}
+	
+	protected void doTargets() throws Exception {
+		if (getMyNode().get("targetting") instanceof NullNode) {
+			if (!isActive())
+				return;
+			throw new Exception("No targeting record was found. for " + adId);
+		}
+
+		ObjectNode targ = (ObjectNode) getMyNode().get("targetting");
+		targeting = new Targeting(targ);
+
+		instantiate("banner", true);
+		instantiate("banner_video", false);
+		compile();
+	}
+	
+	public void compile() throws Exception {
+		
+		for (Creative c : creatives) {
+			c.compile();
+		}
+		
+		if (forensiq != null) {
+			if (forensiq.equals("Y") || forensiq.equals("y"))
+				forensiq = true;
+			else
+				forensiq = false;
+		}
+
+		List<Node> nodes;
+		attributes.clear();
+		if (targeting != null) {
+			nodes = targeting.compile();
+			if (nodes != null) {
+				for (Node n : nodes)
+					attributes.add(n);
+			}
+		}
+
+		if (exchanges.size() != 0) {
+			Node n = new Node("exchanges", "exchange", Node.MEMBER, exchanges);
+			n.notPresentOk = false;
+			attributes.add(n);
+		}
+
+		if (bcat.size() != 0) {
+			Node n = new Node("bcat", "bcat", Node.NOT_INTERSECTS, bcat);
+			n.notPresentOk = true;
+			attributes.add(n);
+		}
+
+		int k = 0;
+		for (Creative c : creatives) {
+			if (c.adxCreativeExtensions != null)
+				k++;
+		}
+		if (k > 0)
+			isAdx = true;
+		else
+			isAdx = false;
+
+		if (capSpec != null && capSpec.length() > 0 && capCount > 0 && capExpire > 0) {
+			frequencyCap = new FrequencyCap();
+			frequencyCap.capSpecification = new ArrayList<String>();
+			Targeting.getList(frequencyCap.capSpecification, capSpec);
+			frequencyCap.capTimeout = capExpire; // in seconds
+			frequencyCap.capFrequency = capCount;
+			frequencyCap.capTimeUnit = capTimeUnit;
+		}
+		doStandardRtb();
+	}
+	
+	/**
+	 * Call after you compile!
+	 * 
+	 * @throws Exception on JSON errors.
+	 */
+	void doStandardRtb() throws Exception {
+
+		ArrayNode array = ResultSetToJSON.factory.arrayNode();
+		for (int i = 0; i < Crosstalk.getInstance().campaignRtbStd.size(); i++) {
+			JsonNode node = Crosstalk.getInstance().campaignRtbStd.get(i);
+			if (adId == node.get("campaign_id").asText()) {
+				Integer key = node.get("rtb_standard_id").asInt();
+				JsonNode x = Crosstalk.getInstance().globalRtbSpecification.get(key);
+				array.add(x);
+			}
+		}
+		RtbStandard.processStandard(array, attributes);
+	}
+	
+	/**
+	 * Report why the campaign is not runnable.
+	 * @return String. The reasons why...
+	 * @throws Exception on ES errors.
+	 */
+	public String report() throws Exception {
+		String reason = "";
+		if (budgetExceeded()) {
+			if (reason.length() != 0)
+				reason += " ";
+			if (BudgetController.getInstance().checkCampaignBudgetsTotal(adId, budget.totalBudget))
+				reason += "Campaign total budget exceeded. ";
+			if (BudgetController.getInstance().checkCampaignBudgetsDaily(adId, budget.dailyBudget))
+				reason += "Campaign daily budget exceeded. ";
+			if (BudgetController.getInstance().checkCampaignBudgetsHourly(adId, budget.hourlyBudget))
+				reason += "Campaign hourly budget exceeded. ";
+		}
+
+		if (isExpired()) {
+			if (reason.length() > 0)
+				reason += " ";
+			reason += "Bid window closed, expiry. ";
+		} else if (!budgetExceeded()) {
+			if (reason.length() > 0)
+				reason += " ";
+
+			if (budget.daypart != null) {
+				if (budget.daypart.isActive() != true) {
+					reason += "Daypart is not active ";
+				}
+			}
+		}
+
+		List<Map> xreasons = new ArrayList<Map>();
+		if (creatives.size() != 0) {
+			for (Creative p : parkedCreatives) {
+				Map<String, Object> r = new HashMap<String, Object>();
+				r.put("creative",p.impid);
+				List<String> reasons = new ArrayList<String>();
+				if (p.budgetExceeded(adId)) {
+					reasons.add("nobudget");
+				}
+
+				r.put("reasons",reasons);
+			}
+		}
+
+		if (xreasons.size() != 0) {
+			reason += DbTools.mapper.writeValueAsString(xreasons);
+		}
+		if (reason.length() > 0)
+			logger.info("Campaign {} not loaded: {}",adId, reason);
+
+		if (reason.length() == 0)
+			reason = "Runnable";
+		return reason;
+	}
+	
+	/**
+	 * Instantiate a creative.
+	 * 
+	 * @param type
+	 *            String. The type of creative.
+	 * @param isBanner
+	 *            boolean. Is this a banner
+	 * @throws Exception on SQL or JSON errors.
+	 * 
+	 */
+	protected void instantiate(String type, boolean isBanner) throws Exception {
+
+		ArrayNode array = (ArrayNode) getMyNode().get(type);
+		if (array == null)
+			return;
+
+		for (int i = 0; i < array.size(); i++) {
+			ObjectNode node = (ObjectNode) array.get(i);
+			Creative creative = new Creative(node, isBanner); 
+			if (!(creative.budgetExceeded(adId))) {
+				unpark(creative);
+			} else {
+				park(creative);
+			}
 		}
 	}
 
