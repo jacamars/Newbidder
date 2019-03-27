@@ -595,8 +595,16 @@ public class Campaign implements Comparable, Portable  {
 		creatives.add(c);
 	}
 
+	/**
+	 * Is the campaign expired? Returns true if expired. If no budget returns false.
+	 * @return boolean. Returns true or false depending on if the campaign expiration was reached. Always return false if no budget is set (Not expired...)
+	 */
 	public boolean isExpired() {
 		Date date = new Date();
+		
+		if (budget == null)
+			return false;
+		
 		boolean expired = date.getTime() > budget.expire_time;
 		if (expired)
 			return expired;
@@ -618,6 +626,9 @@ public class Campaign implements Comparable, Portable  {
 			logger.debug("BUDGET EXCEEDED: {}", adId);
 			return false;
 		}
+		
+		if (budget == null)
+			return true;
 
 		if ((date.getTime() >= budget.activate_time) && (date.getTime() <= budget.expire_time)) {
 
