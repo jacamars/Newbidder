@@ -21,7 +21,8 @@ class App extends Component {
     response: 'I am the response',
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
-    nurl: 'Win URL: '
+    nurl: 'Win URL: ',
+    jsonError: false
   };
 
   exchangeChangedHandler = (event, id) => {
@@ -43,8 +44,9 @@ class App extends Component {
     return JSON.parse(s);
   }
 
-  jsonChangedHandler = (event, id) => {
-      this.setState({ bid: event.target.value });
+  jsonChangedHandler = (obj) => {
+      this.setState({ bid: obj.plainText });
+      this.setState({jsonError: obj.error});
   }
 
   rootHandler = (event, id) => {
@@ -62,6 +64,11 @@ class App extends Component {
   };
 
   sendBid = (event,id) => {
+    if (this.state.jsonError !== false) {
+      alert("Can't send, error at line " + this.state.jsonError.line + "\n" +
+              this.state.jsonError.reason);
+      return;
+    }
     const endpoint = this.composite()
     fetch('https://facebook.github.io/react-native/movies.json')
         .then((response) => response.json())
@@ -96,20 +103,19 @@ class App extends Component {
     this.setState({creative:''});
     this.setState({adm:''});
     this.setState({nurl: 'Win URL: '});
+
+    alert(this.state.bid);
   }
 
   restore = (id) => {
     if (id === "banner") {
-      this.setState({json:this.copy(SampleBanner)})
-      this.setState({bid:JSON.stringify(SampleBanner,null,2)})
+      this.setState({json:this.copy(SampleBanner), bid: JSON.stringify(SampleBanner)});
     } else
     if (id === "video") {
-      this.setState({json:this.copy(SampleVideo)})
-      this.setState({bid:JSON.stringify(SampleVideo,null,2)})
+      this.setState({json:this.copy(SampleVideo),bid:JSON.stringify(SampleVideo,null,2)});
     } else
     if (id === "native") {
-      this.setState({json:this.copy(SampleNative)})
-      this.setState({bid:JSON.stringify(SampleNative,null,2)})
+      this.setState({json:this.copy(SampleNative),bid:JSON.stringify(SampleNative,null,2)});
     }
   }
 

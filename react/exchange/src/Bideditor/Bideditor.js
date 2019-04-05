@@ -1,5 +1,7 @@
 import React from 'react';
 import "./Bideditor.css";
+import JSONInput from 'react-json-editor-ajrm';
+import locale    from 'react-json-editor-ajrm/locale/en';
 const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
     
     const style = {
@@ -22,20 +24,40 @@ const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
 
     return (
         <div className="Bideditor">
+        <table>
+            <tr>
+                <td>
         <p>
             Exchange:&nbsp;
             <select style={style} onChange={exchangeHandler}>
-            {optionItems}
+                {optionItems}
             </select>
             <button onClick={() => {restore("banner")}}>Banner</button>
             <button onClick={() => {restore("video")}}>Video</button>
             <button onClick={() => {restore("native")}}>Native</button>&nbsp;
             <button onClick={bidSender}>Send Bid</button>
         </p>
-         <textarea value={props.bid} cols="50" rows="20" onChange={jsonHandler}></textarea>
+        </td>
+        </tr>
+        <tr>
+            <td>
+        <JSONInput
+            id          = 'a_unique_id'
+            placeholder = { props.json }
+            theme       = 'light_mitsuketa_tribute'
+            locale      = { locale }
+            height      = '260px'
+            width       = '500px'
+            onChange    = {jsonHandler}
+        />
+        </td>
+        <td>
          <textarea disabled value={props.response} 
-            rows="20" 
-            cols="30"/>
+            rows="17" 
+            cols="60"/>
+            </td>
+        </tr>
+        </table>
         </div>
     )
 }
