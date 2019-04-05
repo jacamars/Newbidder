@@ -16,6 +16,7 @@ const exchanges = (props,changeHandler) => {
         let optionItems = list.map((exchange) =>
                 <option key={exchange.name}>{exchange.name}</option>
             );
+            
     return (
        <div className="Exchanges">
             Exchange:&nbsp;

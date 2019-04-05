@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import Radium from 'radium';
-import Exchanges from './Exchanges/Exchanges';
 import Bideditor from './Bideditor/Bideditor';
 import Windisplay from './Windisplay/Windisplay';
-import Biddisplay from './Biddisplay/Biddisplay';
+import {Logo, Tips, SampleBanner, SampleVideo, SampleNative } from './Utils';
 
 
 class App extends Component {
@@ -14,13 +13,13 @@ class App extends Component {
       { name: 'Mobfox', uri: '/rtb/bids/mobfox'},
       { name: 'Bidswitch', uri: '/rtb/bids/bidswitch'}
     ],
-    json: { a:100, b:200, c: 300, d: 'this is a test'},
+    json: SampleBanner,
     selected: 'Nexage',
     uri: '/rtb/bids/nexage',
     url: 'http://localhost:8080',
-    bid: 'I am the bid',
+    bid: JSON.stringify(SampleBanner,null,2),
     response: 'I am the response',
-    creative: 'Creative',
+    creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
     nurl: 'Win URL: '
   };
@@ -39,8 +38,13 @@ class App extends Component {
     this.setState({uri:uri});
   }
 
-  jsonChangedHandler = (event, id) => {
+  copy = (obj) => {
+    const s = JSON.stringify(obj);
+    return JSON.parse(s);
+  }
 
+  jsonChangedHandler = (event, id) => {
+      this.setState({ bid: event.target.value });
   }
 
   rootHandler = (event, id) => {
@@ -59,12 +63,28 @@ class App extends Component {
 
   sendBid = (event,id) => {
     const endpoint = this.composite()
-    const nbid = JSON.stringify(this.state.json,null,2);
-    this.setState({bid:nbid});
+    fetch('https://facebook.github.io/react-native/movies.json')
+        .then((response) => response.json())
+        .then((responseJson) => {
+          this.setState({response:JSON.stringify(responseJson.movies,null,2)});
+        })
+        .catch((error) => {
+          alert("ERROR: " + error);
+          console.error(error);
+        });
   }
 
-  sendWinNotice = (event,id) => {
 
+  sendWinNotice = (event,id) => {
+    fetch('https://facebook.github.io/react-native/movies.json')
+    .then((response) => response.json())
+    .then((responseJson) => {
+      alert(JSON.stringify(responseJson.movies,null,2));
+    })
+    .catch((error) => {
+      alert("ERROR: " + error);
+      console.error(error);
+    });
   }
 
   brClearHandler = (event,id) => {
@@ -78,6 +98,20 @@ class App extends Component {
     this.setState({nurl: 'Win URL: '});
   }
 
+  restore = (id) => {
+    if (id === "banner") {
+      this.setState({json:this.copy(SampleBanner)})
+      this.setState({bid:JSON.stringify(SampleBanner,null,2)})
+    } else
+    if (id === "video") {
+      this.setState({json:this.copy(SampleVideo)})
+      this.setState({bid:JSON.stringify(SampleVideo,null,2)})
+    } else
+    if (id === "native") {
+      this.setState({json:this.copy(SampleNative)})
+      this.setState({bid:JSON.stringify(SampleNative,null,2)})
+    }
+  }
 
   render() {
 
@@ -96,22 +130,21 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <p>Root: <input type="text" value={this.state.url} onChange={this.rootHandler} size='35'/>
-            Endpoint: <input type="text" value={this.composite()} disabled size='35'/>
-          </p>
+        <table>
+          <tr>
+            <td>
+              Root: <input type="text" value={this.state.url} onChange={this.rootHandler} size='35'/>
+              Endpoint: <input type="text" value={this.composite()} disabled size='35'/>
+            </td>
+          </tr>
+        </table>
           <p>
-           {Exchanges(this.state, this.exchangeChangedHandler)}
-          </p>   
-          <p>
-            {Bideditor(this.state,this.jsonChangedHandler, this.sendBid)}
+            {Bideditor(this.state,this.exchangeChangedHandler,
+              this.jsonChangedHandler, this.sendBid,this.restore)}
+              <br/>
+          {Windisplay(this.state,this.sendWinNotice,this.wClearHandler)}
           </p>
-          <p>
-            {Windisplay(this.state,this.sendWinNotice,this.wClearHandler)}
-          </p>
-          <p>
-            {Biddisplay(this.state,this.brClearHandler)}
-          </p>
-          <p><button style={style} onClick={this.show}>Check</button></p>
+          <Logo />
         </header>
       </div>
     );
