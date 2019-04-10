@@ -369,13 +369,7 @@ public class Creative  {
 			 char[] output =  encoder.quoteAsString(forwardurl);
 	     	forwardurl = new String(output);
 		 }
-		/*if (forwardurl != null) {
-			if (forwardurl.contains("<script") || forwardurl.contains("<SCRIPT")) {
-				if (forwardurl.contains("\"") && (forwardurl.contains("\\\"") == false)) { 
-					forwardurl = forwardurl.replaceAll("\"", "\\\\\"");
-				}
-			}
-		}*/
+
 
 		encodedFurl = URIEncoder.myUri(forwardurl);
 		encodedIurl = URIEncoder.myUri(imageurl);
@@ -394,8 +388,6 @@ public class Creative  {
 			encodedAdm = URIEncoder.myUri(s);
 		}
 
-		//strW = Integer.toString(w);
-		//strH = Integer.toString(h);
 		strPrice = Double.toString(price);
 		
 		if (extensions != null) {
@@ -408,6 +400,14 @@ public class Creative  {
 				}
 			}
 		}
+		
+		/**
+		 * Always contain these!
+		 */
+		if (!macros.contains("{pixel_url}"))
+			macros.add("{pixel_url}");
+		if (!macros.contains("{win_url}"))
+			macros.add("{win_url}");
 	}
 
 	/**

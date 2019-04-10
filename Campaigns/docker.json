@@ -1,13 +1,13 @@
 {
   "GDPR_MODE": "$GDPR_MODE",
-  "NOfraud" : {
-    "type" : "forensiq",
-    "threshhold" : 0,
-    "ck" : "none",
-    "endpoint" : "",
-    "bidOnError" : false,
-    "db" : "local/GeoIP2-ISP.mmdb",
-    "watchlist" : [ "Hetzner", "Amazon web services", "Linode", "Digital Ocean", "Vultr" ]
+   "fraud" : {
+    "type" : "$FRAUDTYPE",
+    "threshhold" : "$FRAUDTHRESHOLD",
+    "ck" : "$FRAUDKEY",
+    "endpoint" : "$FRAUDENDPOINT",
+    "bidOnError" : "$FRAUDBIDONERROR",
+    "connections": "$FRAUDCONNECTIONS",
+    "watchlist": "$FRAUDWATCHLIST"
   },
   "hazelcast": {
   	"mapstoredriver": "org.postgresql.Driver",
@@ -27,6 +27,7 @@
   	"region": "US"
   },
   "app" : {
+    "geopatch": "$GEOPATCH",
     "indexPage": "$INDEXPAGE",
     "concurrency" : "3",
     "threads": "2000",
@@ -44,15 +45,15 @@
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
     "zeromq" : {
-      "bidchannel" : "kafka://[$BROKERLIST]&topic=bids",
-      "winchannel" : "kafka://[$BROKERLIST]&topic=wins",
-      "requests" : "kafka://[$BROKERLIST]&topic=requests",
-      "clicks" : "kafka://[$BROKERLIST]&topic=clicks",
-      "pixels" : "kafka://[$BROKERLIST]&topic=pixels",
-      "videoevents": "kafka://[$BROKERLIST]&topic=videoevents",
-      "postbackevents": "kafka://[$BROKERLIST]&topic=postbackevents",
-      "status" : "kafka://[$BROKERLIST]&topic=status",
-      "reasons" : "kafka://[$BROKERLIST]&topic=reasons",
+      "bidchannel" : "$BIDSCHANNEL",
+      "winchannel" : "$WINSCHANNEL",
+      "requests" : "$REQUESTSCHANNEL",
+      "clicks" : "$CLICKSCHANNEL",
+      "pixels" : "$PIXELSCHANNEL",
+      "videoevents": "$VIDEOEVENTSCHANNEL",
+      "postbackevents": "$POSTBACKEVENTSCHANNEL",
+      "status" : "$STATUSCHANNEL",
+      "reasons" : "$REASONSCHANNEL",
 
       "frequencygoverner": "$FREQGOV",
 
@@ -110,7 +111,7 @@
   }, {
     "name" : "adx",
     "id" : "adx-seat-id",
-    "bid" : "/rtb/bids/adx=com.jacamars.dsp.rtb.exchanges.adx.DoubleClick",
+    "bid" : "/rtb/bids/adx=com.jacamars.dsp.rtb.exchanges.adx.DoubleClick&usesPiggyBackWins",
     "extension" : {
       "e_key" : "$ADX_EKEY",
       "i_key" : "$ADX_IKEY"
@@ -139,6 +140,11 @@
     "name" : "openssp",
     "id" : "openssp-id",
     "bid" : "/rtb/bids/openssp=com.jacamars.dsp.rtb.exchanges.Generic"
+  },
+  {
+    "name" : "mobfox",
+    "id" : "mobfox-id",
+    "bid" : "/rtb/bids/mobfox=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
   },
   {
     "name" : "vdopia",
@@ -272,10 +278,10 @@
     "name" : "@ISO2-3",
     "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
   }, {
-    "filename" : "data/METHBOT.txt",
-    "name" : "@CIDR",
+    "filename" : "$MASTERCIDR",
+    "name" : "@MASTERCIDR",
     "type" : "CidrMap"
-  }, {
+  },   {
     "filename" : "data/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"

@@ -26,6 +26,55 @@ public enum  Env {
 
     	if (address == null)
 			return address;
+    	
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		 while (address.contains("$BIDSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$BIDSCHANNEL", "kafka://[$BROKERLIST]&topic=bids");
+		 while (address.contains("$WINSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$WINSCHANNEL", "kafka://[$BROKERLIST]&topic=wins");
+		 while (address.contains("$REQUESTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REQUESTSCHANNEL", "kafka://[$BROKERLIST]&topic=requests");
+		 while (address.contains("$CLICKSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$CLICKSCHANNEL", "kafka://[$BROKERLIST]&topic=clicks");
+		 while (address.contains("$PIXELSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$PIXELSCHANNEL", "kafka://[$BROKERLIST]&topic=pixels");
+		 while (address.contains("$VIDEOEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$VIDEOEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=videoevents");
+		 while (address.contains("$POSTBACKEVENTSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$POSTBACKEVENTSCHANNEL", "kafka://[$BROKERLIST]&topic=postbackevents");
+		 while (address.contains("$STATUSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$STATUSCHANNEL", "kafka://[$BROKERLIST]&topic=status");
+		 while (address.contains("$REASONSCHANNEL"))
+			address = GetEnvironmentVariable(address, "$REASONSCHANNEL", "kafka://[$BROKERLIST]&topic=reasons");
+		 while (address.contains("$LOGCHANNEL"))
+				address = GetEnvironmentVariable(address, "$LOGCHANNEL", "kafka://[$BROKERLIST]&topic=logs");
+		 
+		 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		while (address.contains("$GEOPATCH"))
+			address = GetEnvironmentVariable(address, "$GEOPATCH", "");
+		
+		while (address.contains("$MASTERCIDR"))
+			address = GetEnvironmentVariable(address, "$MASTERCIDR", "");
+
+		while (address.contains("$FRAUDTYPE"))
+			address = GetEnvironmentVariable(address, "$FRAUDTYPE", "");
+		while (address.contains("$FRAUDTHRESHOLD"))
+			address = GetEnvironmentVariable(address, "$FRAUDTHRESHOLD", "100");
+		while (address.contains("$FRAUDKEY"))
+			address = GetEnvironmentVariable(address, "$FRAUDKEY", "");
+		while (address.contains("$FRAUDENDPOINT"))
+			address = GetEnvironmentVariable(address, "$FRAUDENDPOINT", "");
+		while (address.contains("$FRAUDCONNECTIONS"))
+			address = GetEnvironmentVariable(address, "$FRAUDCONNECTIONS", "100");
+		while (address.contains("$FRAUDWATCHLIST"))
+			address = GetEnvironmentVariable(address, "$FRAUDWATCHLIST", "");
+
+		while (address.contains("$BIDSWITCH_ID"))
+			address = GetEnvironmentVariable(address, "$BIDSWITCH_ID", "bidswitch-id");
+
+		/////////////////////////////////////////////////////////////////////////////    	
 		
 		while(address.contains("$MAPSTOREDRIVER"))
 			address = GetEnvironmentVariable(address,"$MAPSTOREDRIEVER",null);

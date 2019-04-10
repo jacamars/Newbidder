@@ -38,9 +38,10 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.pojo.Video;
+import com.jacamars.dsp.rtb.tools.GeoPatch;
 
 interface Command {
-	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key);
+	void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map db, String key) throws Exception;
 }
 
 public class AdxBidRequest extends BidRequest {
@@ -55,7 +56,7 @@ public class AdxBidRequest extends BidRequest {
 	static {
 
 		methodMap.put("device", new Command() {
-			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) {
+			public void runCommand(BidRequest br, RealtimeBidding.BidRequest x, ObjectNode root, Map d, String key) throws Exception {
 				String ip = AdxBidRequest.convertIp(x.getIp());
 				String ua = x.getUserAgent();
 
@@ -98,12 +99,15 @@ public class AdxBidRequest extends BidRequest {
 
 					if (m.hasEncryptedAdvertisingId()) {
 						ByteString bs = m.getEncryptedAdvertisingId();
+						byte[] barry = bs.toByteArray();
 						String id;
 						try {
-							id = AdxWinObject.decryptAdvertisingId(bs.toByteArray());
+							id = AdxWinObject.decryptAdvertisingId(barry);
 							device.put("ifa", id);
 						} catch (Exception e) {
-							e.printStackTrace();
+							if (! RTBServer.spurious("AdxBidRequest.encryptedadid", 60)) {
+								e.printStackTrace();
+							}
 						}
 					}
 
@@ -171,15 +175,19 @@ public class AdxBidRequest extends BidRequest {
 					AdxGeoCode item = lookingGlass.query(geoKey);
 					if (item != null) {
 						String type = item.type.toLowerCase();
-						if (type.equals("city") == false) {
+						if (type.equals("city")) {
 							LookingGlass cz = (LookingGlass) LookingGlass.symbols.get("@ZIPCODES");
 
-							if (cz != null) {
+							if (cz != null && postal != null) {
 								String[] parts = (String[]) cz.query(postal);
 								if (parts != null) {
 									geo.put("city", parts[3]);
 									geo.put("state", parts[4]);
-									geo.put("county", parts[5]);
+									geo.put("region", parts[5]);
+								}
+							} else {
+								if (GeoPatch.getInstance() != null) {
+									GeoPatch.getInstance().patch(device);
 								}
 							}
 						} else {
@@ -197,6 +205,19 @@ public class AdxBidRequest extends BidRequest {
 							}
 						}
 						geo.put("country", item.iso3);
+						if (geo.get("city")==null) {
+							if (GeoPatch.getInstance() != null) {
+								double [] rc = GeoPatch.getInstance().patch(device);
+								br.lat = rc[0];
+								br.lon = rc[1];
+							}
+						}
+					}
+				} else {
+					if (GeoPatch.getInstance() != null) {
+						double [] rc = GeoPatch.getInstance().patch(device);
+						br.lat = rc[0];
+						br.lon = rc[1];
 					}
 				}
 
@@ -877,7 +898,7 @@ public class AdxBidRequest extends BidRequest {
 		} 
 	}
 
-	void internalSetup() {
+	void internalSetup() throws Exception {
 
 		List<String> beenThere = new ArrayList<String>();
 		for (int i = 0; i < keys.size(); i++) {
@@ -937,6 +958,12 @@ public class AdxBidRequest extends BidRequest {
 		}
 		return sb.toString();
 	}
+	
+	public static void setCrypto(String ekey, String ikey) {
+		AdxWinObject.encryptionKeyBytes = e_key =  Base64.decodeBase64(ekey);
+		AdxWinObject.integrityKeyBytes = i_key = Base64.decodeBase64(ikey); 
+	}
+
 
 	@Override
 	public void handleConfigExtensions(Map extension)  {

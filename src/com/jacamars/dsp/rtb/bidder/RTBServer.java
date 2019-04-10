@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
@@ -150,6 +151,11 @@ public class RTBServer implements Runnable {
     // at 0
     
     public static volatile boolean GDPR_MODE = false;
+    
+    /**
+     * CIDR blocked counter
+     */
+    public volatile static long cidrblocked = 0;
 
     /**
      * Indicates of the server is not accepting bids
@@ -379,6 +385,29 @@ public class RTBServer implements Runnable {
     	        hz = Hazelcast.newHazelcastInstance(config);
     	}
         return hz;
+    }
+    
+    static volatile Map<String,Long> spurious = new ConcurrentHashMap();
+    /**
+     * Track chatty errors so we don't bombard the log with spurious output
+     * @param key String. The key of the error message.
+     * @param value int. The frequency which to track the error (seconds)
+     * @return boolean. Returns true if this is spurious, else false (ok to log).
+     */
+    public static boolean spurious(String key, int value) {
+    	Long v = null;
+    	if ((v=spurious.get(key))==null) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	}
+    	
+    	v = System.currentTimeMillis() - v;
+    	v /= 1000;
+    	if (v > value) {
+    		spurious.put(key,System.currentTimeMillis());
+    		return false;
+    	} 
+    	return true;
     }
     
     public static boolean isLeader() {
@@ -793,7 +822,7 @@ public class RTBServer implements Runnable {
                             + "%, threads=" + threads + ", low-on-threads= " + server.getThreadPool().isLowOnThreads()
                             + ", qps=" + sqps + ", avgBidTime=" + savgbidtime + "ms, avgNoBidTime=" + savgnobidtime
                             + "ms, total=" + handled + ", requests=" + request + ", bids=" + bid + ", nobids=" + nobid
-                            + ", fraud=" + fraud + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
+                            + ", fraud=" + fraud + ", cidrblocked=" + cidrblocked + ", wins=" + win + ", pixels=" + pixels + ", clicks=" + clicks
                             + ", exchanges= " + exchangeCounts + ", stopped=" + stopped + ", campaigns="
                             + Configuration.getInstance().getCampaignsList().size();
                     Map m = new HashMap();
@@ -1127,7 +1156,15 @@ class Handler extends AbstractHandler {
                     br = x.copy(body);
                     br.incrementRequests();
                     if (RTBServer.GDPR_MODE)
-                    	br.enforceGDPR();
+                    	br.enforceGDPR();              
+                    
+                    if (!br.enforceMasterCIDR()==false) {
+                    	response.setStatus(br.returnNoBidCode());
+                        response.setContentType(br.returnContentType());
+                        baseRequest.setHandled(true);
+                        RTBServer.cidrblocked++;
+                        return;
+                    }
 
                     id = br.getId();
 

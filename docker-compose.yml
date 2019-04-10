@@ -28,13 +28,11 @@ services:
     image: "rtb4free:J11"
     environment:
       GDPR_MODE: "false"
+      
       BROKERLIST: "kafka:9092"
+      
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
-      S3BUCKET: ""
-      S3REGION: ""
-      S3SECRETKEY: ""
-      S3ACCESSKEY: ""
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""
@@ -43,6 +41,22 @@ services:
       ADX_IKEY:   ""
       BIDSWITCH_ID: "1234"
       ADMINPORT: "0"
+      AWSACCESSKEY: ""
+      AWSSECRETKEY: ""
+      AWSREGION: ""
+      S3BUCKET: ""
+      
+      BIDSCHANNEL: "$BIDSCHANNEL"
+      WINSCHANNEL: "$WINSCHANNEL"
+      REQUESTSCHANNEL: "$REQUESTSCHANNEL"
+      CLICKSCHANNEL: "$CLICKSCHANNEL"
+      PIXELSCHANNEL: "$PIXELSCHANNEL"
+      VIDEOEVENTSCHANNEL: "$VIDEOEVENTSCHANNEL"
+      POSTBACKEVENTSCHANNEL: "$POSTBACKEVENTSCHANNEL"
+      STATUSCHANNEL: "$STATUSCHANNEL"
+      REASONSCHANNEL: "$REASONSCHANNEL"  
+      LOGCHANNEL: "$LOGCHANNEL"
+      
     ports:
       - "8080:8080"
       - "5701:5701"

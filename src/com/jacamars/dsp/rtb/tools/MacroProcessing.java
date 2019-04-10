@@ -1,7 +1,5 @@
 package com.jacamars.dsp.rtb.tools;
 
-import java.net.URLDecoder;
-
 import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
@@ -318,6 +316,7 @@ public class MacroProcessing {
                 case "{pixel_url}":
                 case "{pixel_url_enc}":
                 case "%7Bpixel_url%7D":
+                	value = encodeIfRequested(item,config.pixelTrackingUrl);
                     replaceAll(sb, item, value);
                     break;
 

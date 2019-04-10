@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "jsoneditor": "^5.32.1",
+    "jsoneditor": "^5.32.3",
     "jsoneditor-react": "^1.0.0",
     "radium": "^0.25.1",
     "react": "^16.8.6",
