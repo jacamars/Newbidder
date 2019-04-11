@@ -3,6 +3,7 @@ package com.jacamars.dsp.rtb.exchanges.adx;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 
 public class DoubleClick extends AdxBidRequest {
@@ -60,5 +61,10 @@ public class DoubleClick extends AdxBidRequest {
 		setExchange(AdxBidRequest.ADX);
         usesEncodedAdm = false;
 		return true;
+	}
+	
+	@Override
+	public void handleConfigExtensions(Map extension)  {
+		new AdxBidRequest().handleConfigExtensions(extension);
 	}
 }

@@ -633,11 +633,11 @@ public class AdxBidRequest extends BidRequest {
 		
 		response.slotSetMaxCpmMicros(cost);
 
-		if (imp.h != null) {
-			response.adSetHeight(imp.h);
-			response.adSetWidth(imp.w);
-			response.width = imp.w;
-			response.height = imp.h;
+		if (creat.w != null) {
+			response.adSetHeight(creat.h);
+			response.adSetWidth(creat.w);
+			response.width = creat.w;
+			response.height = creat.h;
 		}
 		
 		response.adAddAgencyId(1);
@@ -969,14 +969,7 @@ public class AdxBidRequest extends BidRequest {
 	public void handleConfigExtensions(Map extension)  {
 		String ekey = (String) extension.get("e_key");
 		String ikey = (String) extension.get("i_key");
-        if (ekey == null || ekey.length()==0) {
-        	logger.warn("Adx ekey and ikeys are not set");
-        	return;
-        }
-		
-		AdxWinObject.encryptionKeyBytes = e_key = Base64.decodeBase64(ekey); //javax.xml.bind.DatatypeConverter.parseBase64Binary(ekey);
-
-		AdxWinObject.integrityKeyBytes = i_key = Base64.decodeBase64(ikey); //javax.xml.bind.DatatypeConverter.parseBase64Binary(ikey);
+		setCrypto(ekey,ikey);
 	}
 
 }

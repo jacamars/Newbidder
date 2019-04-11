@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.BasicCommand;
 import com.jacamars.dsp.rtb.tools.XORShiftRandom;
 
@@ -286,6 +287,11 @@ public class ApiCommand {
      * @throws Exception on network or JSON errors.
      */
     public static ApiCommand instantiate(String ip, String data) throws Exception {
+    	
+    	if (! RTBServer.isLeader()) {
+    		
+    	}
+    	
         int i = data.indexOf("\"type");
         int j = data.substring(i).indexOf("#");
         String token = data.substring(i + 8, i + j + 1);
