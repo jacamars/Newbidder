@@ -757,7 +757,6 @@ public class Configuration {
 		else
 			FrequencyGoverner.silent = true;
 
-		readDatabaseIntoCache("database.json");
 
 		if ((value = (String) zeromq.get("status")) != null)
 			PERF_CHANNEL = value;
@@ -820,11 +819,13 @@ public class Configuration {
 			ttl = (Integer) m.get("ttl");
 		}
 
-		initialLoadlist = (List<String>) m.get("campaigns");
-
-		for (String camp : initialLoadlist) {
-			addCampaign(camp);
+		if (m.get("demodb") != null) {
+			String demodb = (String) m.get("demodb");
+			if (demodb.length() > 0) {
+				readDatabaseIntoCache(demodb);
+			}
 		}
+		
 
 		if (winUrl.contains("localhost")) {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
