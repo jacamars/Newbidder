@@ -29,8 +29,9 @@ public enum CommandController {
 	public static CommandController  getInstance() {
 		if (commands == null) {
 			  commands = RTBServer.getSharedInstance().getTopic(COMMANDS);
-		      commands.addMessageListener(new MessageListenerImpl());
+		      commands.addMessageListener(new CommandListener());
 		      responses = RTBServer.getSharedInstance().getTopic(RESPONSES);
+		      responses.addMessageListener(new ResponseListener());
 		}
 		return INSTANCE;
 	}
@@ -40,10 +41,10 @@ public enum CommandController {
 		String key = cmd.asyncid;
 		ApiCommand response = null;
 		
-		sentUnack.put(cmd.asyncid,cmd);
-		
 		if (timeout == 0)
 			return null;
+		
+		sentUnack.put(cmd.asyncid,cmd);
 		
 		long et = System.currentTimeMillis() + timeout;
 		while (System.currentTimeMillis() < et) {
@@ -54,14 +55,41 @@ public enum CommandController {
 		
 		return null;
 	}
-	
-    private static class MessageListenerImpl implements MessageListener<ApiCommand> {
-        public void onMessage(Message<ApiCommand> m) {
-        	ApiCommand r = m.getMessageObject();
-        	logger.info("Received: {}",r);
-        	myResponses.put(r.asyncid, r,30000);
-        	
-        	sentUnack.remove(r.asyncid);
-        }
+}
+
+/**
+ * The Hazelcast commands message listener. If you are the leader and you receive this - execute it and send
+ * the command back on the responses channel.
+ * the value. Otherwise just return.
+ * @author Ben M. Faul
+ *
+ */
+class CommandListener implements MessageListener<ApiCommand> {
+    public void onMessage(Message<ApiCommand> m) {
+    	ApiCommand r = m.getMessageObject();
+    	CommandController.logger.info("Commands Received: {}",r);
+    	
+    	if (!RTBServer.isLeader()) {
+    		return;
+    	}
+    	
+    	r.execute();
+    	CommandController.responses.publish(r);
+    }
+}
+
+/**
+ * The Hazelcast message listener. If you are the leader and you receive this - exexute it and return
+ * the value. Otherwise just return.
+ * @author Ben M. Faul
+ *
+ */
+class ResponseListener implements MessageListener<ApiCommand> {
+    public void onMessage(Message<ApiCommand> m) {
+    	ApiCommand r = m.getMessageObject();
+    	CommandController.logger.info("Responses Received: {}",r);   	
+    	CommandController.myResponses.put(r.asyncid, r,30000);
+    	CommandController.sentUnack.remove(r.asyncid);
+		
     }
 }

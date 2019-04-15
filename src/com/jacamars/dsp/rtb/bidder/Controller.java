@@ -251,17 +251,6 @@ public enum Controller {
         if (bidCachePool == null) {
             bidCachePool = BidCachePool.getInstance(RTBServer.getSharedInstance());
 
-            if (config.RESPONSES_SEND != null) {
-                responseQueue = new ZPublisher(RTBServer.getSharedInstance(),config.RESPONSES_SEND);
-            } else {
-                logger.error("*** No command response channel, crosstalk will not receive responses from commands!");
-            }
-            if (config.COMMANDS != null) {
-                RTopic tt = new RTopic(config.COMMANDS);
-                tt.addListener(new CommandLoop());
-            }
-            ///////////////////////////////////////////////////////////////////////////////
-
             if (config.VIDEOEVENTS_CHANNEL != null)
                 videoeventsQueue = new ZPublisher(RTBServer.getSharedInstance(),config.VIDEOEVENTS_CHANNEL);
 

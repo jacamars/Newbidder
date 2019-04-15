@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jacamars.dsp.crosstalk.budget.CommandController;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.BasicCommand;
 import com.jacamars.dsp.rtb.tools.XORShiftRandom;
@@ -288,112 +289,97 @@ public class ApiCommand {
      */
     public static ApiCommand instantiate(String ip, String data) throws Exception {
     	
-    	if (! RTBServer.isLeader()) {
-    		
-    	}
-    	
         int i = data.indexOf("\"type");
         int j = data.substring(i).indexOf("#");
         String token = data.substring(i + 8, i + j + 1);
         token = token.replaceAll("\"", "");
+        
+        ApiCommand cmd = null;
 
         logger.info("From IP: {}, command: {}", ip, data);
         switch (token) {
             case Ping:
-                PingCmd ping = mapper.readValue(data, PingCmd.class);
-                ping.execute();
-                return ping;
+                cmd = mapper.readValue(data, PingCmd.class);
+                break;
             case GetPrice:
-                GetPriceCmd getPrice = mapper.readValue(data, GetPriceCmd.class);
-                getPrice.execute();
-                return getPrice;
+                cmd = mapper.readValue(data, GetPriceCmd.class);
+                break;
             case SetPrice:
-                SetPriceCmd setPrice = mapper.readValue(data, SetPriceCmd.class);
-                setPrice.execute();
-                return setPrice;
+                cmd = mapper.readValue(data, SetPriceCmd.class);
+                break;
             case GetBudget:
-                GetBudgetCmd getBudget = mapper.readValue(data, GetBudgetCmd.class);
-                getBudget.execute();
-                return getBudget;
+                cmd = mapper.readValue(data, GetBudgetCmd.class);
+                break;
             case SetBudget:
-                SetBudgetCmd setBudget = mapper.readValue(data, SetBudgetCmd.class);
-                setBudget.execute();
-                return setBudget;
+                cmd = mapper.readValue(data, SetBudgetCmd.class);
+                break;
             case GetValues:
-                GetValuesCmd getValues = mapper.readValue(data, GetValuesCmd.class);
-                getValues.execute();
-                return getValues;
+                cmd = mapper.readValue(data, GetValuesCmd.class);
+                break;
             case Update:
-                UpdateCmd update = mapper.readValue(data, UpdateCmd.class);
-                update.execute();
-                return update;
+                cmd = mapper.readValue(data, UpdateCmd.class);
+                break;
             case Delete:
-                DeleteCmd delete = mapper.readValue(data, DeleteCmd.class);
-                delete.execute();
-                return delete;
+                cmd = mapper.readValue(data, DeleteCmd.class);
+                break;
             case GetCampaign:
-                GetCampaignCmd cmp = mapper.readValue(data, GetCampaignCmd.class);
-                cmp.execute();
-                return cmp;
+                cmd = mapper.readValue(data, GetCampaignCmd.class);
+                break;
 
             case ListCampaigns:
-                ListCampaignsCmd list = mapper.readValue(data, ListCampaignsCmd.class);
-                list.execute();
-                return list;
+                cmd = mapper.readValue(data, ListCampaignsCmd.class);
+                break;
 
             case GetReason:
-                GetReasonCmd reason = mapper.readValue(data, GetReasonCmd.class);
-                reason.execute();
-                return reason;
+                cmd = mapper.readValue(data, GetReasonCmd.class);
+                break;
 
             case Add:
-                AddCampaignCmd addcamp = mapper.readValue(data, AddCampaignCmd.class);
-                addcamp.execute();
-                return addcamp;
+                cmd = mapper.readValue(data, AddCampaignCmd.class);
+                break;
 
             case ConfigureAws:
-                ConfigureAwsObjectCmd aws = mapper.readValue(data, ConfigureAwsObjectCmd.class);
-                aws.execute();
-                return aws;
+                cmd = mapper.readValue(data, ConfigureAwsObjectCmd.class);
+                break;
 
             case Future:
-                FutureCmd fut = mapper.readValue(data, FutureCmd.class);
-                fut.execute();
-                if (fut.cmd == null) {
-                    return fut;
-                }
-                return fut.cmd;
+                cmd = mapper.readValue(data, FutureCmd.class);
+                break;
 
             case SpendRate:
-                GetSpendRateCmd spend = mapper.readValue(data, GetSpendRateCmd.class);
-                spend.execute();
-                return spend;
+                cmd = mapper.readValue(data, GetSpendRateCmd.class);
+                break;
 
             case Dump:
-                DumpCmd dump = mapper.readValue(data, DumpCmd.class);
-                dump.execute();
-                return dump;
+                cmd= mapper.readValue(data, DumpCmd.class);
+                break;
 
             case GetBiddersStatus:
-                GetBiddersStatusCmd stats = mapper.readValue(data, GetBiddersStatusCmd.class);
-                stats.execute();
-                return stats;
+                cmd = mapper.readValue(data, GetBiddersStatusCmd.class);
+                break;
 
             case SetWeights:
-                SetWeightsCmd wts = mapper.readValue(data, SetWeightsCmd.class);
-                wts.execute();
-                return wts;
-
+                cmd = mapper.readValue(data, SetWeightsCmd.class);
+                break;
             case GetWeights:
-                GetWeightsCmd gwc = mapper.readValue(data, GetWeightsCmd.class);
-                gwc.execute();
-                return gwc;
+                cmd = mapper.readValue(data, GetWeightsCmd.class);
+                break;
 
             default:
-                UnknownCmd unk = new UnknownCmd(token);
-                unk.execute();
-                return unk;
+                cmd = new UnknownCmd(token);
+                return cmd;
         }
+        
+        if (!RTBServer.isLeader()) {
+        	cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
+        } else {
+        	cmd.execute();
+        }
+        
+        if (cmd instanceof FutureCmd) {
+        	cmd = ((FutureCmd) cmd).cmd;
+        }
+        return cmd;
     }
 
     /**

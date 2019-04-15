@@ -1,5 +1,8 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -85,8 +88,11 @@ public enum Crosstalk {
 	public static Crosstalk getInstance() throws Exception {
 		if (campaigns != null)
 			return INSTANCE;
-		
-		initialize();
+		try {
+			initialize();
+		} catch (Exception error) {
+			tryCreate();
+		}
 		
 		// Start the connection to elastic search
 		BudgetController.getInstance();
@@ -112,6 +118,25 @@ public enum Crosstalk {
 		
 		return INSTANCE;
 
+	}
+	
+	static void tryCreate() throws Exception {
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners_rtb_standard.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns_rtb_standard.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/rtb_standards.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/exchange_attributes.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
 	}
 
 	static void updateBudgets() {

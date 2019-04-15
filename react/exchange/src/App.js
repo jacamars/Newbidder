@@ -138,7 +138,7 @@ class App extends Component {
         <header className="App-header">
         <table>
           <tr>
-            <td>
+            <td style={{minWidth: '100%', minHeight: '400px', backgroundColor: 'red'}}>
               Root: <input type="text" value={this.state.url} onChange={this.rootHandler} size='35'/>
               Endpoint: <input type="text" value={this.composite()} disabled size='35'/>
             </td>

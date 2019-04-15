@@ -5,32 +5,13 @@
 version: "3"
 
 services:
-
-  zookeeper:
-    image: "zookeeper"
-    ports:
-      - "2181:2181"
-    networks:
-      - rtb_net
-
-  kafka:
-    image: "ches/kafka"
-    environment:
-      ZOOKEEPER_IP: "zookeeper"
-    ports:
-      - "9092:9092"
-    networks:
-      - rtb_net
-    depends_on:
-      - zookeeper
-
   bidder:
     image: "rtb4free:J11"
     environment:
       GDPR_MODE: "false"
-      
-      BROKERLIST: "kafka:9092"
-      
+
+      DEMODB: "database.json"
+
       EXTERNAL: "http://localhost:8080"
       ACCOUNTING: "NONE"
       GOOGLE_EKEY: ""
@@ -83,7 +64,6 @@ services:
       - rtb_net
     volumes:
       - /tmp/data:/var/lib/postgresql/data
-
 
 networks:
   rtb_net:

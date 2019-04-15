@@ -24,6 +24,7 @@
     	"agghost": "$AHOST",
     	"port": "$ESPORT"
     },
+    "webaccess": "8100",
   	"region": "US"
   },
   "app" : {

@@ -15,6 +15,7 @@
     	"agghost": "$AHOST",
     	"port": "$ESPORT"
     },
+    "webaccess": "8100",
   	"region": "US"
   },
   "NOfraud" : {
@@ -33,6 +34,7 @@
     "trace": "$TRACE",
     "stopped" : false,
     "ttl" : 300,
+    "demodb": "$DEMODB",
     "pixel-tracking-url" : "$EXTERNAL/pixel",
     "clickurl" : "$EXTERNAL/click",
     "winurl" : "$EXTERNAL/rtb/win",

@@ -176,8 +176,8 @@ public enum  Env {
 		while (address.contains("$GOOGLE_IKEY"))
 			address = GetEnvironmentVariable(address, "$GOOGLE_IKEY", "");
 
-		while (address.contains("$GOOGLE_IKEY"))
-			address = GetEnvironmentVariable(address, "$GOOGLE_IKEY", "");
+		while (address.contains("$DEMODB"))
+			address = GetEnvironmentVariable(address, "$DEMODB", "");
 		
 		address = GetEnvironmentVariable(address, "$TRACE", "false");
 

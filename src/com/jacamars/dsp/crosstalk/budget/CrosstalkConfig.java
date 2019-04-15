@@ -5,9 +5,16 @@ import java.sql.Statement;
 import java.sql.Connection;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jacamars.dsp.crosstalk.api.WebAccess;
+
 public enum CrosstalkConfig {
 
 	CONFIGURATION;
+	
+	protected static final Logger logger = LoggerFactory.getLogger(CrosstalkConfig.class);
 	
 	static Statement statement;
 	static Connection connect;
@@ -40,6 +47,12 @@ public enum CrosstalkConfig {
 			throw new Exception("ELK is not configured");
 		
 		elk = new Elk((Map<String,String>)crosstalk.get("elk"));
+		
+		String webaccess = (String)crosstalk.get("webaccess");
+		if (webaccess != null && webaccess.length() != 0) {
+			new WebAccess(Integer.parseInt(webaccess));
+			logger.info("Webaccess available on port: {}", webaccess);
+		}
 		return CONFIGURATION;
 	}
 	
