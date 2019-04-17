@@ -122,8 +122,10 @@ public class Targeting {
 			make = myNode.get("make").asText();
 		if (myNode.get("model") != null)
 			model = myNode.get("model").asText();
-		geo_latitude = myNode.get("geo_latitude").asDouble();
-		geo_longitude = myNode.get("geo_longitude").asDouble();
+		if (myNode.get("geo_latitude") != null)
+			geo_latitude = myNode.get("geo_latitude").asDouble();
+		if (myNode.get("geo_longitude") != null)
+			geo_longitude = myNode.get("geo_longitude").asDouble();
 
 		// connectionTYpe is needed here
 

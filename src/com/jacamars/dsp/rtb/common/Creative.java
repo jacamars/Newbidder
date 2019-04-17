@@ -21,8 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
+
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
@@ -31,11 +30,11 @@ import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.exchanges.Nexage;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
-import com.jacamars.dsp.rtb.nativeads.assets.Entity;
-import com.jacamars.dsp.rtb.nativeads.creative.Data;
+
 import com.jacamars.dsp.rtb.nativeads.creative.NativeCreative;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.probe.Probe;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.rtb.tools.MacroProcessing;
 
 /**
@@ -70,7 +69,7 @@ public class Creative  {
 	/** sub-template for banner */
 	public String subtemplate;
 	/** Private/preferred deals */
-	public Deals deals;
+	public Deals deals = new Deals();
 	/** String representation of w */
 	transient public String strW;
 	/** String representation of h */
@@ -256,6 +255,7 @@ public class Creative  {
 			tableName = "banner_videos";
 		update(node);
 	}
+	
 
 	/**
 	 * A shallow copy. This is used to create a 'rotating creative'. The rotating creative will inherit all the
@@ -1167,7 +1167,7 @@ public class Creative  {
 	 *             on JSON errors
 	 */
 	void doStandardRtb() throws Exception {
-		ArrayNode array = ResultSetToJSON.factory.arrayNode();
+		ArrayNode array = JdbcTools.factory.arrayNode();
 		ArrayNode list;
 		String rkey;
 		int theId = Integer.parseInt(bannerid);
@@ -1218,7 +1218,7 @@ public class Creative  {
 			imageurl = node.get(IMAGE_URL).asText(null);
 		}
 		budget = new Budget();
-		budget.totalBudget.set(node.get("total_basket_value").asDouble());
+		budget.totalBudget.set(node.get("total_basket_value"));
 		budget.activate_time = node.get("interval_start").asLong();
 		budget.expire_time = node.get("interval_end").asLong();
 

@@ -1,9 +1,22 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
+
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.hazelcast.client.config.ClientConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.nio.serialization.ClassDefinition;
+import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
+import com.jacamars.dsp.rtb.tools.DbTools;
  
 /**
  * AtomicBigDecimal -- Mutable implementation of BigDecimal, implemented ith the concurrent atomic packag
@@ -11,27 +24,37 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  */
 
-public class AtomicBigDecimal extends Number implements Comparable<Object> {
+public class AtomicBigDecimal extends Number implements Comparable<Object>, Portable {
 	
 	/** Serialized version */
     private static final long serialVersionUID = -94825735363453200L;
     private AtomicReference<BigDecimal> value;
+    
+    public String sval;
  
 
     public AtomicBigDecimal() {
         this(0.0);
+        sval = value.toString();
     }
  
     public AtomicBigDecimal(double initVal) {
         this(new BigDecimal(initVal));
+        sval = value.toString();
     }
      
     public AtomicBigDecimal(BigDecimal initVal) {
         value = new AtomicReference<BigDecimal>(initVal);
+        sval = value.toString();
+    }
+    
+    public AtomicBigDecimal(int intVal) {
+    	this((double)intVal);
     }
      
     public AtomicBigDecimal(Object initVal) {
         this(objectToBigDecimal(initVal));
+        sval = value.toString();
     }
      
     // Atomic methods
@@ -384,6 +407,9 @@ public class AtomicBigDecimal extends Number implements Comparable<Object> {
      
     // Support Routines and constants
     private static BigDecimal objectToBigDecimal(Object obj) {
+    	if (obj == null || obj instanceof NullNode)
+    		return new BigDecimal(0.0);
+    	
         if (obj instanceof AtomicBigDecimal) {
             return ((AtomicBigDecimal) obj).get();
         } if (obj instanceof BigDecimal) {
@@ -398,4 +424,58 @@ public class AtomicBigDecimal extends Number implements Comparable<Object> {
             return new BigDecimal(obj.toString());
         }
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public static final int CLASS_ID = 4;
+    
+    /**
+  	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+  	 * @param config ClientConfig. The configuration for the user.
+  	 */
+  	public static void registerWithHazelCast(ClientConfig config) {
+         config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
+         ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, AtomicBigDecimal.CLASS_ID);
+  		portableCampaignClassBuilder.addUTFField("json");
+
+  		ClassDefinition portablCampaignClassDefinition = portableCampaignClassBuilder.build();
+  	    config.getSerializationConfig().addClassDefinition(portablCampaignClassDefinition);
+  	}
+  	
+  	/**
+  	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+  	 * @param config ClientConfig. The configuration for the member.
+  	 */
+  	public static void registerWithHazelCast(Config config) {
+  		config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
+  	    ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, AtomicBigDecimal.CLASS_ID);
+  	    portableCampaignClassBuilder.addUTFField("json");
+
+  		ClassDefinition portableCampaignClassDefinition = portableCampaignClassBuilder.build();
+  		config.getSerializationConfig().addClassDefinition(portableCampaignClassDefinition);
+  	}
+    
+    
+	@Override
+	public int getFactoryId() {
+		return PortableJsonFactory.FACTORY_ID;
+	}
+
+	@Override
+	public int getClassId() {
+		return CLASS_ID;
+	}
+
+	@Override
+	public void writePortable(PortableWriter writer) throws IOException {
+		String json = DbTools.mapper.writeValueAsString(this);
+		sval = value.toString();
+		writer.writeUTF("json", json);
+	}
+
+	@Override
+	public void readPortable(PortableReader reader) throws IOException {
+		String json = reader.readUTF("json");
+		AtomicBigDecimal c = DbTools.mapper.readValue(json, AtomicBigDecimal.class);
+	}
 }

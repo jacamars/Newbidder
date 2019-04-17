@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,7 +29,7 @@ import com.hazelcast.nio.serialization.ClassDefinitionBuilder;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
 import com.hazelcast.nio.serialization.PortableWriter;
-import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
+
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
@@ -43,6 +44,7 @@ import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
 import com.jacamars.dsp.rtb.tools.DbTools;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 
 /**
  * A class that implements a campaign. Provide the campaign with evaluation
@@ -130,6 +132,9 @@ public class Campaign implements Comparable, Portable  {
 
     private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
     
+    // when it was last updated if by sql
+    public long updated_at;
+    
     /**
      * Resources used to create campaign from JSON based SQL
      */
@@ -187,6 +192,7 @@ public class Campaign implements Comparable, Portable  {
 	 */
 	public Campaign(JsonNode node) throws Exception {
 		myNode = node;
+		updated_at = node.get("updated_at").asLong();
 		setup();
 		process();
 		doTargets();
@@ -212,6 +218,17 @@ public class Campaign implements Comparable, Portable  {
 		init(camp);
 	}
 	
+	public void update(ObjectNode myNode) throws Exception {
+		this.myNode = myNode;
+		this.creatives.clear();
+		this.bcat.clear();
+		this.exchanges.clear();
+
+		setup();
+		process();
+		doTargets();
+	}
+	
 	/** 
 	 * An iniitializer from a copy.
 	 * @param camp
@@ -228,6 +245,7 @@ public class Campaign implements Comparable, Portable  {
 		this.forensiq = camp.forensiq;
 		this.frequencyCap = camp.frequencyCap;
 		this.budget = camp.budget;
+		this.updated_at = camp.updated_at;
 		if (camp.category != null)
 			this.category = camp.category;
 		
@@ -650,7 +668,7 @@ public class Campaign implements Comparable, Portable  {
 
 
 	public boolean budgetExceeded() throws Exception {
-		if (budget == null)
+		if (budget == null || budget.totalBudget.doubleValue()==0)
 			return false;
 
 		return BudgetController.getInstance().checkCampaignBudgets(adId,budget.totalBudget, 
@@ -690,12 +708,12 @@ public class Campaign implements Comparable, Portable  {
 		adId = myNode.get(CAMPAIGN_ID).asText();
 		budget = new Budget();
 		
-		budget.totalCost = new AtomicBigDecimal(myNode);
-		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost").asDouble(0.0));
-		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost").asDouble(0.0));
+		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
+		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost"));
+		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost"));
 		budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
 		budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
-		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET).asDouble());
+		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
 
 		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
 				String parts = myNode.get(DAYPART).asText();
@@ -856,7 +874,7 @@ public class Campaign implements Comparable, Portable  {
 	 */
 	void doStandardRtb() throws Exception {
 
-		ArrayNode array = ResultSetToJSON.factory.arrayNode();
+		ArrayNode array = JdbcTools.factory.arrayNode();
 		for (int i = 0; i < Crosstalk.getInstance().campaignRtbStd.size(); i++) {
 			JsonNode node = Crosstalk.getInstance().campaignRtbStd.get(i);
 			if (adId == node.get("campaign_id").asText()) {
@@ -884,6 +902,12 @@ public class Campaign implements Comparable, Portable  {
 				reason += "Campaign daily budget exceeded. ";
 			if (BudgetController.getInstance().checkCampaignBudgetsHourly(adId, budget.hourlyBudget))
 				reason += "Campaign hourly budget exceeded. ";
+		}
+		
+		if (creatives.size() == 0) {
+			if (reason.length() > 0)
+				reason += " ";
+			reason += "No attached creatives.";
 		}
 
 		if (isExpired()) {
@@ -951,6 +975,14 @@ public class Campaign implements Comparable, Portable  {
 				park(creative);
 			}
 		}
+	}
+	
+	public boolean isRunnable() throws Exception {
+		if (status == null)
+			status = "runnable";
+		if (!status.equals("runnable"))
+			return false;
+		return true;
 	}
 
 }

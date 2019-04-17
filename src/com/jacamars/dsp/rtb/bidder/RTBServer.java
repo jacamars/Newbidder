@@ -49,6 +49,7 @@ import com.jacamars.dsp.rtb.tools.ChattyErrors;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.commands.Echo;
@@ -369,6 +370,7 @@ public class RTBServer implements Runnable {
 
 			Echo.registerWithHazelCast(config);
 			Campaign.registerWithHazelCast(config);
+			AtomicBigDecimal.registerWithHazelCast(config);
 			hz = Hazelcast.newHazelcastInstance(config);
 
 			logger.info("*** Server STARTING, Leader: {} ***", isLeader());

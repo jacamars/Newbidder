@@ -1,16 +1,23 @@
 package com.jacamars.dsp.crosstalk.budget;
 
 import java.nio.charset.StandardCharsets;
+
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,16 +30,24 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.IMap;
 
-import com.jacamars.dsp.crosstalk.api.ResultSetToJSON;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
+import com.jacamars.dsp.rtb.tools.Performance;
 
+/**
+ * Class that loads,updates,deletes campaigns based on SQL queries. Runs once a minute to (a) handle the budgets and (b) update the
+ * campaigns pursuant to SQL.
+ * @author Ben M. Faul
+ *
+ */
 public enum Crosstalk {
 
 	INSTANCE;
@@ -110,6 +125,7 @@ public enum Crosstalk {
 		execService.scheduleAtFixedRate(() -> {
 			try {
 				updateBudgets();
+				INSTANCE.scan();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -137,6 +153,8 @@ public enum Crosstalk {
 		stmt.execute(content);
 		content = new String(Files.readAllBytes(Paths.get("data/postgres/exchange_attributes.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/targets.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
 	}
 
 	static void updateBudgets() {
@@ -157,43 +175,43 @@ public enum Crosstalk {
 		// /////////////////////////// GLOBAL rtb_spec
 		globalRtbSpecification = new HashMap<Integer, JsonNode>();
 		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + RTB_STD);
-		ArrayNode std = ResultSetToJSON.convert(rs);
+		ArrayNode std = JdbcTools.convertToJson(rs);
 		Iterator<JsonNode> it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
 			globalRtbSpecification.put(child.get("id").asInt(), child);
 		}
 
-		campaignRtbStd = ResultSetToJSON.factory.arrayNode();
+		campaignRtbStd = JdbcTools.factory.arrayNode();
 		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + CAMP_RTB_STD);
-		std = ResultSetToJSON.convert(rs);
+		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
 			campaignRtbStd.add(child);
 		}
 
-		bannerRtbStd = ResultSetToJSON.factory.arrayNode();
+		bannerRtbStd = JdbcTools.factory.arrayNode();
 		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + BANNER_RTB_STD);
-		std = ResultSetToJSON.convert(rs);
+		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
 			bannerRtbStd.add(child);
 		}
 
-		videoRtbStd = ResultSetToJSON.factory.arrayNode();
+		videoRtbStd = JdbcTools.factory.arrayNode();
 		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + VIDEO_RTB_STD);
-		std = ResultSetToJSON.convert(rs);
+		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
 			videoRtbStd.add(child);
 		}
 
-		exchangeAttributes = ResultSetToJSON.factory.arrayNode();
+		exchangeAttributes = JdbcTools.factory.arrayNode();
 		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from exchange_attributes");
-		std = ResultSetToJSON.convert(rs);
+		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
@@ -273,7 +291,7 @@ public enum Crosstalk {
 		if (c == null) {
 			c = makeNewCampaign(campaign);
 			if (c.isActive()) {
-				campaigns.put(campaign.adId,c);
+				addCampaignToRTB(c);
 				Configuration.getInstance().addCampaign(campaign);
 				c.runUsingElk();
 				logger.info("New campaign {} going active",campaign);
@@ -313,6 +331,10 @@ public enum Crosstalk {
 		
 	}
 	
+	public Campaign makeNewCampaign(ObjectNode node) throws Exception {
+		return new Campaign(node);
+	}
+	
 	/**
 	 * Update a command, note retrieves the campaign from the SQL database,
 	 * 
@@ -332,4 +354,297 @@ public enum Crosstalk {
 		return update(x,true);
 	}
 	
+	// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public ArrayNode createJson() throws Exception {
+		Date now = new Date();
+		Timestamp update = new Timestamp(now.getTime());
+
+		Configuration config = Configuration.getInstance();
+		//String select = "select * from campaigns where  status = 'runnable' and activate_time <= ? and expire_time > ?";
+		String select = "select * from campaigns where status='runnable'";
+
+		PreparedStatement prep;
+
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		prep = conn.prepareStatement(select);
+	
+		ResultSet rs = prep.executeQuery();
+		ArrayNode nodes = JdbcTools.convertToJson(rs);
+		handleNodes(nodes);
+
+		return nodes;
+	}
+
+	public ArrayNode createJson(String id) throws Exception {
+		Date now = new Date();
+		Timestamp update = new Timestamp(now.getTime());
+
+		Configuration config = Configuration.getInstance();
+
+		String select = "select * from campaigns where id = " + id;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		var prep = conn.prepareStatement(select);
+		ResultSet rs = prep.executeQuery();
+
+		ArrayNode nodes = JdbcTools.convertToJson(rs);
+		handleNodes(nodes);
+
+		return nodes;
+	}
+
+	/**
+	 * Convert SQL tables for campaigns, creatives, target and rtb_standard into JSON object
+	 * @param nodes JSON array to hold the results.
+	 * @throws Exception on JSON or SQL errors.
+	 */
+	public static void handleNodes(ArrayNode nodes) throws Exception {
+
+		ResultSet rs;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		Configuration config = Configuration.getInstance();
+		var stmt = conn.createStatement();
+		List<Integer> list = new ArrayList<Integer>();
+
+		for (int i = 0; i < nodes.size(); i++) {
+			ObjectNode x = (ObjectNode) nodes.get(i);
+			int campaignid = x.get("id").asInt();
+			String regions = x.get("regions").asText();
+			regions = regions.toLowerCase();
+			if (regions.contains(CrosstalkConfig.getInstance().region.toLowerCase())) {
+				int targetid = x.get("target_id").asInt();
+				rs = stmt.executeQuery("select * from targets where id = " + targetid);
+				ArrayNode inner = JdbcTools.convertToJson(rs);
+				ObjectNode y = (ObjectNode) inner.get(0);
+				x.set("targetting", y);
+			} else {
+				list.add(i);
+			}
+		}
+		
+		//
+		// Remove in reverse all that don't belong to my region/
+		//
+		while (list.size() > 0) {
+			Integer x = list.get(list.size() - 1);
+			nodes.remove(x);
+			list.remove(x);
+		}
+
+		if (nodes.size() == 0)
+			return;
+
+		// /////////////////////////// GLOBAL rtb_spec
+		globalRtbSpecification = new HashMap<Integer, JsonNode>();
+		rs = stmt.executeQuery("select * from " + RTB_STD);
+		ArrayNode std = JdbcTools.convertToJson(rs);
+		Iterator<JsonNode> it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			globalRtbSpecification.put(child.get("id").asInt(), child);
+		}
+
+		campaignRtbStd = JdbcTools.factory.arrayNode();
+		rs = stmt.executeQuery("select * from " + CAMP_RTB_STD);
+		std = JdbcTools.convertToJson(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			campaignRtbStd.add(child);
+		}
+
+		bannerRtbStd = JdbcTools.factory.arrayNode();
+		rs = stmt.executeQuery("select * from " + BANNER_RTB_STD);
+		std = JdbcTools.convertToJson(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			bannerRtbStd.add(child);
+		}
+
+		videoRtbStd = JdbcTools.factory.arrayNode();
+		rs = stmt.executeQuery("select * from " + VIDEO_RTB_STD);
+		std = JdbcTools.convertToJson(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			videoRtbStd.add(child);
+		}
+
+		exchangeAttributes = JdbcTools.factory.arrayNode();
+		rs = stmt.executeQuery("select * from exchange_attributes");
+		std = JdbcTools.convertToJson(rs);
+		it = std.iterator();
+		while (it.hasNext()) {
+			JsonNode child = it.next();
+			exchangeAttributes.add(child);
+		}
+		// ////////////////////////////////////////////////////////////////////////////
+		// Banner
+		for (int i = 0; i < nodes.size(); i++) {
+			ObjectNode x = (ObjectNode) nodes.get(i);
+			int campaignid = x.get("id").asInt();
+			rs = stmt.executeQuery("select * from banners where campaign_id = " + campaignid);
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			x.set("banner", inner);
+		}
+
+		// Video
+		for (int i = 0; i < nodes.size(); i++) {
+			ObjectNode x = (ObjectNode) nodes.get(i);
+			int campaignid = x.get("id").asInt(); ///////// CHECK
+			rs = stmt.executeQuery("select * from banner_videos where campaign_id = " + campaignid);
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			x.set("banner_video", inner);
+		}
+	}
+	
+	public void scan() {
+
+			try {
+				refresh();
+				
+				campaigns.entrySet().forEach(e->{
+					Campaign camp = e.getValue();
+					camp.runUsingElk();
+					try {
+					if (!camp.isActive()) {
+						logger.info("Campaign has become inactive: {}", camp.adId);
+						removeFromRTB(camp);
+						camp.report();
+						parkCampaign(camp);
+					} 
+					} catch (Exception error) {
+						logger.error("Error scanning campaign: {}, error: {}", camp.adId,error.getMessage());
+					}
+				});
+				
+				
+				List<String> additions = new ArrayList<String>();
+				List<String> clist = new ArrayList<String>();
+				for (String key : deletedCampaigns.keySet()) {
+					Campaign camp = deletedCampaigns.get(key);
+					if (camp.isRunnable()) {
+						camp.runUsingElk();
+						if (camp.isActive()) {
+							logger.info("Currently inactive campaign going active: {}", camp.adId);
+							addCampaignToRTB(camp);
+							additions.add(key);
+							try {
+								//camp.addToRTB();                                  // one at a time, not good. TBD
+								clist.add(key);
+							} catch (Exception error) {
+								logger.error("Error: Failed to load campaign {} into bidders, reason: {}", camp.adId,error.toString());
+							}
+						}
+					}
+
+				}
+				
+				for (String key : additions) {
+					deletedCampaigns.remove(key);
+				}
+
+				/**
+				 * Make sure any campaigns that have exceeded their total budgets or has expired are
+				 * purged from crosstalk and the bidder.
+				 */
+				purge();
+
+				logger.info("Heartbeat,freedsk: {}, cpu: {}%, mem: {}, runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
+						Performance.getPercFreeDisk(), Performance.getCpuPerfAsString(),
+						Performance.getMemoryUsed(),
+						campaigns.size(),deletedCampaigns.size(),
+						BudgetController.getInstance().getCampaignDailySpend(null),
+						BudgetController.getInstance().getCampaignSpendAverage(null));
+			} catch (Exception error) {
+				error.printStackTrace();
+				if (error.toString().toLowerCase().contains("sql")) {
+					System.err.println("SQL Error, goodbye");
+					System.exit(0);
+				}
+			}
+		}
+	
+	void purge() throws Exception {
+		StringBuilder list = new StringBuilder("");  
+		List<Campaign> dc = new ArrayList<Campaign>();
+		for (String key : deletedCampaigns.keySet()) {
+			Campaign c = deletedCampaigns.get(key);
+			if (c.canBePurged()) {
+				removeFromRTB(c);
+				list.append(c.adId + " ");
+				dc.add(c);
+			}
+		}
+
+		for (Campaign c : dc) {
+			deletedCampaigns.remove("" + c.adId);
+		}
+
+		
+		campaigns.entrySet().forEach(e->{
+			Campaign c = e.getValue();
+			try {
+			if (c.canBePurged()) {
+				removeFromRTB(c);
+				list.append(c.adId + " ");
+			}
+			} catch (Exception error) {
+				logger.error("Error purging campaign: {}: error: {}" + c.adId,error.getMessage());
+			}
+		});
+
+		if (list.length()>0) {
+			logger.info("The following campaigns have been purged: {}",list.toString());
+		}
+	}
+
+	/**
+	 * Remove a campaign from the hazelcast IMap.
+	 * @param camp Campaign. The campaign to add.
+	 */
+	void removeFromRTB(Campaign camp) {
+		campaigns.remove(camp.adId);
+	}
+	
+	/**
+	 * Add a campaign from the hazelcast IMap.
+	 * @param camp Campaign. The campaign to add.
+	 */
+	void addCampaignToRTB(Campaign camp) {
+		campaigns.put(camp.adId,camp);
+	}
+	
+	/**
+	 * Refresh the system. Load all bidders with all runnable campaigns.
+	 * 
+	 * @return List. The bidder list.
+	 * @throws Exception
+	 *             on SQL or 0MQ errors.
+	 */
+	public void refresh() throws Exception {
+		ArrayNode array = createJson(); // get a copy of the SQL database
+
+		logger.info("Campaigns:scanner:refresh", "********** SENDING UPDATES **********");
+		long time = System.currentTimeMillis();
+	
+		
+		ExecutorService executor = Executors.newFixedThreadPool(array.size());
+
+		for (JsonNode s : array) {
+			Runnable w = new CampaignBuilderWorker(s);
+			executor.execute(w);
+			//update(s,false);
+		}
+
+		time = System.currentTimeMillis() - time;
+		time /= 1000;
+		logger.info("Updates took {} seconds",time);
+		executor.shutdown();
+		while (!executor.isTerminated()) {
+		}
+	}
+
 }

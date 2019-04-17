@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -105,7 +106,7 @@ public class AddCampaignCmd extends ApiCommand {
 
 			PreparedStatement prep = config.getConnection().prepareStatement(select);
 			ResultSet rs = prep.executeQuery();
-			ArrayNode nodes = ResultSetToJSON.convert(rs);
+			ArrayNode nodes = JdbcTools.convertToJson(rs);
 			handleNodes(nodes);
 
 			return nodes;
@@ -122,7 +123,7 @@ public class AddCampaignCmd extends ApiCommand {
 			PreparedStatement prep = config.getConnection().prepareStatement(select);
 			ResultSet rs = prep.executeQuery();
 
-			ArrayNode nodes = ResultSetToJSON.convert(rs);
+			ArrayNode nodes = JdbcTools.convertToJson(rs);
 			handleNodes(nodes);
 
 			return nodes;
@@ -148,7 +149,7 @@ public class AddCampaignCmd extends ApiCommand {
 				if (regions.contains(config.getRegion().toLowerCase())) {
 					int targetid = x.get("target_id").asInt();
 					rs = stmt.executeQuery("select * from targets where id = " + targetid);
-					ArrayNode inner = ResultSetToJSON.convert(rs);
+					ArrayNode inner = JdbcTools.convertToJson(rs);
 					ObjectNode y = (ObjectNode) inner.get(0);
 					x.set("targetting", y);
 				} else {
@@ -174,7 +175,7 @@ public class AddCampaignCmd extends ApiCommand {
 				ObjectNode x = (ObjectNode) nodes.get(i);
 				int campaignid = x.get("id").asInt();
 				rs = stmt.executeQuery("select * from banners where campaign_id = " + campaignid);
-				ArrayNode inner = ResultSetToJSON.convert(rs);
+				ArrayNode inner = JdbcTools.convertToJson(rs);
 				x.set("banner", inner);
 			}
 
@@ -183,7 +184,7 @@ public class AddCampaignCmd extends ApiCommand {
 				ObjectNode x = (ObjectNode) nodes.get(i);
 				int campaignid = x.get("id").asInt(); ///////// CHECK
 				rs = stmt.executeQuery("select * from banner_videos where campaign_id = " + campaignid);
-				ArrayNode inner = ResultSetToJSON.convert(rs);
+				ArrayNode inner = JdbcTools.convertToJson(rs);
 				x.set("banner_video", inner);
 			}
 	

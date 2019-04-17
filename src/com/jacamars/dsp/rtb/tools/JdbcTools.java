@@ -1,21 +1,24 @@
-package com.jacamars.dsp.crosstalk.api;
+package com.jacamars.dsp.rtb.tools;
 
 import java.math.BigDecimal;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class ResultSetToJSON {
+public class JdbcTools {
 	public static ObjectMapper mapper = new ObjectMapper();
 	public static final JsonNodeFactory factory = JsonNodeFactory.instance;
 
-
-	public static synchronized ArrayNode convert(ResultSet rs) throws Exception {
+	public static synchronized ArrayNode convertToJson(ResultSet rs) throws Exception {
 		ArrayNode array = factory.arrayNode();
 		ResultSetMetaData rsmd = rs.getMetaData();
 
@@ -85,6 +88,9 @@ public class ResultSetToJSON {
 				case java.sql.Types.CHAR:
 					child.put(column_name,rs.getString(column_name));
 					break;
+				case java.sql.Types.NUMERIC:
+					child.put(column_name, rs.getBigDecimal(column_name));
+					break;
 				default:
 					if  (rsmd.getColumnTypeName(i).equals("TINYINT")) {
 						child.put(column_name,rs.getInt(column_name));
@@ -98,6 +104,34 @@ public class ResultSetToJSON {
 		}
 		return array;
 
+	}
+
+	public static String jsonToInsert(String topic, Map<String,Object> map) {
+		List<String> names = new ArrayList();
+		List<Object> vals = new ArrayList();
+		String q = "INSERT INTO " + topic + " (";
+		map.keySet().forEach(key->{
+			names.add(key);
+			vals.add(map.get(key));
+		});
+		for(int i=0;i<vals.size();i++) {
+			q += vals.get(i);
+			if (i+1 < vals.size())
+				q += ",";
+		}
+		q += ") VALUES()";
+		for (int i=0;i<vals.size();i++) {
+			Object x = vals.get(i);
+			if (x instanceof String) {
+				String str = (String) x;
+				q += "'" + str + "'";
+			} else
+				q += x;
+			if (i+1 < vals.size())
+				q += ",";
+		}
+		q += ");";
+		return q;
 	}
 	
 	public static String toString(ArrayNode nodes) throws Exception {

@@ -9,13 +9,13 @@ public class Budget {
 	public volatile AtomicBigDecimal totalCost = new AtomicBigDecimal(0); 
 	
 	/** Total budget of this object */
-	public AtomicBigDecimal totalBudget;
+	public AtomicBigDecimal totalBudget = new AtomicBigDecimal(0);
 	
 	/** The daily budget of this campaign */
-	public AtomicBigDecimal dailyBudget = null;
+	public AtomicBigDecimal dailyBudget = new AtomicBigDecimal(0);
 	
 	/** The hourly budget of this campaign */
-	public AtomicBigDecimal hourlyBudget = null;
+	public AtomicBigDecimal hourlyBudget = new AtomicBigDecimal(0);
 	
 	public long expire_time ;
 	public long activate_time;

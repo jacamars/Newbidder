@@ -14,6 +14,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
 import com.jacamars.dsp.rtb.common.HttpPostGet;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
