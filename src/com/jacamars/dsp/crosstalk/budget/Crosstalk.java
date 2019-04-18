@@ -618,8 +618,10 @@ public enum Crosstalk {
 	 * @throws Exception
 	 *             on SQL or 0MQ errors.
 	 */
-	public void refresh() throws Exception {
+	public List<String> refresh() throws Exception {
 		ArrayNode array = createJson(); // get a copy of the SQL database
+		List<String> list = new ArrayList();
+		List<CampaignBuilderWorker> workers = new ArrayList();
 
 		logger.info("Campaigns:scanner:refresh", "********** SENDING UPDATES **********");
 		long time = System.currentTimeMillis();
@@ -628,9 +630,9 @@ public enum Crosstalk {
 		ExecutorService executor = Executors.newFixedThreadPool(array.size());
 
 		for (JsonNode s : array) {
-			Runnable w = new CampaignBuilderWorker(s);
+			CampaignBuilderWorker w = new CampaignBuilderWorker(s);
 			executor.execute(w);
-			//update(s,false);
+			workers.add(w);
 		}
 
 		time = System.currentTimeMillis() - time;
@@ -638,7 +640,16 @@ public enum Crosstalk {
 		logger.info("Updates took {} seconds",time);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
+			
 		}
+		
+
+		for (CampaignBuilderWorker w : workers ) {
+			list.add(w.toString());
+		}
+		
+		return list;
+		
 	}
 
 }

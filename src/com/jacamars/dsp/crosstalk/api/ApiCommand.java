@@ -364,6 +364,10 @@ public class ApiCommand {
             case GetWeights:
                 cmd = mapper.readValue(data, GetWeightsCmd.class);
                 break;
+                
+            case Refresh:
+            	cmd = mapper.readValue(data, RefreshCmd.class);
+            	break;
 
             default:
                 cmd = new UnknownCmd(token);

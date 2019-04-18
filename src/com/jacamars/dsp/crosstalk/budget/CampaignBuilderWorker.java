@@ -27,13 +27,15 @@ public class CampaignBuilderWorker implements Runnable {
 
 	@Override
 	public void run() {
+		String campaign = jnode.get("id").asText();
+		msg = "No change required for campaign: " + campaign;
 		try {
 			ObjectNode node = (ObjectNode) jnode;
-			String campaign = jnode.get("id").asText();
 
 			Campaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
 
 			if (c == null && node == null) {
+				msg = "Campaign is unknown; " + campaign;
 				throw new Exception("Campaign is unknown: " + campaign);
 			}
 
@@ -43,7 +45,7 @@ public class CampaignBuilderWorker implements Runnable {
 				c.runUsingElk();
 				if (c.isActive()) {
 					logger.info("New campaign {} going active", campaign);
-					msg = "NEW CAMPAIGN GOING ACTIVE: " + campaign;
+					msg = "New campaign going active: " + campaign;
 					Crosstalk.getInstance().addCampaignToRTB(c);
 				} else {
 					logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
@@ -51,7 +53,7 @@ public class CampaignBuilderWorker implements Runnable {
 				}
 			} else if (node == null && c != null) {                 // node is null, but c is already known
 				logger.info("Deleting a campaign: {}", campaign);
-				msg = "DELETED CAMPAIGN: " + campaign;
+				msg = "Deleted campaign: " + campaign;
 				c.report();
 				Crosstalk.getInstance().deletedCampaigns.put(campaign, c);
 				Crosstalk.getInstance().parkCampaign(c);
@@ -77,16 +79,18 @@ public class CampaignBuilderWorker implements Runnable {
 							} catch (Exception err) {
 								logger.error("Failed to load campaign {} into bidders, reason: {}", c.adId,
 										err.toString());
+								msg = "Failed to load campaign: " + c.adId + ", error"+ err.toString();
 							}
 						}
 					} else {
 						if (updated) {
 							logger.info("Active campaign was updated {}", campaign);
+							msg = "Active campaign was updated: " + campaign;
 							Crosstalk.getInstance().addCampaignToRTB(c);
 						}
 						if (old == true && !c.isActive()) {
 							logger.info("Campaign going inactive:{}, reason: {}", campaign, c.report());
-							msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
+							msg = "Campaign going inactive: " + campaign + ", reason: " + c.report();
 							Crosstalk.getInstance().parkCampaign(c); // notifies the bidder
 						}
 					}
@@ -95,12 +99,13 @@ public class CampaignBuilderWorker implements Runnable {
 						logger.info("Previously inactive campaign updated, but is still inactive:{}, reason: {}", campaign, c.report());
 					else
 						logger.info("Previously active campaign going inactive:{}, reason: {}", campaign, c.report());
-					msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
+					msg = "Campaign going inactive: " + campaign + ", reason: " + c.report();
 					Crosstalk.getInstance().parkCampaign(c); // notifies the bidder
 				}
 			}
 		} catch (Exception error) {
 			error.printStackTrace();
+			msg = "Error creating campaign: " + campaign + ", error: "+ error.toString();
 			logger.error("Error creating campaign: {}", error.toString());
 		}
 

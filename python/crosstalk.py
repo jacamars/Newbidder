@@ -46,7 +46,6 @@ def Ping():
 def Refresh():
     try:
         r = requests.post(globalHost, data='{"type":"Refresh#"}')
-        r = requests.post(globalHost, data='{"type":"Refresh#"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
