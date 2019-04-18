@@ -788,6 +788,8 @@ public class Campaign implements Comparable, Portable  {
 		for (Creative c : list) {
 			park(c);
 		}
+		
+		updated_at = myNode.get("updated_at").asLong();
 
 		return change;
 	}

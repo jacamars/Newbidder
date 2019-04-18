@@ -254,9 +254,9 @@ public enum Crosstalk {
 		if (camp == null || deletedCampaigns.get(camp.adId) != null)
 			return false;
 
-		CampaignCache.getClientInstance(RTBServer.getSharedInstance()).deleteCampaign(camp.adId);
+		campaigns.delete(camp.adId);
 		deletedCampaigns.put(camp.adId, camp); // add to the deleted campaigns map
-		campaigns.remove(camp);							// remove from the campaigns set, used on refresh
+
 		return true;
 	}
 	
@@ -545,12 +545,6 @@ public enum Crosstalk {
 				for (String key : additions) {
 					deletedCampaigns.remove(key);
 				}
-
-				/**
-				 * Make sure any campaigns that have exceeded their total budgets or has expired are
-				 * purged from crosstalk and the bidder.
-				 */
-				purge();
 
 				logger.info("Heartbeat,freedsk: {}, cpu: {}%, mem: {}, runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
 						Performance.getPercFreeDisk(), Performance.getCpuPerfAsString(),

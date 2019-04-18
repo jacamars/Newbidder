@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
@@ -54,12 +55,10 @@ public class ListCampaignsCmd extends ApiCommand {
 			super.execute();
 			try {
 				campaigns = new ArrayList<String>();
-				HazelcastInstance hz = RTBServer.getSharedInstance();
-				List<Campaign> clist = CampaignCache.getClientInstance(hz).getCampaigns();
-				List<String> names = new ArrayList();
-				for (Campaign cm : clist) {
-					campaigns.add(cm.adId);
-				}
+				Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
+					Campaign c = e.getValue();
+					campaigns.add(c.adId);
+				});
 				return;
 			} catch (Exception err) {
 				error = true;

@@ -47,8 +47,7 @@ public class CampaignBuilderWorker implements Runnable {
 					Crosstalk.getInstance().addCampaignToRTB(c);
 				} else {
 					logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
-					Crosstalk.getInstance().removeFromRTB(c);
-					Crosstalk.getInstance().deletedCampaigns.put(campaign, c);
+					Crosstalk.getInstance().parkCampaign(c); 
 				}
 			} else if (node == null && c != null) {                 // node is null, but c is already known
 				logger.info("Deleting a campaign: {}", campaign);
@@ -91,6 +90,13 @@ public class CampaignBuilderWorker implements Runnable {
 							Crosstalk.getInstance().parkCampaign(c); // notifies the bidder
 						}
 					}
+				} else {
+					if (old == false)
+						logger.info("Previously inactive campaign updated, but is still inactive:{}, reason: {}", campaign, c.report());
+					else
+						logger.info("Previously active campaign going inactive:{}, reason: {}", campaign, c.report());
+					msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
+					Crosstalk.getInstance().parkCampaign(c); // notifies the bidder
 				}
 			}
 		} catch (Exception error) {
