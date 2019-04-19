@@ -18,7 +18,7 @@ services:
       - zookeeper
 
   bidder:
-    image: "jacamars/rtb4free:J11"
+    image: "rtb4free:J11"
     environment:
       GDPR_MODE: "true"
       BROKERLIST: "kafka:9092"

@@ -1218,6 +1218,7 @@ public class Configuration {
 			String fileName = (String) m.get("filename");
 			String name = (String) m.get("name");
 			String type = (String) m.get("type");
+			System.out.println("*** Configuration Initializing: " + fileName);
 			if (name.startsWith("@") == false)
 				name = "@" + name;
 			if (type.contains("NavMap") || type.contains("RangeMap")) {

@@ -623,9 +623,11 @@ public enum Crosstalk {
 		List<String> list = new ArrayList();
 		List<CampaignBuilderWorker> workers = new ArrayList();
 
-		logger.info("Campaigns:scanner:refresh", "********** SENDING UPDATES **********");
+		logger.info( "********** SENDING UPDATES: N={} **********",array.size());
 		long time = System.currentTimeMillis();
 	
+		if (array.size()==0)
+			return list;
 		
 		ExecutorService executor = Executors.newFixedThreadPool(array.size());
 

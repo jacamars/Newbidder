@@ -74,6 +74,9 @@ public class MovingAverage {
      * @return double. The moving average.
      */
     public double getAverage() {
+    	if (last_size == 0)
+    		return 0;
+    	
     	return total / last_size;
     }
     

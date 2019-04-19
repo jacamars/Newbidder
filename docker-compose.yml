@@ -5,8 +5,27 @@
 version: "3"
 
 services:
+  zookeeper:
+    image: "zookeeper"
+    networks:
+      - rtb_net
+    #ports:
+    # - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    networks:
+      - rtb_net
+    #ports:
+    #  - "9092:9092"
+    restart: always
+    depends_on:
+      - zookeeper
+
   bidder:
-    image: "rtb4free:J11"
+    image: "jacamars/rtb4free:J11"
     environment:
       GDPR_MODE: "false"
 

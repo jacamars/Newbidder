@@ -456,7 +456,7 @@ public enum BudgetController {
 	 */
 	public double getCampaignSpendAverage(String id) throws Exception {
 		Campaign c;
-		if (id == null)
+		if (id == null) 
 			c = Aggregator.global;
 		else
 			c = Aggregator.get(id);

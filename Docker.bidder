@@ -102,7 +102,7 @@ COPY target/*with-dependencies.jar /target
 
 COPY wait-for-it.sh /
 COPY tools/* /
-COPY data/ /data
+COPY data/* data/
 COPY shell/ /shell
 
 COPY www/* /www/
