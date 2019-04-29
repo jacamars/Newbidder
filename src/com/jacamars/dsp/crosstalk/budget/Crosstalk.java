@@ -141,11 +141,13 @@ public enum Crosstalk {
 		var stmt = conn.createStatement();
 		String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners_rtb_standard.sql")), StandardCharsets.UTF_8);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners_rtb_standards.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos_rtb_standards.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
 		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns_rtb_standard.sql")), StandardCharsets.UTF_8);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns_rtb_standards.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
 		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
