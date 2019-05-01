@@ -6,6 +6,7 @@ bin/
 tmp/
 logs/
 target/
+postgres/
 *.log
 temp/
 *.tmp

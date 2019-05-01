@@ -13,11 +13,13 @@ services:
     ports:
       - "9092:9092"
         
-  postgres:
+  dbpg:
+#    user: "1000:1000"
     image: postgres
     environment:
-      - "POSTGRES_PASSWORD=postgres"
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     volumes:
-      - /tmp/data:/var/lib/postgresql/data
+      - ./postgres/data:/var/lib/postgresql/data
