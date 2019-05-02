@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -66,7 +69,11 @@ public class UpdateCmd extends ApiCommand {
 		public void execute() {
 			super.execute();	
 			try {
-				message = Crosstalk.getInstance().add(campaign);
+				ArrayNode nodes = Crosstalk.getInstance().createJson(campaign);
+				if (nodes.size()==0)
+					throw new Exception("No such campaign in db: " + campaign);
+				var c = Crosstalk.getInstance().makeNewCampaign((ObjectNode)nodes.get(0));
+				message = Crosstalk.getInstance().update(c,true);
 			} catch (Exception err) {
 				error = true;
 				logger.error("Update command issued an error: " + err.toString());
