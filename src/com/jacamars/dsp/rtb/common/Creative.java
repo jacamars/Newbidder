@@ -34,6 +34,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
 import com.jacamars.dsp.rtb.nativeads.creative.NativeCreative;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.probe.Probe;
+import com.jacamars.dsp.rtb.tools.Env;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.rtb.tools.MacroProcessing;
 
@@ -352,6 +353,16 @@ public class Creative  {
 	void encodeUrl() {
 		MacroProcessing.findMacros(macros, forwardurl);
 		MacroProcessing.findMacros(macros, imageurl);
+		
+		/**
+		 * Docker environment variable substitutions too
+		 */
+		try {
+			imageurl = Env.getInstance().substitute(imageurl);
+			forwardurl = Env.getInstance().substitute(forwardurl);
+		} catch (Exception error) {
+			error.printStackTrace();
+		}
 
 		if (w != null) {
 			if (dimensions == null)
