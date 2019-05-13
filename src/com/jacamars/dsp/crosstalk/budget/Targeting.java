@@ -126,6 +126,8 @@ public class Targeting {
 			geo_latitude = myNode.get("geo_latitude").asDouble();
 		if (myNode.get("geo_longitude") != null)
 			geo_longitude = myNode.get("geo_longitude").asDouble();
+		if (myNode.get("geo_range") != null)
+			geo_range = myNode.get("geo_range").asDouble();
 
 		// connectionTYpe is needed here
 
