@@ -3,7 +3,7 @@ import './App.css';
 import Radium from 'radium';
 import Bideditor from './Bideditor/Bideditor';
 import Windisplay from './Windisplay/Windisplay';
-import {Logo, Tips, SampleBanner, SampleVideo, SampleNative } from './Utils';
+import {Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from './Utils';
 
 
 class App extends Component {
@@ -69,16 +69,33 @@ class App extends Component {
               this.state.jsonError.reason);
       return;
     }
-    const endpoint = this.composite()
-    fetch('https://facebook.github.io/react-native/movies.json')
-        .then((response) => response.json())
+    const endpoint = document.getElementById('endpoint').value;
+    var bid = this.state.bid
+    bid = JSON.stringify(JSON.parse(bid))
+    console.log("BID is: " + bid)
+    fetch(endpoint, {
+      method: 'post',
+      body: bid
+    })
+        .then((response) => {
+          if (response.status  === 200) {
+            for (var pair of response.headers.entries()) {
+              console.log(pair[0]+ ': '+ pair[1]);
+            }
+            return response.json()
+          }
+          else
+            alert("NOBID: Response was: " + response.status)
+        })
         .then((responseJson) => {
-          this.setState({response:JSON.stringify(responseJson.movies,null,2)});
+          console.log("RESPONSE: " + JSON.stringify(responseJson,null,2));
+          this.setState({response:JSON.stringify(responseJson,null,2)});
         })
         .catch((error) => {
-          alert("ERROR: " + error);
+          alert("ERROR: " + error + " " + endpoint);
           console.error(error);
         });
+  
   }
 
 
@@ -113,10 +130,15 @@ class App extends Component {
     } else
     if (id === "video") {
       this.setState({json:this.copy(SampleVideo),bid:JSON.stringify(SampleVideo,null,2)});
-    } else
+    } else 
+    if (id === "audio") {
+      this.setState({json:this.copy(SampleAudio),bid:JSON.stringify(SampleAudio,null,2)});
+    }
+    else
     if (id === "native") {
       this.setState({json:this.copy(SampleNative),bid:JSON.stringify(SampleNative,null,2)});
     }
+
   }
 
   render() {
@@ -140,7 +162,7 @@ class App extends Component {
           <tr>
             <td style={{minWidth: '100%', minHeight: '400px', backgroundColor: 'red'}}>
               Root: <input type="text" value={this.state.url} onChange={this.rootHandler} size='35'/>
-              Endpoint: <input type="text" value={this.composite()} disabled size='35'/>
+              Endpoint: <input type="text" value={this.composite()} disabled size='35' id='endpoint'/>
             </td>
           </tr>
         </table>

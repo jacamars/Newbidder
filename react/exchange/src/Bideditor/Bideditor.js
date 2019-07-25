@@ -34,6 +34,7 @@ const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
             </select>
             <button onClick={() => {restore("banner")}}>Banner</button>
             <button onClick={() => {restore("video")}}>Video</button>
+            <button onClick={() => {restore("audio")}}>Audio</button>
             <button onClick={() => {restore("native")}}>Native</button>&nbsp;
             <button onClick={bidSender}>Send Bid</button>
         </p>
@@ -42,7 +43,7 @@ const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
         <tr>
             <td>
         <JSONInput
-            id          = 'a_unique_id'
+            id          = 'json_bid'
             placeholder = { props.json }
             theme       = 'light_mitsuketa_tribute'
             locale      = { locale }

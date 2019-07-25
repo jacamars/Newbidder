@@ -650,7 +650,7 @@ public enum BudgetController {
 			if (total != null && total.doubleValue() != 0) {
 				budget = total.getDoubleValue();
 				spend = getCreativeTotalSpend(id, crid, type);
-				logger.debug("Creative check -------> TOTAL, {}/{} budget: {} vs spend: {}", crid, type, budget, spend);
+				logger.debug("Creative check -------> ID: {}. TOTAL, {}/{} budget: {} vs spend: {}", id, crid, type, budget, spend);
 				if (spend != 0 && spend >= budget)
 					return true;
 			}
@@ -658,7 +658,7 @@ public enum BudgetController {
 			if (daily != null && daily.doubleValue() != 0) {
 				budget = daily.getDoubleValue();
 				spend = getCreativeDailySpend(id, crid, type);
-				logger.debug("Creative check -------> DAILY {}/{} budget: {} vs spend: {}", id, crid, type, budget,
+				logger.debug("Creative check -------> ID: {}. DAILY {}/{} budget: {} vs spend: {}", id, crid, type, budget,
 						spend);
 				if (spend >= budget)
 					return true;
@@ -667,7 +667,7 @@ public enum BudgetController {
 			if (hourly != null && hourly.doubleValue() != 0) {
 				budget = hourly.getDoubleValue();
 				spend = getCreativeHourlySpend(id, crid, type);
-				logger.debug("Creative check -------> HOURLY {}/{}, budet: {} vs spend: {}", id, crid, type, budget,
+				logger.debug("Creative check ------->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", id, crid, type, budget,
 						spend);
 				if (spend >= budget)
 					return true;

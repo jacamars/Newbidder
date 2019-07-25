@@ -410,6 +410,10 @@ public class RTBServer implements Runnable {
 	}
 
 	public static boolean isLeader() {
+		
+		if (hz== null || hz.getLifecycleService() == null)
+			return false;
+		
 		if (!hz.getLifecycleService().isRunning())
 			return false;
 

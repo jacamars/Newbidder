@@ -83,7 +83,7 @@ insert into rtb_standards (created_at,
         'Demonstates 5 zipcodes and a range of 10km.');
 
 
-insert into banners_rtb_standards set(banner_id, rtb_standard_id) 
+insert into banners_rtb_standards (banner_id, rtb_standard_id) 
 		VALUES(1,7);   
 
 insert into rtb_standards (created_at,

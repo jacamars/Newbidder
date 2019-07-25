@@ -174,6 +174,64 @@ export const SampleVideo = {
   }
 };
 
+export const SampleAudio = {
+    "id": "d7de216e-10de-472d-b70f-4497c2e0cd83",
+    "at": 2,
+    "imp": [{
+        "id": "d7de216e-10de-472d-b70f-4497c2e0cd83-1",
+        "instl": 1,
+        "audio": {
+            "mimes": ["audio/mp4"],
+            "minduration": 0,
+            "protocols": [5, 2]
+        },
+        "companionad": [
+            {
+                "banner": {
+                    "h": 50,
+                    "w": 320,
+                    "mimes": ["image/jpg", "text/javascript" ],
+                    "pos": 0
+                }
+            }
+        ],
+        "bidfloor": 1.0,
+        "ext": {
+            "nex_screen": 0
+        }
+    }],
+    "app": {
+        "id": "16745",
+        "name": "Auido App",
+        "publisher": {
+            "id": "1744",
+            "name": "Audio App Pub",
+            "ext": {
+                "nex_else": 0
+            }
+        },
+        "domain": "nexage.com",
+        "cat": ["IAB1", "IAB2", "IAB3"],
+        "bundle": "com.audioapp.cma",
+        "storeurl": "https://play.google.com/store/apps/details?id=com.audoapp.cma&hl=en"
+    },
+    "device": {
+        "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+        "model": "Non-Mobile",
+        "devicetype": 4
+    },
+    "user": {
+        "id": "DAf4044202-9a11-11e6-999-99999999"
+    },
+    "regs": {
+        "coppa": 0,
+        "ext": {
+            "gdpr": 1
+        }
+
+    }
+};
+
 export const SampleNative = {
   "Xid": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
   "id": "123",
