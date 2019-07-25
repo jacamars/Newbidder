@@ -217,7 +217,7 @@
   }, {
     "name" : "nexage",
     "id" : "99999999",
-    "bid" : "/rtb/bids/nexage==com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
+    "bid" : "/rtb/bids/nexage=com.jacamars.dsp.rtb.exchanges.Generic&!usesEncodedAdm"
   }, {
     "name" : "privatex",
     "id" : "5555555",
