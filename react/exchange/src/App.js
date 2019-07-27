@@ -13,6 +13,12 @@ class App extends Component {
       { name: 'Mobfox', uri: '/rtb/bids/mobfox'},
       { name: 'Bidswitch', uri: '/rtb/bids/bidswitch'}
     ],
+    bidTypes: [
+      { name: "Banner", file: SampleBanner },
+      { name: "Video", file: SampleVideo },
+      { name: "Audio", file: SampleAudio },
+      { name: "Native", file: SampleNative}
+    ],
     json: SampleBanner,
     selected: 'Nexage',
     uri: '/rtb/bids/nexage',
@@ -22,6 +28,7 @@ class App extends Component {
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
     nurl: 'Win URL: ',
+    selectedBidType: 'Banner',
     jsonError: false
   };
 
@@ -37,6 +44,20 @@ class App extends Component {
 
     this.setState({selected:name});
     this.setState({uri:uri});
+  }
+
+  bidTypeChangedHandler = (event, id) => {
+    const name = event.target.value;
+    var file = '?';
+    for(var i in this.state.bidTypes) {
+      var bt = this.state.bidTypes[i]
+        if (bt.name === name) {
+          file = bt.file;
+        }
+    }
+
+    this.setState({selectedBidType:name});
+    this.setState({json:this.copy(file),bid:JSON.stringify(file,null,2)});
   }
 
   copy = (obj) => {
@@ -73,6 +94,12 @@ class App extends Component {
     var bid = this.state.bid
     bid = JSON.stringify(JSON.parse(bid))
     console.log("BID is: " + bid)
+
+    this.setState({nurl: ''})
+    this.setState({response: ''})
+    this.setState({adm: ''})
+    this.setState({creative: ''})
+
     fetch(endpoint, {
       method: 'post',
       body: bid
@@ -86,10 +113,17 @@ class App extends Component {
           }
           else
             alert("NOBID: Response was: " + response.status)
+            return null
         })
         .then((responseJson) => {
+          if (responseJson === null)
+            return
+
           console.log("RESPONSE: " + JSON.stringify(responseJson,null,2));
+          this.setState({nurl: responseJson.seatbid[0].bid[0].nurl});
           this.setState({response:JSON.stringify(responseJson,null,2)});
+          this.setState({adm: responseJson.seatbid[0].bid[0].adm});
+          this.setState({creative: responseJson.seatbid[0].bid[0].adm});
         })
         .catch((error) => {
           alert("ERROR: " + error + " " + endpoint);
@@ -100,10 +134,13 @@ class App extends Component {
 
 
   sendWinNotice = (event,id) => {
-    fetch('https://facebook.github.io/react-native/movies.json')
-    .then((response) => response.json())
-    .then((responseJson) => {
-      alert(JSON.stringify(responseJson.movies,null,2));
+    var nurl = this.state.nurl
+    nurl = nurl.replace("${AUCTION_PRICE}","1.23")
+    console.log("NURL: " + nurl)
+    fetch(nurl)
+    .then((response) => response.text())
+    .then((responseText) => {
+      alert("Text is: " + responseText)
     })
     .catch((error) => {
       alert("ERROR: " + error);
@@ -120,25 +157,9 @@ class App extends Component {
     this.setState({creative:''});
     this.setState({adm:''});
     this.setState({nurl: 'Win URL: '});
+    this.setState({response:''});
 
     alert(this.state.bid);
-  }
-
-  restore = (id) => {
-    if (id === "banner") {
-      this.setState({json:this.copy(SampleBanner), bid: JSON.stringify(SampleBanner)});
-    } else
-    if (id === "video") {
-      this.setState({json:this.copy(SampleVideo),bid:JSON.stringify(SampleVideo,null,2)});
-    } else 
-    if (id === "audio") {
-      this.setState({json:this.copy(SampleAudio),bid:JSON.stringify(SampleAudio,null,2)});
-    }
-    else
-    if (id === "native") {
-      this.setState({json:this.copy(SampleNative),bid:JSON.stringify(SampleNative,null,2)});
-    }
-
   }
 
   render() {
@@ -167,7 +188,7 @@ class App extends Component {
           </tr>
         </table>
           <p>
-            {Bideditor(this.state,this.exchangeChangedHandler,
+            {Bideditor(this.state,this.bidTypeChangedHandler,this.exchangeChangedHandler,
               this.jsonChangedHandler, this.sendBid,this.restore)}
               <br/>
           {Windisplay(this.state,this.sendWinNotice,this.wClearHandler)}

@@ -7,9 +7,10 @@ const windisplay = (props, sendWinNotice, clearHandler) => {
         <div className="Windisplay">
             <p>
              <button onClick={sendWinNotice}>Send Win</button>&nbsp;
-             {props.nurl}
+             <input type="text" value={props.nurl} disabled size='105' id='winurl'/>
             </p>
-         <textarea value={props.creative} rows="10" cols="60" disabled/><textarea value={props.adm} rows="10" cols="60" disabled/>
+         <textarea value={props.creative} rows="10" cols="60" disabled/>
+         <textarea value={props.adm} rows="10" cols="60" disabled/>
          <button onClick={clearHandler}>Clear</button>
         </div>
     )

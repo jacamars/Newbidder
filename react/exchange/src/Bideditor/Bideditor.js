@@ -2,7 +2,7 @@ import React from 'react';
 import "./Bideditor.css";
 import JSONInput from 'react-json-editor-ajrm';
 import locale    from 'react-json-editor-ajrm/locale/en';
-const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
+const bideditor = (props,bidTypeChangeHandler,exchangeHandler, jsonHandler, bidSender, restore) => {
     
     const style = {
         backgroundColor: 'yellow',
@@ -14,13 +14,18 @@ const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
       }
 
       let list = props.exchanges;
-        let optionItems = list.map((exchange) =>
+      let optionItems = list.map((exchange) =>
                 <option key={exchange.name}>{exchange.name}</option>
             );
 
             let estyle = {
                 overflow:'scroll'
             }
+
+      list = props.bidTypes;
+      let bidTypes = list.map((bid) =>
+                <option key={bid.name}>{bid.name}</option>
+            );
 
     return (
         <div className="Bideditor">
@@ -32,11 +37,10 @@ const bideditor = (props,exchangeHandler, jsonHandler, bidSender, restore) => {
             <select style={style} onChange={exchangeHandler}>
                 {optionItems}
             </select>
-            <button onClick={() => {restore("banner")}}>Banner</button>
-            <button onClick={() => {restore("video")}}>Video</button>
-            <button onClick={() => {restore("audio")}}>Audio</button>
-            <button onClick={() => {restore("native")}}>Native</button>&nbsp;
-            <button onClick={bidSender}>Send Bid</button>
+            &nbsp;Type:&nbsp;
+            <select style={style} onChange={bidTypeChangeHandler}>
+                {bidTypes}
+            </select>
         </p>
         </td>
         </tr>
