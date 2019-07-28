@@ -13,13 +13,10 @@ const windisplay = (props, sendWinNotice, clearHandler) => {
     return (
         <Card bg="primary" text="white" style={{ width: '100%' }}>
             <Card.Body>
-                <Card.Title>Process Win</Card.Title>
+                <Card.Title>Process Win&nbsp;
+                    <Button variant="success" onClick={sendWinNotice} size="sm">Send Win</Button>
+                </Card.Title>
                 <InputGroup className="mb-3">
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">
-                            <Button variant="success" onClick={sendWinNotice} size="sm">Send Win</Button>
-                        </InputGroup.Text>
-                    </InputGroup.Prepend>
                     <FormControl
                         value={props.nurl} 
                         disabled

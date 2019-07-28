@@ -37,11 +37,11 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
     return (
         <Card bg="primary" text="white" style={{ width: '100%' }}>
             <Card.Body>
-                <Card.Title>Select Request Type</Card.Title>
-                Type:&nbsp;
+                <Card.Title>Select Request Type &nbsp;
                 <select style={style} onChange={bidTypeChangeHandler}>
                     {bidTypes}
                 </select>
+                </Card.Title>
                 <Row>
                     <Col>
                         <JSONInput
