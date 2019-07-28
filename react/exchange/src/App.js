@@ -9,6 +9,7 @@ import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from
 import Container from 'react-bootstrap/Container';
 
 class App extends Component {
+  
   state = {
     exchanges: [
       { name: 'Nexage', uri: '/rtb/bids/nexage' },
@@ -29,7 +30,7 @@ class App extends Component {
     response: 'I am the response',
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
-    nurl: 'Win URL Will Appear Here ',
+    nurl: 'Win URL Will Appear Here',
     selectedBidType: 'Banner',
     jsonError: false
   };
@@ -160,7 +161,7 @@ class App extends Component {
   wClearHandler = (event, id) => {
     this.setState({ creative: '' });
     this.setState({ adm: '' });
-    this.setState({ nurl: 'Win URL Will Appear Here' });
+    this.setState({ nurl: 'Win URL Will Appear Here'});
     this.setState({ response: '' });
 
     alert(this.state.bid);

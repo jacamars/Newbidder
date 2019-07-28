@@ -2,8 +2,7 @@ import React from 'react';
 import "./Bideditor.css";
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
+import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -41,6 +40,7 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
                 <select style={style} onChange={bidTypeChangeHandler}>
                     {bidTypes}
                 </select>
+                &nbsp;   <Button variant="danger" onClick={bidSender} size="sm">Send Bid</Button>
                 </Card.Title>
                 <Row>
                     <Col>
