@@ -26,11 +26,11 @@ const windisplay = (props, sendWinNotice, clearHandler) => {
                                 id='winurl' />
                         </InputGroup>
                         <Row>
-                            <Col>
-                                <textarea value={props.creative} rows="10" cols="49" disabled />
+                            <Col md="6">
+                                <textarea value={props.creative} rows="10" cols="45" disabled />
                             </Col>
-                            <Col>
-                                <textarea value={props.adm} rows="10" cols="49" disabled />
+                            <Col md="6">
+                                <textarea value={props.adm} rows="10" cols="45" disabled />
                             </Col>
                         </Row>
                         <Button variant="danger" onClick={clearHandler} size="sm">Clear</Button>

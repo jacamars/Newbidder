@@ -42,22 +42,22 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
                 </select>
                 &nbsp;   <Button variant="danger" onClick={bidSender} size="sm">Send Bid</Button>
                 </Card.Title>
-                <Row>
-                    <Col>
+                <Row className="no-gutters">
+                    <Col md="6">
                         <JSONInput
                             id='json_bid'
                             placeholder={props.json}
-                            theme='light_mitsuketa_tribute'
+                            theme='dark'
                             locale={locale}
                             height='260px'
                             width='500px'
                             onChange={jsonHandler}
                         />
                     </Col>
-                    <Col>
+                    <Col md="6">
                         <textarea disabled value={props.response}
                             rows="10"
-                            cols="50" />
+                            cols="45" />
                 </Col>
                 </Row>
             </Card.Body>

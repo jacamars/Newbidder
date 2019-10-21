@@ -1,0 +1,14 @@
+#
+#
+version: "3"
+
+services:
+  simulator:
+    image: "rtbx"
+    environment:
+      GDPR_MODE: "false"
+    ports:
+      - "8000:80"
+
+
+
