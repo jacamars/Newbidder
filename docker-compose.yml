@@ -7,8 +7,8 @@ version: "3"
 services:
   zookeeper:
     image: "zookeeper"
-    networks:
-      - rtb_net
+    #networks:
+    #  - rtb_net
     #ports:
     # - "2181:2181"
 
@@ -16,8 +16,8 @@ services:
     image: "ches/kafka"
     environment:
       ZOOKEEPER_IP: "zookeeper"
-    networks:
-      - rtb_net
+#    networks:
+#      - rtb_net
     #ports:
     #  - "9092:9092"
     restart: always
@@ -66,8 +66,8 @@ services:
     volumes:
       - "./database.json:/database.json"
     #  - "./payday.json:/Campaigns/payday.json"
-    networks:
-      - rtb_net
+#    networks:
+#      - rtb_net
     depends_on:
       - kafka
     command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh && sleep 1; ./rtb4free"
@@ -79,11 +79,11 @@ services:
       - "POSTGRES_PASSWORD=postgres"
     ports:
       - "5432:5432"
-    networks:
-      - rtb_net
+#    networks:
+#      - rtb_net
     volumes:
       - /tmp/data:/var/lib/postgresql/data
 
-networks:
-  rtb_net:
-    external: true
+#networks:
+#  rtb_net:
+#    external: true
