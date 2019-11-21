@@ -1,39 +1,41 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>RTB4FREE</name>
 	<description>RTB 2.5 DSP</description>
-	
+
 	<properties>
-        <maven.plugin.version>2.19.1</maven.plugin.version>
-        <slf4j.api.version>1.7.25</slf4j.api.version>
-        <junit.version>4.12</junit.version>
-        <graalvm.version>19.1.0</graalvm.version>
-        <zookeeper.version>3.4.5</zookeeper.version>
-        <kafka.version>0.10.1.1</kafka.version>
-        <google.protobuf.version>3.3.1</google.protobuf.version>
-        <ehcache.version>0.3.0</ehcache.version>
-        <mapdb.version>3.0.5</mapdb.version>
-        <jamm.version>RELEASE</jamm.version>
-        <cache2k.version>1.0.0.CR3</cache2k.version>
-        <redis.version>2.9.0</redis.version>
-        <jackson.version>2.9.8</jackson.version>
-        <javax.servlet.version>4.0.0</javax.servlet.version>
-        <commons.pool2.version>2.5.0</commons.pool2.version>
-        <commons.io.version>2.5</commons.io.version>
-        <postgres.version>9.1-901-1.jdbc4</postgres.version>
-        <hazelcast.version>3.11.2</hazelcast.version>
-        <javax.persistence.version>1.0.2</javax.persistence.version>
-        <http.client.version>4.5.3</http.client.version>
-        <openrtb.core.version>1.5.1</openrtb.core.version>
-        <grok.version>0.1.9</grok.version>
-        <maxmind.version>2.12.0</maxmind.version>
-        <aws.sdk.version>1.11.534</aws.sdk.version>
-        <antlr.runtime.version>4.7</antlr.runtime.version>
-        <elastic.rest.version>6.2.2</elastic.rest.version>
-        <jetty.server.version>9.4.18.v20190429</jetty.server.version>
-    </properties>
+		<maven.plugin.version>2.19.1</maven.plugin.version>
+		<slf4j.api.version>1.7.25</slf4j.api.version>
+		<junit.version>4.12</junit.version>
+		<graalvm.version>19.1.0</graalvm.version>
+		<zookeeper.version>3.4.5</zookeeper.version>
+		<kafka.version>0.10.1.1</kafka.version>
+		<google.protobuf.version>3.3.1</google.protobuf.version>
+		<ehcache.version>0.3.0</ehcache.version>
+		<mapdb.version>3.0.5</mapdb.version>
+		<jamm.version>RELEASE</jamm.version>
+		<cache2k.version>1.0.0.CR3</cache2k.version>
+		<redis.version>2.9.0</redis.version>
+		<jackson.version>2.9.8</jackson.version>
+		<javax.servlet.version>4.0.0</javax.servlet.version>
+		<commons.pool2.version>2.5.0</commons.pool2.version>
+		<commons.io.version>2.5</commons.io.version>
+		<postgres.version>9.1-901-1.jdbc4</postgres.version>
+		<hazelcast.version>3.11.2</hazelcast.version>
+		<javax.persistence.version>1.0.2</javax.persistence.version>
+		<http.client.version>4.5.3</http.client.version>
+		<openrtb.core.version>1.5.1</openrtb.core.version>
+		<grok.version>0.1.9</grok.version>
+		<maxmind.version>2.12.0</maxmind.version>
+		<aws.sdk.version>1.11.534</aws.sdk.version>
+		<antlr.runtime.version>4.7</antlr.runtime.version>
+		<elastic.rest.version>6.2.2</elastic.rest.version>
+		<jetty.server.version>9.4.18.v20190429</jetty.server.version>
+	</properties>
 
 	<dependencies>
 
@@ -43,14 +45,14 @@
 			<version>${maven.plugin.version}</version>
 			<type>maven-plugin</type>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
 		<dependency>
-    		<groupId>org.slf4j</groupId>
-    		<artifactId>slf4j-api</artifactId>
-   			 <version>${slf4j.api.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.api.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -63,20 +65,20 @@
 			<artifactId>zookeeper</artifactId>
 			<version>${zookeeper.version}</version>
 			<type>pom</type>
-		   <exclusions>
-            <exclusion>
-                <groupId>com.sun.jmx</groupId>
-                <artifactId>jmxri</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>com.sun.jdmk</groupId>
-                <artifactId>jmxtools</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>javax.jms</groupId>
-                <artifactId>jms</artifactId>
-            </exclusion>
-        </exclusions>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 
@@ -94,12 +96,12 @@
 			<version>${ehcache.version}</version>
 		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
-        <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>${mapdb.version}</version>
-        </dependency>
+		<!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>${mapdb.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.cache2k</groupId>
@@ -148,9 +150,9 @@
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor -->
 		<dependency>
-    		<groupId>com.fasterxml.jackson.dataformat</groupId>
-    		<artifactId>jackson-dataformat-cbor</artifactId>
-    		<version>${jackson.version}</version>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-cbor</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
@@ -174,57 +176,57 @@
 			<version>${commons.pool2.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
-        </dependency>
-        
-           <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-smile</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-      
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        
-        <!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
-		<dependency>
-    		<groupId>postgresql</groupId>
-    		<artifactId>postgresql</artifactId>
-    		<version>${postgres.version}</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
 		</dependency>
-        
-        
-<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast -->
-<dependency>
-    <groupId>com.hazelcast</groupId>
-    <artifactId>hazelcast</artifactId>
-    <version>${hazelcast.version}</version>
-</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-smile</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgres.version}</version>
+		</dependency>
 
 
-<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast-client -->
-<dependency>
-    <groupId>com.hazelcast</groupId>
-    <artifactId>hazelcast-client</artifactId>
-    <version>${hazelcast.version}</version>
-</dependency>
+		<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
 
-<dependency>
-  <groupId>javax.persistence</groupId>
-  <artifactId>persistence-api</artifactId>
-  <version>${javax.persistence.version}</version>
-</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast-client -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-client</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>${javax.persistence.version}</version>
+		</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -240,27 +242,27 @@
 			<artifactId>openrtb-core</artifactId>
 			<version>${openrtb.core.version}</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>io.krakens</groupId>
-            <artifactId>java-grok</artifactId>
-            <version>${grok.version}</version>
-        </dependency>
-		
-	<dependency>
-        <groupId>com.maxmind.geoip2</groupId>
-        <artifactId>geoip2</artifactId>
-        <version>${maxmind.version}</version>
-    </dependency>
 
-	<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+		<dependency>
+			<groupId>io.krakens</groupId>
+			<artifactId>java-grok</artifactId>
+			<version>${grok.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>${maxmind.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk</artifactId>
 			<version>${aws.sdk.version}</version>
 		</dependency>
-		
-	    <dependency>
+
+		<dependency>
 			<groupId>test</groupId>
 			<artifactId>Cuckoo</artifactId>
 			<version>1.0</version>
@@ -274,19 +276,19 @@
 			<version>${antlr.runtime.version}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>com.github.stephenc</groupId>
-            <artifactId>jamm</artifactId>
-            <version>${jamm.version}</version>
-        </dependency>
-        
 		<dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-client</artifactId>
-            <version>${elastic.rest.version}</version>
-        </dependency>
+			<groupId>com.github.stephenc</groupId>
+			<artifactId>jamm</artifactId>
+			<version>${jamm.version}</version>
+		</dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-client</artifactId>
+			<version>${elastic.rest.version}</version>
+		</dependency>
+
+	</dependencies>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -312,10 +314,10 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-        			<release>10</release>
-                   	<source>1.10</source>
-                    <target>1.10</target>
-    				</configuration>
+					<release>10</release>
+					<source>1.10</source>
+					<target>1.10</target>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -324,9 +326,9 @@
 				<version>2.4</version>
 				<configuration>
 					<archive>
-                        <manifestEntries>
-                            <Premain-Class>org.github.jamm.MemoryMeter</Premain-Class>
-                        </manifestEntries>
+						<manifestEntries>
+							<Premain-Class>org.github.jamm.MemoryMeter</Premain-Class>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
