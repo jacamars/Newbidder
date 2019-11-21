@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import Radium from 'radium';
 import Endpoint from './Endpoint/Endpoint';
 import Bideditor from './Bideditor/Bideditor';
 import Windisplay from './Windisplay/Windisplay';
@@ -8,9 +7,11 @@ import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from
 
 import Container from 'react-bootstrap/Container';
 
-class App extends Component {
+const App = () =>  {
   
-  state = {
+  const [count, setCount] = useState(0);
+
+  const [vars, setVars] = useState({
     exchanges: [
       { name: 'Nexage', uri: '/rtb/bids/nexage' },
       { name: 'Mobfox', uri: '/rtb/bids/mobfox' },
@@ -33,77 +34,92 @@ class App extends Component {
     nurl: 'Win URL Will Appear Here',
     selectedBidType: 'Banner',
     jsonError: false
-  };
+  });
 
-  exchangeChangedHandler = (event, id) => {
+  const exchangeChangedHandler = (event, id) => {
     const name = event.target.value;
     var uri = '?';
-    for (var i in this.state.exchanges) {
-      var exchange = this.state.exchanges[i]
+    for (var i in vars.exchanges) {
+      var exchange = vars.exchanges[i]
       if (exchange.name === name) {
         uri = exchange.uri;
       }
     }
 
-    this.setState({ selected: name });
-    this.setState({ uri: uri });
+    vars.selected = name;
+    vars.uri = uri;
+    setVars(vars);
 
-    console.log("NEW URI: " + uri)
+    console.log("NEW URI: " + vars.uri)
+    redraw();
   }
 
-  bidTypeChangedHandler = (event, id) => {
+  const redraw = () => {
+    setCount(count + 1);
+  }
+
+  const bidTypeChangedHandler = (event, id) => {
     const name = event.target.value;
     var file = '?';
-    for (var i in this.state.bidTypes) {
-      var bt = this.state.bidTypes[i]
+    for (var i in vars.bidTypes) {
+      var bt = vars.bidTypes[i]
       if (bt.name === name) {
         file = bt.file;
       }
     }
 
-    this.setState({ selectedBidType: name });
-    this.setState({ json: this.copy(file), bid: JSON.stringify(file, null, 2) });
+    vars.selectedBidType = name;
+    vars.json = copy(file);
+    vars.bid = JSON.stringify(file, null, 2);
+    setVars(vars);
+
+    redraw();
   }
 
-  copy = (obj) => {
+  const copy = (obj) => {
     const s = JSON.stringify(obj);
     return JSON.parse(s);
   }
 
-  jsonChangedHandler = (obj) => {
-    this.setState({ bid: obj.plainText });
-    this.setState({ jsonError: obj.error });
+  const jsonChangedHandler = (obj) => {
+    vars.bid = obj.plainText;
+    vars.jsonError = obj.error;
+    setVars(vars);
   }
 
-  rootHandler = (event, id) => {
+  const rootHandler = (event, id) => {
     const newval = event.target.value;
-    this.setState({ url: newval });
+    vars.url = newval;
+    setVars(vars);
   }
 
-  composite = () => {
-    return this.state.url + this.state.uri;
+  const composite = () => {
+    return vars.state.url + vars.state.uri;
   }
 
-  show = () => {
+  const show = () => {
     alert(JSON.stringify(this.state))
-    this.forceUpdate();
   };
 
-  sendBid = (event, id) => {
-    if (this.state.jsonError !== false) {
-      alert("Can't send, error at line " + this.state.jsonError.line + "\n" +
-        this.state.jsonError.reason);
+  const sendBid = (event, id) => {
+    console.log("SENDING A BID");
+    if (vars.jsonError !== false) {
+      alert("Can't send, error at line " + vars.jsonError.line + "\n" +
+        vars.jsonError.reason);
       return;
     }
     const endpoint = document.getElementById('endpoint').value;
-    var bid = this.state.bid
+    var bid = vars.bid
     bid = JSON.stringify(JSON.parse(bid))
     console.log("BID is: " + bid)
 
-    this.setState({ nurl: '' })
-    this.setState({ response: '' })
-    this.setState({ adm: '' })
-    this.setState({ creative: '' })
+    vars.nurl = '';
+    vars.response = '';
+    vars.adm = '';
+    vars.creative = '';
+
+    setVars(vars);
+
 
     fetch(endpoint, {
       method: 'post',
@@ -125,10 +141,12 @@ class App extends Component {
           return
 
         console.log("RESPONSE: " + JSON.stringify(responseJson, null, 2));
-        this.setState({ nurl: responseJson.seatbid[0].bid[0].nurl });
-        this.setState({ response: JSON.stringify(responseJson, null, 2) });
-        this.setState({ adm: responseJson.seatbid[0].bid[0].adm });
-        this.setState({ creative: responseJson.seatbid[0].bid[0].adm });
+        vars.nurl =  responseJson.seatbid[0].bid[0].nurl;
+        vars.response = JSON.stringify(responseJson, null, 2)
+        vars.adm = responseJson.seatbid[0].bid[0].adm;
+        vars.creative = responseJson.seatbid[0].bid[0].adm;
+
+        setVars(vars);
       })
       .catch((error) => {
         alert("ERROR: " + error + " " + endpoint);
@@ -138,8 +156,8 @@ class App extends Component {
   }
 
 
-  sendWinNotice = (event, id) => {
-    var nurl = this.state.nurl
+  const sendWinNotice = (event, id) => {
+    var nurl = vars.nurl
     nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
     console.log("NURL: " + nurl)
     fetch(nurl)
@@ -153,22 +171,27 @@ class App extends Component {
       });
   }
 
-  brClearHandler = (event, id) => {
-    this.setState({ bid: '' });
-    this.setState({ response: '' });
+  const restore = () => {
+
   }
 
-  wClearHandler = (event, id) => {
-    this.setState({ creative: '' });
-    this.setState({ adm: '' });
-    this.setState({ nurl: 'Win URL Will Appear Here'});
-    this.setState({ response: '' });
+  const brClearHandler = (event, id) => {
+    vars.bid = '';
+    vars.response = '';
+    setVars(vars);
 
-    alert(this.state.bid);
+    redraw();
   }
 
+  const wClearHandler = (event, id) => {
+    vars.creative = '';
+    vars.adm = '';
+    vars.nurl = 'Win URL Will Appear Here';
+    vars.response = '';
+    setVars(vars);
 
-  render() {
+    redraw();
+  }
 
     let style = {
       backgroundColor: 'white',
@@ -183,14 +206,15 @@ class App extends Component {
     };
 
     return (
+      <div>
       <Container>
-        {Endpoint(this.state, this.rootHandler, this.exchangeChangedHandler)}
-        {Bideditor(this.state, this.bidTypeChangedHandler,
-          this.jsonChangedHandler, this.sendBid, this.restore)}
-        {Windisplay(this.state, this.sendWinNotice, this.wClearHandler)}
+        <Endpoint vars={vars} rootHandler={rootHandler} exchangeHandler={exchangeChangedHandler} />
+        <Bideditor vars={vars} bidTypeChangedHandler={bidTypeChangedHandler}
+          jsonChangedHandler={jsonChangedHandler} sendBid={sendBid} restore={restore} />
+        <Windisplay vars={vars} sendWinNotice={sendWinNotice}  wClearHandler={wClearHandler} />
       </Container>
+      </div>
     );
-  }
 }
 
-export default Radium(App);
+export default App;

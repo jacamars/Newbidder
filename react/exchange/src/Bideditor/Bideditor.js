@@ -8,7 +8,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 
-const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore) => {
+const bideditor = (props) => {
 
     const style = {
         backgroundColor: 'yellow',
@@ -19,7 +19,7 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
 
     }
 
-    let list = props.exchanges;
+    let list = props.vars.exchanges;
     let optionItems = list.map((exchange) =>
         <option key={exchange.name}>{exchange.name}</option>
     );
@@ -28,7 +28,7 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
         overflow: 'scroll'
     }
 
-    list = props.bidTypes;
+    list = props.vars.bidTypes;
     let bidTypes = list.map((bid) =>
         <option key={bid.name}>{bid.name}</option>
     );
@@ -37,21 +37,21 @@ const bideditor = (props, bidTypeChangeHandler, jsonHandler, bidSender, restore)
         <Card bg="primary" text="white" style={{ width: '100%' }}>
             <Card.Body>
                 <Card.Title>Select Request Type &nbsp;
-                <select style={style} onChange={bidTypeChangeHandler}>
+                <select style={style} onChange={props.bidTypeChangedHandler}>
                     {bidTypes}
                 </select>
-                &nbsp;   <Button variant="danger" onClick={bidSender} size="sm">Send Bid</Button>
+                &nbsp;   <Button variant="danger" onClick={props.sendBid} size="sm">Send Bid</Button>
                 </Card.Title>
                 <Row className="no-gutters">
                     <Col md="6">
                         <JSONInput
                             id='json_bid'
-                            placeholder={props.json}
+                            placeholder={props.vars.json}
                             theme='dark'
                             locale={locale}
                             height='260px'
                             width='500px'
-                            onChange={jsonHandler}
+                            onChange={props.jsonHandler}
                         />
                     </Col>
                     <Col md="6">

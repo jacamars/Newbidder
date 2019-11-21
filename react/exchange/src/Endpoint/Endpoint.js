@@ -6,7 +6,7 @@ import Card from 'react-bootstrap/Card';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 
-const endpoint = (props, rootHandler, exchangeHandler) => {
+const endpoint = (props) => {
 
     const style = {
         backgroundColor: 'yellow',
@@ -17,8 +17,7 @@ const endpoint = (props, rootHandler, exchangeHandler) => {
 
     }
 
-    let list = props.exchanges;
-    let optionItems = list.map((exchange) =>
+    const optionItems = props.vars.exchanges.map((exchange) =>
         <option key={exchange.name}>{exchange.name}</option>
     );
 
@@ -27,6 +26,8 @@ const endpoint = (props, rootHandler, exchangeHandler) => {
     }
 
     let composite = props.url + props.uri
+
+    console.log("ENDPOINT: " + props.vars.uri);
 
     return (
         <Card bg="primary" text="white" style={{ width: '100%' }}>
@@ -38,18 +39,18 @@ const endpoint = (props, rootHandler, exchangeHandler) => {
                         <InputGroup.Text id="basic-addon1">Root</InputGroup.Text>
                     </InputGroup.Prepend>
                     <FormControl
-                        value={props.url}
-                        onChange={rootHandler}
+                        value={props.vars.url}
+                        onChange={props.rootHandler}
                     />
-                    <select style={style} onChange={exchangeHandler}>
+                    <select style={style} onChange={props.exchangeHandler}>
                         {optionItems}
                     </select>
                     <InputGroup.Prepend>
                         <InputGroup.Text id="basic-addon1">Endpoint</InputGroup.Text>
                     </InputGroup.Prepend>
                     <FormControl
-                        value={props.url + props.uri}
-                        onChange={rootHandler}
+                        value={props.vars.url + props.vars.uri}
+                        onChange={props.rootHandler}
                         disabled
                         id='endpoint'
                     />

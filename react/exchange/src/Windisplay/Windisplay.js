@@ -7,9 +7,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 
-const windisplay = (props, sendWinNotice, clearHandler) => {
+const windisplay = (props) => {
 
-    const show = props.nurl == !('Win URL Will Appear Here' || props.nurl === '');
+    const show = props.vars.nurl == !('Win URL Will Appear Here' || props.vars.nurl === '');
 
     return (
         <div>
@@ -17,23 +17,23 @@ const windisplay = (props, sendWinNotice, clearHandler) => {
                 <Card bg="primary" text="white" style={{ width: '100%' }} >
                     <Card.Body>
                         <Card.Title>Process Win&nbsp;
-                    <Button variant="success" onClick={sendWinNotice} size="sm">Send Win</Button>
+                    <Button variant="success" onClick={props.sendWinNotice} size="sm">Send Win</Button>
                         </Card.Title>
                         <InputGroup className="mb-3">
                             <FormControl
-                                value={props.nurl}
+                                value={props.vars.nurl}
                                 disabled
                                 id='winurl' />
                         </InputGroup>
                         <Row>
                             <Col md="6">
-                                <textarea value={props.creative} rows="10" cols="45" disabled />
+                                <textarea value={props.vars.creative} rows="10" cols="45" disabled />
                             </Col>
                             <Col md="6">
-                                <textarea value={props.adm} rows="10" cols="45" disabled />
+                                <textarea value={props.vars.adm} rows="10" cols="45" disabled />
                             </Col>
                         </Row>
-                        <Button variant="danger" onClick={clearHandler} size="sm">Clear</Button>
+                        <Button variant="danger" onClick={props.clearHandler} size="sm">Clear</Button>
                     </Card.Body>
                 </Card>
             ) : (
