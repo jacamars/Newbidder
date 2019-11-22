@@ -13,6 +13,7 @@
     "react-json-editor-ajrm": "^2.5.9",
     "react-jsoneditor": "^0.2.22",
     "react-native-elements": "^1.2.7",
+    "react-player": "^1.14.2",
     "react-scripts": "2.1.8",
     "yarn": "^1.19.1"
   },

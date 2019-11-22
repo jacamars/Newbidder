@@ -6,10 +6,21 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import ReactPlayer from 'react-player'
 
 const windisplay = (props) => {
 
-    const show = props.vars.nurl == !('Win URL Will Appear Here' || props.vars.nurl === '');
+    const textAreaStyle = {
+        fontSize: 12
+    };
+
+    const pausedNotice = (e) =>{
+        console.log("PAUSED: " + e);
+    }
+
+    console.log("WIN NURL: " + props.vars.nurl);
+    console.log("ADM: " + props.vars.adm)
+    const show = props.vars.nurl != ('Win URL Will Appear Here' || props.vars.nurl === '');
 
     return (
         <div>
@@ -27,13 +38,25 @@ const windisplay = (props) => {
                         </InputGroup>
                         <Row>
                             <Col md="6">
-                                <textarea value={props.vars.creative} rows="10" cols="45" disabled />
+                                <textarea 
+                                    style={textAreaStyle}
+                                    value={props.vars.creative} 
+                                    rows="14" cols="65" disabled />
                             </Col>
                             <Col md="6">
-                                <textarea value={props.vars.adm} rows="10" cols="45" disabled />
+                                <div>
+                                { props.vars.isVideo ? (
+                                    <ReactPlayer 
+                                        width='100%'
+                                        height='265px'
+                                        onPause={pausedNotice}
+                                        url={props.vars.adm} playing />
+                                ) : (
+                                    <textarea value={props.vars.adm} rows="14" cols="65" style={textAreaStyle} disabled />
+                                 ) }
+                                </div>
                             </Col>
                         </Row>
-                        <Button variant="danger" onClick={props.clearHandler} size="sm">Clear</Button>
                     </Card.Body>
                 </Card>
             ) : (

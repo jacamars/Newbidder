@@ -14,8 +14,44 @@ const App = () =>  {
   const [vars, setVars] = useState({
     exchanges: [
       { name: 'Nexage', uri: '/rtb/bids/nexage' },
+      { name: 'Bidswitch', uri: '/rtb/bids/bidswitch' },
+      { name: 'Admedia', uri: '/rtb/bids/admedia'},
+      { name: 'Adprudence', uri: '/rtb/bids/adprudence' },
+      { name: 'Appnexus', uri: '/rtb/bids/appnexus' },
+      { name: 'Adventurefeeds', uri: '/rtb/bids/adventurefeeds' },
+      { name: 'Atomx', uri: '/rtb/bids/atomx' },
+      { name: 'Axonix', uri: '/rtb/bids/axionix' },
+      { name: 'Bidswitch', uri: '/rtb/bids/bidswitch' },
+      { name: 'c1x', uri: '/rtb/bids/c1x' },
+      { name: 'Cappture', uri: '/rtb/bids/cappture' },
+      { name: 'Citenko', uri: '/rtb/bids/citenko' },
+      { name: 'Epomx', uri: '/rtb/bids/epomx' },
+      { name: 'Fyber', uri: '/rtb/bids/fyber' },
+      { name: 'Gotham', uri: '/rtb/bids/gotham' },
+      { name: 'Google', uri: '/rtb/bids/google' },
+      { name: 'Index', uri: '/rtb/bids/index' },
+      { name: 'Intango', uri: '/rtb/bids/intango' },
+      { name: 'Kadam', uri: '/rtb/bids/kaddam' },
+      { name: 'Medianexusnetwork', uri: '/rtb/bids/medianexusnetwork' },
       { name: 'Mobfox', uri: '/rtb/bids/mobfox' },
-      { name: 'Bidswitch', uri: '/rtb/bids/bidswitch' }
+      { name: 'Openssp', uri: '/rtb/bids/openssp' },
+      { name: 'Openx', uri: '/rtb/bids/openx' },
+      { name: 'Pokkt', uri: '/rtb/bids/pookt' },
+      { name: 'Pubmatic', uri: '/rtb/bids/pubmatic' },
+      { name: 'Republer', uri: '/rtb/bids/republer' },
+      { name: 'Smaato', uri: '/rtb/bids/smaato' },
+      { name: 'Smartyads', uri: '/rtb/bids/smartyads' },
+      { name: 'Smartadserver', uri: '/rtb/bids/smartadserver' },
+      { name: 'Spotx', uri: '/rtb/bids/spotx' },
+      { name: 'Ssphwy', uri: '/rtb/bids/ssphwy' },
+      { name: 'Stroer', uri: '/rtb/bids/stroer' },
+      { name: 'Taggify', uri: '/rtb/bids/taggify' },
+      { name: 'Tappx', uri: '/rtb/bids/tappx' },
+      { name: 'Vdopia', uri: '/rtb/bids/vdopia' },
+      { name: 'Ventuno', uri: '/rtb/bids/ventuno' },
+      { name: 'Vertamedia', uri: '/rtb/bids/vertamedia' },
+      { name: 'Waardx', uri: '/rtb/bids/waardx' },
+      { name: 'Wideorbit', uri: '/rtb/bids/wideorbit' }
     ],
     bidTypes: [
       { name: "Banner", file: SampleBanner },
@@ -33,6 +69,7 @@ const App = () =>  {
     adm: 'ADM',
     nurl: 'Win URL Will Appear Here',
     selectedBidType: 'Banner',
+    isVideo: false,
     jsonError: false
   });
 
@@ -82,7 +119,11 @@ const App = () =>  {
   }
 
   const jsonChangedHandler = (obj) => {
-    vars.bid = obj.plainText;
+    var x = eval('(' + obj.plainText+ ')');
+    x = JSON.stringify(x,null,2);
+    console.log("CHANGED: " + x);    
+
+    vars.bid = x;
     vars.jsonError = obj.error;
     setVars(vars);
   }
@@ -101,6 +142,7 @@ const App = () =>  {
     alert(JSON.stringify(this.state))
   };
 
+
   const sendBid = (event, id) => {
     console.log("SENDING A BID");
     if (vars.jsonError !== false) {
@@ -109,14 +151,16 @@ const App = () =>  {
       return;
     }
     const endpoint = document.getElementById('endpoint').value;
+    setVars(vars);
     var bid = vars.bid
     bid = JSON.stringify(JSON.parse(bid))
-    console.log("BID is: " + bid)
+    console.log("THE BID IS: " + bid);
 
     vars.nurl = '';
     vars.response = '';
     vars.adm = '';
     vars.creative = '';
+    vars.isVideo=false;
 
     setVars(vars);
 
@@ -147,6 +191,7 @@ const App = () =>  {
         vars.creative = responseJson.seatbid[0].bid[0].adm;
 
         setVars(vars);
+        redraw();
       })
       .catch((error) => {
         alert("ERROR: " + error + " " + endpoint);
@@ -163,7 +208,9 @@ const App = () =>  {
     fetch(nurl)
       .then((response) => response.text())
       .then((responseText) => {
-        alert("Text is: " + responseText)
+        vars.isVideo = nurl.indexOf("Video") > -1;
+        setVars(vars);
+        redraw();
       })
       .catch((error) => {
         alert("ERROR: " + error);
@@ -209,9 +256,9 @@ const App = () =>  {
       <div>
       <Container>
         <Endpoint vars={vars} rootHandler={rootHandler} exchangeHandler={exchangeChangedHandler} />
-        <Bideditor vars={vars} bidTypeChangedHandler={bidTypeChangedHandler}
+        <Bideditor vars={vars} bidTypeChangedHandler={bidTypeChangedHandler}   clearHandler={wClearHandler} 
           jsonChangedHandler={jsonChangedHandler} sendBid={sendBid} restore={restore} />
-        <Windisplay vars={vars} sendWinNotice={sendWinNotice}  wClearHandler={wClearHandler} />
+        <Windisplay vars={vars} sendWinNotice={sendWinNotice} />
       </Container>
       </div>
     );

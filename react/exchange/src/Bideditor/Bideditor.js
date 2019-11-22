@@ -19,9 +19,13 @@ const bideditor = (props) => {
 
     }
 
+    const textAreaStyle = {
+        fontSize: 12
+    };
+
     let list = props.vars.exchanges;
     let optionItems = list.map((exchange) =>
-        <option key={exchange.name}>{exchange.name}</option>
+        <option {...exchange.selected} key={exchange.name}>{exchange.name}</option>
     );
 
     let estyle = {
@@ -41,6 +45,7 @@ const bideditor = (props) => {
                     {bidTypes}
                 </select>
                 &nbsp;   <Button variant="danger" onClick={props.sendBid} size="sm">Send Bid</Button>
+                &nbsp; <Button variant="danger" onClick={props.clearHandler} size="sm">Clear</Button>
                 </Card.Title>
                 <Row className="no-gutters">
                     <Col md="6">
@@ -49,15 +54,17 @@ const bideditor = (props) => {
                             placeholder={props.vars.json}
                             theme='dark'
                             locale={locale}
-                            height='260px'
-                            width='500px'
-                            onChange={props.jsonHandler}
+                            height='266px'
+                            width='95%'
+                            onChange={props.jsonChangedHandler}
                         />
                     </Col>
                     <Col md="6">
-                        <textarea disabled value={props.response}
-                            rows="10"
-                            cols="45" />
+                        <textarea disabled value={props.vars.response}
+                            width='100%'
+                            rows='14'
+                            style={textAreaStyle}
+                            cols="65" />
                 </Col>
                 </Row>
             </Card.Body>

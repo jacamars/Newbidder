@@ -7,8 +7,8 @@
   "crosstalk": {
   	"sql": {
   		"jdbcdriver": "org.postgresql.Driver",
-  		"Xlogin": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres",
-  		"login": "jdbc:postgresql://127.0.0.1/rtb4free?user=postgres&password=postgres"
+  		"login": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres",
+  		"Xlogin": "jdbc:postgresql://127.0.0.1/rtb4free?user=postgres&password=postgres"
   	},
   	"elk": {
     	"XsimFile": "simdata/debug.sim",
