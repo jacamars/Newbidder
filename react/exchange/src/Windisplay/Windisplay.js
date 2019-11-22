@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import ReactPlayer from 'react-player'
+import DemoTag from '../DemoTag/DemoTag';
 
 const windisplay = (props) => {
 
@@ -14,13 +15,11 @@ const windisplay = (props) => {
         fontSize: 12
     };
 
-    const pausedNotice = (e) =>{
-        console.log("PAUSED: " + e);
-    }
-
     console.log("WIN NURL: " + props.vars.nurl);
-    console.log("ADM: " + props.vars.adm)
-    const show = props.vars.nurl != ('Win URL Will Appear Here' || props.vars.nurl === '');
+    console.log("ADM: " + props.vars.adm);
+    console.log("VIDEO: " + props.vars.isVideo);
+    const show = !(props.vars.nurl === 'Win URL Will Appear Here' || props.vars.nurl === '');
+    console.log("SHOW: " + show);
 
     return (
         <div>
@@ -28,11 +27,14 @@ const windisplay = (props) => {
                 <Card bg="primary" text="white" style={{ width: '100%' }} >
                     <Card.Body>
                         <Card.Title>Process Win&nbsp;
-                    <Button variant="success" onClick={props.sendWinNotice} size="sm">Send Win</Button>
+                            <Button variant="success" onClick={props.sendWinNotice} size="sm">Send Win</Button>
+                            &nbsp;
+                            {props.vars.xtime}
                         </Card.Title>
                         <InputGroup className="mb-3">
                             <FormControl
                                 value={props.vars.nurl}
+                                style={textAreaStyle}
                                 disabled
                                 id='winurl' />
                         </InputGroup>
@@ -44,17 +46,7 @@ const windisplay = (props) => {
                                     rows="14" cols="65" disabled />
                             </Col>
                             <Col md="6">
-                                <div>
-                                { props.vars.isVideo ? (
-                                    <ReactPlayer 
-                                        width='100%'
-                                        height='265px'
-                                        onPause={pausedNotice}
-                                        url={props.vars.adm} playing />
-                                ) : (
-                                    <textarea value={props.vars.adm} rows="14" cols="65" style={textAreaStyle} disabled />
-                                 ) }
-                                </div>
+                                <DemoTag isVideo={props.vars.isVideo} adm={props.vars.adm} />
                             </Col>
                         </Row>
                     </Card.Body>

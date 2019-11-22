@@ -1056,6 +1056,7 @@ class Handler extends AbstractHandler {
 
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+		response.addHeader("Access-Control-Expose-Headers", "X-TIME");
 
 		InputStream body = request.getInputStream();
 		String type = request.getContentType();

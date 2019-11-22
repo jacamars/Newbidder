@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import http from 'http';
 import './App.css';
 import Endpoint from './Endpoint/Endpoint';
 import Bideditor from './Bideditor/Bideditor';
 import Windisplay from './Windisplay/Windisplay';
 import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from './Utils';
-
 import Container from 'react-bootstrap/Container';
+
+const httpAgent = new http.Agent({ keepAlive: true });
+const axiosInstance = axios.create({
+  httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
+});
 
 const App = () =>  {
   
@@ -69,6 +75,7 @@ const App = () =>  {
     adm: 'ADM',
     nurl: 'Win URL Will Appear Here',
     selectedBidType: 'Banner',
+    xtime: 'xtime: 0, rtt: 0',
     isVideo: false,
     jsonError: false
   });
@@ -143,7 +150,7 @@ const App = () =>  {
   };
 
 
-  const sendBid = (event, id) => {
+  const sendBid = async  (event, id) => {
     console.log("SENDING A BID");
     if (vars.jsonError !== false) {
       alert("Can't send, error at line " + vars.jsonError.line + "\n" +
@@ -151,7 +158,7 @@ const App = () =>  {
       return;
     }
     const endpoint = document.getElementById('endpoint').value;
-    setVars(vars);
+
     var bid = vars.bid
     bid = JSON.stringify(JSON.parse(bid))
     console.log("THE BID IS: " + bid);
@@ -161,61 +168,54 @@ const App = () =>  {
     vars.adm = '';
     vars.creative = '';
     vars.isVideo=false;
-
     setVars(vars);
+ 
+    var rtt =  performance.now();
+    var xtime;
+    
+    try {
+      const response = await axiosInstance.post(endpoint,bid);
+      rtt = "rtt: " + (performance.now() - rtt);
+      xtime = "xtime: " + response.headers['x-time'];
+      vars.xtime = rtt + ", " + xtime;
+      if (response.status !== 200) {
+        alert("NOBID: Response was: " + response.status + ", rtt: " + (performance.now()-rtt) + ", xtime: " + xtime);
+        return;
+      }
+      console.log("RESPONSE: " + JSON.stringify(response.data));
+      vars.nurl =  response.data.seatbid[0].bid[0].nurl;
+      vars.response = JSON.stringify(response.data, null, 2);
+      vars.adm = response.data.seatbid[0].bid[0].adm;
+      vars.creative = response.data.seatbid[0].bid[0].adm;
 
-
-    fetch(endpoint, {
-      method: 'post',
-      body: bid
-    })
-      .then((response) => {
-        if (response.status === 200) {
-          for (var pair of response.headers.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-          }
-          return response.json()
-        }
-        else
-          alert("NOBID: Response was: " + response.status)
-        return null
-      })
-      .then((responseJson) => {
-        if (responseJson === null)
-          return
-
-        console.log("RESPONSE: " + JSON.stringify(responseJson, null, 2));
-        vars.nurl =  responseJson.seatbid[0].bid[0].nurl;
-        vars.response = JSON.stringify(responseJson, null, 2)
-        vars.adm = responseJson.seatbid[0].bid[0].adm;
-        vars.creative = responseJson.seatbid[0].bid[0].adm;
-
-        setVars(vars);
-        redraw();
-      })
-      .catch((error) => {
-        alert("ERROR: " + error + " " + endpoint);
-        console.error(error);
-      });
-
+      setVars(vars);
+      redraw();
+    } catch (error) {
+      vars.nurl =  '';
+      vars.response = '';
+      vars.adm = '';
+      vars.creative = '';
+      setVars(vars);
+      redraw();
+      alert("ERROR: " + error + " " + endpoint);
+    console.error(error);
   }
+}
 
-
-  const sendWinNotice = (event, id) => {
+  const sendWinNotice = async (event, id) => {
     var nurl = vars.nurl
     nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
     console.log("NURL: " + nurl)
-    fetch(nurl)
-      .then((response) => response.text())
-      .then((responseText) => {
-        vars.isVideo = nurl.indexOf("Video") > -1;
-        setVars(vars);
-        redraw();
-      })
-      .catch((error) => {
-        alert("ERROR: " + error);
-        console.error(error);
-      });
+
+    try {
+      const response = await axiosInstance.get(nurl);
+      console.log("RESPONSE: " + response.data);
+      vars.isVideo = nurl.indexOf("Video") > -1;
+      setVars(vars);
+      redraw();
+    } catch (error) {
+      alert("ERROR: " + error);
+    }
   }
 
   const restore = () => {
@@ -239,18 +239,6 @@ const App = () =>  {
 
     redraw();
   }
-
-    let style = {
-      backgroundColor: 'white',
-      font: 'inherit',
-      border: '4x solid blue',
-      padding: '8px',
-      cursor: 'pointer',
-      ':hover': {
-        backgroundColor: 'green',
-        color: 'black'
-      }
-    };
 
     return (
       <div>
