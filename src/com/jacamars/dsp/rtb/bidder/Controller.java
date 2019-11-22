@@ -1127,10 +1127,12 @@ public enum Controller {
         if (rb == null)
         	return null;
         
-       for (int i=0;i<rb.getFrequencyCap().size();i++) {
-        	FrequencyCap c = rb.getFrequencyCap().get(i);
-        	FrequencyCap.handleExpiry(c.capKey,c.capTimeout,c.capTimeUnit);
-        } 
+        if (rb.getFrequencyCap() != null) {
+        	for (int i=0;i<rb.getFrequencyCap().size();i++) {
+        		FrequencyCap c = rb.getFrequencyCap().get(i);
+        		FrequencyCap.handleExpiry(c.capKey,c.capTimeout,c.capTimeUnit);
+        	}
+        }
         return rb.getAdType();
         
         

@@ -1214,7 +1214,6 @@ class Handler extends AbstractHandler {
 						if (bresp == null) {
 							code = RTBServer.NOBID_CODE;
 							json = br.returnNoBid("No matching campaign");
-							code = RTBServer.NOBID_CODE;
 							RTBServer.nobid++;
 							Controller.getInstance().sendRequest(br, false);
 							Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));

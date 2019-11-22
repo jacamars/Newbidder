@@ -248,26 +248,20 @@ public class WinObject {
 	 * @param adm
 	 *            String. The adm that was returned.
 	 * @throws Exception
-	 *             on REDIS errors (bid not found, can happen if bid times out.
+	 *             on Hazelcache errors (bid not found, can happen if bid times out.
 	 * 
 	 *             TODO: Last 2 look redundant
 	 */
 	public static void convertBidToWin(String hash, String cost, String lat, String lon, String adId, String cridId,
-			String pubId, String image, String forward, String price, String adm, String domain, String bidType) throws Exception {
-
+			String pubId, String image, String forward, String price, String adm, String domain, String bidType) {
+		String adType = null;
 		try {
-			Controller.getInstance().deleteBidFromCache(hash);
-		} catch (Exception error) {
-			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());
-		}
-		String adtype = Configuration.getInstance().getAdType(adId,cridId);
-		Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
-
-		try {
+			adType = Controller.getInstance().deleteBidFromCache(hash);
+			Controller.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adType, domain, bidType);
 			double value = Double.parseDouble(price);
 			RTBServer.adspend += value;
 		} catch (Exception error) {
-			logger.error("Error: exchange {} did not pass a proper {AUCTION_PRICE} substitution on the WIN, win price is undeterimed: {}, hash = {}", pubId,price, hash);
+			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());
 		}
 	}
 }
