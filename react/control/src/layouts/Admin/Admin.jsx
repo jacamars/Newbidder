@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
@@ -32,33 +32,29 @@ import logo from "assets/img/react-logo.png";
 
 var ps;
 
-class Admin extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      backgroundColor: "blue",
-      sidebarOpened:
-        document.documentElement.className.indexOf("nav-open") !== -1
-    };
-  }
-  componentDidMount() {
+const Admin = (props) => {
+  const [backgroundColor, setBackgroundColor] = useState('blue');
+  const [sidebarOpened, setSidebarOpened] = useState( document.documentElement.className.indexOf("nav-open") !== -1);
+
+ /* useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       document.documentElement.className += " perfect-scrollbar-on";
       document.documentElement.classList.remove("perfect-scrollbar-off");
-      ps = new PerfectScrollbar(this.refs.mainPanel, { suppressScrollX: true });
+      ps = new PerfectScrollbar(refs.mainPanel, { suppressScrollX: true });
       let tables = document.querySelectorAll(".table-responsive");
       for (let i = 0; i < tables.length; i++) {
         ps = new PerfectScrollbar(tables[i]);
       }
-    }
-  }
-  componentWillUnmount() {
+    } 
+  },[]);
+
+ /* componentWillUnmount() {
     if (navigator.platform.indexOf("Win") > -1) {
       ps.destroy();
       document.documentElement.className += " perfect-scrollbar-off";
       document.documentElement.classList.remove("perfect-scrollbar-on");
     }
-  }
+  } 
   componentDidUpdate(e) {
     if (e.history.action === "PUSH") {
       if (navigator.platform.indexOf("Win") > -1) {
@@ -71,13 +67,15 @@ class Admin extends React.Component {
       document.scrollingElement.scrollTop = 0;
       this.refs.mainPanel.scrollTop = 0;
     }
-  }
+  }  */
+
   // this function opens and closes the sidebar on small devices
-  toggleSidebar = () => {
+  const toggleSidebar = () => {
     document.documentElement.classList.toggle("nav-open");
-    this.setState({ sidebarOpened: !this.state.sidebarOpened });
+    setSidebarOpened(!sidebarOpened);
   };
-  getRoutes = routes => {
+
+  const getRoutes = routes => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
         return (
@@ -92,13 +90,15 @@ class Admin extends React.Component {
       }
     });
   };
-  handleBgClick = color => {
-    this.setState({ backgroundColor: color });
+
+  const handleBgClick = color => {
+    setBackgroundColor(color);
   };
-  getBrandText = path => {
+
+  const getBrandText = path => {
     for (let i = 0; i < routes.length; i++) {
       if (
-        this.props.location.pathname.indexOf(
+        props.location.pathname.indexOf(
           routes[i].layout + routes[i].path
         ) !== -1
       ) {
@@ -107,46 +107,45 @@ class Admin extends React.Component {
     }
     return "Brand";
   };
-  render() {
+
     return (
       <>
         <div className="wrapper">
           <Sidebar
-            {...this.props}
+            {...props}
             routes={routes}
-            bgColor={this.state.backgroundColor}
+            bgColor={backgroundColor}
             logo={{
               outterLink: "https://www.creative-tim.com/",
-              text: "Creative Tim",
+              text: "RTB4FREE",
               imgSrc: logo
             }}
-            toggleSidebar={this.toggleSidebar}
+            toggleSidebar={toggleSidebar}
           />
           <div
             className="main-panel"
-            ref="mainPanel"
-            data={this.state.backgroundColor}
+
+            data={backgroundColor}
           >
             <AdminNavbar
-              {...this.props}
-              brandText={this.getBrandText(this.props.location.pathname)}
-              toggleSidebar={this.toggleSidebar}
-              sidebarOpened={this.state.sidebarOpened}
+              {...props}
+              brandText={getBrandText(props.location.pathname)}
+              toggleSidebar={toggleSidebar}
+              sidebarOpened={sidebarOpened}
             />
-            <Switch>{this.getRoutes(routes)}</Switch>
+            <Switch>{getRoutes(routes)}</Switch>
             {// we don't want the Footer to be rendered on map page
-            this.props.location.pathname.indexOf("maps") !== -1 ? null : (
+              props.location.pathname.indexOf("maps") !== -1 ? null : (
               <Footer fluid />
             )}
           </div>
         </div>
         <FixedPlugin
-          bgColor={this.state.backgroundColor}
-          handleBgClick={this.handleBgClick}
+          bgColor={backgroundColor}
+          handleBgClick={handleBgClick}
         />
       </>
     );
-  }
 }
 
 export default Admin;
