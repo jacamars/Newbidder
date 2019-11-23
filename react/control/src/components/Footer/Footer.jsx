@@ -47,7 +47,7 @@ class Footer extends React.Component {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Creative Tim
+              RTB4FREE
             </a>{" "}
             for a better web.
           </div>

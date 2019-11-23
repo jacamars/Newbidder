@@ -71,11 +71,14 @@ const bideditor = (props) => {
                         />
                     </Col>
                     <Col xs="6">
-                        <textarea disabled value={props.vars.response}
-                            width='100%'
-                            rows='14'
-                            style={textAreaStyle}
-                            cols="65" />
+                        <JSONInput
+                            id='json_response'
+                            placeholder={props.vars.response}
+                            theme='dark'
+                            locale={locale}
+                            height='266px'
+                            width='95%'
+                        />
                 </Col>
                 </Row>
         </Card>

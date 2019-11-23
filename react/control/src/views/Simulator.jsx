@@ -69,7 +69,7 @@ const Simulator = (props) =>  {
     uri: '/rtb/bids/nexage',
     url: 'http://localhost:8080',
     bid: JSON.stringify(SampleBanner, null, 2),
-    response: 'I am the response',
+    response: {response: 'I am the response'},
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
     nurl: 'Win URL Will Appear Here',
@@ -165,7 +165,7 @@ const Simulator = (props) =>  {
     console.log("THE BID IS: " + bid);
 
     vars.nurl = '';
-    vars.response = '';
+    vars.response = {};
     vars.adm = '';
     vars.creative = '';
     vars.isVideo=false;
@@ -185,7 +185,7 @@ const Simulator = (props) =>  {
       }
       console.log("RESPONSE: " + JSON.stringify(response.data));
       vars.nurl =  response.data.seatbid[0].bid[0].nurl;
-      vars.response = JSON.stringify(response.data, null, 2);
+      vars.response = response.data;
       vars.adm = response.data.seatbid[0].bid[0].adm;
       vars.creative = response.data.seatbid[0].bid[0].adm;
 
@@ -193,7 +193,7 @@ const Simulator = (props) =>  {
       redraw();
     } catch (error) {
       vars.nurl =  '';
-      vars.response = '';
+      vars.response = {};
       vars.adm = '';
       vars.creative = '';
       setVars(vars);
@@ -225,7 +225,7 @@ const Simulator = (props) =>  {
 
   const brClearHandler = (event, id) => {
     vars.bid = '';
-    vars.response = '';
+    vars.response = {};
     setVars(vars);
 
     redraw();
@@ -235,7 +235,7 @@ const Simulator = (props) =>  {
     vars.creative = '';
     vars.adm = '';
     vars.nurl = 'Win URL Will Appear Here';
-    vars.response = '';
+    vars.response = {};
     setVars(vars);
 
     redraw();

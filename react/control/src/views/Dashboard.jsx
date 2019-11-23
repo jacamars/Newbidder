@@ -72,7 +72,23 @@ class Dashboard extends React.Component {
                 <CardHeader>
                   <Row>
                     <Col className="text-left" sm="6">
-                      <h5 className="card-category">Total Shipments</h5>
+                      <h5 className="card-category">Total Events</h5>
+                      <select width='100%'>
+                        <option>15 Minutes</option>
+                        <option>30 Minutes</option>
+                        <option>1 Hour</option>
+                        <option>6 Hours</option>
+                        <option>24 Hours</option>
+                        <option>1 Week</option>
+                        <option>1 Month</option>
+                      </select>
+                      <select width='100%'>
+                        <option selected>All Instances</option>
+                        <option>Instance-1</option>
+                        <option>Instance-2</option>
+                        <option>Instance-3</option>
+                        <option>Inatance-4</option>
+                      </select>
                       <CardTitle tag="h2">Performance</CardTitle>
                     </Col>
                     <Col sm="6">
@@ -97,7 +113,7 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Accounts
+                            Requests
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-single-02" />
@@ -119,7 +135,7 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Purchases
+                            Bids
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-gift-2" />
@@ -141,7 +157,29 @@ class Dashboard extends React.Component {
                             type="radio"
                           />
                           <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Sessions
+                            Wins
+                          </span>
+                          <span className="d-block d-sm-none">
+                            <i className="tim-icons icon-tap-02" />
+                          </span>
+                        </Button>
+                        <Button
+                          color="info"
+                          id="3"
+                          size="sm"
+                          tag="label"
+                          className={classNames("btn-simple", {
+                            active: this.state.bigChartData === "data4"
+                          })}
+                          onClick={() => this.setBgChartData("data4")}
+                        >
+                          <input
+                            className="d-none"
+                            name="options"
+                            type="radio"
+                          />
+                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                            Pixels
                           </span>
                           <span className="d-block d-sm-none">
                             <i className="tim-icons icon-tap-02" />
