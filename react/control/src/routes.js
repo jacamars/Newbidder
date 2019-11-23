@@ -22,9 +22,19 @@ import Notifications from "views/Notifications.jsx";
 import Rtl from "views/Rtl.jsx";
 import TableList from "views/TableList.jsx";
 import Typography from "views/Typography.jsx";
-import UserProfile from "views/UserProfile.jsx";
+import UserProfile from "views/UserProfile.jsx"
+import Simulator from "views/Simulator.jsx"
+
 
 var routes = [
+  {
+    path: "/simulator",
+    name: "Simulator",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-light-3",
+    component: Simulator,
+    layout: "/admin"
+  },
   {
     path: "/dashboard",
     name: "Dashboard",
