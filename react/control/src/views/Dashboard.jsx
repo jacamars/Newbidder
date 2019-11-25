@@ -15,11 +15,14 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React,  { useState, useEffect } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
+// networking
+import axios from 'axios';
+import http from 'http';
 
 // reactstrap components
 import {
@@ -50,19 +53,109 @@ import {
   chartExample4
 } from "variables/charts.jsx";
 
-class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      bigChartData: "data1"
-    };
-  }
-  setBgChartData = name => {
-    this.setState({
-      bigChartData: name
-    });
+const httpAgent = new http.Agent({ keepAlive: true });
+const axiosInstance = axios.create({
+  httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
+});
+
+const Dashboard = (props) => {
+  const [bigChartData, setBigChartData] = useState('data1');
+  const [count, setCount] = useState(1);
+  const [members, setMembers] = useState([]);
+  const [instanceNames, setInstanceNames] = useState([]);
+  const [selectedInstance, setSelectedInstance] = useState('');
+  const [leader,setLeader] = useState('');
+  const [snapShotView, setSnapShotView] = useState('');
+  
+  useEffect(() => {
+    // Update the document title using the browser API
+    doGetStatusCmd();
+  },[]);
+
+  const setBgChartData = name => {
+    setBigChartData(name);
   };
-  render() {
+
+  const setInstances = (list) => {
+    var output = '';
+    var leader = '';
+    if (list.length==1) {
+      output  = <option>{list[0].name + '*'}</option>;
+      setSelectedInstance(list[0].name);
+      setLeader(list[0].name);
+    } else {
+      for (var i=0;i<list.length;i++) {
+        if (setLeader(list[i].values.leader)) {
+          setLeader(list[i].name);
+          leader = '*';
+        } else
+          leader = '';
+        if (setSelectedInstance !== '') {
+          if (selectedInstance === list[i].name)
+            output += <option selected>{list[i].name + leader}</option>;
+          else
+            output += <option>{list[i].name + leader}</option>;
+        } else {
+          if (i === 0) {
+            output += <option selected>All Instances</option>;
+          }
+          output += <option>{list[i].name + leader}</option>;
+          setSelectedInstance("All Instances");
+        }
+      }
+    }
+    setInstanceNames(output);
+  }
+
+  const doGetStatusCmd = async () => {
+    try {
+      var cmd = { command: 'getstatus' }
+      const response = await axiosInstance.post("http://localhost:8080/ajax",JSON.stringify(cmd)); 
+      console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
+      var list = response.data;
+      setMembers(list);
+      setInstances(list);
+      setSnapShotView(getSnapShotView(list));
+      redraw();
+    } catch (e) {
+      alert (e);
+    }
+  }
+
+  const getSnapShotView = (rows) => {
+    return(
+      rows.map(row => (
+        <tr key={row.id}>
+          <td>{row.name}</td>
+          <td className="text-right">{row.values.request}</td>
+          <td className="text-right">{row.values.bid}</td>
+          <td className="text-right">{row.values.win}</td>
+          <td className="text-right">{row.values.pixels}</td>
+          <td className="text-right">{row.values.clicks}</td>
+        </tr>
+      ))
+    )
+  }
+
+  /*
+    <tr key={row.id}>
+          <td>{row.name}</td>
+          <td>{row.values.request}</td>
+          <td>{row.values.bid}</td>
+          <td  className="text-center">{row.values.win}</td>
+        </tr>
+  <tr>
+                        <td>Dakota Rice</td>
+                        <td>Niger</td>
+                        <td>Oud-Turnhout</td>
+                        <td className="text-center">$36,738</td>
+                      </tr>
+  */
+
+  const redraw = () => {
+    setCount(count + 1);
+  }
+
     return (
       <>
         <div className="content">
@@ -83,12 +176,9 @@ class Dashboard extends React.Component {
                         <option>1 Month</option>
                       </select>
                       <select width='100%'>
-                        <option selected>All Instances</option>
-                        <option>Instance-1</option>
-                        <option>Instance-2</option>
-                        <option>Instance-3</option>
-                        <option>Inatance-4</option>
+                          {instanceNames}
                       </select>
+                      <Button size="sm" color="info" onClick={doGetStatusCmd}>Refresh</Button>
                       <CardTitle tag="h2">Performance</CardTitle>
                     </Col>
                     <Col sm="6">
@@ -99,12 +189,12 @@ class Dashboard extends React.Component {
                         <Button
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data1"
+                            active: bigChartData === "data1"
                           })}
                           color="info"
                           id="0"
                           size="sm"
-                          onClick={() => this.setBgChartData("data1")}
+                          onClick={() => setBgChartData("data1")}
                         >
                           <input
                             defaultChecked
@@ -125,9 +215,9 @@ class Dashboard extends React.Component {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data2"
+                            active: bigChartData === "data2"
                           })}
-                          onClick={() => this.setBgChartData("data2")}
+                          onClick={() => setBgChartData("data2")}
                         >
                           <input
                             className="d-none"
@@ -147,9 +237,9 @@ class Dashboard extends React.Component {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data3"
+                            active: bigChartData === "data3"
                           })}
-                          onClick={() => this.setBgChartData("data3")}
+                          onClick={() => setBgChartData("data3")}
                         >
                           <input
                             className="d-none"
@@ -169,9 +259,9 @@ class Dashboard extends React.Component {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data4"
+                            active: bigChartData === "data4"
                           })}
-                          onClick={() => this.setBgChartData("data4")}
+                          onClick={() => setBgChartData("data4")}
                         >
                           <input
                             className="d-none"
@@ -192,7 +282,7 @@ class Dashboard extends React.Component {
                 <CardBody>
                   <div className="chart-area">
                     <Line
-                      data={chartExample1[this.state.bigChartData]}
+                      data={chartExample1[bigChartData]}
                       options={chartExample1.options}
                     />
                   </div>
@@ -529,61 +619,22 @@ class Dashboard extends React.Component {
             <Col lg="6" md="12">
               <Card>
                 <CardHeader>
-                  <CardTitle tag="h4">Simple Table</CardTitle>
+                  <CardTitle tag="h4">Snapshot Counts<Button size="sm" color="info" onClick={doGetStatusCmd}>Refresh</Button></CardTitle>
                 </CardHeader>
                 <CardBody>
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>
-                        <th>Name</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th className="text-center">Salary</th>
+                        <th className="text-center">Instance</th>
+                        <th className="text-right">Requests</th>
+                        <th className="text-right">Bids</th>
+                        <th className="text-right">Wins</th>
+                        <th className="text-right">Pixels</th>
+                        <th className="text-right">Clicks</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Dakota Rice</td>
-                        <td>Niger</td>
-                        <td>Oud-Turnhout</td>
-                        <td className="text-center">$36,738</td>
-                      </tr>
-                      <tr>
-                        <td>Minerva Hooper</td>
-                        <td>Curaçao</td>
-                        <td>Sinaai-Waas</td>
-                        <td className="text-center">$23,789</td>
-                      </tr>
-                      <tr>
-                        <td>Sage Rodriguez</td>
-                        <td>Netherlands</td>
-                        <td>Baileux</td>
-                        <td className="text-center">$56,142</td>
-                      </tr>
-                      <tr>
-                        <td>Philip Chaney</td>
-                        <td>Korea, South</td>
-                        <td>Overland Park</td>
-                        <td className="text-center">$38,735</td>
-                      </tr>
-                      <tr>
-                        <td>Doris Greene</td>
-                        <td>Malawi</td>
-                        <td>Feldkirchen in Kärnten</td>
-                        <td className="text-center">$63,542</td>
-                      </tr>
-                      <tr>
-                        <td>Mason Porter</td>
-                        <td>Chile</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$78,615</td>
-                      </tr>
-                      <tr>
-                        <td>Jon Porter</td>
-                        <td>Portugal</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$98,615</td>
-                      </tr>
+                          {snapShotView}
                     </tbody>
                   </Table>
                 </CardBody>
@@ -593,7 +644,6 @@ class Dashboard extends React.Component {
         </div>
       </>
     );
-  }
 }
 
 export default Dashboard;

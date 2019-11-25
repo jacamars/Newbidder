@@ -41,7 +41,6 @@ const windisplay = (props) => {
                         <Input
                                 value={props.vars.nurl}
                                 style={textAreaStyle}
-                                disabled
                                 id='winurl' />
                     </Row>
                         <Row>

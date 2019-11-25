@@ -151,6 +151,10 @@ public class WebCampaign {
 		if (cmd.equalsIgnoreCase("writeDeletedCampaigns")) {
 			return writeDeletedCampaigns(m);
 		}
+		
+		if (cmd.equalsIgnoreCase("getstatus")) {
+			return getStatusCmd();
+		}
 
 		m.put("error", true);
 		m.put("message", "No such command: " + cmd);
@@ -759,10 +763,31 @@ public class WebCampaign {
 	 * 
 	 * @return List. The membership list of 'bidders'
 	 * @throws Exception
-	 *             on aerospike errors.
+	 *             on hazelcast errors.
 	 */
 	List<String> getMembers() throws Exception {
 		return BidCachePool.getInstance(RTBServer.getSharedInstance()).getMembersNames();
+	}
+	
+	public String getStatusCmd() throws Exception{
+		Map outer = null;
+		var list = new ArrayList();
+		var members = getMembers();
+		try {
+			for (var member : members) {
+				outer = new HashMap();
+				outer.put("name", member);
+				outer.put("values",Controller.getInstance().getMemberStatus(member));
+				list.add(outer);
+			}
+			return getString(list);
+		} catch (Exception error) {
+			outer = new HashMap();
+			error.printStackTrace();
+			outer.put("message", "failed: " + error.toString());
+			outer.put("error", true);
+			return getString(outer);
+		}
 	}
 
 	/*

@@ -1809,8 +1809,8 @@ class AdminHandler extends Handler {
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 
-		response.addHeader("Access-Control-Allow-Origin", "*");
-		response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+	//	response.addHeader("Access-Control-Allow-Origin", "*");
+	//	response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 
 		InputStream body = request.getInputStream();
 		String type = request.getContentType();

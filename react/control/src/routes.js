@@ -28,19 +28,19 @@ import Simulator from "views/Simulator.jsx"
 
 var routes = [
   {
-    path: "/simulator",
-    name: "Simulator",
-    rtlName: "لوحة القيادة",
-    icon: "tim-icons icon-light-3",
-    component: Simulator,
-    layout: "/admin"
-  },
-  {
     path: "/dashboard",
     name: "Dashboard",
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-chart-pie-36",
     component: Dashboard,
+    layout: "/admin"
+  },
+  {
+    path: "/simulator",
+    name: "Simulator",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-light-3",
+    component: Simulator,
     layout: "/admin"
   },
   {
