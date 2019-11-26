@@ -915,7 +915,7 @@ public class RTBServer implements Runnable {
 	}
 
 	/**
-	 * Returns the sertver's campaign selector used by the bidder. Generally used by
+	 * Returns the server's campaign selector used by the bidder. Generally used by
 	 * javascript programs.
 	 *
 	 * @return CampaignSelector. The campaign selector object used by this server.

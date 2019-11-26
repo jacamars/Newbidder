@@ -66,6 +66,7 @@ const Dashboard = (props) => {
   const [selectedInstance, setSelectedInstance] = useState('');
   const [leader,setLeader] = useState('');
   const [snapShotView, setSnapShotView] = useState('');
+  const [campaigns, setCampaigns] = useState([]);
   
   useEffect(() => {
     // Update the document title using the browser API
@@ -79,7 +80,7 @@ const Dashboard = (props) => {
   const setInstances = (list) => {
     var output = '';
     var leader = '';
-    if (list.length==1) {
+    if (list.length===1) {
       output  = <option>{list[0].name + '*'}</option>;
       setSelectedInstance(list[0].name);
       setLeader(list[0].name);
@@ -107,15 +108,30 @@ const Dashboard = (props) => {
     setInstanceNames(output);
   }
 
+  const setCampaignsView = (rows) => {
+    setCampaigns(setCampaignsViewInternal(rows));
+  }
+
+  const setCampaignsViewInternal = (rows) => {
+    return(
+      rows.map((row, i) => (<tr key={'"campaign-view-' + i + '"'}>
+          <td>{row}</td>
+        </tr>))
+    )
+  }
+
   const doGetStatusCmd = async () => {
     try {
       var cmd = { command: 'getstatus' }
       const response = await axiosInstance.post("http://localhost:8080/ajax",JSON.stringify(cmd)); 
       console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
       var list = response.data;
+      var x = list[0];
+      console.log("SINGLE ENTRY: " + JSON.stringify(x,null,2));
       setMembers(list);
       setInstances(list);
       setSnapShotView(getSnapShotView(list));
+      setCampaignsView(list[0].values.campaigns);
       redraw();
     } catch (e) {
       alert (e);
@@ -124,40 +140,22 @@ const Dashboard = (props) => {
 
   const getSnapShotView = (rows) => {
     return(
-      rows.map(row => (
-        <tr key={row.id}>
-          <td>{row.name}</td>
-          <td className="text-right">{row.values.request}</td>
-          <td className="text-right">{row.values.bid}</td>
-          <td className="text-right">{row.values.win}</td>
-          <td className="text-right">{row.values.pixels}</td>
-          <td className="text-right">{row.values.clicks}</td>
-        </tr>
-      ))
+      rows.map((row, index) => (<tr key={'snaphotview-' + row}>
+<td>{row.name}</td>
+<td key={'snaphotview-request-' + index} className="text-right">{row.values.request}</td>
+<td key={'snaphotview-bid-' + index} className="text-right">{row.values.bid}</td>
+<td key={'snaphotview-win-' + index} className="text-right">{row.values.win}</td>
+<td key={'snaphotview-pixels-' + index} className="text-right">{row.values.pixels}</td>
+<td key={'snaphotview-clicks-' + index} className="text-right">{row.values.clicks}</td>
+</tr>))
     )
   }
-
-  /*
-    <tr key={row.id}>
-          <td>{row.name}</td>
-          <td>{row.values.request}</td>
-          <td>{row.values.bid}</td>
-          <td  className="text-center">{row.values.win}</td>
-        </tr>
-  <tr>
-                        <td>Dakota Rice</td>
-                        <td>Niger</td>
-                        <td>Oud-Turnhout</td>
-                        <td className="text-center">$36,738</td>
-                      </tr>
-  */
 
   const redraw = () => {
     setCount(count + 1);
   }
 
     return (
-      <>
         <div className="content">
           <Row>
             <Col xs="12">
@@ -294,7 +292,7 @@ const Dashboard = (props) => {
             <Col lg="4">
               <Card className="card-chart">
                 <CardHeader>
-                  <h5 className="card-category">Total Shipments</h5>
+                  <h5 className="card-category">X-Time</h5>
                   <CardTitle tag="h3">
                     <i className="tim-icons icon-bell-55 text-info" />{" "}
                     763,215
@@ -313,7 +311,7 @@ const Dashboard = (props) => {
             <Col lg="4">
               <Card className="card-chart">
                 <CardHeader>
-                  <h5 className="card-category">Daily Sales</h5>
+                  <h5 className="card-category">CPU</h5>
                   <CardTitle tag="h3">
                     <i className="tim-icons icon-delivery-fast text-primary" />{" "}
                     3,500€
@@ -332,7 +330,7 @@ const Dashboard = (props) => {
             <Col lg="4">
               <Card className="card-chart">
                 <CardHeader>
-                  <h5 className="card-category">Completed Tasks</h5>
+                  <h5 className="card-category">Memory</h5>
                   <CardTitle tag="h3">
                     <i className="tim-icons icon-send text-success" /> 12,100K
                   </CardTitle>
@@ -352,7 +350,7 @@ const Dashboard = (props) => {
             <Col lg="6" md="12">
               <Card className="card-tasks">
                 <CardHeader>
-                  <h6 className="title d-inline">Tasks(5)</h6>
+                  <h6 className="title d-inline">Campaigns</h6>
                   <p className="card-category d-inline"> today</p>
                   <UncontrolledDropdown>
                     <DropdownToggle
@@ -389,227 +387,18 @@ const Dashboard = (props) => {
                 <CardBody>
                   <div className="table-full-width table-responsive">
                     <Table>
+                    <thead className="text-primary">
+                      <tr>
+                        <th className="text-center">Campaign</th>
+                        <th className="text-right">Bids</th>
+                        <th className="text-right">Wins</th>
+                        <th className="text-right">Pixels</th>
+                        <th className="text-right">Clicks</th>
+                        <th className="text-right">Spend</th>
+                      </tr>
+                    </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input defaultValue="" type="checkbox" />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">Update the Documentation</p>
-                            <p className="text-muted">
-                              Dwuamish Head, Seattle, WA 8:47 AM
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip636901683"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip636901683"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input
-                                  defaultChecked
-                                  defaultValue=""
-                                  type="checkbox"
-                                />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">GDPR Compliance</p>
-                            <p className="text-muted">
-                              The GDPR is a regulation that requires businesses
-                              to protect the personal data and privacy of Europe
-                              citizens for transactions that occur within EU
-                              member states.
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip457194718"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip457194718"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input defaultValue="" type="checkbox" />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">Solve the issues</p>
-                            <p className="text-muted">
-                              Fifty percent of all respondents said they would
-                              be more likely to shop at a company
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip362404923"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip362404923"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input defaultValue="" type="checkbox" />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">Release v2.0.0</p>
-                            <p className="text-muted">
-                              Ra Ave SW, Seattle, WA 98116, SUA 11:19 AM
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip818217463"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip818217463"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input defaultValue="" type="checkbox" />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">Export the processed files</p>
-                            <p className="text-muted">
-                              The report also shows that consumers will not
-                              easily forgive a company once a breach exposing
-                              their personal data occurs.
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip831835125"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip831835125"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <FormGroup check>
-                              <Label check>
-                                <Input defaultValue="" type="checkbox" />
-                                <span className="form-check-sign">
-                                  <span className="check" />
-                                </span>
-                              </Label>
-                            </FormGroup>
-                          </td>
-                          <td>
-                            <p className="title">Arival at export process</p>
-                            <p className="text-muted">
-                              Capitol Hill, Seattle, WA 12:34 AM
-                            </p>
-                          </td>
-                          <td className="td-actions text-right">
-                            <Button
-                              color="link"
-                              id="tooltip217595172"
-                              title=""
-                              type="button"
-                            >
-                              <i className="tim-icons icon-pencil" />
-                            </Button>
-                            <UncontrolledTooltip
-                              delay={0}
-                              target="tooltip217595172"
-                              placement="right"
-                            >
-                              Edit Task
-                            </UncontrolledTooltip>
-                          </td>
-                        </tr>
+                        {campaigns}
                       </tbody>
                     </Table>
                   </div>
@@ -633,16 +422,13 @@ const Dashboard = (props) => {
                         <th className="text-right">Clicks</th>
                       </tr>
                     </thead>
-                    <tbody>
-                          {snapShotView}
-                    </tbody>
+                    <tbody>{snapShotView}</tbody>
                   </Table>
                 </CardBody>
               </Card>
             </Col>
           </Row>
         </div>
-      </>
     );
 }
 
