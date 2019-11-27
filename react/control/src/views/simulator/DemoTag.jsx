@@ -20,16 +20,13 @@ const DemoTag = (props) => {
     let output = props.adm;
 
     if (props.isVideo)
-        output = 
-        <ReactPlayer 
+        return (<ReactPlayer 
             width='100%'
             height='265px'
             onPause={pausedNotice}
-            url={props.adm} playing />;
-
-    return (
-        <div>{ ReactHtmlParser( output) }</div>
-    );
+        url={props.adm} playing />);
+    else 
+        return( <div>{ ReactHtmlParser( output) }</div> );
 }
 
 export default DemoTag;
