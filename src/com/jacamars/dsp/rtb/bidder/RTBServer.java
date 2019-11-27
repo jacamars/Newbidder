@@ -1364,6 +1364,10 @@ class Handler extends AbstractHandler {
 					}
 					RTBServer.clicks++;
 					return;
+					
+				case "conversion":
+					System.out.println("CONVERSION!");
+					return;
 
 				default:
 					logger.warn("Undefined command: {}", rs);
@@ -1990,6 +1994,24 @@ class AdminHandler extends Handler {
 
 				page = SSI.convert(page);
 				page = Env.substitute(page);
+				response.setContentType("text/html");
+				response.setStatus(HttpServletResponse.SC_OK);
+				baseRequest.setHandled(true);
+				response.getWriter().println(page);
+				return;
+			}
+			
+			if (target.contains("test.html")) {
+				String rs = request.getQueryString();
+				System.out.println(rs);
+				String [] tuples = rs.split("&");
+				String page = Charset.defaultCharset()
+						.decode(ByteBuffer.wrap(Files.readAllBytes(Paths.get("www/test.html")))).toString();
+				for (String tuple : tuples) {
+					String [] p = tuple.split("=");
+					page = page.replaceAll(p[0], p[1]);
+				}
+				System.out.println(page);
 				response.setContentType("text/html");
 				response.setStatus(HttpServletResponse.SC_OK);
 				baseRequest.setHandled(true);

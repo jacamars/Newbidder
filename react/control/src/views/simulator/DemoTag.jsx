@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactPlayer from 'react-player'
+import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
+
+import useScript from '../../useScript';
 
 const DemoTag = (props) => {
+
 
     const myStyle = {
         fontSize: 12
@@ -11,8 +15,12 @@ const DemoTag = (props) => {
         console.log("PAUSED: " + e);
     }
 
+    const sendEvent = () => {
+        console.log("===============================");
+    }
 
-    let output =  <textarea value={props.adm} rows="14" cols="65" style={myStyle} disabled />;
+    let output = props.adm;
+
     if (props.isVideo)
         output = 
         <ReactPlayer 
@@ -22,7 +30,7 @@ const DemoTag = (props) => {
             url={props.adm} playing />;
 
     return (
-        <div>{output}</div>
+        <div>{ ReactHtmlParser( output) }</div>
     );
 }
 

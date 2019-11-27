@@ -22,8 +22,8 @@ const Endpoint = (props) => {
 
     }
 
-    const optionItems = props.vars.exchanges.map((exchange) =>
-        <option key={exchange.name}>{exchange.name}</option>
+    const optionItems = props.vars.exchanges.map((exchange,index) =>
+        <option key={"exchange-select" + index}>{exchange.name}</option>
     );
 
     let estyle = {

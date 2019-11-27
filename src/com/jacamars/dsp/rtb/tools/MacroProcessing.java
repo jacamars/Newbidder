@@ -40,6 +40,8 @@ public class MacroProcessing {
 
     static final String APP = "APP";
     static final String SITE = "SITE";
+    
+    static String external =  Env.GetEnvironment("$EXTERNAL", "http://localhost:8080");
 
     static Set<String> macroList = new HashSet();
 
@@ -268,6 +270,11 @@ public class MacroProcessing {
         macroList.add("{tid}");
         macroList.add("{tid_enc}");
         macroList.add("%7Btid%7D");
+        
+        macroList.add("{external}");
+        macroList.add("{external_enc}");
+        macroList.add("%7Bexternal%7D");
+        
 
     }
 
@@ -769,6 +776,7 @@ public class MacroProcessing {
                     value = encodeIfRequested(item, value);
                     replaceAll(sb, item, value);
                     break;
+                    
                 case "{user_profile}":
                 case "{user_profile_enc}":
                 case "%7Buser_profile%7D":
@@ -777,12 +785,19 @@ public class MacroProcessing {
                     value = encodeIfRequested(item, value);
                     replaceAll(sb, item, value);
                     break;
+                    
                 case "{tid}":
                 case "{tid_enc}":
                 case "%7Btid}":
                     value = TidKey.get(br,adid,creat);
                     replaceAll(sb, item, value);
                     break;
+                
+                case "{external}":
+                case "{external_enc}":
+                case "%7Bexternal%7D":
+                	replaceAll(sb,item,external);
+                	break;
 
                 default:
                     value = Configuration.getInstance().getMacroDefinition(item);
