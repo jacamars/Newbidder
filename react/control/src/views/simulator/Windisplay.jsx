@@ -11,7 +11,7 @@ import {
 import DemoTag from './DemoTag';
 
 const windisplay = (props) => {
-
+    
     const textAreaStyle = {
         fontSize: 12
     };
@@ -51,7 +51,9 @@ const windisplay = (props) => {
                                     rows="14" cols="65" disabled />
                             </Col>
                             <Col xs="6">
-                                <DemoTag isVideo={props.vars.isVideo} adm={props.vars.adm} />
+                                { props.vars.winSent &&
+                                  <DemoTag isVideo={props.vars.isVideo} adm={props.vars.adm} />
+                                }
                             </Col>
                         </Row>
                 </Card>

@@ -88,7 +88,7 @@ public class Config {
         try {
 
             if (server == null) {
-                server = new RTBServer("./Campaigns/payday.json",  "", 8080, 8081,exchanges);
+                server = new RTBServer("./Campaigns/payday.json",  "",exchanges);
                 int wait = 0;
                 while(!server.isReady() && wait < 10) {
                     Thread.sleep(1000);
@@ -136,7 +136,7 @@ public class Config {
 		try {
 			if (server == null) {
            
-				server = new RTBServer("./Campaigns/payday.json", shard, port, port+1,null);
+				server = new RTBServer("./Campaigns/payday.json", shard, null);
 				int wait = 0;
 				while(!server.isReady() && wait < 10) {
 					Thread.sleep(1000);

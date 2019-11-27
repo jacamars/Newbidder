@@ -44,6 +44,7 @@
     "eventurl" : "$EXTERNAL/track",
     "postbackurl" : "$EXTERNAL/postback",
     "adminPort" : "0",
+    "port": "$PORT",
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
     "verbosity" : {

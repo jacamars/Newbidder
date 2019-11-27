@@ -149,6 +149,8 @@ public enum  Env {
 			address = GetEnvironmentVariable(address, "$CONCURRENCY", "3");
 		while (address.contains("$ADMINPORT"))
 			address = GetEnvironmentVariable(address, "$ADMINPORT", "8155");
+		while (address.contains("$PORT"))
+			address = GetEnvironmentVariable(address, "$PORT", "8080");
 		while (address.contains("$REQUESTSTRATEGY"))
 			address = GetEnvironmentVariable(address, "$REQUESTSTRATEGY", "100");
 		while (address.contains("$ACCOUNTING"))

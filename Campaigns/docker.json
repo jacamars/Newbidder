@@ -44,6 +44,7 @@
     "eventurl" : "$EXTERNAL/callback?type=track",
     "postbackurl" : "$EXTERNAL/callback?type=postback",
     "adminPort" : "$ADMINPORT",
+    "port": "$PORT",
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
     "zeromq" : {

@@ -1,12 +1,10 @@
-import React from 'react';
+import React, { useState} from 'react';
 import ReactPlayer from 'react-player'
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 
 import useScript from '../../useScript';
 
 const DemoTag = (props) => {
-
-
     const myStyle = {
         fontSize: 12
     };
