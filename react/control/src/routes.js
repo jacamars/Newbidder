@@ -17,7 +17,7 @@
 */
 import Dashboard from "views/Dashboard.jsx";
 import Icons from "views/Icons.jsx";
-import Map from "views/Map.jsx";
+import LeafMap from "views/LeafMap.jsx";
 import Notifications from "views/Notifications.jsx";
 import Rtl from "views/Rtl.jsx";
 import TableList from "views/TableList.jsx";
@@ -56,7 +56,7 @@ var routes = [
     name: "Map",
     rtlName: "خرائط",
     icon: "tim-icons icon-pin",
-    component: Map,
+    component: LeafMap,
     layout: "/admin"
   },
   {
