@@ -320,21 +320,9 @@ public class Configuration {
 		theInstance = null;
 	}
 
-	/**
-	 * Clear the config entries to default state,
-	 */
-	public void clear() {
-		shard = "";
-		port = 8080;
-		url = null;
-		logLevel = 4;
-		campaignsList.clear();
-		overrideList.clear();
-	}
-
 	public void initialize(String fileName) throws Exception {
 		this.fileName = fileName;
-		initialize(fileName, "", 8080, 8081, null);
+		initialize(fileName, "", null);
 	}
 
 	/**
@@ -347,7 +335,7 @@ public class Configuration {
 	 * @param exchanges String. The comma separated list of exchanges
 	 * @throws Exception on file errors.
 	 */
-	public void initialize(String path, String shard, int port, int sslPort, String exchanges) throws Exception {
+	public void initialize(String path, String shard, String exchanges) throws Exception {
 		this.fileName = path;
 
 		/**
@@ -396,25 +384,11 @@ public class Configuration {
 														// directory in www so
 														// preview campaign will
 														// work
-
-		/*********************************************
-		 * USE ZOOKEEPER, AEROSPIKE OR FILE CONFIG
-		 *********************************************/
 		String str = null;
-		if (path.startsWith("zookeeper")) {
-			String parts[] = path.split(":");
-			logger.info("Zookeeper: {}", "" + parts);
-			zk = new ZkConnect(parts[1]);
-			zk.join(parts[2], "bidders", instanceName);
-			str = zk.readConfig(parts[2] + "/bidders");
-		} else {
-			byte[] encoded = Files.readAllBytes(Paths.get(path));
-			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
-
-			str = Env.substitute(str);
-
-			System.out.println(str);
-		}
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
+		str = Env.substitute(str);
+		System.out.println(str);
 
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
@@ -826,7 +800,6 @@ public class Configuration {
 			}
 		}
 		
-
 		if (winUrl.contains("localhost")) {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
 		}
@@ -837,7 +810,7 @@ public class Configuration {
 	void printEnvironment() throws Exception {
 
 		String[] args = new String[] { "FREQGOV", "HOSTNAME", "BROKERLIST", "PUBSUB", "WIN", "PIXEL", "VIDEO", "BID",
-				"EXTERNAL", "PUBPORT", "SUBPORT", "INITPORT", "TRACE", "THREADS", "CONCURRENCY", "ADMINPORT",
+				"EXTERNAL", "PUBPORT", "SUBPORT", "INITPORT", "TRACE", "THREADS", "CONCURRENCY", "ADMINPORT", "PORT",
 				"REQUESTSTRATEGY", "ACCOUNTING", "THROTTLE", "IPADRESS", "TRACKER", "BROKERLIST", "NOBIDREASON" };
 
 		String[] macros = { "pixel_tracker", "redirect_tracker", "postback_tracker", "event_tracker",
@@ -1311,18 +1284,17 @@ public class Configuration {
 	 * 
 	 * @param fileName String. The filename of the configuration file.
 	 * @param shard    String. The shard name for this instance.
-	 * @param port     int. The HTTP port byumber
 	 * @return Configuration singleton.
 	 * @throws Exception on file errors and JSON errors.
 	 */
-	public static Configuration getInstance(String fileName, String shard, int port, int sslPort, String exchanges)
+	public static Configuration getInstance(String fileName, String shard, String exchanges)
 			throws Exception {
 		if (theInstance == null) {
 			synchronized (Configuration.class) {
 				if (theInstance == null) {
 					theInstance = new Configuration();
 					try {
-						theInstance.initialize(fileName, shard, port, sslPort, exchanges);
+						theInstance.initialize(fileName, shard, exchanges);
 						theInstance.shell = new JJS();
 					} catch (Exception error) {
 						error.printStackTrace();

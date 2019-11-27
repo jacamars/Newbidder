@@ -89,7 +89,6 @@ public class TestCampaignProcessor  {
 		InputStream is = Configuration.getInputStream("SampleBids/nexage.txt");
 		BidRequest request = new BidRequest(is);
 		Configuration cf = Configuration.getInstance();
-		cf.clear();
 		cf.initialize("Campaigns/payday.json");
 		Campaign c = cf.getCampaignsListReal().get(0);
 		

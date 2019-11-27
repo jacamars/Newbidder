@@ -300,19 +300,7 @@ public class RTBServer implements Runnable {
 		String fileName = "Campaigns/payday.json";
 		String exchanges = null;
 		String shard = "";
-		Integer port = 8080;
-		Integer sslPort = 8081;
 
-		String pidfile = System.getProperty("pidfile");
-		if (pidfile != null) {
-			String target = System.getProperty("target");
-			try {
-				String pid = "" + Performance.getPid(target);
-				Files.write(Paths.get(pidfile), pid.getBytes());
-			} catch (Exception e) {
-				System.err.println("WARTNING: Error writing pidfile: " + pidfile);
-			}
-		}
 
 		if (args.length == 1)
 			fileName = args[0];
@@ -320,19 +308,9 @@ public class RTBServer implements Runnable {
 			int i = 0;
 			while (i < args.length) {
 				switch (args[i]) {
-				case "-p":
-					i++;
-					port = Integer.parseInt(args[i]);
-					i++;
-					break;
 				case "-s":
 					i++;
 					shard = args[i];
-					i++;
-					break;
-				case "-x":
-					i++;
-					sslPort = Integer.parseInt(args[i]);
 					i++;
 					break;
 				case "-z":
@@ -355,7 +333,7 @@ public class RTBServer implements Runnable {
 		}
 
 		try {
-			new RTBServer(fileName, shard, port, sslPort, exchanges);
+			new RTBServer(fileName, shard, exchanges);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -450,14 +428,14 @@ public class RTBServer implements Runnable {
 	 * @throws Exception if the Server could not start (network error, error reading
 	 *                   configuration)
 	 */
-	public RTBServer(String fileName, String shard, int port, int sslPort, String exchanges) throws Exception {
+	public RTBServer(String fileName, String shard, String exchanges) throws Exception {
 
 		try {
 			Configuration.reset(); // this resquired so that when the server is
 			// restarted, the old config won't stick
 			// around.
 
-			Configuration.getInstance(fileName, shard, port, sslPort, exchanges);
+			Configuration.getInstance(fileName, shard, exchanges);
 
 			AddShutdownHook hook = new AddShutdownHook();
 			hook.attachShutDownHook();

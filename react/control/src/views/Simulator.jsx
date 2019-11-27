@@ -73,6 +73,7 @@ const Simulator = (props) =>  {
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
     nurl: 'Win URL Will Appear Here',
+    winSent: false,
     selectedBidType: 'Banner',
     xtime: 'xtime: 0, rtt: 0',
     isVideo: false,
@@ -169,6 +170,7 @@ const Simulator = (props) =>  {
     vars.adm = '';
     vars.creative = '';
     vars.isVideo=false;
+    vars.winSent = false;
     setVars(vars);
  
     var rtt =  performance.now();
@@ -196,6 +198,7 @@ const Simulator = (props) =>  {
       vars.response = {};
       vars.adm = '';
       vars.creative = '';
+      vars.winSent = false;
       setVars(vars);
       redraw();
       alert("ERROR: " + error + " " + endpoint);
@@ -212,6 +215,7 @@ const Simulator = (props) =>  {
       const response = await axiosInstance.get(nurl);
       console.log("RESPONSE: " + response.data);
       vars.isVideo = nurl.indexOf("Video") > -1;
+      vars.winSent = true;
       setVars(vars);
       redraw();
     } catch (error) {
