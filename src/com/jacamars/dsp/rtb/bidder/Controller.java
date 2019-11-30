@@ -246,6 +246,9 @@ public enum Controller {
     public static Controller getInstance() throws Exception {
 
         config = Configuration.getInstance();
+        if (config == null)
+        	return null;
+        
         /** the cache of bid adms */
 
         if (bidCachePool == null) {

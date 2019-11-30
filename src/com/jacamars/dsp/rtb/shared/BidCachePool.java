@@ -1,20 +1,21 @@
 package com.jacamars.dsp.rtb.shared;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.EntryEvent;
@@ -24,12 +25,10 @@ import com.hazelcast.core.ITopic;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.Echo;
-import com.jacamars.dsp.rtb.common.Campaign;
+
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.RecordedBid;
 import com.jacamars.dsp.rtb.common.RecordedVideo;
-import com.jacamars.dsp.rtb.tools.DbTools;
-import com.jacamars.dsp.rtb.tools.Env;
 
 public enum BidCachePool {
 
@@ -44,8 +43,11 @@ public enum BidCachePool {
 
 	/** The cache to contain the general context */
 	static private volatile IMap<String, RecordedBid> bidCache;
+	/** The cache that contains the membership records of all the bidders */
 	static private volatile IMap<String, Echo> memberCache;
+	/** The video cache of VAST tags */
 	static private volatile IMap<String, RecordedVideo> videoCache;
+	/** The cache of miscellaneous stuff that needs to be shared */
 	static private volatile IMap<String, RecordedMisc> miscCache;
 
 	/** The default backup count if you dont set it */

@@ -29,6 +29,8 @@ import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
+import scala.annotation.meta.setter;
+
 public enum CampaignCache  {
 
     INSTANCE;
@@ -126,6 +128,7 @@ public enum CampaignCache  {
         return INSTANCE;
     }
     
+    
     public static CampaignCache getClientInstance(HazelcastInstance hz) {
     	if (cache != null)
             return INSTANCE;
@@ -162,6 +165,10 @@ public enum CampaignCache  {
         } catch (Exception error) {
             error.printStackTrace();
         }
+    }
+    
+    public void addCampaign(String key, Campaign c) {
+    	cache.set(key,c);
     }
     
     public void deleteCampaigns() throws Exception {

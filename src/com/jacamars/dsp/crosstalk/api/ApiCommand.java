@@ -350,10 +350,6 @@ public class ApiCommand {
                 cmd = mapper.readValue(data, GetSpendRateCmd.class);
                 break;
 
-            case Dump:
-                cmd= mapper.readValue(data, DumpCmd.class);
-                break;
-
             case GetBiddersStatus:
                 cmd = mapper.readValue(data, GetBiddersStatusCmd.class);
                 break;

@@ -79,7 +79,7 @@ class CommandListener implements MessageListener<ApiCommand> {
 }
 
 /**
- * The Hazelcast message listener. If you are the leader and you receive this - exexute it and return
+ * The Hazelcast message listener. If you are the leader and you receive this - execute it and return
  * the value. Otherwise just return.
  * @author Ben M. Faul
  *
