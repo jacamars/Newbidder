@@ -6,8 +6,7 @@ import java.text.SimpleDateFormat;
 
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,7 @@ import com.jacamars.dsp.rtb.common.*;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxFeedback;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.jmq.Ping;
-import com.jacamars.dsp.rtb.jmq.RTopic;
+
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
@@ -31,7 +30,6 @@ import com.jacamars.dsp.rtb.pojo.WinObject;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
-import com.jacamars.dsp.rtb.tools.Performance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

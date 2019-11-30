@@ -514,7 +514,6 @@ public class Configuration {
 			mapstoredriver = hazel.get("mapstoredriver");
 			mapstorejdbc = hazel.get("mapstorejdbc");
 		}
-        RTBServer.getSharedInstance();
         //////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 * Create forensiq, anura or organizational trap in mmdb
@@ -805,6 +804,8 @@ public class Configuration {
 		}
 		
 		printEnvironment();
+		
+        RTBServer.getSharedInstance();
 	}
 
 	void printEnvironment() throws Exception {
