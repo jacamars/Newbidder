@@ -23,7 +23,7 @@ import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 const LeafMap = () => {
 
   const leafStyle = {
-    height: '1200px',
+    height: '900px',
     width: '100%'
   };
 

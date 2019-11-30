@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.bidder;
 
 import java.io.ByteArrayOutputStream;
 
+
 import java.io.File;
 
 import java.io.FileInputStream;
@@ -63,7 +64,6 @@ import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.Env;
-import com.jacamars.dsp.rtb.tools.HeapDumper;
 import com.jacamars.dsp.rtb.tools.Performance;
 
 import org.slf4j.Logger;
@@ -353,7 +353,8 @@ public class RTBServer implements Runnable {
 
 			logger.info("*** Server STARTING, Leader: {} ***", isLeader());
 			try {
-				Controller.getInstance().setMemberStatus();
+				if (Controller.getInstance() != null)						// can happen if this is not a bidder, but is a client.
+					Controller.getInstance().setMemberStatus();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1868,25 +1869,6 @@ class AdminHandler extends Handler {
 				baseRequest.setHandled(true);
 				response.getWriter().println("OK");
 				response.setStatus(200);
-				return;
-			}
-
-			if (target.equals("/dump")) {
-				String fileName = request.getParameter("filename");
-				if (fileName == null) {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:ss");
-					fileName = sdf.format(new Date()) + ".bin";
-				}
-				String msg = "Dumped " + fileName;
-				try {
-					HeapDumper.dumpHeap(fileName, false);
-				} catch (Exception error) {
-					msg = "Error dumping " + fileName + ", error=" + error.toString();
-				}
-				response.setContentType("text/html;charset=utf-8");
-				response.setStatus(HttpServletResponse.SC_OK);
-				baseRequest.setHandled(true);
-				response.getWriter().println("<h1>" + msg + "</h1>");
 				return;
 			}
 

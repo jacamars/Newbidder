@@ -1,12 +1,17 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.nio.file.Files;
+
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Create an initial database to begin using the system.
+ * @author ben
+ *
+ */
 public class CreateInitialDatabase {
 	
 	static String makeDb = "CREATE DATABASE RTB4FREE;";
@@ -15,15 +20,19 @@ public class CreateInitialDatabase {
 	static Statement stmt;
 
 	public static void main(String [] args) throws Exception {
+		var idb = new CreateInitialDatabase("jdbc:postgresql://localhost:5432/", "rtb4free","postgres","postgres");
+		idb.close();	
+	}
+		
+	public CreateInitialDatabase(String jdbc, String db, String username, String password) throws Exception {
 		boolean dbExists = false;
+		String url = jdbc + db;
 		try {
-		conn = DriverManager.getConnection(
-	                "jdbc:postgresql://localhost:5432/rtb4free", "postgres", "postgres");
-		dbExists = true;
+			conn = DriverManager.getConnection(url, username, password);
+			dbExists = true;
 		} catch (Exception err) {
 			if (err.getMessage().contains("does not exist")) {
-				conn = DriverManager.getConnection(
-		                "jdbc:postgresql://localhost:5432/", "postgres", "postgres");
+				conn = DriverManager.getConnection(jdbc, username, password);
 				dbExists = false;
 			} else
 				throw err;
@@ -54,6 +63,10 @@ public class CreateInitialDatabase {
 	   make("data/postgres/sample.sql");
 	   
 	   System.out.println("Database created!");
+	}
+	
+	public void close() throws Exception {
+		conn.close();
 	}
 	
 	public static void make(String str) throws Exception {

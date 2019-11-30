@@ -35,6 +35,7 @@
 		<antlr.runtime.version>4.7</antlr.runtime.version>
 		<elastic.rest.version>6.2.2</elastic.rest.version>
 		<jetty.server.version>9.4.18.v20190429</jetty.server.version>
+		<socket.io.version>1.0.10</socket.io.version>
 	</properties>
 
 	<dependencies>
@@ -287,6 +288,17 @@
 			<artifactId>elasticsearch-rest-client</artifactId>
 			<version>${elastic.rest.version}</version>
 		</dependency>
+		
+		
+<!-- https://mvnrepository.com/artifact/com.codeminders.socketio/socketio-server -->
+<dependency>
+    <groupId>com.codeminders.socketio</groupId>
+    <artifactId>socketio-server</artifactId>
+    <version>1.0.2</version>
+    <type>pom</type>
+</dependency>
+
+
 
 	</dependencies>
 
