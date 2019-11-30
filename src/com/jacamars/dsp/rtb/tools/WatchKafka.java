@@ -16,7 +16,7 @@ public class WatchKafka {
 
     public static void main(String [] args) throws Exception {
 
-        String address = "kafka://[$BROKERLIST]&topic=requests&groupid=reader";
+        String address = "kafka://[$BROKERLIST]&topic=bids";
 
         if (args.length > 0)
             address = args[0];

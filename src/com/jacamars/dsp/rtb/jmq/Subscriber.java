@@ -3,11 +3,11 @@ package com.jacamars.dsp.rtb.jmq;
 
 import com.amazonaws.services.kinesis.model.*;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.Message;
-import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 
 import io.krakens.grok.api.Grok;

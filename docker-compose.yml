@@ -7,71 +7,23 @@ version: "3"
 services:
   zookeeper:
     image: "zookeeper"
-    #networks:
-    #  - rtb_net
-    #ports:
-    # - "2181:2181"
+    networks:
+     - rtb_net
+    ports:
+     - "2181:2181"
 
   kafka:
     image: "ches/kafka"
     environment:
       ZOOKEEPER_IP: "zookeeper"
-#    networks:
-#      - rtb_net
-    #ports:
-    #  - "9092:9092"
+    networks:
+      - rtb_net
+    ports:
+      - "9092:9092"
     restart: always
     depends_on:
       - zookeeper
 
-  bidder:
-    image: "jacamars/rtb4free:J11"
-    environment:
-      GDPR_MODE: "false"
-
-      DEMODB: "database.json"
-
-      EXTERNAL: "http://localhost:8080"
-      ACCOUNTING: "NONE"
-      GOOGLE_EKEY: ""
-      GOOGLE_IKEY: ""
-      OPENX_EKEY: ""
-      OPENX_IKEY: ""
-      ADX_EKEY:   ""
-      ADX_IKEY:   ""
-      BIDSWITCH_ID: "1234"
-      ADMINPORT: "0"
-      AWSACCESSKEY: ""
-      AWSSECRETKEY: ""
-      AWSREGION: ""
-      S3BUCKET: ""
-      
-      BIDSCHANNEL: "$BIDSCHANNEL"
-      WINSCHANNEL: "$WINSCHANNEL"
-      REQUESTSCHANNEL: "$REQUESTSCHANNEL"
-      CLICKSCHANNEL: "$CLICKSCHANNEL"
-      PIXELSCHANNEL: "$PIXELSCHANNEL"
-      VIDEOEVENTSCHANNEL: "$VIDEOEVENTSCHANNEL"
-      POSTBACKEVENTSCHANNEL: "$POSTBACKEVENTSCHANNEL"
-      STATUSCHANNEL: "$STATUSCHANNEL"
-      REASONSCHANNEL: "$REASONSCHANNEL"  
-      LOGCHANNEL: "$LOGCHANNEL"
-      
-    ports:
-      - "8080:8080"
-      - "5701:5701"
-      - "8155:8155"
-      - "7379:7379"
-      - "7000:7000"
-    volumes:
-      - "./database.json:/database.json"
-    #  - "./payday.json:/Campaigns/payday.json"
-#    networks:
-#      - rtb_net
-    depends_on:
-      - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 --t=120 && ./wait-for-it.sh && sleep 1; ./rtb4free"
-    #command:  bash -c "./wait-for-it.sh kafka:9092 --timeout=120 && ./wait-for-it.sh zerospike:6000 --timeout 120 && sleep 1; ./rtb4free-jmx"
 
   postgres:
     image: postgres
@@ -84,6 +36,6 @@ services:
     volumes:
       - /tmp/data:/var/lib/postgresql/data
 
-#networks:
-#  rtb_net:
-#    external: true
+networks:
+  rtb_net:
+    external: true
