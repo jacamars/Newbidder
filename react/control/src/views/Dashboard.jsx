@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React,  { useState, useEffect } from "react";
+import React,  { useState, useEffect, useContext } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react plugin used to create charts
@@ -53,17 +53,24 @@ import {
   chartExample4
 } from "variables/charts.jsx";
 
+import { useViewContext } from "../ViewContext";
+
 const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
   httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
 });
 
 const Dashboard = (props) => {
-  const [bigChartData, setBigChartData] = useState('data1');
+
+  const vx = useViewContext();
+
   const [count, setCount] = useState(1);
   const [members, setMembers] = useState([]);
   const [instanceNames, setInstanceNames] = useState([]);
-  const [selectedInstance, setSelectedInstance] = useState('');
+
+  //const [selectedInstance, setSelectedInstance] = useState('');
+
+
   const [leader,setLeader] = useState('');
   const [snapShotView, setSnapShotView] = useState('');
   const [campaigns, setCampaigns] = useState([]);
@@ -73,16 +80,17 @@ const Dashboard = (props) => {
     doGetStatusCmd();
   },[]);
 
-  const setBgChartData = name => {
-    setBigChartData(name);
-  };
+  //const setBgChartData = name => {
+  //  setBigChartData(name);
+  //};
 
   const setInstances = (list) => {
     var output = '';
     var leader = '';
+    var selected = vx.selectedHost;
     if (list.length===1) {
       output  = <option>{list[0].name + '*'}</option>;
-      setSelectedInstance(list[0].name);
+      vx.setSelectedHost(list[0].name);
       setLeader(list[0].name);
     } else {
       for (var i=0;i<list.length;i++) {
@@ -91,8 +99,8 @@ const Dashboard = (props) => {
           leader = '*';
         } else
           leader = '';
-        if (setSelectedInstance !== '') {
-          if (selectedInstance === list[i].name)
+        if (selected !== '') {
+          if (selected === list[i].name)
             output += <option selected>{list[i].name + leader}</option>;
           else
             output += <option>{list[i].name + leader}</option>;
@@ -101,7 +109,7 @@ const Dashboard = (props) => {
             output += <option selected>All Instances</option>;
           }
           output += <option>{list[i].name + leader}</option>;
-          setSelectedInstance("All Instances");
+          vx.setSelectedInstance("All Instances");
         }
       }
     }
@@ -124,10 +132,10 @@ const Dashboard = (props) => {
     try {
       var cmd = { command: 'getstatus' }
       const response = await axiosInstance.post("http://localhost:8080/ajax",JSON.stringify(cmd)); 
-      console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
+      //console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
       var list = response.data;
       var x = list[0];
-      console.log("SINGLE ENTRY: " + JSON.stringify(x,null,2));
+      //console.log("SINGLE ENTRY: " + JSON.stringify(x,null,2));
       setMembers(list);
       setInstances(list);
       setSnapShotView(getSnapShotView(list));
@@ -165,15 +173,6 @@ const Dashboard = (props) => {
                     <Col className="text-left" sm="6">
                       <h5 className="card-category">Total Events</h5>
                       <select width='100%'>
-                        <option>15 Minutes</option>
-                        <option>30 Minutes</option>
-                        <option>1 Hour</option>
-                        <option>6 Hours</option>
-                        <option>24 Hours</option>
-                        <option>1 Week</option>
-                        <option>1 Month</option>
-                      </select>
-                      <select width='100%'>
                           {instanceNames}
                       </select>
                       <Button size="sm" color="info" onClick={doGetStatusCmd}>Refresh</Button>
@@ -187,12 +186,12 @@ const Dashboard = (props) => {
                         <Button
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: bigChartData === "data1"
+                            active: vx.bigChartData === "data1"
                           })}
                           color="info"
                           id="0"
                           size="sm"
-                          onClick={() => setBgChartData("data1")}
+                          onClick={() => vx.setBgChartData("data1")}
                         >
                           <input
                             defaultChecked
@@ -213,9 +212,9 @@ const Dashboard = (props) => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: bigChartData === "data2"
+                            active: vx.bigChartData === "data2"
                           })}
-                          onClick={() => setBgChartData("data2")}
+                          onClick={() => vx.setBgChartData("data2")}
                         >
                           <input
                             className="d-none"
@@ -235,9 +234,9 @@ const Dashboard = (props) => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: bigChartData === "data3"
+                            active: vx.bigChartData === "data3"
                           })}
-                          onClick={() => setBgChartData("data3")}
+                          onClick={() => vx.setBgChartData("data3")}
                         >
                           <input
                             className="d-none"
@@ -257,9 +256,9 @@ const Dashboard = (props) => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: bigChartData === "data4"
+                            active: vx.bigChartData === "data4"
                           })}
-                          onClick={() => setBgChartData("data4")}
+                          onClick={() => vx.setBgChartData("data4")}
                         >
                           <input
                             className="d-none"
@@ -280,7 +279,7 @@ const Dashboard = (props) => {
                 <CardBody>
                   <div className="chart-area">
                     <Line
-                      data={chartExample1[bigChartData]}
+                      data={chartExample1[vx.bigChartData]}
                       options={chartExample1.options}
                     />
                   </div>

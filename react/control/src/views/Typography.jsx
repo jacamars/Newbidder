@@ -20,8 +20,7 @@ import React from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, CardTitle, Row, Col } from "reactstrap";
 
-class Typography extends React.Component {
-  render() {
+const Typography = () => {
     return (
       <>
         <div className="content">
@@ -211,7 +210,6 @@ class Typography extends React.Component {
         </div>
       </>
     );
-  }
 }
 
 export default Typography;

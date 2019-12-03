@@ -20,6 +20,7 @@ import classNames from "classnames";
 import { Map as LeafletMap, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 // reactstrap components
 import { Button, ButtonGroup, Card, CardHeader, CardBody, CardTitle, Row, Col } from "reactstrap";
+import { useViewContext } from "../ViewContext";
 
 /*
                   <CircleMarker center={[34.052235, -118.243683]} radius={10}>
@@ -34,18 +35,19 @@ import { Button, ButtonGroup, Card, CardHeader, CardBody, CardTitle, Row, Col } 
                   </Marker>
                   */
 
+var map;
 const LeafMap = () => {
+
+  const vx = useViewContext();
 
   const [count, setCount] = useState(0);
 
-  const [mapType, setMapType] = useState('none');
-  const [positions, setPositions] = useState([]);
+  // const [mapType, setMapType] = useState('none');
+//  const [positions, setPositions] = useState([]);
   //  {'x': 34.152235, 'y': -118.143683},
    // {'x': 34.052235, 'y':-118.243683}]);
 
   const  loggerCallback = (spec,logname,  callback) => {
-      var self = this;
-    
       var previous_response_length = 0;
       var xhr = new XMLHttpRequest()
       xhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
@@ -56,7 +58,7 @@ const LeafMap = () => {
         if (xhr.readyState == 3) {
           var response = xhr.responseText;
           var chunk = response.slice(previous_response_length);
-          console.log("GOT SOME CHUNK DATA: " + chunk);
+          //console.log("GOT SOME CHUNK DATA: " + chunk);
           var i = chunk.indexOf("{");
           if (i < 0)
             return;
@@ -65,7 +67,7 @@ const LeafMap = () => {
           chunk = chunk.substring(i);
           previous_response_length = response.length;
           
-          console.log("GOT DATA: " + chunk);
+          //console.log("GOT DATA: " + chunk);
           var lines = chunk.split("\n");
           var rows = []
           for (var j = 0; j < lines.length; j++) {
@@ -76,6 +78,7 @@ const LeafMap = () => {
               rows.push(y);
             }
             callback(rows)
+            redraw();
           }
         }
       }
@@ -87,20 +90,8 @@ const LeafMap = () => {
     width: '100%'
   };
 
-  const addMapEntries = (rows) => {
-    console.log("ADD MAP ENTRIES: ROWS = " + JSON.stringify(rows,null,2));
-    for (var i = 0; i< rows.length; i++) {
-      positions.push(rows[i])
-      if (positions.length > 20) 
-        positions.shift();
-    }
-    setPositions(positions); 
-    console.log("POSITIONS = " + JSON.stringify(positions,null,2));
-    redraw();
-  }
-
   const redraw = () => {
-    console.log(JSON.stringify(positions,null,2));
+    console.log(JSON.stringify(vx.mapPositions,null,2));
     setCount(count+1);
   }
   const setPositionsView = (rows) => {
@@ -114,9 +105,31 @@ const LeafMap = () => {
   }
 
   const setType = (data) => {
-    setMapType(data);
-    loggerCallback("localhost:7379",data,  addMapEntries);
+    vx.setMapType(data);
+    loggerCallback("localhost:7379",data,  vx.addMapPositions);
   }
+
+  const handleZoom = (e) => {
+    vx.setZoomLevel( map.leafletElement.getZoom() );
+  };
+
+  function stringify(value) {
+		var seen = [];
+
+		return JSON.stringify(value, function(key, val) {
+   			if (val != null && typeof val == "object") {
+        		if (seen.indexOf(val) >= 0) {
+            		return;
+        		}
+        		seen.push(val);
+    		}
+    		return val;
+			}, 2);
+	}
+
+
+  if (vx.mapType === '')
+    setType('bids');
 
 
   return (
@@ -138,12 +151,12 @@ const LeafMap = () => {
                         <Button
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: mapType === "requests"
+                            active: vx.mapType === "requests"
                           })}
                           color="info"
                           id="0"
                           size="sm"
-                          onClick={() => setType("requests")}
+                          onClick={() => vx.setMapType("requests")}
                         >
                           <input
                             defaultChecked
@@ -164,9 +177,9 @@ const LeafMap = () => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: mapType === "bids"
+                            active: vx.mapType === "bids"
                           })}
-                          onClick={() => setType("bids")}
+                          onClick={() => vx.setMapType("bids")}
                         >
                           <input
                             className="d-none"
@@ -186,9 +199,9 @@ const LeafMap = () => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: mapType === "wins"
+                            active: vx.mapType === "wins"
                           })}
-                          onClick={() => setType("wins")}
+                          onClick={() => vx.setMapType("wins")}
                         >
                           <input
                             className="d-none"
@@ -208,9 +221,9 @@ const LeafMap = () => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: mapType === "conversions"
+                            active: vx.CardHeadermapType === "conversions"
                           })}
-                          onClick={() => setType("conversions")}
+                          onClick={() => vx.setMapType("conversions")}
                         >
                           <input
                             className="d-none"
@@ -231,12 +244,14 @@ const LeafMap = () => {
                 <CardBody>
                   <LeafletMap style={leafStyle}
                     center={[34.052235, -118.243683]}
-                    zoom={13}
+                    zoom={vx.zoomLevel}
+                    onzoom={handleZoom}
+                    ref={(ref) => { map = ref; }}
                   >
                   <TileLayer
                       url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
-                  {setPositionsView(positions)}
+                  {setPositionsView(vx.mapPositions)}
                   </LeafletMap>
                 </CardBody>
               </Card>

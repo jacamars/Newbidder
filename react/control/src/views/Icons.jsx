@@ -20,8 +20,7 @@ import React from "react";
 // reactstrap components
 import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 
-class Icons extends React.Component {
-  render() {
+const Icons = () => {
     return (
       <>
         <div className="content">
@@ -1145,7 +1144,6 @@ class Icons extends React.Component {
         </div>
       </>
     );
-  }
 }
 
 export default Icons;

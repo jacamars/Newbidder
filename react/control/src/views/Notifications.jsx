@@ -32,8 +32,8 @@ import {
   Col
 } from "reactstrap";
 
-class Notifications extends React.Component {
-  notify = place => {
+const Notifications = () => {
+  const notify = place => {
     var color = Math.floor(Math.random() * 5 + 1);
     var type;
     switch (color) {
@@ -70,9 +70,9 @@ class Notifications extends React.Component {
       icon: "tim-icons icon-bell-55",
       autoDismiss: 7
     };
-    this.refs.notificationAlert.notificationAlert(options);
+    //refs.notificationAlert.notificationAlert(options);
+    //notificationAlert.notificationAlert(options);
   };
-  render() {
     return (
       <>
         <div className="content">
@@ -242,7 +242,6 @@ class Notifications extends React.Component {
         </div>
       </>
     );
-  }
 }
 
 export default Notifications;
