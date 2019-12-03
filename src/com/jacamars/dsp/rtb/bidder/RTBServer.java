@@ -351,7 +351,8 @@ public class RTBServer implements Runnable {
 			AtomicBigDecimal.registerWithHazelCast(config);
 			hz = Hazelcast.newHazelcastInstance(config);
 
-			logger.info("*** Server STARTING, Leader: {} ***", isLeader());
+			if (logger != null)
+				logger.info("*** Server STARTING, Leader: {} ***", isLeader());
 			try {
 				if (Controller.getInstance() != null)						// can happen if this is not a bidder, but is a client.
 					Controller.getInstance().setMemberStatus();
