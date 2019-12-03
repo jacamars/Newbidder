@@ -36,39 +36,6 @@ const Admin = (props) => {
   const [backgroundColor, setBackgroundColor] = useState('blue');
   const [sidebarOpened, setSidebarOpened] = useState( document.documentElement.className.indexOf("nav-open") !== -1);
 
- /* useEffect(() => {
-    if (navigator.platform.indexOf("Win") > -1) {
-      document.documentElement.className += " perfect-scrollbar-on";
-      document.documentElement.classList.remove("perfect-scrollbar-off");
-      ps = new PerfectScrollbar(refs.mainPanel, { suppressScrollX: true });
-      let tables = document.querySelectorAll(".table-responsive");
-      for (let i = 0; i < tables.length; i++) {
-        ps = new PerfectScrollbar(tables[i]);
-      }
-    } 
-  },[]);
-
- /* componentWillUnmount() {
-    if (navigator.platform.indexOf("Win") > -1) {
-      ps.destroy();
-      document.documentElement.className += " perfect-scrollbar-off";
-      document.documentElement.classList.remove("perfect-scrollbar-on");
-    }
-  } 
-  componentDidUpdate(e) {
-    if (e.history.action === "PUSH") {
-      if (navigator.platform.indexOf("Win") > -1) {
-        let tables = document.querySelectorAll(".table-responsive");
-        for (let i = 0; i < tables.length; i++) {
-          ps = new PerfectScrollbar(tables[i]);
-        }
-      }
-      document.documentElement.scrollTop = 0;
-      document.scrollingElement.scrollTop = 0;
-      this.refs.mainPanel.scrollTop = 0;
-    }
-  }  */
-
   // this function opens and closes the sidebar on small devices
   const toggleSidebar = () => {
     document.documentElement.classList.toggle("nav-open");

@@ -32,8 +32,7 @@ import {
   Col
 } from "reactstrap";
 
-class UserProfile extends React.Component {
-  render() {
+const UserProfile = () => {
     return (
       <>
         <div className="content">
@@ -206,7 +205,6 @@ class UserProfile extends React.Component {
         </div>
       </>
     );
-  }
 }
 
 export default UserProfile;
