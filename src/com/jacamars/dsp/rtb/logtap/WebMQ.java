@@ -1,4 +1,4 @@
-package com.jacamars.dsp.logtap;
+package com.jacamars.dsp.rtb.logtap;
 
 import java.io.BufferedReader;
 
@@ -11,7 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.text.SimpleDateFormat;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletException;
@@ -110,13 +111,6 @@ public class WebMQ implements Runnable {
 	} 
 }
 
-/**
- * The class that handles HTTP calls for Skrambler actions.
- * 
- * @author Ben M. Faul
- *
- */
-
 @MultipartConfig
 class Handler extends AbstractHandler {
 	/**
@@ -211,7 +205,26 @@ class Handler extends AbstractHandler {
 				}
 				
 				
-				new WebMQSubscriber(response,topics);       // does not return
+				new WebMQSubscriber(response,topics).run();       // does not return
+				System.out.println("Client disconnected");
+				
+			}
+			
+			if (target.startsWith("/shortsub")) {
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("application/json;charset=utf-8");
+				baseRequest.setHandled(true);
+				
+				String topics = request.getParameter("topic");
+	
+				if (topics == null) {
+					response.getWriter().println("{\"error\":\"no topic specified\"}");
+					return;
+				}
+				
+				
+				new ShortSubscriber(response,topics).run();       // does not return
+				System.out.println("Client disconnected");
 				
 			}
 
@@ -297,5 +310,4 @@ class Handler extends AbstractHandler {
 			return sb.toString();
 
 		}
-
 }

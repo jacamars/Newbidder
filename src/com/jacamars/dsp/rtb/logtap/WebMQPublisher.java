@@ -1,4 +1,4 @@
-package com.jacamars.dsp.logtap;
+package com.jacamars.dsp.rtb.logtap;
 
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
