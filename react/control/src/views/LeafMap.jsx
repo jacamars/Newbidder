@@ -16,33 +16,12 @@
 
 */
 import React, { useState } from "react";
+import classNames from "classnames";
 import { Map as LeafletMap, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 // reactstrap components
-import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
+import { Button, ButtonGroup, Card, CardHeader, CardBody, CardTitle, Row, Col } from "reactstrap";
 
-const LeafMap = () => {
-
-  const leafStyle = {
-    height: '900px',
-    width: '100%'
-  };
-
-  return (
-      <>
-        <div className="content">
-          <Row>
-            <Col md="12">
-              <Card className="card-plain">
-                <CardHeader>Leaf Maps</CardHeader>
-                <CardBody>
-                  <LeafletMap style={leafStyle}
-                    center={[34.052235, -118.243683]}
-                    zoom={13}
-
-                  >
-                  <TileLayer
-                      url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                  />
+/*
                   <CircleMarker center={[34.052235, -118.243683]} radius={10}>
                     <Popup>
                       Popup for any custom information.
@@ -53,6 +32,211 @@ const LeafMap = () => {
                       Popup for any custom information.
                     </Popup>
                   </Marker>
+                  */
+
+const LeafMap = () => {
+
+  const [count, setCount] = useState(0);
+
+  const [mapType, setMapType] = useState('none');
+  const [positions, setPositions] = useState([]);
+  //  {'x': 34.152235, 'y': -118.143683},
+   // {'x': 34.052235, 'y':-118.243683}]);
+
+  const  loggerCallback = (spec,logname,  callback) => {
+      var self = this;
+    
+      var previous_response_length = 0;
+      var xhr = new XMLHttpRequest()
+      xhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
+      xhr.onreadystatechange = checkData;
+      xhr.send(null);
+      
+      function checkData() {
+        if (xhr.readyState == 3) {
+          var response = xhr.responseText;
+          var chunk = response.slice(previous_response_length);
+          console.log("GOT SOME CHUNK DATA: " + chunk);
+          var i = chunk.indexOf("{");
+          if (i < 0)
+            return;
+          if (chunk.trim().length === 0)
+            return;
+          chunk = chunk.substring(i);
+          previous_response_length = response.length;
+          
+          console.log("GOT DATA: " + chunk);
+          var lines = chunk.split("\n");
+          var rows = []
+          for (var j = 0; j < lines.length; j++) {
+            var line = lines[j];
+            line = line.trim();
+            if (line.length > 0) {
+              var y = JSON.parse(line);
+              rows.push(y);
+            }
+            callback(rows)
+          }
+        }
+      }
+      ;
+    }
+
+  const leafStyle = {
+    height: '900px',
+    width: '100%'
+  };
+
+  const addMapEntries = (rows) => {
+    console.log("ADD MAP ENTRIES: ROWS = " + JSON.stringify(rows,null,2));
+    for (var i = 0; i< rows.length; i++) {
+      positions.push(rows[i])
+      if (positions.length > 20) 
+        positions.shift();
+    }
+    setPositions(positions); 
+    console.log("POSITIONS = " + JSON.stringify(positions,null,2));
+    redraw();
+  }
+
+  const redraw = () => {
+    console.log(JSON.stringify(positions,null,2));
+    setCount(count+1);
+  }
+  const setPositionsView = (rows) => {
+    return(
+      rows.map((row, i) => (<Marker key={'"position-' + i + "'"} position={[row.x, row.y]}>
+         <Popup>
+           Popup for any custom information.
+         </Popup>
+       </Marker>))
+    )
+  }
+
+  const setType = (data) => {
+    setMapType(data);
+    loggerCallback("localhost:7379",data,  addMapEntries);
+  }
+
+
+  return (
+      <>
+        <div className="content">
+          <Row>
+            <Col md="12">
+              <Card className="card-plain">
+              <CardHeader>
+                  <Row>
+                    <Col className="text-left" sm="6">
+                      <CardTitle tag="h2">Events Map</CardTitle>
+                    </Col>
+                    <Col sm="6">
+                      <ButtonGroup
+                        className="btn-group-toggle float-right"
+                        data-toggle="buttons"
+                      >
+                        <Button
+                          tag="label"
+                          className={classNames("btn-simple", {
+                            active: mapType === "requests"
+                          })}
+                          color="info"
+                          id="0"
+                          size="sm"
+                          onClick={() => setType("requests")}
+                        >
+                          <input
+                            defaultChecked
+                            className="d-none"
+                            name="options"
+                            type="radio"
+                          />
+                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                            Requests
+                          </span>
+                          <span className="d-block d-sm-none">
+                            <i className="tim-icons icon-single-02" />
+                          </span>
+                        </Button>
+                        <Button
+                          color="info"
+                          id="1"
+                          size="sm"
+                          tag="label"
+                          className={classNames("btn-simple", {
+                            active: mapType === "bids"
+                          })}
+                          onClick={() => setType("bids")}
+                        >
+                          <input
+                            className="d-none"
+                            name="options"
+                            type="radio"
+                          />
+                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                            Bids
+                          </span>
+                          <span className="d-block d-sm-none">
+                            <i className="tim-icons icon-gift-2" />
+                          </span>
+                        </Button>
+                        <Button
+                          color="info"
+                          id="2"
+                          size="sm"
+                          tag="label"
+                          className={classNames("btn-simple", {
+                            active: mapType === "wins"
+                          })}
+                          onClick={() => setType("wins")}
+                        >
+                          <input
+                            className="d-none"
+                            name="options"
+                            type="radio"
+                          />
+                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                            Wins
+                          </span>
+                          <span className="d-block d-sm-none">
+                            <i className="tim-icons icon-tap-02" />
+                          </span>
+                        </Button>
+                        <Button
+                          color="info"
+                          id="3"
+                          size="sm"
+                          tag="label"
+                          className={classNames("btn-simple", {
+                            active: mapType === "conversions"
+                          })}
+                          onClick={() => setType("conversions")}
+                        >
+                          <input
+                            className="d-none"
+                            name="options"
+                            type="radio"
+                          />
+                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                            Conversions
+                          </span>
+                          <span className="d-block d-sm-none">
+                            <i className="tim-icons icon-tap-02" />
+                          </span>
+                        </Button>
+                      </ButtonGroup>
+                    </Col>
+                  </Row>
+                </CardHeader>
+                <CardBody>
+                  <LeafletMap style={leafStyle}
+                    center={[34.052235, -118.243683]}
+                    zoom={13}
+                  >
+                  <TileLayer
+                      url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                  />
+                  {setPositionsView(positions)}
                   </LeafletMap>
                 </CardBody>
               </Card>
