@@ -1,22 +1,17 @@
 package com.jacamars.dsp.rtb.tools;
 
-import com.jacamars.dsp.rtb.common.Configuration;
-import com.jacamars.dsp.rtb.jmq.EventIF;
-import com.jacamars.dsp.rtb.jmq.MSubscriber;
-import com.jacamars.dsp.rtb.jmq.ZPublisher;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created by ben on 12/23/17.
  */
 public class WatchKafka {
     int count = 0;
+    public static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String [] args) throws Exception {
 
-        String address = "kafka://[$BROKERLIST]&topic=bids";
+        String address = "kafka://[$BROKERLIST]&topic=logs";
 
         if (args.length > 0)
             address = args[0];
@@ -32,7 +27,12 @@ public class WatchKafka {
         channel.addListener(new com.jacamars.dsp.rtb.jmq.MessageListener<Object>() {
             @Override
             public void onMessage(String channel, Object data) {
-                System.out.println(channel + " [" + count + "] = " + data + "\n");
+            	try {
+            		String sdata = mapper.writeValueAsString(data);
+            		System.out.println(channel + " [" + count + "] = " + sdata);
+            	} catch (Exception error) {
+            		System.out.println(channel + " [" + count + "] = " + data);
+            	}
                 count++;
             }
         });
