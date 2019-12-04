@@ -10,8 +10,11 @@ import {
     InputGroupAddon,
     InputGroupText
  } from 'reactstrap';
+ import { useViewContext } from "../../ViewContext";
 
 const Endpoint = (props) => {
+
+    const vx = useViewContext();
 
     const style = {
         backgroundColor: 'yellow',
@@ -23,7 +26,7 @@ const Endpoint = (props) => {
     }
 
     const optionItems = props.vars.exchanges.map((exchange,index) =>
-        <option key={"exchange-select" + index}>{exchange.name}</option>
+        <option selected={exchange.name===vx.ssp} key={"exchange-select" + index}>{exchange.name}</option>
     );
 
     let estyle = {

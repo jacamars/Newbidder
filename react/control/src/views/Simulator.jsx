@@ -6,6 +6,7 @@ import Bideditor from './simulator/Bideditor';
 import Windisplay from './simulator/Windisplay';
 import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from './simulator/Utils';
 import { SSL_OP_LEGACY_SERVER_CONNECT } from 'constants';
+import { useViewContext } from "../ViewContext";
 
 const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
@@ -13,7 +14,9 @@ const axiosInstance = axios.create({
 });
 
 const Simulator = (props) =>  {
-  
+
+  const vx = useViewContext();
+
   const [count, setCount] = useState(0);
 
   const [vars, setVars] = useState({
@@ -65,16 +68,15 @@ const Simulator = (props) =>  {
       { name: "Native", file: SampleNative }
     ],
     json: SampleBanner,
-    selected: 'Nexage',
-    uri: '/rtb/bids/nexage',
-    url: 'http://localhost:8080',
+    uri: vx.uri,
+    url: vx.url,
     bid: JSON.stringify(SampleBanner, null, 2),
     response: {response: 'I am the response'},
     creative: '<a href="http://google.com">Click Here</a>',
     adm: 'ADM',
     nurl: 'Win URL Will Appear Here',
     winSent: false,
-    selectedBidType: 'Banner',
+    selectedBidType: vx.bidtype,
     xtime: 'xtime: 0, rtt: 0',
     isVideo: false,
     jsonError: false
@@ -82,16 +84,18 @@ const Simulator = (props) =>  {
 
   const exchangeChangedHandler = (event, id) => {
     const name = event.target.value;
-    var uri = '?';
     for (var i in vars.exchanges) {
       var exchange = vars.exchanges[i]
       if (exchange.name === name) {
-        uri = exchange.uri;
+        vx.changeSsp(name);
+        vx.changeUri(exchange.uri);
+
+        console.log("EXCHANGE IS NOW: " + name);
       }
     }
 
-    vars.selected = name;
-    vars.uri = uri;
+    vars.uri = vx.uri;
+    vars.url = vx.url;
     setVars(vars);
 
     console.log("NEW URI: " + vars.uri)
@@ -109,6 +113,7 @@ const Simulator = (props) =>  {
       var bt = vars.bidTypes[i]
       if (bt.name === name) {
         file = bt.file;
+        vx.changeBidtype(bt.name);
       }
     }
 
@@ -126,11 +131,15 @@ const Simulator = (props) =>  {
   }
 
   const jsonChangedHandler = (obj) => {
-    var x = eval('(' + obj.plainText+ ')');
-    x = JSON.stringify(x,null,2);
-    console.log("CHANGED: " + x);    
+    try {
+      var x = eval('(' + obj.plainText+ ')');
+      x = JSON.stringify(x,null,2);
+      console.log("CHANGED: " + x);    
 
-    vars.bid = x;
+      vars.bid = x;
+    } catch (e) {
+      // is an error but the editor will handle it.
+    }
     vars.jsonError = obj.error;
     setVars(vars);
   }
@@ -138,6 +147,7 @@ const Simulator = (props) =>  {
   const rootHandler = (event, id) => {
     const newval = event.target.value;
     vars.url = newval;
+    vx.changeUrl(newval);
     console.log("ROOTHANDLER: " + event.target.value)
     setVars(vars);
     redraw();
@@ -244,7 +254,6 @@ const Simulator = (props) =>  {
 
     redraw();
   }
-
     return (
         <>
             <div className="content">

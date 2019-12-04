@@ -8,9 +8,12 @@ import {
     Row,
     Col
  } from 'reactstrap';
+ import { useViewContext } from "../../ViewContext";
 
 
-const bideditor = (props) => {
+const Bideditor = (props) => {
+
+    const vx = useViewContext();
 
     const style = {
         backgroundColor: 'yellow',
@@ -25,18 +28,13 @@ const bideditor = (props) => {
         fontSize: 12
     };
 
-    let list = props.vars.exchanges;
-    let optionItems = list.map((exchange) =>
-        <option {...exchange.selected} key={exchange.name}>{exchange.name}</option>
-    );
 
     let estyle = {
         overflow: 'scroll'
     }
 
-    list = props.vars.bidTypes;
-    let bidTypes = list.map((bid) =>
-        <option key={bid.name}>{bid.name}</option>
+    let bidTypes = props.vars.bidTypes.map((bid) =>
+        <option  selected={bid.name===vx.bidtype} key={bid.name}>{bid.name}</option>
     );
 
     return (
@@ -85,4 +83,4 @@ const bideditor = (props) => {
     )
 }
 
-export default bideditor;
+export default Bideditor;
