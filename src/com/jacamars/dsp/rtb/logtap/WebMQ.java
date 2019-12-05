@@ -54,8 +54,6 @@ public class WebMQ implements Runnable {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 	
-	public static boolean aeroSpikeConnected = false;
-	
 	static SimpleDateFormat sdf = new SimpleDateFormat(
 			"yyyy-MM-dd HH:mm:ss.SSS");
 	

@@ -40,12 +40,7 @@ const LeafMap = () => {
 
   const vx = useViewContext();
 
-  const [count, setCount] = useState(0);
-
-  // const [mapType, setMapType] = useState('none');
-//  const [positions, setPositions] = useState([]);
-  //  {'x': 34.152235, 'y': -118.143683},
-   // {'x': 34.052235, 'y':-118.243683}]);
+  const [mapdata, setMapdata] = useState('init');
 
   const  loggerCallback = (spec,logname,  callback) => {
       var previous_response_length = 0;
@@ -77,9 +72,9 @@ const LeafMap = () => {
               var y = JSON.parse(line);
               rows.push(y);
             }
-            callback(rows)
-            redraw();
           }
+          callback(rows)
+          setMapdata(setPositionsView(vx.mapPositions));
         }
       }
       ;
@@ -89,11 +84,7 @@ const LeafMap = () => {
     height: '900px',
     width: '100%'
   };
-
-  const redraw = () => {
-    console.log(JSON.stringify(vx.mapPositions,null,2));
-    setCount(count+1);
-  }
+  
   const setPositionsView = (rows) => {
     return(
       rows.map((row, i) => (<Marker key={'"position-' + i + "'"} position={[row.x, row.y]}>
@@ -128,9 +119,12 @@ const LeafMap = () => {
 	}
 
 
-  if (vx.mapType === '')
+  if (vx.mapType === '') 
     setType('bids');
 
+  if (mapdata === 'init')
+    setMapdata(setPositionsView(vx.mapPositions));
+ 
 
   return (
       <>
@@ -251,7 +245,7 @@ const LeafMap = () => {
                   <TileLayer
                       url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
-                  {setPositionsView(vx.mapPositions)}
+                  {mapdata}
                   </LeafletMap>
                 </CardBody>
               </Card>
