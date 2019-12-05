@@ -19,7 +19,7 @@ const windisplay = (props) => {
     console.log("WIN NURL: " + props.vars.nurl);
     console.log("ADM: " + props.vars.adm);
     console.log("VIDEO: " + props.vars.isVideo);
-    const show = !(props.vars.nurl === 'Win URL Will Appear Here' || props.vars.nurl === '');
+    const show = !(props.vars.nurl === '');
     console.log("SHOW: " + show);
 
     return (
@@ -47,7 +47,7 @@ const windisplay = (props) => {
                             <Col xs="6">
                                 <textarea 
                                     style={textAreaStyle}
-                                    value={props.vars.creative} 
+                                    value={props.vars.adm} 
                                     rows="14" cols="65" disabled />
                             </Col>
                             <Col xs="6">
