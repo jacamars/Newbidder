@@ -66,10 +66,28 @@ const  ViewContext = () => {
         setWinsent(value);
     }
 
+    const [consoleLogspec, setConsoleLogspec] = useState('')
+    const [logdata, setLogdata] = useState([]);
+    const changeConsoleLogspec = (value) => {
+        setConsoleLogspec(value);
+    }
+    const addLogdata = (rows) => {
+        var data = logdata;
+        for (var i=0; i<rows.length; i++) {
+            data.unshift(rows[i]);
+        }
+        setLogdata(data);
+        console.log("BUFFERED DATA IS: " + JSON.stringify(data,null,2));
+    }
+    const clearLogdata = () => {
+        setLogdata([]);
+    }
+
     return { bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, 
         mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
-        nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent
+        nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
+        consoleLogspec, changeConsoleLogspec, logdata, addLogdata, clearLogdata
     };
 };
 
