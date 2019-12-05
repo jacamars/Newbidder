@@ -58,7 +58,7 @@ const LeafMap = () => {
         if (xhr.readyState == 3) {
           var response = xhr.responseText;
           var chunk = response.slice(previous_response_length);
-          //console.log("GOT SOME CHUNK DATA: " + chunk);
+          console.log("GOT SOME CHUNK DATA: " + chunk);
           var i = chunk.indexOf("{");
           if (i < 0)
             return;
@@ -67,7 +67,7 @@ const LeafMap = () => {
           chunk = chunk.substring(i);
           previous_response_length = response.length;
           
-          //console.log("GOT DATA: " + chunk);
+          console.log("GOT DATA: " + chunk);
           var lines = chunk.split("\n");
           var rows = []
           for (var j = 0; j < lines.length; j++) {
