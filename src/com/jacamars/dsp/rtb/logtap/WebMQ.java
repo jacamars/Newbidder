@@ -203,8 +203,10 @@ class Handler extends AbstractHandler {
 				}
 				
 				
-				new WebMQSubscriber(response,topics).run();       // does not return
-				System.out.println("Client disconnected");
+				var wmq = new WebMQSubscriber(response,topics);       // does not return
+				System.out.println(wmq + " has initialized for: " + topics);
+				wmq.run();
+				System.out.println("Client disconnected: " + wmq);
 				
 			}
 			
@@ -221,8 +223,10 @@ class Handler extends AbstractHandler {
 				}
 				
 				
-				new ShortSubscriber(response,topics).run();       // does not return
-				System.out.println("Client disconnected");
+				var ss = new ShortSubscriber(response,topics);       // does not return
+				System.out.println(ss + " has initialized for: " + topics);
+				ss.run();
+				System.out.println("Client disconnected: " + ss);
 				
 			}
 

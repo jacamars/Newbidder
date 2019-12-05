@@ -34,7 +34,7 @@
                         <td className="text-left">CROSSTALK budgeting has started</td>
                       </tr>
 */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
@@ -49,10 +49,17 @@ import {
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
 
+var xhr;
+var undef;
+
  const ConsoleLog = (props) => {
 
   const vx = useViewContext();
   const [logview, setLogview] = useState('init');
+  
+  useEffect(() => {
+    return () => {console.log("Logger UNMOUNTED"); }
+  }, []);
 
   const RED = {
     backgroundColor: 'red'
@@ -70,7 +77,11 @@ import { useViewContext } from "../ViewContext";
 
   const  loggerCallback = (spec,logname) => {
     var previous_response_length = 0;
-    var xhr = new XMLHttpRequest()
+    if (xhr !== undef) {
+      console.log("WARNING XHR already defined");
+      return;
+    }
+    xhr = new XMLHttpRequest()
     xhr.open("GET", "http://" + spec + "/subscribe?topic=" + logname, true);
     xhr.onreadystatechange = checkData;
     xhr.send(null);
@@ -102,7 +113,7 @@ import { useViewContext } from "../ViewContext";
         console.log("BEFORE: " + vx.logdata.length);
         vx.addLogdata(rows)
         console.log("AFTER: " + vx.logdata.length)
-        setLogview(setConsoleView(vx.logdata));
+        redraw();
       }
     }
     ;
@@ -117,17 +128,16 @@ import { useViewContext } from "../ViewContext";
   }
 
   const setConsoleView = (rows) => {
-    var index = rows.length;
     return(
       rows.map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
          <td>
-           {index--}
+           {row.index}
          </td>
          <td>
-           time?
+           {row.time}
          </td>
          <td>
-           {row.source}
+           {row.source} : {row.field}
          </td>
          <td>
            {row.sev}
@@ -145,7 +155,7 @@ import { useViewContext } from "../ViewContext";
 
   const clear = () => {
     vx.clearLogdata();
-    setLogview(setConsoleView([]));
+    setLogview(null);
   }
 
   if (vx.consoleLogspec === '') {
@@ -165,7 +175,7 @@ import { useViewContext } from "../ViewContext";
             <Col md="12">
               <Card>
                 <CardHeader>
-                  <CardTitle tag="h4">RTB4FREE Console Log</CardTitle>
+                  <CardTitle tag="h4">RTB4FREE Console Log {vx.logcount}</CardTitle>
                   <Button size="sm" color="info" onClick={redraw}>Refresh</Button>
                   <Button size="sm" color="warn" onClick={clear}>Clear</Button>
                 </CardHeader>

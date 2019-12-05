@@ -35,7 +35,9 @@ import { useViewContext } from "../ViewContext";
                   </Marker>
                   */
 
+var undef;
 var map;
+var xhr;
 const LeafMap = () => {
 
   const vx = useViewContext();
@@ -44,7 +46,11 @@ const LeafMap = () => {
 
   const  loggerCallback = (spec,logname,  callback) => {
       var previous_response_length = 0;
-      var xhr = new XMLHttpRequest()
+      if (xhr !== undef) {
+        console.log("WARNING XHR already defined");
+        return;
+      }
+      xhr = new XMLHttpRequest();
       xhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
       xhr.onreadystatechange = checkData;
       xhr.send(null);
