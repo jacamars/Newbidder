@@ -23,6 +23,7 @@ import TableList from "views/TableList.jsx";
 import Typography from "views/Typography.jsx";
 import UserProfile from "views/UserProfile.jsx"
 import Simulator from "views/Simulator.jsx"
+import ConsoleLog from "views/ConsoleLog.jsx"
 
 
 var routes = [
@@ -50,7 +51,7 @@ var routes = [
   {
     path: "/map",
     name: "Map",
-    icon: "tim-icons icon-pin",
+    icon: "tim-icons icon-world",
     component: LeafMap,
     layout: "/admin"
   },
@@ -59,6 +60,13 @@ var routes = [
     name: "Notifications",
     icon: "tim-icons icon-bell-55",
     component: Notifications,
+    layout: "/admin"
+  },
+  {
+    path: "/console",
+    name: "Console",
+    icon: "tim-icons icon-bell-55",
+    component: ConsoleLog,
     layout: "/admin"
   },
   {
