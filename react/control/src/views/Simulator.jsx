@@ -12,6 +12,7 @@ const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
   httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
 });
+const cannedResponse = {"response": "will go here"};
 
 const Simulator = (props) =>  {
 
@@ -67,18 +68,17 @@ const Simulator = (props) =>  {
       { name: "Audio", file: SampleAudio },
       { name: "Native", file: SampleNative }
     ],
-    json: SampleBanner,
+    json: vx.bidobject, //SampleBanner,
     uri: vx.uri,
     url: vx.url,
-    bid: JSON.stringify(SampleBanner, null, 2),
-    response: {response: 'I am the response'},
-    creative: '<a href="http://google.com">Click Here</a>',
-    adm: 'ADM',
-    nurl: 'Win URL Will Appear Here',
-    winSent: false,
+    bid: vx.bidvalue, // JSON.stringify(SampleBanner, null, 2),
+    response: vx.bidresponse,
+    adm: vx.adm,
+    nurl: vx.nurl,
+    winSent: vx.winsent,
     selectedBidType: vx.bidtype,
-    xtime: 'xtime: 0, rtt: 0',
-    isVideo: false,
+    xtime: vx.xtime,
+    isVideo: vx.nurl.indexOf("Video") > -1,
     jsonError: false
   });
 
@@ -114,9 +114,10 @@ const Simulator = (props) =>  {
       if (bt.name === name) {
         file = bt.file;
         vx.changeBidtype(bt.name);
+        vx.changeBidresponse(cannedResponse);
       }
     }
-
+    vars.response = cannedResponse;
     vars.selectedBidType = name;
     vars.json = copy(file);
     vars.bid = JSON.stringify(file, null, 2);
@@ -135,7 +136,7 @@ const Simulator = (props) =>  {
       var x = eval('(' + obj.plainText+ ')');
       x = JSON.stringify(x,null,2);
       console.log("CHANGED: " + x);    
-
+      vx.changeBidvalue(x);
       vars.bid = x;
     } catch (e) {
       // is an error but the editor will handle it.
@@ -176,11 +177,11 @@ const Simulator = (props) =>  {
     console.log("THE BID IS: " + bid);
 
     vars.nurl = '';
-    vars.response = {};
     vars.adm = '';
     vars.creative = '';
     vars.isVideo=false;
     vars.winSent = false;
+    vx.setWinSent = false;
     setVars(vars);
  
     var rtt =  performance.now();
@@ -191,25 +192,32 @@ const Simulator = (props) =>  {
       rtt = "rtt: " + (performance.now() - rtt);
       xtime = "xtime: " + response.headers['x-time'];
       vars.xtime = rtt + ", " + xtime;
+      vx.changeXtime(rtt + ", " + xtime)
       if (response.status !== 200) {
         alert("NOBID: Response was: " + response.status + ", rtt: " + (performance.now()-rtt) + ", xtime: " + xtime);
         return;
       }
-      console.log("RESPONSE: " + JSON.stringify(response.data));
+      //console.log("RESPONSE: " + JSON.stringify(response.data));
+      vx.changeBidresponse(response.data);
       vars.nurl =  response.data.seatbid[0].bid[0].nurl;
+      vx.changeNurl(vars.nurl);
       vars.response = response.data;
       vars.adm = response.data.seatbid[0].bid[0].adm;
       vars.creative = response.data.seatbid[0].bid[0].adm;
-
+      vx.changeAdm(response.data.seatbid[0].bid[0].adm);
       setVars(vars);
       redraw();
     } catch (error) {
+      vx.changeBidresponse({"oops": error});
       vars.nurl =  '';
-      vars.response = {};
+      vars.response = {"oops": error};
       vars.adm = '';
       vars.creative = '';
       vars.winSent = false;
+      vx.changeWinsent(false)
       setVars(vars);
+      vx.changeXtime("rtt: 0, xtime: 0");
+      vx.setAdm('');
       redraw();
       alert("ERROR: " + error + " " + endpoint);
     console.error(error);
@@ -219,6 +227,7 @@ const Simulator = (props) =>  {
   const sendWinNotice = async (event, id) => {
     var nurl = vars.nurl
     nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
+    vx.changeNurl(nurl);
     console.log("NURL: " + nurl)
 
     try {
@@ -226,6 +235,7 @@ const Simulator = (props) =>  {
       console.log("RESPONSE: " + response.data);
       vars.isVideo = nurl.indexOf("Video") > -1;
       vars.winSent = true;
+      vx.changeWinsent(true);
       setVars(vars);
       redraw();
     } catch (error) {
@@ -246,14 +256,17 @@ const Simulator = (props) =>  {
   }
 
   const wClearHandler = (event, id) => {
-    vars.creative = '';
     vars.adm = '';
-    vars.nurl = 'Win URL Will Appear Here';
-    vars.response = {};
+    vars.nurl = '';
+    vars.response = cannedResponse;
+    vx.changeAdm('');
+    vx.changeNurl('');
+    vx.changeBidresponse(cannedResponse);
     setVars(vars);
 
     redraw();
   }
+
     return (
         <>
             <div className="content">
