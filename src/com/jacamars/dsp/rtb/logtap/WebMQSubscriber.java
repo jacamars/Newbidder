@@ -15,6 +15,7 @@ public class WebMQSubscriber {
     RTopic chan;
     volatile boolean running = true;
     volatile int ticks = 0;
+    int index = 0;
 
     public WebMQSubscriber(HttpServletResponse response, String topic) throws Exception {
         // Prepare our context and subscriber
@@ -35,9 +36,13 @@ public class WebMQSubscriber {
             public void onMessage(String channel, Object data) {
                 try {
                     String contents = mapper.writeValueAsString(data);
+                    contents = contents.substring(1);
+                    contents = "{\"index\":" + index + ", " + contents;
                     response.getWriter().println(contents);
                     response.flushBuffer();
                     ticks = 0;
+                    System.out.println(this + " wrote: " + contents);
+                    index++;
                 } catch (Exception e) {
                     // The other side closed, we are outta here!
                     chan.shutdown();
@@ -55,9 +60,8 @@ public class WebMQSubscriber {
               try {
                   Thread.sleep(1000);
                   if (ticks++ > 15) {
-                	  System.out.println("TICKS > 15");
                 	  ticks = 0;
-                	  response.getWriter().println(" ");
+                	  response.getWriter().print(" ");
                       response.flushBuffer();
                   }
               } catch (InterruptedException e) {
