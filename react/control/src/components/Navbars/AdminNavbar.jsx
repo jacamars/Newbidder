@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, {useState, useEffect} from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 
@@ -34,44 +34,48 @@ import {
   NavLink,
   Nav,
   Container,
-  Modal
+  Modal,
 } from "reactstrap";
+import {useViewContext } from "../../ViewContext";
 
-class AdminNavbar extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+const AdminNavbar = (props) => {
+
+  const vx = useViewContext();
+
+  const [modalState, setModalState] = useState({
       collapseOpen: false,
       modalSearch: false,
       color: "navbar-transparent"
-    };
-  }
-  componentDidMount() {
-    window.addEventListener("resize", this.updateColor);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateColor);
-  }
+    });
+
+  useEffect(() => {
+    window.addEventListener("resize", updateColor);
+  }, [modalState]);
+
+  useEffect(() => {
+    window.removeEventListener("resize", updateColor);
+  }, []);
+
   // function that adds color white/transparent to the navbar on resize (this is for the collapse)
-  updateColor = () => {
-    if (window.innerWidth < 993 && this.state.collapseOpen) {
-      this.setState({
+  const updateColor = () => {
+    if (window.innerWidth < 993 && modalState.collapseOpen) {
+      setModalState({
         color: "bg-white"
       });
     } else {
-      this.setState({
+      setModalState({
         color: "navbar-transparent"
       });
     }
   };
   // this function opens and closes the collapse on small devices
-  toggleCollapse = () => {
-    if (this.state.collapseOpen) {
-      this.setState({
+  const toggleCollapse = () => {
+    if (modalState.collapseOpen) {
+      setModalState({
         color: "navbar-transparent"
       });
     } else {
-      this.setState({
+      setModalState({
         color: "bg-white"
       });
     }
@@ -80,29 +84,28 @@ class AdminNavbar extends React.Component {
     });
   };
   // this function is to open the Search modal
-  toggleModalSearch = () => {
-    this.setState({
-      modalSearch: !this.state.modalSearch
+  const toggleModalSearch = () => {
+    setModalState({
+      modalSearch: !modalState.modalSearch
     });
   };
-  render() {
     return (
       <>
         <Navbar
-          className={classNames("navbar-absolute", this.state.color)}
+          className={classNames("navbar-absolute", modalState.color)}
           expand="lg"
         >
           <Container fluid>
             <div className="navbar-wrapper">
               <div
                 className={classNames("navbar-toggle d-inline", {
-                  toggled: this.props.sidebarOpened
+                  toggled: props.sidebarOpened
                 })}
               >
                 <button
                   className="navbar-toggler"
                   type="button"
-                  onClick={this.props.toggleSidebar}
+                  onClick={props.toggleSidebar}
                 >
                   <span className="navbar-toggler-bar bar1" />
                   <span className="navbar-toggler-bar bar2" />
@@ -110,7 +113,7 @@ class AdminNavbar extends React.Component {
                 </button>
               </div>
               <NavbarBrand href="#pablo" onClick={e => e.preventDefault()}>
-                {this.props.brandText}
+                {props.brandText}
               </NavbarBrand>
             </div>
             <button
@@ -121,13 +124,13 @@ class AdminNavbar extends React.Component {
               data-toggle="collapse"
               id="navigation"
               type="button"
-              onClick={this.toggleCollapse}
+              onClick={toggleCollapse}
             >
               <span className="navbar-toggler-bar navbar-kebab" />
               <span className="navbar-toggler-bar navbar-kebab" />
               <span className="navbar-toggler-bar navbar-kebab" />
             </button>
-            <Collapse navbar isOpen={this.state.collapseOpen}>
+            <Collapse navbar isOpen={modalState.collapseOpen}>
               <Nav className="ml-auto" navbar>
                 <InputGroup className="search-bar">
                   <Button
@@ -135,7 +138,7 @@ class AdminNavbar extends React.Component {
                     data-target="#searchModal"
                     data-toggle="modal"
                     id="search-button"
-                    onClick={this.toggleModalSearch}
+                    onClick={toggleModalSearch}
                   >
                     <i className="tim-icons icon-zoom-split" />
                     <span className="d-lg-none d-md-block">Search</span>
@@ -202,9 +205,14 @@ class AdminNavbar extends React.Component {
                       <DropdownItem className="nav-item">Settings</DropdownItem>
                     </NavLink>
                     <DropdownItem divider tag="li" />
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">Log out</DropdownItem>
-                    </NavLink>
+
+                    {!vx.loggedIn && <NavLink tag="li">
+                      <DropdownItem className="nav-item" onClick={e => vx.changeLoginState(true)} >Log in</DropdownItem>
+                    </NavLink>}
+                    {vx.loggedIn &&<NavLink tag="li">
+                      <DropdownItem className="nav-item" onClick={e => vx.changeLoginState(false)} >Log out</DropdownItem>
+                    </NavLink>}
+
                   </DropdownMenu>
                 </UncontrolledDropdown>
                 <li className="separator d-lg-none" />
@@ -214,8 +222,8 @@ class AdminNavbar extends React.Component {
         </Navbar>
         <Modal
           modalClassName="modal-search"
-          isOpen={this.state.modalSearch}
-          toggle={this.toggleModalSearch}
+          isOpen={modalState.modalSearch}
+          toggle={toggleModalSearch}
         >
           <div className="modal-header">
             <Input id="inlineFormInputGroup" placeholder="SEARCH" type="text" />
@@ -224,7 +232,7 @@ class AdminNavbar extends React.Component {
               className="close"
               data-dismiss="modal"
               type="button"
-              onClick={this.toggleModalSearch}
+              onClick={toggleModalSearch}
             >
               <i className="tim-icons icon-simple-remove" />
             </button>
@@ -232,7 +240,6 @@ class AdminNavbar extends React.Component {
         </Modal>
       </>
     );
-  }
 }
 
 export default AdminNavbar;
