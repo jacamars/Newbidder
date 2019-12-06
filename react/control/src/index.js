@@ -26,6 +26,7 @@ import "assets/scss/black-dashboard-react.scss";
 import "assets/demo/demo.css";
 import "assets/css/nucleo-icons.css";
 
+import LoginModal from './LoginModal'
 import { useViewContext } from './ViewContext'
 
 const hist = createBrowserHistory();
@@ -34,6 +35,7 @@ const hist = createBrowserHistory();
 ReactDOM.render(
   <Router history={hist}>
     <useViewContext.Provider>
+      <LoginModal />
     <Switch>
       <Route path="/admin" render={props => <AdminLayout {...props} />} />
       <Redirect from="/" to="/admin/dashboard" />

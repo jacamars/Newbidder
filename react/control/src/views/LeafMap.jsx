@@ -37,7 +37,6 @@ import { useViewContext } from "../ViewContext";
 
 var undef;
 var map;
-var xhr;
 const LeafMap = () => {
 
   const vx = useViewContext();

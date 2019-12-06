@@ -56,13 +56,6 @@ var routes = [
     layout: "/admin"
   },
   {
-    path: "/notifications",
-    name: "Notifications",
-    icon: "tim-icons icon-bell-55",
-    component: Notifications,
-    layout: "/admin"
-  },
-  {
     path: "/console",
     name: "Console",
     icon: "tim-icons icon-bell-55",

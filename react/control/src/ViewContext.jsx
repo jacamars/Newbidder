@@ -8,6 +8,22 @@ const  ViewContext = () => {
 
     var xhrLog;
 
+    const [loggedIn, setLoggedIn] = useState(false);
+    const changeLoginState = (value) => {
+      if (value && loggedIn)
+        return;
+
+      if (!value && !loggedIn)
+        return;
+
+      setLoggedIn(value);
+      if (value) {
+        
+      } else {
+
+      }
+    }
+
     const [consoleLogspec, setConsoleLogspec] = useState('');
     const [logcount, setLogcount] = useState(1);
 
@@ -186,7 +202,8 @@ const  ViewContext = () => {
 
       ///////////////////////////
 
-    return { bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, mapperCallback,
+    return { loggedIn, changeLoginState,
+        bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, mapperCallback,
         mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
