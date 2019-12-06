@@ -3,13 +3,12 @@ import createUseContext from "constate"; // State Context Object Creator
 import { SampleBanner} from './views/simulator/Utils';
 
 var undef;
-
+var mapXhr;
 const  ViewContext = () => {
 
     var xhrLog;
 
-    const [logsuspended, setLogsuspended] = useState(true);
-
+    const [consoleLogspec, setConsoleLogspec] = useState('');
     const [logcount, setLogcount] = useState(1);
 
     const [bigChartData, setBigChartData] = useState('data1');
@@ -74,11 +73,8 @@ const  ViewContext = () => {
         setWinsent(value);
     }
 
-    const [consoleLogspec, setConsoleLogspec] = useState('')
     const [logdata, setLogdata] = useState([]);
-    const changeConsoleLogspec = (value) => {
-        setConsoleLogspec(value);
-    }
+    
     const addLogdata = (rows) => {
         var data = logdata;
         for (var i=0; i<rows.length; i++) {
@@ -99,14 +95,15 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  loggerCallback = (spec,logname, callback) => {
+    const  loggerCallback = (spec,callback) => {
+        setConsoleLogspec(spec);
         var previous_response_length = 0;
         if (xhrLog !== undef) {
           console.log("WARNING XHR for logger already defined");
           return;
         }
         xhrLog = new XMLHttpRequest()
-        xhrLog.open("GET", "http://" + spec + "/subscribe?topic=" + logname, true);
+        xhrLog.open("GET", "http://" + spec + "/subscribe?topic=logs", true);
         xhrLog.onreadystatechange = checkData;
         xhrLog.send(null);
         
@@ -130,16 +127,16 @@ const  ViewContext = () => {
               var line = lines[j];
               line = line.trim();
               if (line.length > 0) {
-                var y = JSON.parse(line)
-                rows.push(y);
+                console.log("CHECKING: " + line);
+                try {
+                    var y = JSON.parse(line)
+                    rows.push(y);
+                } catch (e) {
+                    console.log("Error parsing: " + line);
+                }
               }
             }
-            console.log("BEFORE: " + logdata.length);
             addLogdata(rows)
-            console.log("AFTER: " + logdata.length)
-            if (!logSuspended) {
-                callback(logdata)
-            }
           }
         }
         ;
@@ -147,12 +144,53 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    return { bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, 
+    const  mapperCallback = (spec,logname,) => {
+        var previous_response_length = 0;
+        if (mapXhr !== undef) {
+          mapXhr.abort();
+        }
+        mapXhr = new XMLHttpRequest();
+        mapXhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
+        mapXhr.onreadystatechange = checkData;
+        mapXhr.send(null);
+        
+        function checkData() {
+          if (mapXhr.readyState == 3) {
+            var response = mapXhr.responseText;
+            var chunk = response.slice(previous_response_length);
+            console.log("GOT SOME CHUNK DATA: " + chunk);
+            var i = chunk.indexOf("{");
+            if (i < 0)
+              return;
+            if (chunk.trim().length === 0)
+              return;
+            chunk = chunk.substring(i);
+            previous_response_length = response.length;
+            
+            console.log("GOT DATA: " + chunk);
+            var lines = chunk.split("\n");
+            var rows = []
+            for (var j = 0; j < lines.length; j++) {
+              var line = lines[j];
+              line = line.trim();
+              if (line.length > 0) {
+                var y = JSON.parse(line);
+                rows.push(y);
+              }
+            }
+            addMapPositions(rows);
+          }
+        }
+        ;
+      }
+
+      ///////////////////////////
+
+    return { bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, mapperCallback,
         mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
-        consoleLogspec, changeConsoleLogspec, logdata, addLogdata, clearLogdata,
-        logsuspended, setLogsuspended
+        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback,
     };
 };
 

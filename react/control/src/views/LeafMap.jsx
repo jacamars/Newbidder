@@ -42,49 +42,6 @@ const LeafMap = () => {
 
   const vx = useViewContext();
 
-  const [mapdata, setMapdata] = useState('init');
-
-  const  loggerCallback = (spec,logname,  callback) => {
-      var previous_response_length = 0;
-      if (xhr !== undef) {
-        console.log("WARNING XHR already defined");
-        return;
-      }
-      xhr = new XMLHttpRequest();
-      xhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
-      xhr.onreadystatechange = checkData;
-      xhr.send(null);
-      
-      function checkData() {
-        if (xhr.readyState == 3) {
-          var response = xhr.responseText;
-          var chunk = response.slice(previous_response_length);
-          console.log("GOT SOME CHUNK DATA: " + chunk);
-          var i = chunk.indexOf("{");
-          if (i < 0)
-            return;
-          if (chunk.trim().length === 0)
-            return;
-          chunk = chunk.substring(i);
-          previous_response_length = response.length;
-          
-          console.log("GOT DATA: " + chunk);
-          var lines = chunk.split("\n");
-          var rows = []
-          for (var j = 0; j < lines.length; j++) {
-            var line = lines[j];
-            line = line.trim();
-            if (line.length > 0) {
-              var y = JSON.parse(line);
-              rows.push(y);
-            }
-          }
-          callback(rows)
-          setMapdata(setPositionsView(vx.mapPositions));
-        }
-      }
-      ;
-    }
 
   const leafStyle = {
     height: '900px',
@@ -103,7 +60,7 @@ const LeafMap = () => {
 
   const setType = (data) => {
     vx.setMapType(data);
-    loggerCallback("localhost:7379",data,  vx.addMapPositions);
+    vx.mapperCallback("localhost:7379",data);
   }
 
   const handleZoom = (e) => {
@@ -127,9 +84,6 @@ const LeafMap = () => {
 
   if (vx.mapType === '') 
     setType('bids');
-
-  if (mapdata === 'init')
-    setMapdata(setPositionsView(vx.mapPositions));
  
 
   return (
@@ -251,7 +205,7 @@ const LeafMap = () => {
                   <TileLayer
                       url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
-                  {mapdata}
+                  {setPositionsView(vx.mapPositions)}
                   </LeafletMap>
                 </CardBody>
               </Card>

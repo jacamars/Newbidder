@@ -55,11 +55,16 @@ var undef;
  const ConsoleLog = (props) => {
 
   const vx = useViewContext();
-  const [logview, setLogview] = useState('init');
+  const [count, setCount] = useState(1);
   
-  useEffect(() => {
-    return () => {console.log("Logger UNMOUNTED"); }
+  /*useEffect(() => {
+    return () => {console.log("Logger UNMOUNTED"); vx.setLogsuspended(true); }
   }, []);
+
+  useEffect(() => {
+    console.log("Console MOUNTED");
+    vx.changeLogsuspened(false);
+  }, [logview]);*/
 
   const RED = {
     backgroundColor: 'red'
@@ -69,54 +74,6 @@ var undef;
   }
   const YELLOW = {
     backgroundColor: 'goldenrod'
-  }
-
-  const redraw = () => {
-    setLogview(setConsoleView(vx.logdata));
-  }
-
-  const  loggerCallback = (spec,logname) => {
-    var previous_response_length = 0;
-    if (xhr !== undef) {
-      console.log("WARNING XHR already defined");
-      return;
-    }
-    xhr = new XMLHttpRequest()
-    xhr.open("GET", "http://" + spec + "/subscribe?topic=" + logname, true);
-    xhr.onreadystatechange = checkData;
-    xhr.send(null);
-    
-    function checkData() {
-      if (xhr.readyState === 3) {
-        var response = xhr.responseText;
-        var chunk = response.slice(previous_response_length);
-        console.log("GOT SOME LOG CHUNK DATA: " + chunk);
-        var i = chunk.indexOf("{");
-        if (i < 0)
-          return;
-        if (chunk.trim().length === 0)
-          return;
-        chunk = chunk.substring(i);
-        previous_response_length = response.length;
-        
-        console.log("GOT LOG DATA: " + chunk);
-        var lines = chunk.split("\n");
-        var rows = []
-        for (var j = 0; j < lines.length; j++) {
-          var line = lines[j];
-          line = line.trim();
-          if (line.length > 0) {
-            var y = JSON.parse(line);
-            rows.push(y);
-          }
-        }
-        console.log("BEFORE: " + vx.logdata.length);
-        vx.addLogdata(rows)
-        console.log("AFTER: " + vx.logdata.length)
-        redraw();
-      }
-    }
-    ;
   }
 
   const getStyle = (value) => {
@@ -129,7 +86,7 @@ var undef;
 
   const setConsoleView = (rows) => {
     return(
-      rows.map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
+     rows.map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
          <td>
            {row.index}
          </td>
@@ -152,20 +109,18 @@ var undef;
     )
   }
 
+  const fromCallback = () => {
+    setCount(count+1);
+  }
 
   const clear = () => {
     vx.clearLogdata();
-    setLogview(null);
+    fromCallback();
   }
 
   if (vx.consoleLogspec === '') {
-    vx.changeConsoleLogspec("localhost:7379");
     console.log("WE HAVE SET THE CONSOLE LOG")
-    loggerCallback("localhost:7379","logs");
-  }
-
-  if (logview === 'init') {
-    setLogview(setConsoleView(vx.logdata));
+    vx.loggerCallback("localhost:7379",fromCallback);
   }
 
     return (
@@ -176,7 +131,7 @@ var undef;
               <Card>
                 <CardHeader>
                   <CardTitle tag="h4">RTB4FREE Console Log {vx.logcount}</CardTitle>
-                  <Button size="sm" color="info" onClick={redraw}>Refresh</Button>
+                  <Button size="sm" color="info" onClick={fromCallback}>Refresh</Button>
                   <Button size="sm" color="warn" onClick={clear}>Clear</Button>
                 </CardHeader>
                 <CardBody>
@@ -192,7 +147,7 @@ var undef;
                       </tr>
                     </thead>
                     <tbody>
-                      {logview}
+                      {setConsoleView(vx.logdata)}
                     </tbody>
                   </Table>
                 </CardBody>
