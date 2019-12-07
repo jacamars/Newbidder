@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React,  { useState, useEffect, useContext } from "react";
+import React,  { useState, useEffect } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react plugin used to create charts
@@ -54,18 +54,20 @@ import {
 } from "variables/charts.jsx";
 
 import { useViewContext } from "../ViewContext";
+import { memberExpression } from "@babel/types";
 
 const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
   httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
 });
 
+var undef;
+
 const Dashboard = (props) => {
 
   const vx = useViewContext();
 
   const [count, setCount] = useState(1);
-  const [members, setMembers] = useState([]);
   const [instanceNames, setInstanceNames] = useState([]);
 
   //const [selectedInstance, setSelectedInstance] = useState('');
@@ -130,13 +132,15 @@ const Dashboard = (props) => {
 
   const doGetStatusCmd = async () => {
     try {
-      var cmd = { command: 'getstatus' }
-      const response = await axiosInstance.post("http://localhost:8080/ajax",JSON.stringify(cmd)); 
-      //console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
-      var list = response.data;
+      var list;
+      if (vx.members.length == 0)
+        list = vx.getMembers();
+      else 
+        list = vx.members;
+      if (list === undef)
+        return;
       var x = list[0];
       //console.log("SINGLE ENTRY: " + JSON.stringify(x,null,2));
-      setMembers(list);
       setInstances(list);
       setSnapShotView(getSnapShotView(list));
       setCampaignsView(list[0].values.campaigns);

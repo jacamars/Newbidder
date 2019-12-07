@@ -59,7 +59,7 @@ const LeafMap = () => {
 
   const setType = (data) => {
     vx.setMapType(data);
-    vx.mapperCallback("localhost:7379",data);
+    vx.mapperCallback(data);
   }
 
   const handleZoom = (e) => {

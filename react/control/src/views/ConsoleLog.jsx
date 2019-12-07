@@ -120,7 +120,7 @@ var undef;
 
   if (vx.consoleLogspec === '') {
     console.log("WE HAVE SET THE CONSOLE LOG")
-    vx.loggerCallback("localhost:7379",fromCallback);
+    vx.loggerCallback("localhost:8080");
   }
 
     return (
