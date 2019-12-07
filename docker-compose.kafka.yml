@@ -25,7 +25,7 @@ services:
       - zookeeper
 
   bidder:
-    image: "jacamars/rtb4free:J11"
+    image: "pookie-w:5000/rtb4free:J11"
     environment:
       GDPR_MODE: "false"
 
