@@ -1,19 +1,19 @@
 OpenRTB Bidder
 =====================
-This is a JAVA 1.8 based openRTB bidding system.
+This is a JAVA 1.11 based openRTB bidding system.
 
 
 DOCKER BASED RTB BIdder
 =======================
 
-These are the Docker instructions for working with Bidder, Crosstalk, Zerospike, Kafka and Zookeeper.
+These are the Docker instructions for working with Bidder, Postgres, Kafka and Zookeeper components.
 
 No Source Deployments
 ===========================
 
 Docker Swarm
 ---------------------------
-Use Docker swarm to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper
+Use Docker swarm to run Bidder, Postgres, Kafka and Zookeeper
 
 1. Copy docker-compose.yml from Project's docker/ directory.
 
@@ -31,7 +31,7 @@ Use Docker swarm to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper
    
 Docker Compose
 -------------------------------
-Use Docker Compose to run Crosstalk, Bidder, Zerospike, Kafka and Zookeeper in a single console window:
+Use Docker Compose to run Bidder, Kafka and Zookeeper in a single console window:
 
 1. Copy docker-compose.yml from Project's docker/ directory.
    
