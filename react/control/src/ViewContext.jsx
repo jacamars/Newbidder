@@ -1,14 +1,24 @@
 import {useState} from 'react';
 import createUseContext from "constate"; // State Context Object Creator
+import http from 'http';
+import axios from 'axios';
 import { SampleBanner} from './views/simulator/Utils';
 
 var undef;
 var mapXhr;
+var xhrLog;
+
+const httpAgent = new http.Agent({ keepAlive: true });
+const axiosInstance = axios.create({
+  httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
+});
+
 const  ViewContext = () => {
 
-    var xhrLog;
-
     const [loggedIn, setLoggedIn] = useState(false);
+    const [serverPrefix, setServerPrefix] = useState();
+    const [members, setMembers] = useState([]);
+
     const changeLoginState = (value) => {
       if (value && loggedIn)
         return;
@@ -18,7 +28,7 @@ const  ViewContext = () => {
 
       setLoggedIn(value);
       if (value) {
-        
+
       } else {
 
       }
@@ -111,7 +121,7 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  loggerCallback = (spec,callback) => {
+    const  loggerCallback = (spec) => {
         setConsoleLogspec(spec);
         var previous_response_length = 0;
         if (xhrLog !== undef) {
@@ -160,13 +170,13 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  mapperCallback = (spec,logname,) => {
+    const  mapperCallback = (logname) => {
         var previous_response_length = 0;
         if (mapXhr !== undef) {
           mapXhr.abort();
         }
         mapXhr = new XMLHttpRequest();
-        mapXhr.open("GET", "http://" + spec + "/shortsub"+ "?topic=" + logname, true);
+        mapXhr.open("GET", "http://" + serverPrefix + "/shortsub"+ "?topic=" + logname, true);
         mapXhr.onreadystatechange = checkData;
         mapXhr.send(null);
         
@@ -196,8 +206,23 @@ const  ViewContext = () => {
             }
             addMapPositions(rows);
           }
+        };
+      }
+
+      const getMembers = async (prefix) => {
+        if (prefix == undef)
+          prefix = serverPrefix;
+        try {
+          var cmd = { command: 'getstatus' }
+          const response = await axiosInstance.post("http://" + prefix + "/ajax",JSON.stringify(cmd)); 
+          //console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
+          setServerPrefix(prefix);
+          setUrl("http://" + prefix);
+          setMembers(response.data);
+          return  response.data;   
+        } catch (e) {
+          alert (e);
         }
-        ;
       }
 
       ///////////////////////////
@@ -207,7 +232,7 @@ const  ViewContext = () => {
         mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
-        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback,
+        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members
     };
 };
 

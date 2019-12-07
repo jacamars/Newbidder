@@ -626,14 +626,16 @@ public enum Crosstalk {
 		List<String> list = new ArrayList();
 		List<CampaignBuilderWorker> workers = new ArrayList();
 
-		logger.info( "********** SENDING UPDATES: N={} **********",array.size());
 		long time = System.currentTimeMillis();
 	
-		if (array.size()==0)
+		if (array.size()==0) {
+			logger.info("No campaign updates scheduled to be being sent.");
 			return list;
+		}
 		
 		ExecutorService executor = Executors.newFixedThreadPool(array.size());
 
+		logger.info("Sending {} periodic campaign updates, to {} members.",list.size(),workers.size());
 		for (JsonNode s : array) {
 			CampaignBuilderWorker w = new CampaignBuilderWorker(s);
 			executor.execute(w);
@@ -642,13 +644,12 @@ public enum Crosstalk {
 
 		time = System.currentTimeMillis() - time;
 		time /= 1000;
-		logger.info("Updates took {} seconds",time);
+		logger.info("Periodic updates took {} seconds",time);
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 			
 		}
 		
-
 		for (CampaignBuilderWorker w : workers ) {
 			list.add(w.toString());
 		}

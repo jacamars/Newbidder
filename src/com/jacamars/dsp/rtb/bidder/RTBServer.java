@@ -1,5 +1,6 @@
 package com.jacamars.dsp.rtb.bidder;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 
 
@@ -8,7 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -58,7 +59,9 @@ import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.SSL;
 import com.jacamars.dsp.rtb.fraud.ForensiqClient;
-
+import com.jacamars.dsp.rtb.logtap.ShortSubscriber;
+import com.jacamars.dsp.rtb.logtap.WebMQPublisher;
+import com.jacamars.dsp.rtb.logtap.WebMQSubscriber;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
@@ -468,12 +471,9 @@ public class RTBServer implements Runnable {
 
 	public static void panicStop() {
 		try {
-			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-				logger.warn("{}", ste);
-			}
-			Controller.getInstance().sendShutdown();
+			logger.error("PanicStop", "Bidder is shutting down *** NOW ****");
 			Thread.sleep(100);
-			logger.warn("PanicStop", "Bidder is shutting down *** NOW ****");
+			Controller.getInstance().sendShutdown();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1979,12 +1979,89 @@ class AdminHandler extends Handler {
 				response.getWriter().println(page);
 				return;
 			}
+			
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+				
+				if (target.startsWith("/publish")) {
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json;charset=utf-8");
+					baseRequest.setHandled(true);
+					String result = null;
+					String port = request.getParameter("port");
+					String topic = request.getParameter("topic");
+					String message = request.getParameter("message");
+					if (port == null) {
+						response.getWriter().println("{\"error\":\"no port specified\"}");
+						return;
+					}
+					if (topic == null) {
+						response.getWriter().println("{\"error\":\"no topic specified\"}");
+						return;
+					}
+					if (message == null) {
+						message = getStringFromInputStream(body);
+					}
+					
+					
+					try {
+						new WebMQPublisher(port,topic,message);
+						response.getWriter().println("{\"status\":\"ok\"}");
+					} catch (Exception error) {
+						response.getWriter().println("{\"error\":\"" + error.toString() + "\"}");
+					}
+					
+					return;
+				}
+				
+				/**
+				 * Warning, never returns
+				 *  /subscribe?topic=xxx
+				 */
+				if (target.startsWith("/subscribe")) {
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json;charset=utf-8");
+					baseRequest.setHandled(true);
+					
+					String topics = request.getParameter("topic");
+		
+					if (topics == null) {
+						response.getWriter().println("{\"error\":\"no topic specified\"}");
+						return;
+					}
+					
+					
+					var wmq = new WebMQSubscriber(response,topics);       // does not return
+					System.out.println(wmq + " has initialized for: " + topics);
+					wmq.run();
+					System.out.println("Client disconnected: " + wmq);
+					return;
+					
+				}
+				
+				if (target.startsWith("/shortsub")) {
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.setContentType("application/json;charset=utf-8");
+					baseRequest.setHandled(true);
+					
+					String topics = request.getParameter("topic");
+		
+					if (topics == null) {
+						response.getWriter().println("{\"error\":\"no topic specified\"}");
+						return;
+					}
+					
+					
+					var ss = new ShortSubscriber(response,topics);       // does not return
+					System.out.println(ss + " has initialized for: " + topics);
+					ss.run();
+					System.out.println("Client disconnected: " + ss);
+					return;
+				}
 
 			// /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			logger.warn("Bad html processing on {}: {} at line no: {}" + target, e.toString(),
 					Thread.currentThread().getStackTrace()[2].getLineNumber());
 			// if (br != null && br.id.equals("123"))
@@ -2117,6 +2194,35 @@ class AdminHandler extends Handler {
 			baseRequest.setHandled(true);
 		}
 	}
+		
+		  public static String getStringFromInputStream(InputStream is) {
+
+				BufferedReader br = null;
+				StringBuilder sb = new StringBuilder();
+
+				String line;
+				try {
+
+					br = new BufferedReader(new InputStreamReader(is));
+					while ((line = br.readLine()) != null) {
+						sb.append(line);
+					}
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					if (br != null) {
+						try {
+							br.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				return sb.toString();
+
+			}
 }
 
 class AddShutdownHook {
