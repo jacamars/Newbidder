@@ -89,9 +89,14 @@ const AdminNavbar = (props) => {
       modalSearch: !modalState.modalSearch
     });
   };
+
+  const style = { 
+    bgColor: "red"
+  }
+  ;
     return (
       <>
-        <Navbar
+        <Navbar 
           className={classNames("navbar-absolute", modalState.color)}
           expand="lg"
         >
@@ -102,7 +107,7 @@ const AdminNavbar = (props) => {
                   toggled: props.sidebarOpened
                 })}
               >
-                <button
+                <button style={style}
                   className="navbar-toggler"
                   type="button"
                   onClick={props.toggleSidebar}

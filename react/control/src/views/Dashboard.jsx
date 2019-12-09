@@ -123,6 +123,9 @@ const Dashboard = (props) => {
   }
 
   const setCampaignsViewInternal = (rows) => {
+    if (rows ===undef)
+      return null;
+
     return(
       rows.map((row, i) => (<tr key={'"campaign-view-' + i + '"'}>
           <td>{row}</td>
@@ -131,16 +134,22 @@ const Dashboard = (props) => {
   }
 
   const doGetStatusCmd = async () => {
+    if (!vx.loggedIn)
+      return;
+      
     try {
       var list;
-      if (vx.members.length == 0)
+      if (vx.members.length === 0)
         list = vx.getMembers();
       else 
         list = vx.members;
       if (list === undef)
         return;
+
       var x = list[0];
-      //console.log("SINGLE ENTRY: " + JSON.stringify(x,null,2));
+      if (x ===undef)     // can happen if the network is not connected yet
+        return;
+
       setInstances(list);
       setSnapShotView(getSnapShotView(list));
       setCampaignsView(list[0].values.campaigns);
@@ -151,15 +160,19 @@ const Dashboard = (props) => {
   }
 
   const getSnapShotView = (rows) => {
+    console.log("GET SNAPSHOT VIEW: " + rows);
+    if (rows === undef)
+      return null;
     return(
-      rows.map((row, index) => (<tr key={'snaphotview-' + row}>
-<td>{row.name}</td>
-<td key={'snaphotview-request-' + index} className="text-right">{row.values.request}</td>
-<td key={'snaphotview-bid-' + index} className="text-right">{row.values.bid}</td>
-<td key={'snaphotview-win-' + index} className="text-right">{row.values.win}</td>
-<td key={'snaphotview-pixels-' + index} className="text-right">{row.values.pixels}</td>
-<td key={'snaphotview-clicks-' + index} className="text-right">{row.values.clicks}</td>
-</tr>))
+      rows.map((row, index) => (
+        <tr key={'snaphotview-' + row}>
+          <td>{row.name}</td>
+          <td key={'snaphotview-request-' + index} className="text-right">{row.values.request}</td>
+          <td key={'snaphotview-bid-' + index} className="text-right">{row.values.bid}</td>
+          <td key={'snaphotview-win-' + index} className="text-right">{row.values.win}</td>
+          <td key={'snaphotview-pixels-' + index} className="text-right">{row.values.pixels}</td>
+          <td key={'snaphotview-clicks-' + index} className="text-right">{row.values.clicks}</td>
+        </tr>))
     )
   }
 
