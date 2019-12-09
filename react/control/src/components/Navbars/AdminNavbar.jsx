@@ -90,6 +90,32 @@ const AdminNavbar = (props) => {
     });
   };
 
+  const setEventsView = () => {
+    if (!vx.loggedIn) {
+      return (
+      <div><NavLink tag="li"></NavLink>
+      <DropdownItem className="nav-item">
+        You are not logged in.
+      </DropdownItem></div>);
+    }
+    var rows = vx.getEvents();
+
+    if (rows.length == 0) 
+      return(
+        <div><NavLink tag="li"></NavLink>
+        <DropdownItem className="nav-item">
+          No High severity events to report
+        </DropdownItem></div>      
+      )
+    
+    return(
+      rows.map((row, i) => ( <div  key={'"div-pos-' + i + "'"}><NavLink tag="li"  key={'"link-pos-' + i + "'"}></NavLink>
+      <DropdownItem className="nav-item" key={'"dropdown-pos-' + i + "'"}>
+        {row.time}, {row.instance}, {row.message}
+      </DropdownItem></div>))
+    )
+  }
+
   const style = { 
     bgColor: "red"
   }
@@ -161,31 +187,7 @@ const AdminNavbar = (props) => {
                     <p className="d-lg-none">Notifications</p>
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Mike John responded to your email
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        You have 5 more tasks
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Your friend Michael is in town
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Another notification
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Another one
-                      </DropdownItem>
-                    </NavLink>
+                    {setEventsView()}
                   </DropdownMenu>
                 </UncontrolledDropdown>
                 <UncontrolledDropdown nav>

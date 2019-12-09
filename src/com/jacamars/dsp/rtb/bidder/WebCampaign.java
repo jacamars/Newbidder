@@ -741,13 +741,14 @@ public class WebCampaign {
 				values.put("ncampaigns", Configuration.getInstance().getCampaignsList().size());
 				values.put("loglevel", Configuration.getInstance().logLevel);
 				values.put("nobidreason", Configuration.getInstance().printNoBidReason);
+				values.put("events", RTBServer.events);
 			} else {
 				Echo info = Controller.getInstance().getMemberStatus(member);
 				values.put("stopped", info.stopped);
 				values.put("ncampaigns", info.ncampaigns);
 				values.put("loglevel", info.loglevel);
 				values.put("nobidreason", info.nobidreason);
-
+				values.put("events", info.events);
 			}
 			entry.put("name", member);
 			entry.put("values", values);

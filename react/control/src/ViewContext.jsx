@@ -18,6 +18,7 @@ const  ViewContext = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [serverPrefix, setServerPrefix] = useState();
     const [members, setMembers] = useState([]);
+    const [events, setEvents] = useState([]);
 
     const changeLoginState = (value) => {
       if (value && loggedIn)
@@ -225,6 +226,17 @@ const  ViewContext = () => {
         }
       }
 
+      const getEvents = () => {
+        var rows = []
+        for(var i=0; i<members.length;i++) {
+          var m = members[i];
+          for (var j=0;j<m.values.events.length;j++) {
+            rows.push(m.values.events[j]);
+          }
+        }
+        return rows;
+      }
+
       ///////////////////////////
 
     return { loggedIn, changeLoginState,
@@ -232,7 +244,8 @@ const  ViewContext = () => {
         mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
-        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members
+        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members,
+        getEvents
     };
 };
 

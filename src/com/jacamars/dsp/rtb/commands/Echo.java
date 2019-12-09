@@ -94,6 +94,8 @@ public class Echo extends BasicCommand implements Portable {
 	public int ecampaigns;
 	/** no bid readon flag */
 	public boolean nobidreason;
+	/** High severity events */
+	public List<Map<String,String>> events;
 	
 	public transient String json;
 	
@@ -210,6 +212,7 @@ public class Echo extends BasicCommand implements Portable {
 		ncampaigns = e.ncampaigns;
 		ecampaigns = e.ecampaigns;
 		nobidreason = e.nobidreason;
+		events = e.events;
 		
 		probe = e.probe;
 		exchanges = e.exchanges;

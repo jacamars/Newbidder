@@ -159,8 +159,22 @@ const Dashboard = (props) => {
     }
   }
 
+  function stringify(value) {
+		var seen = [];
+
+		return JSON.stringify(value, function(key, val) {
+   			if (val != null && typeof val == "object") {
+        		if (seen.indexOf(val) >= 0) {
+            		return;
+        		}
+        		seen.push(val);
+    		}
+    		return val;
+			}, 2);
+	}
+
   const getSnapShotView = (rows) => {
-    console.log("GET SNAPSHOT VIEW: " + rows);
+    console.log("GET SNAPSHOT VIEW: " + stringify(rows));
     if (rows === undef)
       return null;
     return(

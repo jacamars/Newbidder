@@ -252,6 +252,8 @@ public class RTBServer implements Runnable {
 	static AtomicLong totalNoBidTime = new AtomicLong(0);
 	static AtomicLong bidCountWindow = new AtomicLong(0);
 	static AtomicLong nobidCountWindow = new AtomicLong(0);
+	
+	public static volatile List<Map<String,String>> events = new ArrayList<Map<String,String>>();
 
 	/**
 	 * The JETTY server used by the bidder
@@ -651,6 +653,8 @@ public class RTBServer implements Runnable {
 			nthread.start();
 
 			Crosstalk.getInstance();
+			
+			logger.error("Ok, this is a test");
 
 			server.join();
 		} catch (Exception error) {
@@ -988,6 +992,7 @@ public class RTBServer implements Runnable {
 		e.cores = Performance.getCores();
 		e.ncampaigns = Configuration.getInstance().getCampaignsList().size();
 		e.lastupdate = System.currentTimeMillis();
+		e.events = RTBServer.events;
 
 		return e;
 	}
@@ -2032,9 +2037,9 @@ class AdminHandler extends Handler {
 					
 					
 					var wmq = new WebMQSubscriber(response,topics);       // does not return
-					System.out.println(wmq + " has initialized for: " + topics);
+					logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
 					wmq.run();
-					System.out.println("Client disconnected: " + wmq);
+					logger.info("Client disconnected: {}" + getIpAddress(request));
 					return;
 					
 				}
@@ -2053,9 +2058,9 @@ class AdminHandler extends Handler {
 					
 					
 					var ss = new ShortSubscriber(response,topics);       // does not return
-					System.out.println(ss + " has initialized for: " + topics);
+					logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
 					ss.run();
-					System.out.println("Client disconnected: " + ss);
+					logger.info("Client disconnected: getIpAddress(request)" + ss);
 					return;
 				}
 
