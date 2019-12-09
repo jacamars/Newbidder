@@ -259,6 +259,18 @@ public class Commands {
 				key = sub.get(0);
 				FreqSetCache.getClientInstance(client).get(key);
 				break;
+				
+			case "show-events":
+				if (sub == null) {
+					list = BidCachePool.getClientInstance(client).getMembersNames();
+					for (String member : list) {
+						Echo m = BidCachePool.getClientInstance(client).getMemberStatus(member);
+						str = member + ":\n" + DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(m.events)
+								+ "\n**************";
+						System.out.println(str);
+					}
+				}
+				break;
 
 			case "exit":
 				running = false;

@@ -41,7 +41,7 @@ public class WebMQSubscriber {
                     response.getWriter().println(contents);
                     response.flushBuffer();
                     ticks = 0;
-                    System.out.println(this + " wrote: " + contents);
+                    // System.out.println(this + " wrote: " + contents);
                     index++;
                 } catch (Exception e) {
                     // The other side closed, we are outta here!

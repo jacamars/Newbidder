@@ -1,25 +1,18 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.text.SimpleDateFormat;
-
-
 import java.util.Date;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.Map;
 
-import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * A class to log log4j messages to memory, for use by the web api.
+ * A class to log log4j messages to another publisher (in the case of the bidder, this is usually to kafka logs topic)/
  * See: https://mytechattempts.wordpress.com/2011/05/10/log4j-custom-memory-appender
  * @author Ben M. Faul
  *
@@ -90,7 +83,7 @@ public class ZPublisher4J extends AppenderSkeleton {
 		String level = event.getLevel().toString();
 		String message = event.getRenderedMessage();
 		String line = event.getLocationInformation().getLineNumber();
-		Map s = new HashMap();
+		var s = new HashMap<String,String>();
 		s.put("instance",Configuration.instanceName);
 		s.put("sev", level);
 		s.put("source", name);
@@ -98,5 +91,13 @@ public class ZPublisher4J extends AppenderSkeleton {
 		s.put("message", message);
 
 		publisher.add(s);
+		
+		/**
+		 * Copy high severity alarms to the member's hazelcast record
+		 */
+		if (level.equals("ERROR")) {
+			s.put("time", new Date().toString());
+			RTBServer.events.add(s);
+		}
 	}
 }

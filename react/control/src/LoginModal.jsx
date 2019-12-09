@@ -31,13 +31,10 @@ const LoginModal = () => {
       vx.changeLoginState(true);
   }
 
-  const cancel = () => { 
-     // does nothing
-  }
-
+  // in dark mode, the text is white, but this won't work here.... It will appear invisible in the field
   let estyle = {
     color: 'black'
-}
+  }
 
   return (
     <>
@@ -47,7 +44,7 @@ const LoginModal = () => {
         <FormGroup row>
             <Label for="username" sm={2}>User</Label>
             <Col sm={10}>
-                <Input style={estyle} type="text" id="username" onChange={changeName}/>
+                <Input style={estyle} type="text" id="username" placeHolder={name} onChange={changeName}/>
             </Col>
         </FormGroup>
         <FormGroup row>

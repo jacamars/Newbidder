@@ -551,7 +551,7 @@ public enum Crosstalk {
 					deletedCampaigns.remove(key);
 				}
 
-				logger.info("Heartbeat,freedsk: runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
+				logger.info("Heartbeat,runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
 						campaigns.size(),deletedCampaigns.size(),
 						BudgetController.getInstance().getCampaignDailySpend(null),
 						BudgetController.getInstance().getCampaignSpendAverage(null));
