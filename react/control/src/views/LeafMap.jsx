@@ -48,6 +48,9 @@ const LeafMap = () => {
   };
   
   const setPositionsView = (rows) => {
+    if (rows.map === undef)
+      return null;
+      
     return(
       rows.map((row, i) => (<Marker key={'"position-' + i + "'"} position={[row.x, row.y]}>
          <Popup>

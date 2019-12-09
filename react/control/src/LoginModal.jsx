@@ -65,7 +65,6 @@ const LoginModal = () => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={login}>Login</Button>{' '}
-          <Button color="secondary" onClick={cancel}>Cancel</Button>
         </ModalFooter>
       </Modal>
     </div>

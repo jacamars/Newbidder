@@ -34,6 +34,8 @@ class Sidebar extends React.Component {
     super(props);
     this.activeRoute.bind(this);
   }
+
+
   // verifies if routeName is the one active (in browser input)
   activeRoute(routeName) {
     return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -55,6 +57,8 @@ class Sidebar extends React.Component {
     document.documentElement.classList.remove("nav-open");
   };
   render() {
+
+
     const { bgColor, routes, rtlActive, logo } = this.props;
     let logoImg = null;
     let logoText = null;
@@ -114,7 +118,7 @@ class Sidebar extends React.Component {
               {logoText}
             </div>
           ) : null}
-          <Nav>
+          <Nav >
             {routes.map((prop, key) => {
               if (prop.redirect) return null;
               return (
@@ -154,7 +158,7 @@ Sidebar.propTypes = {
   // if true, then instead of the routes[i].name, routes[i].rtlName will be rendered
   // insde the links of this component
   rtlActive: PropTypes.bool,
-  bgColor: PropTypes.oneOf(["primary", "blue", "green"]),
+  bgColor: PropTypes.oneOf(["primary", "blue", "green", "red"]),
   routes: PropTypes.arrayOf(PropTypes.object),
   logo: PropTypes.shape({
     // innerLink is for links that will direct the user within the app

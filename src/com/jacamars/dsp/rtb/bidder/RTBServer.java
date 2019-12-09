@@ -436,7 +436,7 @@ public class RTBServer implements Runnable {
 	public RTBServer(String fileName, String shard, String exchanges) throws Exception {
 
 		try {
-			Configuration.reset(); // this resquired so that when the server is
+			Configuration.reset(); // this required so that when the server is
 			// restarted, the old config won't stick
 			// around.
 

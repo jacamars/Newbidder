@@ -85,6 +85,8 @@ var undef;
   }
 
   const setConsoleView = (rows) => {
+    if (rows === undef)
+      return null;
     return(
      rows.map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
          <td>
