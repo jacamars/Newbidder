@@ -63,6 +63,7 @@ public class Bidswitch extends BidRequest {
 		Bidswitch copy = new Bidswitch(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
         copy.multibid = BidRequest.usesMultibids(BIDSWITCH);
+		copy.usesGzipResponse = usesGzipResponse;
         return copy;
 	}
 	

@@ -897,6 +897,7 @@ public class GoogleBidRequest extends BidRequest {
 	public GoogleBidRequest copy(InputStream in) throws Exception {
 		GoogleBidRequest copy = new GoogleBidRequest(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 }

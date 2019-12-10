@@ -56,6 +56,7 @@ public class Adventurefeeds extends BidRequest {
     	public Adventurefeeds copy(InputStream in) throws Exception  {
     		Adventurefeeds copy =  new Adventurefeeds(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

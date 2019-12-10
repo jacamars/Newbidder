@@ -56,6 +56,7 @@ public class Cappture extends BidRequest {
     	public Cappture copy(InputStream in) throws Exception  {
     		Cappture copy =  new Cappture(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

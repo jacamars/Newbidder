@@ -56,6 +56,7 @@ public class Taggify extends BidRequest {
     	public Taggify copy(InputStream in) throws Exception  {
     		Taggify copy =  new Taggify(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

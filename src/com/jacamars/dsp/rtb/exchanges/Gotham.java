@@ -56,6 +56,7 @@ public class Gotham extends BidRequest {
     	public Gotham copy(InputStream in) throws Exception  {
     		Gotham copy = new Gotham(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

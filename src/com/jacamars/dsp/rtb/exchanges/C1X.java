@@ -117,6 +117,7 @@ public class C1X extends BidRequest {
     	public C1X copy(InputStream in) throws Exception  {
     		C1X copy = new C1X(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

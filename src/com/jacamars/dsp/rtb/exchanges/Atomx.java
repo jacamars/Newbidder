@@ -46,6 +46,7 @@ public class Atomx extends BidRequest {
 	public Atomx copy(InputStream in) throws Exception  {
 		Atomx copy = new Atomx(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

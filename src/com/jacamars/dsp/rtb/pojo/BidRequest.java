@@ -131,6 +131,9 @@ public class BidRequest {
 	public String pageurl = "";
 	// The type field, used in logging
 	public String logtype = "requests";
+	
+	/** Set to true to force bid response to be gzipped */
+	public boolean usesGzipResponse = false;
 
 	/** Set this to false to mark as an app */
 	boolean isSite = true;

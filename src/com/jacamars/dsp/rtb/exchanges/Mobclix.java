@@ -45,4 +45,12 @@ public class Mobclix extends BidRequest {
 		setExchange( "mobclix" );
 		return true;
 	}
+	
+	@Override
+	public Mobclix copy(InputStream in) throws Exception  {
+		Mobclix copy =  new Mobclix(in);
+		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
+		return copy;
+	}
 }

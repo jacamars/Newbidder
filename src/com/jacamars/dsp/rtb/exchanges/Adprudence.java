@@ -56,6 +56,7 @@ public class Adprudence extends BidRequest {
     	public Adprudence copy(InputStream in) throws Exception  {
     		Adprudence copy =  new Adprudence(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

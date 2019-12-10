@@ -1077,6 +1077,13 @@ public class Configuration {
 					case "usesPiggyBackWins":
 						BidRequest.setUsesPiggyBackWins(name);
 						break;
+						
+					case "!usesGzipResponse":
+						break;		
+					case "usesGzipResponse":
+						br.usesGzipResponse = true;
+						break;
+						
 					default:
 						System.err.println("Unknown request: " + tuples[0] + " in definition of " + className);
 					}

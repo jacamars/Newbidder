@@ -66,6 +66,7 @@ public class AdMedia extends BidRequest {
     	public AdMedia copy(InputStream in) throws Exception  {
     		AdMedia copy = new AdMedia(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }
