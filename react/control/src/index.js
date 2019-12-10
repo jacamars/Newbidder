@@ -35,7 +35,6 @@ const hist = createBrowserHistory();
 ReactDOM.render(
   <Router history={hist}>
     <useViewContext.Provider>
-      <LoginModal />
     <Switch>
       <Route path="/admin" render={props => <AdminLayout {...props} />} />
       <Redirect from="/" to="/admin/dashboard" />

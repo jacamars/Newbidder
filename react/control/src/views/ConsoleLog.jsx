@@ -48,8 +48,8 @@ import {
   Col
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
+import LoginModal from '../LoginModal'
 
-var xhr;
 var undef;
 
  const ConsoleLog = (props) => {
@@ -120,14 +120,15 @@ var undef;
     fromCallback();
   }
 
-  if (vx.consoleLogspec === '') {
-    console.log("WE HAVE SET THE CONSOLE LOG")
-    vx.loggerCallback("localhost:8080");
+  const setInstances = async(list,selectedHost) => {
+    console.log("SELECTED HOST: " + selectedHost);
+    vx.loggerCallback(selectedHost);
   }
 
     return (
       <>
         <div className="content">
+        { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
           <Row>
             <Col md="12">
               <Card>

@@ -53,7 +53,10 @@ import {
   chartExample4
 } from "variables/charts.jsx";
 
+
+import LoginModal from '../LoginModal'
 import { useViewContext } from "../ViewContext";
+
 import { memberExpression } from "@babel/types";
 
 const httpAgent = new http.Agent({ keepAlive: true });
@@ -67,6 +70,7 @@ const Dashboard = (props) => {
 
   const vx = useViewContext();
 
+  const [members, setMembers] = useState([]);
   const [count, setCount] = useState(1);
   const [instanceNames, setInstanceNames] = useState([]);
 
@@ -134,7 +138,8 @@ const Dashboard = (props) => {
   }
 
   const doGetStatusCmd = async (override) => {
-    if (!vx.loggedIn)
+    console.log("Do Status Cmd says: " + vx.members.length);
+    if (!vx.loggedIn && !override)
       return;
       
     try {
@@ -159,6 +164,15 @@ const Dashboard = (props) => {
       alert (e);
     }
   }
+
+  /*const login = async (server) => {
+    var mx = await vx.getMembers(server);
+    console.log("MEMBERS = " + mx.length);
+    if (mx === undef)
+      return;
+    vx.changeLoginState(true);
+    setInstances(mx);
+  }*/
 
   function stringify(value) {
 		var seen = [];
@@ -197,6 +211,7 @@ const Dashboard = (props) => {
 
     return (
         <div className="content">
+          { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
           <Row>
             <Col xs="12">
               <Card className="card-chart">
@@ -204,7 +219,7 @@ const Dashboard = (props) => {
                   <Row>
                     <Col className="text-left" sm="6">
                       <h5 className="card-category">Total Events</h5>
-                      <select width='100%'>
+                      <select id='instance-selections' width='100%'>
                           {instanceNames}
                       </select>
                       <Button size="sm" color="info" onClick={() => doGetStatusCmd()}>Refresh</Button>
