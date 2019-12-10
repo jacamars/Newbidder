@@ -133,16 +133,17 @@ const Dashboard = (props) => {
     )
   }
 
-  const doGetStatusCmd = async () => {
+  const doGetStatusCmd = async (override) => {
     if (!vx.loggedIn)
       return;
       
     try {
       var list;
       if (vx.members.length === 0)
-        list = vx.getMembers();
+        list = await vx.getMembers();
       else 
         list = vx.members;
+
       if (list === undef)
         return;
 
@@ -206,7 +207,7 @@ const Dashboard = (props) => {
                       <select width='100%'>
                           {instanceNames}
                       </select>
-                      <Button size="sm" color="info" onClick={doGetStatusCmd}>Refresh</Button>
+                      <Button size="sm" color="info" onClick={() => doGetStatusCmd()}>Refresh</Button>
                       <CardTitle tag="h2">Performance</CardTitle>
                     </Col>
                     <Col sm="6">
