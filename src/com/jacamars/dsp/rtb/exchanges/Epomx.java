@@ -56,6 +56,7 @@ public class Epomx extends BidRequest {
     	public Epomx copy(InputStream in) throws Exception  {
     		Epomx copy =  new Epomx(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

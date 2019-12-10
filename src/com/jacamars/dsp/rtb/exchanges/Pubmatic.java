@@ -67,6 +67,7 @@ public class Pubmatic extends BidRequest {
     	public Pubmatic copy(InputStream in) throws Exception  {
     		Pubmatic copy =  new Pubmatic(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

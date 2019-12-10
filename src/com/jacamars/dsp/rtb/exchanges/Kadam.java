@@ -56,6 +56,7 @@ public class Kadam extends BidRequest {
     	public Kadam copy(InputStream in) throws Exception  {
     		Kadam copy =  new Kadam(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

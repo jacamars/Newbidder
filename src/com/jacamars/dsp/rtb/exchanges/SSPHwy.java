@@ -56,6 +56,7 @@ public class SSPHwy extends BidRequest {
     	public SSPHwy copy(InputStream in) throws Exception  {
     		SSPHwy copy = new SSPHwy(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     		
     	}

@@ -71,6 +71,7 @@ public class OpenX extends BidRequest {
     		OpenX copy = new OpenX(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
             copy.multibid = BidRequest.usesMultibids(OPENX);
+    		copy.usesGzipResponse = usesGzipResponse;
             return copy;
     	}
 

@@ -152,6 +152,7 @@ public class Appnexus extends BidRequest {
 			Appnexus copy = new Appnexus(in);
 			copy.usesEncodedAdm = usesEncodedAdm;
 			copy.altJson = altJson;
+    		copy.usesGzipResponse = usesGzipResponse;
 			return copy;
 		case CLICK:
 			return new Appnexus(CLICK, in);

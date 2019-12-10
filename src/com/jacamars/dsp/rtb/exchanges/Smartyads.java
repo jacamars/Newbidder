@@ -46,6 +46,7 @@ public class Smartyads extends BidRequest {
 	public Smartyads copy(InputStream in) throws Exception  {
 		Smartyads copy =  new Smartyads(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

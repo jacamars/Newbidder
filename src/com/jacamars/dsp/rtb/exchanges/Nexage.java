@@ -68,6 +68,7 @@ public class Nexage extends BidRequest {
 	public Nexage copy(InputStream in) throws Exception  {
 		Nexage copy =  new Nexage(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

@@ -35,6 +35,7 @@ public class Fyber extends BidRequest {
 	public Fyber copy(InputStream in) throws Exception  {
 		Fyber copy =  new Fyber(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

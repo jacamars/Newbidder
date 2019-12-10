@@ -56,6 +56,7 @@ public class Republer extends BidRequest {
     	public Republer copy(InputStream in) throws Exception  {
     		Republer copy = new Republer(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

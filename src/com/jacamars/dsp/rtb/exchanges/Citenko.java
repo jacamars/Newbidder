@@ -56,6 +56,7 @@ public class Citenko extends BidRequest {
     	public Citenko copy(InputStream in) throws Exception  {
     		Citenko copy =  new Citenko(in);
     		copy.usesEncodedAdm = usesEncodedAdm;
+    		copy.usesGzipResponse = usesGzipResponse;
     		return copy;
     	}
 }

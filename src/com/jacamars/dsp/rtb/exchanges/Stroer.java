@@ -46,6 +46,7 @@ public class Stroer extends BidRequest {
 	public Stroer copy(InputStream in) throws Exception  {
 		Stroer copy =  new Stroer(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

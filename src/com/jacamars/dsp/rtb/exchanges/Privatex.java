@@ -52,6 +52,7 @@ public class Privatex extends BidRequest {
 	public Privatex copy(InputStream in) throws Exception  {
 		Privatex copy = new Privatex(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 	}
 	

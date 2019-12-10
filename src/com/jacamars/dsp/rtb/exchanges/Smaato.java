@@ -58,6 +58,7 @@ public class Smaato extends BidRequest {
 	public Smaato copy(InputStream in) throws Exception  {
 		Smaato copy = new Smaato(in);
 		copy.usesEncodedAdm = usesEncodedAdm;
+		copy.usesGzipResponse = usesGzipResponse;
 		return copy;
 		
 	}

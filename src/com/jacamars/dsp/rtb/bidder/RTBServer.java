@@ -1629,7 +1629,7 @@ class Handler extends AbstractHandler {
 		return str;
 	}
 
-	private static byte[] compressGZip(String uncompressed) throws Exception {
+	protected static byte[] compressGZip(String uncompressed) throws Exception {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		GZIPOutputStream gzos = new GZIPOutputStream(baos);
 
@@ -1922,8 +1922,12 @@ class AdminHandler extends Handler {
 				response.setStatus(HttpServletResponse.SC_OK);
 				baseRequest.setHandled(true);
 				String data = WebCampaign.getInstance().handler(request, body);
-				response.getWriter().println(data);
-				response.flushBuffer();
+				
+				response.setHeader("Content-Encoding","gzip");
+				GZIPOutputStream gzipOutputStream = new GZIPOutputStream(response.getOutputStream());
+				gzipOutputStream.write(data.getBytes());
+				gzipOutputStream.close();
+				
 				return;
 			}
 
