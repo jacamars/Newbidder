@@ -21,6 +21,7 @@ import { Map as LeafletMap, TileLayer, Marker, Popup, CircleMarker } from 'react
 // reactstrap components
 import { Button, ButtonGroup, Card, CardHeader, CardBody, CardTitle, Row, Col } from "reactstrap";
 import { useViewContext } from "../ViewContext";
+import LoginModal from '../LoginModal'
 
 /*
                   <CircleMarker center={[34.052235, -118.243683]} radius={10}>
@@ -60,9 +61,9 @@ const LeafMap = () => {
     )
   }
 
-  const setType = (data) => {
+  const setType = (data, server) => {
     vx.setMapType(data);
-    vx.mapperCallback(data);
+    vx.mapperCallback(data, server);
   }
 
   const handleZoom = (e) => {
@@ -83,14 +84,17 @@ const LeafMap = () => {
 			}, 2);
 	}
 
+  const setInstances = (na,server) => {
+    setType("bids",server);
+  }
 
   if (vx.mapType === '') 
     setType('bids');
  
-
   return (
       <>
         <div className="content">
+        { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
           <Row>
             <Col md="12">
               <Card className="card-plain">

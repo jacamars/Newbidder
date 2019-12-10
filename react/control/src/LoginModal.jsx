@@ -4,7 +4,7 @@ import {useViewContext } from "./ViewContext";
 
 var undef;
 
-const LoginModal = () => {
+const LoginModal = (props) => {
 
   const vx = useViewContext();
 
@@ -25,10 +25,12 @@ const LoginModal = () => {
   }
 
   const login = async () => {
-      var members = await vx.getMembers(server);
-      if (members === undef)
-        return;
-      vx.changeLoginState(true);
+    var mx = await vx.getMembers(server);
+    console.log("MEMBERS = " + mx.length);
+    if (mx === undef)
+      return;
+    vx.changeLoginState(true);
+    props.callback(mx,server);
   }
 
   // in dark mode, the text is white, but this won't work here.... It will appear invisible in the field
@@ -44,7 +46,7 @@ const LoginModal = () => {
         <FormGroup row>
             <Label for="username" sm={2}>User</Label>
             <Col sm={10}>
-                <Input style={estyle} type="text" id="username" placeHolder={name} onChange={changeName}/>
+                <Input style={estyle} type="text" id="username" placeholder={name} onChange={changeName}/>
             </Col>
         </FormGroup>
         <FormGroup row>

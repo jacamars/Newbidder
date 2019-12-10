@@ -18,21 +18,16 @@ const  ViewContext = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [serverPrefix, setServerPrefix] = useState();
     const [members, setMembers] = useState([]);
-    const [events, setEvents] = useState([]);
 
-    const changeLoginState = (value) => {
+    const changeLoginState = async (value) => {
       if (value && loggedIn)
         return;
 
       if (!value && !loggedIn)
-        return;
+        return; 
 
-      setLoggedIn(value);
-      if (value) {
-
-      } else {
-
-      }
+      await setLoggedIn(value);
+      return loggedIn;
     }
 
     const [consoleLogspec, setConsoleLogspec] = useState('');
@@ -171,13 +166,19 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  mapperCallback = (logname) => {
+    const  mapperCallback = (logname, server) => {
         var previous_response_length = 0;
         if (mapXhr !== undef) {
           mapXhr.abort();
         }
+
+        console.log("MAPPER SET TO " + serverPrefix);
+        console.log("SERVER: " + server);
         mapXhr = new XMLHttpRequest();
-        mapXhr.open("GET", "http://" + serverPrefix + "/shortsub"+ "?topic=" + logname, true);
+        if (serverPrefix != undef)
+           mapXhr.open("GET", "http://" + serverPrefix + "/shortsub"+ "?topic=" + logname, true);
+        else
+          mapXhr.open("GET", "http://" + server+ "/shortsub"+ "?topic=" + logname, true);
         mapXhr.onreadystatechange = checkData;
         mapXhr.send(null);
         
