@@ -31,7 +31,7 @@ const  ViewContext = () => {
     }
 
     const [consoleLogspec, setConsoleLogspec] = useState('');
-    const [logcount, setLogcount] = useState(1);
+    const [logcount, setLogcount] = useState(0);
 
     const [bigChartData, setBigChartData] = useState('data1');
     const setBgChartData = (data) => {
@@ -41,16 +41,6 @@ const  ViewContext = () => {
 
     const [zoomLevel, setZoomLevel] = useState(2.5);
     const [mapType, setMapType] = useState('');
-    const [mapPositions, setMapPositions] = useState([]);
-    const addMapPositions = (rows) => {
-        for (var i = 0; i< rows.length; i++) {
-            mapPositions.push(rows[i])
-            if (mapPositions.length > 20) 
-              mapPositions.shift();
-        }
-        setMapPositions(mapPositions); 
-    }
-
     const [ssp, setSsp] = useState('Nexage')
     const [uri, setUri] = useState('/rtb/bids/nexage');
     const [url, setUrl] = useState('http://localhost:8080');
@@ -102,17 +92,17 @@ const  ViewContext = () => {
         for (var i=0; i<rows.length; i++) {
             rows[i].time = new Date().toLocaleString();
             data.unshift(rows[i]);
-            if (data.length > 200) {
+            if (data.length > 1000) {
                 data.pop();
             }
         }
-        setLogcount(logcount + rows.length)
         setLogdata(data);
+        setLogcount(data.length);
         //console.log("BUFFERED DATA IS: " + JSON.stringify(data,null,2));
     }
     const clearLogdata = () => {
         setLogdata([]);
-        setLogcount(1);
+        setLogcount(0);
     }
 
     /////////////////////////////////////////
@@ -133,7 +123,7 @@ const  ViewContext = () => {
           if (xhrLog.readyState === 3) {
             var response = xhrLog.responseText;
             var chunk = response.slice(previous_response_length);
-            console.log("GOT SOME LOG CHUNK DATA: " + chunk);
+            //console.log("GOT SOME LOG CHUNK DATA: " + chunk);
             var i = chunk.indexOf("{");
             if (i < 0)
               return;
@@ -142,14 +132,14 @@ const  ViewContext = () => {
             chunk = chunk.substring(i);
             previous_response_length = response.length;
             
-            console.log("GOT LOG DATA: " + chunk);
+            //console.log("GOT LOG DATA: " + chunk);
             var lines = chunk.split("\n");
             var rows = []
             for (var j = 0; j < lines.length; j++) {
               var line = lines[j];
               line = line.trim();
               if (line.length > 0) {
-                console.log("CHECKING: " + line);
+                //console.log("CHECKING: " + line);
                 try {
                     var y = JSON.parse(line)
                     rows.push(y);
@@ -166,10 +156,12 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  mapperCallback = (logname, server) => {
+    const  mapperCallback = (logname, server, callback) => {
         var previous_response_length = 0;
         if (mapXhr !== undef) {
+          console.log("mapXhr aborting");
           mapXhr.abort();
+          console.log("Aborted");
         }
 
         console.log("MAPPER SET TO " + serverPrefix);
@@ -206,7 +198,9 @@ const  ViewContext = () => {
                 rows.push(y);
               }
             }
-            addMapPositions(rows);
+            if (rows.length == 0)
+              return;
+            callback(rows);
           }
         };
       }
@@ -242,10 +236,10 @@ const  ViewContext = () => {
 
     return { loggedIn, changeLoginState,
         bigChartData, setBgChartData, selectedHost, setSelectedHost, mapType, setMapType, mapperCallback,
-        mapPositions, addMapPositions, zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
+        zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
-        consoleLogspec, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members,
+        consoleLogspec, logcount, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members,
         getEvents
     };
 };

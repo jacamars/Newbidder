@@ -13,32 +13,15 @@
 =========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-                     <tr style={RED}>
-                        <td>2019-12-04 16:18:34</td>
-                        <td>WARN</td>
-                        <td>Crosstalk:169</td>
-                        <td className="text-left">CROSSTALK budgeting has started</td>
-                      </tr>
-                      <tr style={YELLOW}>
-                        <td>2019-12-04 16:26:34</td>
-                        <td>INFO</td>
-                        <td>RTBServer:845</td>
-                        <td className="text-left">Heartbeat leader: true, total-errors=0, openfiles=448, cpu=13.5%, mem=159M (5.306%), freedsk=18.123%, threads=156, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=34, requests=13, bids=13, nobids=0, fraud=0, cidrblocked=0, wins=6, pixels=5, clicks=0, exchanges=[wins=0, qps=0.0, bids=0, name=nexage, requests=0, errors=0], stopped=false, campaigns=9
-</td>
-                      </tr>
-                      <tr style={GREY}>
-                        <td>2019-12-04 16:18:34</td>
-                        <td>WARN</td>
-                        <td>Crosstalk:169</td>
-                        <td className="text-left">CROSSTALK budgeting has started</td>
-                      </tr>
 */
 import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
+  Badge,
   Button,
+  ButtonGroup,
+  ButtonToolbar,
   Card,
   CardHeader,
   CardBody,
@@ -55,6 +38,7 @@ var undef;
  const ConsoleLog = (props) => {
 
   const vx = useViewContext();
+  const [rSelected, setRSelected] = useState(3);     // buttons
   const [count, setCount] = useState(1);
   
   /*useEffect(() => {
@@ -84,11 +68,21 @@ var undef;
     return RED;
   }
 
+  const getSev = (key) => {
+    if (key === "ERROR")
+      return 1;
+    if (key === "WARN")
+      return 2;
+    if (key === "INFO")
+      return 3;
+    return 4;
+  }
+
   const setConsoleView = (rows) => {
     if (rows === undef)
       return null;
     return(
-     rows.map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
+     rows.filter(item => getSev(item.sev) <= rSelected).map((row, i) => (<tr key={'"console-pos-' + i + "'"} style={getStyle(row.sev)}>
          <td>
            {row.index}
          </td>
@@ -121,8 +115,7 @@ var undef;
   }
 
   const setInstances = async(list,selectedHost) => {
-    console.log("SELECTED HOST: " + selectedHost);
-    vx.loggerCallback(selectedHost);
+    vx.loggerCallback(selectedHost,fromCallback);
   }
 
     return (
@@ -133,9 +126,21 @@ var undef;
             <Col md="12">
               <Card>
                 <CardHeader>
-                  <CardTitle tag="h4">RTB4FREE Console Log {vx.logcount}</CardTitle>
+                  <CardTitle tag="h4">
+                    RTB4FREE Console Log <Badge color="primary">{vx.logcount}</Badge>
+                  </CardTitle>
+  
                   <Button size="sm" color="info" onClick={fromCallback}>Refresh</Button>
                   <Button size="sm" color="warn" onClick={clear}>Clear</Button>
+                  <ButtonToolbar>
+                    <ButtonGroup>
+                      <Button color="danger"  onClick={() => setRSelected(1)} active={rSelected === 1}>ERROR</Button>
+                      <Button color="warning" onClick={() => setRSelected(2)} active={rSelected === 2}>WARN</Button>
+                      <Button color="secondary" onClick={() => setRSelected(3)} active={rSelected === 3}>INFO</Button>
+                      <Button color="success"  onClick={() => setRSelected(4)} active={rSelected === 4}>DEBUG</Button>
+                    </ButtonGroup>
+                  </ButtonToolbar>
+
                 </CardHeader>
                 <CardBody>
                   <Table className="tablesorter" responsive>
