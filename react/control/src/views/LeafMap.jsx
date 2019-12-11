@@ -16,6 +16,7 @@
 
 */
 import React, { useState } from "react";
+import {Badge} from "reactstrap"
 import classNames from "classnames";
 import { Map as LeafletMap, TileLayer, Marker, Popup, CircleMarker } from 'react-leaflet';
 // reactstrap components
@@ -41,6 +42,16 @@ var map;
 const LeafMap = () => {
 
   const vx = useViewContext();
+  const [positions, setPositions] = useState([]);
+
+  const handlePositions = (rows) => {
+    console.log("SPV: " + rows.length);
+    var old = positions;
+    for(var i=0;i<rows.length;i++) {
+      old.push(rows[i]);
+    }
+    setPositions(old);
+  }
 
 
   const leafStyle = {
@@ -49,26 +60,35 @@ const LeafMap = () => {
   };
   
   const setPositionsView = (rows) => {
-    if (rows.map === undef)
+    if (rows === undef)
       return null;
+
+    console.log("REDRAW: " + rows.length);
       
     return(
       rows.map((row, i) => (<Marker key={'"position-' + i + "'"} position={[row.x, row.y]}>
          <Popup>
-           Popup for any custom information.
+           {row.price}
          </Popup>
        </Marker>))
     )
   }
 
+  const clear = () => {
+    setPositions([]);
+  }
+
   const setType = (data, server) => {
     vx.setMapType(data);
-    vx.mapperCallback(data, server);
+    vx.mapperCallback(data, server, handlePositions);
   }
+
 
   const handleZoom = (e) => {
     vx.setZoomLevel( map.leafletElement.getZoom() );
   };
+
+
 
   function stringify(value) {
 		var seen = [];
@@ -88,7 +108,12 @@ const LeafMap = () => {
     setType("bids",server);
   }
 
-  if (vx.mapType === '') 
+  const show = () =>{
+    console.log("Update badge count to: " + positions.length);
+    return positions.length;
+  }
+
+  if (vx.mapType === '')
     setType('bids');
  
   return (
@@ -101,7 +126,17 @@ const LeafMap = () => {
               <CardHeader>
                   <Row>
                     <Col className="text-left" sm="6">
-                      <CardTitle tag="h2">Events Map</CardTitle>
+                      <CardTitle tag="h2">Events Map
+                      <Button
+                          tag="label"
+                          className={classNames("btn-simple")}
+                          color="info"
+                          id="0"
+                          size="sm"
+                          onClick={() => clear()}
+                        >Clear</Button>
+                         <Badge color="primary">{show()}</Badge>
+                      </CardTitle>
                     </Col>
                     <Col sm="6">
                       <ButtonGroup
@@ -116,7 +151,7 @@ const LeafMap = () => {
                           color="info"
                           id="0"
                           size="sm"
-                          onClick={() => vx.setMapType("requests")}
+                          onClick={() => setType("requests")}
                         >
                           <input
                             defaultChecked
@@ -139,7 +174,7 @@ const LeafMap = () => {
                           className={classNames("btn-simple", {
                             active: vx.mapType === "bids"
                           })}
-                          onClick={() => vx.setMapType("bids")}
+                          onClick={() => setType("bids")}
                         >
                           <input
                             className="d-none"
@@ -161,7 +196,7 @@ const LeafMap = () => {
                           className={classNames("btn-simple", {
                             active: vx.mapType === "wins"
                           })}
-                          onClick={() => vx.setMapType("wins")}
+                          onClick={() => setType("wins")}
                         >
                           <input
                             className="d-none"
@@ -181,9 +216,9 @@ const LeafMap = () => {
                           size="sm"
                           tag="label"
                           className={classNames("btn-simple", {
-                            active: vx.CardHeadermapType === "conversions"
+                            active: vx.mapType === "conversions"
                           })}
-                          onClick={() => vx.setMapType("conversions")}
+                          onClick={() => setType("conversions")}
                         >
                           <input
                             className="d-none"
@@ -211,7 +246,7 @@ const LeafMap = () => {
                   <TileLayer
                       url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
                   />
-                  {setPositionsView(vx.mapPositions)}
+                  {setPositionsView(positions)}
                   </LeafletMap>
                 </CardBody>
               </Card>

@@ -653,8 +653,6 @@ public class RTBServer implements Runnable {
 			nthread.start();
 
 			Crosstalk.getInstance();
-			
-			logger.error("Ok, this is a test");
 
 			server.join();
 		} catch (Exception error) {
@@ -666,7 +664,7 @@ public class RTBServer implements Runnable {
 					e.printStackTrace();
 				}
 			else
-				error.printStackTrace();
+				logger.error("HALT: : {}", error.toString());
 			System.exit(1);
 		}
 	}

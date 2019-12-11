@@ -139,7 +139,7 @@ public enum Crosstalk {
 	static void tryCreate() throws Exception {
 		var conn = CrosstalkConfig.getInstance().getConnection();
 		if (conn == null)
-			throw new Exception("Crosstalk connection was not established");
+			throw new Exception("Crosstalk database connection was not established");
 		
 		var stmt = conn.createStatement();
 		String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);

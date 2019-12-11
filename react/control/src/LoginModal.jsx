@@ -26,10 +26,11 @@ const LoginModal = (props) => {
 
   const login = async () => {
     var mx = await vx.getMembers(server);
-    console.log("MEMBERS = " + mx.length);
     if (mx === undef)
       return;
+    console.log("MEMBERS = " + mx.length);
     vx.changeLoginState(true);
+    vx.loggerCallback(server);
     props.callback(mx,server);
   }
 
