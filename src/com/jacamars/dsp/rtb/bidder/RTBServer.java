@@ -65,6 +65,7 @@ import com.jacamars.dsp.rtb.logtap.WebMQSubscriber;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
+import com.jacamars.dsp.rtb.shared.SharedTimer;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.Env;
 import com.jacamars.dsp.rtb.tools.Performance;
@@ -359,8 +360,8 @@ public class RTBServer implements Runnable {
 			if (logger != null)
 				logger.info("*** Server STARTING, Leader: {} ***", isLeader());
 			try {
-				if (Controller.getInstance() != null)						// can happen if this is not a bidder, but is a client.
-					Controller.getInstance().setMemberStatus();
+				//if (Controller.getInstance() != null)						// can happen if this is not a bidder, but is a client.
+				//	Controller.getInstance().setMemberStatus();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -653,6 +654,7 @@ public class RTBServer implements Runnable {
 			nthread.start();
 
 			Crosstalk.getInstance();
+			SharedTimer.getInstance("timebase",60);
 
 			server.join();
 		} catch (Exception error) {
@@ -729,7 +731,7 @@ public class RTBServer implements Runnable {
 		statusUpdater = () -> {
 			try {
 				while (true) {
-					Controller.getInstance().setMemberStatus();
+					//Controller.getInstance().setMemberStatus();
 					Controller.getInstance().reportNoBidReasons();
 
 					CampaignProcessor.probe.reset();
@@ -944,6 +946,7 @@ public class RTBServer implements Runnable {
 		return server.isRunning();
 	}
 
+	static volatile Echo myStatus = null;
 	/**
 	 * Returns the status of this server.
 	 *
@@ -951,48 +954,50 @@ public class RTBServer implements Runnable {
 	 */
 	public static Echo getStatus() {
 		setSummaryStats();
-		Echo e = new Echo();
-		e.from = Configuration.instanceName;
-		e.leader = isLeader();
-		e.percentage = percentage.intValue();
-		e.stopped = stopped;
-		e.request = request;
-		e.bid = bid;
-		e.win = win;
-		e.nobid = nobid;
-		e.error = error;
-		e.handled = handled;
-		e.unknown = unknown;
-		e.clicks = clicks;
-		e.pixels = pixels;
-		e.fraud = fraud;
-		e.adspend = adspend;
-		e.loglevel = Configuration.getInstance().logLevel;
-		e.qps = qps;
-		List<Campaign> list = Configuration.getInstance().getCampaignsList();
-		for (Campaign c : list) {
-			e.campaigns.add(c.adId);
+		if (myStatus == null) {
+			myStatus = new Echo();
+			myStatus.ipaddress = Performance.getInternalAddress();
+			myStatus.from = Configuration.getInstance().instanceName;
 		}
-		e.avgx = avgx;
-		e.ipaddress = Performance.getInternalAddress();
-		e.exchanges = BidRequest.getExchangeCounts();
-		e.timestamp = System.currentTimeMillis();
-		e.probe = CampaignProcessor.probe;
+		myStatus.leader = isLeader();
+		myStatus.percentage = percentage.intValue();
+		myStatus.stopped = stopped;
+		myStatus.request = request;
+		myStatus.bid = bid;
+		myStatus.win = win;
+		myStatus.nobid = nobid;
+		myStatus.error = error;
+		myStatus.handled = handled;
+		myStatus.unknown = unknown;
+		myStatus.clicks = clicks;
+		myStatus.pixels = pixels;
+		myStatus.fraud = fraud;
+		myStatus.adspend = adspend;
+		myStatus.loglevel = Configuration.getInstance().logLevel;
+		myStatus.qps = qps;
+		List<Campaign> list = Configuration.getInstance().getCampaignsList();
+		myStatus.campaigns.clear();
+		for (Campaign c : list) {
+			myStatus.campaigns.add(c.adId);
+		}
+		myStatus.avgx = avgx;
+		myStatus.exchanges = BidRequest.getExchangeCounts();
+		myStatus.probe = CampaignProcessor.probe;
 
 		String perf = Performance.getCpuPerfAsString();
 		int threads = Performance.getThreadCount();
 		String pf = Performance.getPercFreeDisk();
 		String mem = Performance.getMemoryUsed();
-		e.threads = threads;
-		e.memory = mem;
-		e.freeDisk = pf;
-		e.cpu = perf;
-		e.cores = Performance.getCores();
-		e.ncampaigns = Configuration.getInstance().getCampaignsList().size();
-		e.lastupdate = System.currentTimeMillis();
-		e.events = RTBServer.events;
+		myStatus.threads.add(threads);
+		myStatus.memory.add(mem);
+		myStatus.freeDisk.add(pf);
+		myStatus.cpu.add(perf);
+		myStatus.cores = Performance.getCores();
+		myStatus.ncampaigns = Configuration.getInstance().getCampaignsList().size();
+		myStatus.lastupdate = System.currentTimeMillis();
+		myStatus.events = RTBServer.events;
 
-		return e;
+		return myStatus;
 	}
 }
 

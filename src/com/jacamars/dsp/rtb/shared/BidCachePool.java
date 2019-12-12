@@ -46,7 +46,7 @@ public enum BidCachePool {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 	
-	static Map<String,Map<String,WatchInterface>> watchMap = new HashMap();
+	static Map<String,Map<String,List<WatchInterface>>> watchMap = new HashMap();
 	static {
 		watchMap.put(MISC, new HashMap());
 		watchMap.put(VIDEO, new HashMap());
@@ -85,10 +85,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						BidCacheStore.evict(event.getKey());
 					}
-					WatchInterface ifc = watchMap.get(BIDCACHE).get(event.getKey());
-					if (ifc != null)
-						ifc.callback(BIDCACHE, event.getKey());
-					System.out.println("**** EVICTED: " + event.getKey());
+					handleWatch(BIDCACHE, event.getKey());
 				}
 			}, true);
 
@@ -134,10 +131,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						VideoCacheStore.evict(event.getKey());
 					}
-					WatchInterface ifc = watchMap.get(VIDEO).get(event.getKey());
-					if (ifc != null)
-						ifc.callback(VIDEO, event.getKey());
-					System.out.println("**** EVICTED: " + event.getKey());
+					handleWatch(VIDEO, event.getKey());
 				}
 			}, true);
 
@@ -162,11 +156,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						MiscCacheStore.evict(event.getKey());
 					}
-					var key = event.getKey();
-					WatchInterface ifc = watchMap.get(MISC).get(key);
-					if (ifc != null)
-						ifc.callback(MISC, key);
-					System.out.println("**** EVICTED: " + key);
+					handleWatch(MISC,event.getKey());
 				}
 			}, true);
 
@@ -183,6 +173,13 @@ public enum BidCachePool {
 			}
 		}
 		return INSTANCE;
+	}
+	
+	static void handleWatch(String category, String key) {
+		System.out.println("**** EVICTED: " + category + "/" + key );
+		List<WatchInterface> ifcs = watchMap.get(category).get(key);
+		if (ifcs != null)
+			ifcs.stream().forEach(ifc -> ifc.callback(category, key));
 	}
 
 	public static BidCachePool getClientInstance(HazelcastInstance inst) {
@@ -210,10 +207,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						BidCacheStore.evict(event.getKey());
 					}
-					WatchInterface ifc = watchMap.get(BIDCACHE).get(event.getKey());
-					if (ifc != null)
-						ifc.callback(BIDCACHE, event.getKey());
-					System.out.println("**** EVICTED: " + event.getKey());
+					handleWatch(BIDCACHE, event.getKey());
 				}
 			}, true);
 			miscCache.addEntryListener(new EntryEvictedListener<String, RecordedMisc>() {
@@ -222,10 +216,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						MiscCacheStore.evict(event.getKey());
 					}
-					WatchInterface ifc = watchMap.get(MISC).get(event.getKey());
-					if (ifc != null)
-						ifc.callback(MISC, event.getKey());
-					System.out.println("**** EVICTED: " + event.getKey());
+					handleWatch(MISC, event.getKey());
 				}
 			}, true);
 			
@@ -235,10 +226,7 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						VideoCacheStore.evict(event.getKey());
 					}
-					WatchInterface ifc = watchMap.get(VIDEO).get(event.getKey());
-					if (ifc != null)
-						ifc.callback(VIDEO, event.getKey());
-					System.out.println("**** EVICTED: " + event.getKey());
+					handleWatch(VIDEO, event.getKey());
 				}
 			}, true);
 		}
@@ -251,23 +239,45 @@ public enum BidCachePool {
 	
 	/**
 	 * A hook for watching evictions
-	 * @param which String. Which shared interface.
+	 * @param category String. Which shared interface.
 	 * @param key String. The key to watch
 	 * @param ifc WatchInterface. The implementation to catch on the watch.
 	 * @throws Exception if the 'which' defined map does not exist.
 	 */
-	public void addWatch(String which, String key, WatchInterface ifc) throws Exception {
-		BidCachePool.watchMap.get(which.toUpperCase()).put(key, ifc);
+	public void addWatch(String category, String key, WatchInterface ifc) throws Exception {
+		var map = BidCachePool.watchMap.get(category.toUpperCase());
+		var list = map.get(key);
+		if (list == null) {
+			list = new ArrayList();
+			map.put(key, list);
+		}
+		if (list.contains(ifc))
+			return;
+		list.add(ifc);
 	}
 	
 	/**
-	 * Delete an eviction watcher
-	 * @param which String. Which shared map to remove from.
+	 * Delete all eviction watchers at location key.
+	 * @param category String. Which shared map to remove from.
 	 * @param key String. The key to remove.
 	 * @throws Exception if the 'which' defined map does not exist.
 	 */
-	public void deleteWatch(String which, String key) throws Exception {
-		BidCachePool.watchMap.get(which.toUpperCase()).remove(key);
+	public void deleteWatch(String category, String key) throws Exception {
+		BidCachePool.watchMap.get(category.toUpperCase()).remove(key);
+	}
+	
+	/**
+	 * Delete a single watcher on a key
+	 * @param which String. The category of what is being watched.
+	 * @param key String. The key being watched.
+	 * @param ifc WatchInterface. The callback location.
+	 * @throws Exception if the category is not known/
+	 */
+	public void deleteWatch(String category, String key, WatchInterface ifc) throws Exception{
+		var list = BidCachePool.watchMap.get(category.toUpperCase()).get(key);
+		if (list == null)
+			return;
+		list.remove(ifc);
 	}
 
 	public void setMemberStatus(String key, Echo member) {
