@@ -141,6 +141,7 @@ public class Commands {
 		// clientConfig.setProperty("hazelcast.logging.type", "slf4j");
 
 		clientConfig.addAddress(cluster);
+
 		HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 
 		String str = null;
@@ -277,7 +278,8 @@ public class Commands {
 				break;
 				
 			default:
-				System.out.println("???");
+				if (command.trim().length()!=0)				
+					System.out.println("???");
 			}
 			command = null;
 		}

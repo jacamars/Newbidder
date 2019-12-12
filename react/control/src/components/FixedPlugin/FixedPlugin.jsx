@@ -104,19 +104,21 @@ class FixedPlugin extends Component {
             </li>
             <li className="button-container">
               <Button
-                href="https://www.creative-tim.com/product/black-dashboard-react"
+                href="http://rtb4free.com"
                 color="primary"
                 block
                 className="btn-round"
+                target="_blank"
               >
-                Download Now
+                Home Page
               </Button>
               <Button
                 color="default"
                 block
                 className="btn-round"
                 outline
-                href="https://demos.creative-tim.com/black-dashboard-react/#/documentation/tutorial"
+                href="http://rtb4free.com/controlpanel.html"
+                target="_blank"
               >
                 Documentation
               </Button>
