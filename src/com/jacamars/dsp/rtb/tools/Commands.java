@@ -27,6 +27,7 @@ import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FreqSetCache;
 import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
+import com.jacamars.dsp.rtb.shared.WatchInterface;
 
 /**
  * A simple class that sends and receives commands from RTB4FREE bidders.
@@ -34,10 +35,11 @@ import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
  * @author Ben M. Faul
  */
 
-public class Commands {
-	static CountDownLatch latch;
+public class Commands implements WatchInterface {
+	HazelcastInstance client;
+	CountDownLatch latch;
+	String [] args;
 
-	static String uuid = "crosstalk:commands:" + UUID.randomUUID().toString();
 	static ObjectMapper mapper = new ObjectMapper();
 
 	static {
@@ -54,6 +56,16 @@ public class Commands {
 	 * @param args String[]. The array of arguments.
 	 */
 	public static void main(String[] args) throws Exception {
+		
+		Commands c = new Commands(args);
+		c.run();
+	}
+	
+	public Commands(String[] args) throws Exception {
+		this.args = args;
+	}
+	
+	public void run() throws Exception {
 		String cluster[] = null;
 		String command = null; // "list-bidders";
 		String key = null;
@@ -142,7 +154,7 @@ public class Commands {
 
 		clientConfig.addAddress(cluster);
 
-		HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+		client = HazelcastClient.newHazelcastClient(clientConfig);
 
 		String str = null;
 		int count = 0;
@@ -150,6 +162,9 @@ public class Commands {
 
 		boolean running = true;
 		String oCmd = command;
+		
+		BidCachePool bcp = BidCachePool.getClientInstance(client);
+		
 		while(running) {
 			if (oCmd == null) {
 				System.out.print("command>");
@@ -272,6 +287,21 @@ public class Commands {
 					}
 				}
 				break;
+				
+			case "get":
+				Object mx = doGet(sub);
+				if (mx == null)
+					System.out.println("null");
+				else
+					System.out.println(DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(mx));
+				break;
+			case "set":
+				doSet(sub);
+				break;
+			
+			case "watch":
+				 BidCachePool.getClientInstance(client).addWatch(sub.get(0), sub.get(1), this);
+				 break;
 
 			case "exit":
 				running = false;
@@ -288,5 +318,37 @@ public class Commands {
 
 		System.exit(1);
 
+	}
+	
+	public Object doGet(List<String> sub) {
+		Object r = null;
+		switch(sub.get(0)) {
+		case "misc":
+			r = BidCachePool.getClientInstance(client).get(sub.get(1));
+			break;
+		default:
+			r = BidCachePool.getClientInstance(client).get(sub.get(0));
+			break;
+		}
+		
+		return r;
+		
+	}
+	
+	public void doSet(List<String> sub) throws Exception {
+		switch(sub.get(0)) {
+		case "misc":
+			BidCachePool.getClientInstance(client).set(sub.get(1), sub.get(2), Long.parseLong(sub.get(3)));
+			break;
+		default:
+
+			break;
+		}
+	}
+
+	@Override
+	public void callback(String which, String key) {
+		System.out.println("WATCHER SHARED MAP: " + which + " has deleted: " + key);
+		
 	}
 }

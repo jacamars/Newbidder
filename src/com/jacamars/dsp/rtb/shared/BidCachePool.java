@@ -4,8 +4,9 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -33,12 +34,23 @@ import com.jacamars.dsp.rtb.common.RecordedVideo;
 public enum BidCachePool {
 
 	INSTANCE;
+	
+	public static final String BIDCACHE = "BIDCACHE";
+	public static final String VIDEO = "VIDEO";
+	public static final String MISC = "MISC";
 
 	private static final Logger logger = LoggerFactory.getLogger(BidCachePool.class);
 	private static ObjectMapper mapper = new ObjectMapper();
 	static {
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+	
+	static Map<String,Map<String,WatchInterface>> watchMap = new HashMap();
+	static {
+		watchMap.put(MISC, new HashMap());
+		watchMap.put(VIDEO, new HashMap());
+		watchMap.put(BIDCACHE,  new HashMap());
 	}
 
 	/** The cache to contain the general context */
@@ -73,6 +85,9 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						BidCacheStore.evict(event.getKey());
 					}
+					WatchInterface ifc = watchMap.get(BIDCACHE).get(event.getKey());
+					if (ifc != null)
+						ifc.callback(BIDCACHE, event.getKey());
 					System.out.println("**** EVICTED: " + event.getKey());
 				}
 			}, true);
@@ -119,6 +134,9 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						VideoCacheStore.evict(event.getKey());
 					}
+					WatchInterface ifc = watchMap.get(VIDEO).get(event.getKey());
+					if (ifc != null)
+						ifc.callback(VIDEO, event.getKey());
 					System.out.println("**** EVICTED: " + event.getKey());
 				}
 			}, true);
@@ -144,7 +162,11 @@ public enum BidCachePool {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
 						MiscCacheStore.evict(event.getKey());
 					}
-					System.out.println("**** EVICTED: " + event.getKey());
+					var key = event.getKey();
+					WatchInterface ifc = watchMap.get(MISC).get(key);
+					if (ifc != null)
+						ifc.callback(MISC, key);
+					System.out.println("**** EVICTED: " + key);
 				}
 			}, true);
 
@@ -181,12 +203,71 @@ public enum BidCachePool {
 
 			name = "MISC";
 			miscCache = inst.getMap(name);
+			
+			bidCache.addEntryListener(new EntryEvictedListener<String, RecordedBid>() {
+				@Override
+				public void entryEvicted(EntryEvent<String, RecordedBid> event) {
+					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
+						BidCacheStore.evict(event.getKey());
+					}
+					WatchInterface ifc = watchMap.get(BIDCACHE).get(event.getKey());
+					if (ifc != null)
+						ifc.callback(BIDCACHE, event.getKey());
+					System.out.println("**** EVICTED: " + event.getKey());
+				}
+			}, true);
+			miscCache.addEntryListener(new EntryEvictedListener<String, RecordedMisc>() {
+				@Override
+				public void entryEvicted(EntryEvent<String, RecordedMisc> event) {
+					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
+						MiscCacheStore.evict(event.getKey());
+					}
+					WatchInterface ifc = watchMap.get(MISC).get(event.getKey());
+					if (ifc != null)
+						ifc.callback(MISC, event.getKey());
+					System.out.println("**** EVICTED: " + event.getKey());
+				}
+			}, true);
+			
+			videoCache.addEntryListener(new EntryEvictedListener<String, RecordedVideo>() {
+				@Override
+				public void entryEvicted(EntryEvent<String, RecordedVideo> event) {
+					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
+						VideoCacheStore.evict(event.getKey());
+					}
+					WatchInterface ifc = watchMap.get(VIDEO).get(event.getKey());
+					if (ifc != null)
+						ifc.callback(VIDEO, event.getKey());
+					System.out.println("**** EVICTED: " + event.getKey());
+				}
+			}, true);
 		}
 		return INSTANCE;
 	}
 	
 	public static BidCachePool getInstance() {
 		return INSTANCE;
+	}
+	
+	/**
+	 * A hook for watching evictions
+	 * @param which String. Which shared interface.
+	 * @param key String. The key to watch
+	 * @param ifc WatchInterface. The implementation to catch on the watch.
+	 * @throws Exception if the 'which' defined map does not exist.
+	 */
+	public void addWatch(String which, String key, WatchInterface ifc) throws Exception {
+		BidCachePool.watchMap.get(which.toUpperCase()).put(key, ifc);
+	}
+	
+	/**
+	 * Delete an eviction watcher
+	 * @param which String. Which shared map to remove from.
+	 * @param key String. The key to remove.
+	 * @throws Exception if the 'which' defined map does not exist.
+	 */
+	public void deleteWatch(String which, String key) throws Exception {
+		BidCachePool.watchMap.get(which.toUpperCase()).remove(key);
 	}
 
 	public void setMemberStatus(String key, Echo member) {
@@ -304,4 +385,5 @@ public enum BidCachePool {
 		ITopic topic = RTBServer.getSharedInstance().getReliableTopic(name);
 		return topic;
 	}
+	
 }
