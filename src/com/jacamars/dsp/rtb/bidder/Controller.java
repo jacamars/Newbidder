@@ -29,6 +29,7 @@ import com.jacamars.dsp.rtb.pojo.NobidResponse;
 import com.jacamars.dsp.rtb.pojo.WinObject;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
+import com.jacamars.dsp.rtb.shared.SharedTimer;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
 import org.slf4j.Logger;
@@ -687,6 +688,7 @@ public enum Controller {
     public void setMemberStatus() throws Exception {
         String member = Configuration.instanceName;
         Echo m = RTBServer.getStatus();
+        m.timestamp = SharedTimer.getInstance().getValue();
         bidCachePool.setMemberStatus(member, m);
 
     }

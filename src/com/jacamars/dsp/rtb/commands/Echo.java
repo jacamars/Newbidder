@@ -63,17 +63,17 @@ public class Echo extends BasicCommand implements Portable {
 	/** relative qps */
 	public double qps;
 	/** avg xtime */
-	public double avgx;
+	public List<Double> avgx = new ArrayList();
 	/** Fraud count */
 	public long fraud;
 	/** Number of threads */
-	public int threads;
+	public List<Integer>threads = new ArrayList();
 	/** Percentage of memory used by the VM */
-	public String memory;
+	public List<String> memory = new ArrayList();
 	/** Percentage of disk free */
-	public String freeDisk;
+	public List<String> freeDisk = new ArrayList();
 	/** Disk usage percentage */
-	public String cpu;
+	public List<String> cpu = new ArrayList();
 	/** Summary stats by exchanges */
 	public List<Map>exchanges;
 	/** Campaign/creative performance map */
@@ -88,14 +88,14 @@ public class Echo extends BasicCommand implements Portable {
 	public long total;
 	/** number of cores */
 	public int cores;
-	/** number f camoaigns */
+	/** number of campaigns */
 	public int ncampaigns;
 	/** number of effective campaigns */
 	public int ecampaigns;
 	/** no bid readon flag */
 	public boolean nobidreason;
 	/** High severity events */
-	public List<Map<String,String>> events;
+	public List<Map<String,String>> events = new ArrayList();
 	
 	public transient String json;
 	
@@ -182,7 +182,11 @@ public class Echo extends BasicCommand implements Portable {
 		for (String c : e.campaigns) {
 			campaigns.add(c);
 		}
+		for(Map<String,String> m : e.events) {
+			events.add(m);
+		}
 		
+		timestamp = e.timestamp;
 		name = e.name;
 		percentage = e.percentage;
 		stopped = e.stopped;
