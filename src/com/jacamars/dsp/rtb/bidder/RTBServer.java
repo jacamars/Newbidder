@@ -725,8 +725,8 @@ public class RTBServer implements Runnable {
 	 */
 	private void startPeridocLogger() throws Exception {
 
-		Runnable redisupdater;
-		redisupdater = () -> {
+		Runnable statusUpdater;
+		statusUpdater = () -> {
 			try {
 				while (true) {
 					Controller.getInstance().setMemberStatus();
@@ -751,7 +751,7 @@ public class RTBServer implements Runnable {
 				e.printStackTrace();
 			}
 		};
-		Thread nthread = new Thread(redisupdater);
+		Thread nthread = new Thread(statusUpdater);
 		nthread.start();
 
 		////////////////////

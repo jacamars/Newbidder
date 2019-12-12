@@ -36,7 +36,6 @@ import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.common.HttpPostGet;
 
-import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
@@ -599,11 +598,6 @@ public class WebCampaign {
 				x.put("setKeyManagerPassword", Configuration.getInstance().ssl.setKeyManagerPassword);
 				m.put("ssl", x);
 			}
-			x = new HashMap();
-			x.put("host", Configuration.getInstance().cacheHost);
-			x.put("port", Configuration.getInstance().cachePort);
-			x.put("maxconns", Configuration.getInstance().maxconns);
-			m.put("aerospike", x);
 
 			x = new HashMap();
 			x.put("threads", RTBServer.threads);

@@ -1,11 +1,7 @@
 package com.jacamars.dsp.rtb.probe;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jacamars.dsp.rtb.jmq.Tools;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.LongAdder;
 

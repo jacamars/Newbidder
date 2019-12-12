@@ -3,10 +3,12 @@ import createUseContext from "constate"; // State Context Object Creator
 import http from 'http';
 import axios from 'axios';
 import { SampleBanner} from './views/simulator/Utils';
+import { resetWarningCache } from 'prop-types';
 
 var undef;
 var mapXhr;
 var xhrLog;
+var interval = 0;
 
 const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
@@ -19,6 +21,21 @@ const  ViewContext = () => {
     const [serverPrefix, setServerPrefix] = useState();
     const [members, setMembers] = useState([]);
 
+    const test = () => {
+      var time = new Date().getTime();
+      var delta = (time - interval)/1000;
+      if (delta > 30) {
+        reset();
+        return;
+      }
+      setTimeout(test,5000);
+    }
+
+    const reset = () => {
+      clearLogdata();
+      setLoggedIn(false);
+    }
+
     const changeLoginState = async (value) => {
       if (value && loggedIn)
         return;
@@ -26,6 +43,13 @@ const  ViewContext = () => {
       if (!value && !loggedIn)
         return; 
 
+      if (value) {
+        setInterval(new Date().getTime());
+        setTimeout(test,5000);
+      } else {
+        reset();
+      }
+        
       await setLoggedIn(value);
       return loggedIn;
     }
@@ -112,8 +136,9 @@ const  ViewContext = () => {
         var previous_response_length = 0;
         if (xhrLog !== undef) {
           console.log("WARNING XHR for logger already defined");
-          return;
+          xhrLog.abort();
         }
+        interval = new Date().getTime();
         xhrLog = new XMLHttpRequest()
         xhrLog.open("GET", "http://" + spec + "/subscribe?topic=logs", true);
         xhrLog.onreadystatechange = checkData;
@@ -122,6 +147,7 @@ const  ViewContext = () => {
         function checkData() {
           if (xhrLog.readyState === 3) {
             var response = xhrLog.responseText;
+            interval = new Date().getTime();
             var chunk = response.slice(previous_response_length);
             //console.log("GOT SOME LOG CHUNK DATA: " + chunk);
             var i = chunk.indexOf("{");
@@ -159,9 +185,7 @@ const  ViewContext = () => {
     const  mapperCallback = (logname, server, callback) => {
         var previous_response_length = 0;
         if (mapXhr !== undef) {
-          console.log("mapXhr aborting");
           mapXhr.abort();
-          console.log("Aborted");
         }
 
         console.log("MAPPER SET TO " + serverPrefix);

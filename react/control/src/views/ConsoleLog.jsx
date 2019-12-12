@@ -111,7 +111,6 @@ var undef;
 
   const clear = () => {
     vx.clearLogdata();
-    fromCallback();
   }
 
   const setInstances = async(list,selectedHost) => {
