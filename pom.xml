@@ -36,6 +36,7 @@
 		<elastic.rest.version>6.2.2</elastic.rest.version>
 		<jetty.server.version>9.4.18.v20190429</jetty.server.version>
 		<socket.io.version>1.0.10</socket.io.version>
+		<bucket4j.version>4.7.0</bucket4j.version>
 	</properties>
 
 	<dependencies>
@@ -288,6 +289,12 @@
 			<artifactId>elasticsearch-rest-client</artifactId>
 			<version>${elastic.rest.version}</version>
 		</dependency>
+		
+		<dependency>
+            <groupId>com.github.vladimir-bukhtoyarov</groupId>
+            <artifactId>bucket4j-hazelcast</artifactId>
+            <version>${bucket4j.version}</version>
+        </dependency>
 		
 		
 <!-- https://mvnrepository.com/artifact/com.codeminders.socketio/socketio-server -->

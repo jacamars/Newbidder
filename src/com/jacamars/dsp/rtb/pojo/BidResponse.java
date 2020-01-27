@@ -1,10 +1,12 @@
 package com.jacamars.dsp.rtb.pojo;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -750,17 +752,61 @@ public class BidResponse {
 
 
 	/**
-	 * Output the bid response.
-	 * @param res HttpServletResponse
+	 * Output the bid response. 
+	 * @param res HttpServletResponse The servlet response.
+	 * @param respondGzip boolean. Use gzip if true.
 	 * @throws Exception on I/O errors.
 	 */
-	public void writeTo(HttpServletResponse res) throws Exception {
-		res.getOutputStream().write(response.toString().getBytes());
+	public void writeTo(HttpServletResponse res, boolean respondGzip) throws Exception {
+		if (!respondGzip)
+			res.getOutputStream().write(response.toString().getBytes());
+		else {
+			byte[] bytes = compressGZip(response.toString());
+			res.addHeader("Content-Encoding", "gzip");
+			int sz = bytes.length;
+			res.setContentLength(sz);
+			res.getOutputStream().write(bytes);
+		}
 	}
 	
-	public void writeTo(HttpServletResponse res, String json) throws Exception {
-		res.getOutputStream().write(json.getBytes());
+	/**
+	 * Output the bid response using the enclosed json. 
+	 * @param res HttpServletResponse The servlet response.
+	 * @param json String. The JSON string to write.
+	 * @param respondGzip boolean. Use gzip if true.
+	 * @throws Exception on I/O errors.
+	 */
+	
+	public void writeTo(HttpServletResponse res, String json, boolean respondGzip) throws Exception {
+		if (!respondGzip)
+			res.getOutputStream().write(json.getBytes());
+		else {
+			byte[] bytes = compressGZip(json);
+			res.addHeader("Content-Encoding", "gzip");
+			int sz = bytes.length;
+			res.setContentLength(sz);
+			res.getOutputStream().write(bytes);
+		}
 	}
+	
+	/**
+	 * Compress a string to a byte array in gzip compression.
+	 * @param uncompressed String. The uncompressed data.
+	 * @return byte []. The array of bytes, compressed.
+	 * @throws Exception on I/O errors.
+	 */
+	protected static byte[] compressGZip(String uncompressed) throws Exception {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		GZIPOutputStream gzos = new GZIPOutputStream(baos);
+
+		byte[] uncompressedBytes = uncompressed.getBytes();
+
+		gzos.write(uncompressedBytes, 0, uncompressedBytes.length);
+		gzos.close();
+
+		return baos.toByteArray();
+	}
+
 	
 	/**
 	 * Return whether this is a no bid. For openRTB it always returns false because we won't make this object when

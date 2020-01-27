@@ -37,8 +37,14 @@ public class Performance {
 	static {
 		formatter.setRoundingMode(RoundingMode.DOWN);
 	}
+	
+	public static void main(String []args) throws Exception {
+		System.out.println("Cores: " + getCores());
+		System.out.println("Memory: " + getMemoryUsed());
+	}
 
 	/**
+	 * 
 	 * Get CPU performance as a String, adjusted by cores
 	 * 
 	 * @return String. Returns a cpu percentage string

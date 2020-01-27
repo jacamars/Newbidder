@@ -1079,6 +1079,7 @@ public class Configuration {
 						break;
 						
 					case "!usesGzipResponse":
+						br.usesGzipResponse = false;
 						break;		
 					case "usesGzipResponse":
 						br.usesGzipResponse = true;

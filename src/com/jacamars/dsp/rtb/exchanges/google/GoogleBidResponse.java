@@ -407,7 +407,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 	 * Write the response This used to transmit the OCTET string back.
 	 */
 	@Override
-	public void writeTo(HttpServletResponse response) throws Exception {
+	public void writeTo(HttpServletResponse response, boolean na) throws Exception {
 		response.setContentType("application/octet-string");
 		internal.writeTo(response.getOutputStream());
 	}
@@ -416,7 +416,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 	 * Write the response using your favorite type.
 	 */
 	@Override
-	public void writeTo(HttpServletResponse response, String x) throws Exception {
+	public void writeTo(HttpServletResponse response, String x, boolean na) throws Exception {
 		response.setContentType(x);
 		internal.writeTo(response.getOutputStream());
 	}
