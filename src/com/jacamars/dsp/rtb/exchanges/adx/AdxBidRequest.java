@@ -702,7 +702,7 @@ public class AdxBidRequest extends BidRequest {
 		// new AdxBidResponse((int)time).writeTo(response);
 		AdxBidResponse resp = new AdxBidResponse();
 		resp.setNoBid();
-		resp.writeTo(response);
+		resp.writeTo(response,false);
 	}
 
 	/**

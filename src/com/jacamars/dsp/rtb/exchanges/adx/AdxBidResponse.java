@@ -233,13 +233,13 @@ public class AdxBidResponse extends BidResponse {
 	}
 	
 	@Override
-	public void writeTo(HttpServletResponse response) throws Exception {
+	public void writeTo(HttpServletResponse response, boolean na) throws Exception {
 		response.setContentType("application/octet-string");
 		internal.writeTo(response.getOutputStream());
 	}
 	
 	@Override
-	public void writeTo(HttpServletResponse response, String x) throws Exception {
+	public void writeTo(HttpServletResponse response, String x, boolean na) throws Exception {
 		internal.writeTo(response.getOutputStream());
 	}
 	

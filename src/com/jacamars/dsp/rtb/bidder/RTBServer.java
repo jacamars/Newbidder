@@ -980,7 +980,7 @@ public class RTBServer implements Runnable {
 		for (Campaign c : list) {
 			myStatus.campaigns.add(c.adId);
 		}
-		myStatus.avgx = avgx;
+		myStatus.avgx.add(avgx);
 		myStatus.exchanges = BidRequest.getExchangeCounts();
 		myStatus.probe = CampaignProcessor.probe;
 
@@ -1242,7 +1242,7 @@ class Handler extends AbstractHandler {
 						RTBServer.bidCountWindow.incrementAndGet();
 						response.setStatus(code);
 						if (bresp != null)
-							bresp.writeTo(response);
+							bresp.writeTo(response, (isGzip && br.usesGzipResponse));
 					} else {
 						RTBServer.totalNoBidTime.addAndGet(time);
 						RTBServer.nobidCountWindow.incrementAndGet();
@@ -1597,10 +1597,10 @@ class Handler extends AbstractHandler {
 		int rc = fin.read(fileContent);
 		if (rc != fileContent.length)
 			throw new Exception("Incomplete read of " + file.getName());
-		sendResponse(response, new String(fileContent));
+		sendGzipResponse(response, new String(fileContent));
 	}
 
-	public static void sendResponse(HttpServletResponse response, String html) throws Exception {
+	public static void sendGzipResponse(HttpServletResponse response, String html) throws Exception {
 
 		try {
 			byte[] bytes = compressGZip(html);
@@ -2194,7 +2194,7 @@ class AdminHandler extends Handler {
 			response.setContentType("text/html");
 			response.setStatus(HttpServletResponse.SC_OK);
 			baseRequest.setHandled(true);
-			sendResponse(response, page);
+			sendGzipResponse(response, page);
 
 		} catch (Exception err) {
 			if (target.contains("/rtb/appnexus")) {
