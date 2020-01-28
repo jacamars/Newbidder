@@ -1,0 +1,70 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
+# Does contain zookeeper and kafka.
+#
+version: "3"
+
+services:
+  zookeeper:
+    image: "zookeeper"
+    networks:
+     - rtb_net
+    ports:
+     - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    networks:
+      - rtb_net
+    ports:
+      - "9092:9092"
+    restart: always
+    depends_on:
+      - zookeeper
+
+
+  postgres:
+    image: postgres
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - "5432:5432"
+#    networks:
+#      - rtb_net
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      
+  bidder:
+    image: "newbidder"
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      S3BUCKET: ""
+      S3REGION: ""
+      S3SECRETKEY: ""
+      S3ACCESSKEY: ""
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    ports:
+      - "8080:8080"
+      - "5701:5701"
+      - "7000:7000"
+    #volumes:
+    #  - "./database.json:/database.json"
+    #  - "./payday.json:/Campaigns/payday.json"
+    #networks:
+    #  - rtb_net
+    depends_on:
+      - kafka
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh postgres:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+
+
+networks:
+  rtb_net:
+    external: true

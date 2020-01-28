@@ -124,6 +124,6 @@ COPY Campaigns/docker.json Campaigns/payday.json
 
 COPY sendbid /
 
-EXPOSE 8080 7379 7000 5071
+EXPOSE 8080 5701
 
 CMD ./rtb4free
