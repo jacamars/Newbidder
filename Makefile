@@ -1,4 +1,4 @@
-.PHONY: clean local pookie
+.PHONY: clean local docker
 
 build: application 
 
@@ -12,8 +12,10 @@ pookie:
 
 local:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
-	docker build -t rtb4free:J11 .
+	docker build -t newbidder .
 
+docker:
+	docker build -t newbidder .
 
 
 clean:
