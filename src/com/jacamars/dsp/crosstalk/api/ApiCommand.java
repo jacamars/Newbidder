@@ -154,6 +154,11 @@ public class ApiCommand {
     public String asyncid = null;
 
     /**
+     * JWT
+     */
+    public String token = null;
+    
+    /**
      * An object For serialization we use an object mapper
      */
     protected static final ObjectMapper mapper = new ObjectMapper();

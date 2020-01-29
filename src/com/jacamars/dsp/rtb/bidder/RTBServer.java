@@ -160,7 +160,8 @@ public class RTBServer implements Runnable {
 	/**
 	 * Indicates of the server is not accepting bids
 	 */
-	public static volatile boolean stopped = false; // is the server not accepting bid
+	private static volatile boolean stopped = false; // is the server not accepting bid
+	private static volatile Object stopFlag = new Object();
 	// requests?
 
 	/**
@@ -522,6 +523,32 @@ public class RTBServer implements Runnable {
 		// QPS the exchanges
 		BidRequest.getExchangeCounts();
 	}
+	
+	public static void stopBidder() {
+		synchronized (stopFlag) {
+			stopped = true;
+		}
+		System.out.println("**** STOPPED");
+	}
+	
+	public static void startBidder() {
+		synchronized (stopFlag) {
+			stopped = false;
+		}
+		System.out.println("**** STARTED");
+	}
+	
+	public static boolean isStopped() {
+		synchronized (stopFlag) {
+			return stopped;
+		}
+	}
+	
+	public static void setState(boolean t) {
+		synchronized (stopFlag) {
+			stopped = t;
+		}
+	}
 
 	/**
 	 * Retrieve a summary of activity.
@@ -619,11 +646,7 @@ public class RTBServer implements Runnable {
 			 * Override the start state if the deadmanswitch object is not null and the key
 			 * doesn't exist
 			 */
-			if (Configuration.getInstance().deadmanSwitch != null) {
-				if (Configuration.getInstance().deadmanSwitch.canRun() == false) {
-					RTBServer.stopped = true;
-				}
-			}
+			
 
 			server.start();
 
@@ -656,6 +679,17 @@ public class RTBServer implements Runnable {
 			Crosstalk.getInstance();
 			SharedTimer.getInstance("timebase",60);
 
+			
+			Thread.sleep(1000);
+			int count = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
+			if (count > 1) {
+				if (Configuration.getInstance().deadmanSwitch != null) {
+					if (Configuration.getInstance().deadmanSwitch.canRun() == false) {
+						RTBServer.stopBidder();
+					}
+				}
+			}
+			
 			server.join();
 		} catch (Exception error) {
 			if (error.toString().contains("Interrupt"))
@@ -802,7 +836,8 @@ public class RTBServer implements Runnable {
 					String mem = Performance.getMemoryUsed();
 					long of = Performance.getOpenFileDescriptorCount();
 					List exchangeCounts = BidRequest.getExchangeCounts();
-					String msg = "leader: " + RTBServer.isLeader() + ", total-errors=" + RTBServer.error
+					int members = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
+					String msg = "members: " + members + ", leader: " + RTBServer.isLeader() + ", total-errors=" + RTBServer.error
 							+ ", openfiles=" + of + ", cpu=" + perf + "%, mem=" + mem + ", freedsk=" + pf
 							+ "%, threads=" + threads + ", low-on-threads= " + server.getThreadPool().isLowOnThreads()
 							+ ", qps=" + sqps + ", avgBidTime=" + savgbidtime + "ms, avgNoBidTime=" + savgnobidtime
@@ -1183,19 +1218,22 @@ class Handler extends AbstractHandler {
 						json = br.returnNoBid("No campaigns loaded");
 						code = RTBServer.NOBID_CODE;
 						RTBServer.nobid++;
+						ChattyErrors.printWarningEveryMinute(logger, "Can't bid, no campaigns loaded");
 						Controller.getInstance().sendRequest(br, false);
 						Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
-					} else if (RTBServer.stopped) {
+					} else if (RTBServer.isStopped()) {
 						logger.debug("Server stopped");
 						json = br.returnNoBid("Server stopped");
 						code = RTBServer.NOBID_CODE;
 						RTBServer.nobid++;
+						ChattyErrors.printWarningEveryMinute(logger, "Can't bid, server stopped");
 						Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
 					} else if (!checkPercentage()) {
 						json = br.returnNoBid("Server throttled");
 						logger.debug("Percentage throttled");
 						code = RTBServer.NOBID_CODE;
 						RTBServer.nobid++;
+						ChattyErrors.printWarningEveryMinute(logger, "Can't bid, server throttled");
 						Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
 					} else {
 						bresp = CampaignSelector.getInstance().getMaxConnections(br);
@@ -1918,6 +1956,7 @@ class AdminHandler extends Handler {
 				response.getWriter().println(page);
 				return;
 			}
+			
 
 			// ///////////////////////////
 			if (target.contains("ajax")) {
@@ -2100,26 +2139,18 @@ class AdminHandler extends Handler {
 		 * This set of if's handle non bid request transactions.
 		 *
 		 */
+		if (target.equals("/control"))
+			target = "/control/index.html";
+		else
+		if (target.equals("/exchange"))
+			target = "/exchange/index.html";
+		else	
+		if (target.equals("/campaigns"))
+			target = "/campaigns/index.html";
+		
+		System.out.println("=============> " + target);
 		try {
 			type = null;
-			/**
-			 * Get rid of artifacts coming from embedde urls
-			 */
-			if (target.contains("simulator/temp/test") == false)
-				target = target.replaceAll("xrtb/simulator/temp/", ""); // load
-			// the
-			// html
-			// test
-			// file
-			// from
-			// here
-			// but
-			// not
-			// resources
-			target = target.replaceAll("xrtb/simulator/", "");
-
-			// System.out.println("---> ACCESS: " + target + ": " +
-			// getIpAddress(request));
 			if (target.equals("/"))
 				target = Configuration.indexPage;
 

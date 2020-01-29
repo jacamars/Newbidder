@@ -7,8 +7,8 @@ version: "3"
 services:
   zookeeper:
     image: "zookeeper"
-    networks:
-     - rtb_net
+#    networks:
+#     - rtb_net
     ports:
      - "2181:2181"
 
@@ -16,8 +16,8 @@ services:
     image: "ches/kafka"
     environment:
       ZOOKEEPER_IP: "zookeeper"
-    networks:
-      - rtb_net
+#    networks:
+#      - rtb_net
     ports:
       - "9092:9092"
     restart: always
@@ -25,8 +25,8 @@ services:
       - zookeeper
 
 
-  postgres:
-    image: postgres
+  sqldb:
+    image: "postgres"
     environment:
       - "POSTGRES_PASSWORD=postgres"
     ports:
@@ -34,13 +34,14 @@ services:
 #    networks:
 #      - rtb_net
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - /tmp/data:/var/lib/postgresql/data
       
-  bidder:
+  bidder1:
     image: "newbidder"
     environment:
       BROKERLIST: "kafka:9092"
       EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
       S3REGION: ""
       S3SECRETKEY: ""
@@ -52,9 +53,9 @@ services:
       ADX_EKEY:   ""
       ADX_IKEY:   ""
     ports:
-      - "8080:8080"
-      - "5701:5701"
-      - "7000:7000"
+      - "8081:8080"
+      - "8156:8155"
+      - "5702:5701"
     #volumes:
     #  - "./database.json:/database.json"
     #  - "./payday.json:/Campaigns/payday.json"
@@ -62,7 +63,36 @@ services:
     #  - rtb_net
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh postgres:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+
+  bidder2:
+    image: "newbidder"
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
+      S3BUCKET: ""
+      S3REGION: ""
+      S3SECRETKEY: ""
+      S3ACCESSKEY: ""
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    ports:
+      - "8082:8090"
+      - "8157:8155"
+      - "5703:5701"
+    #volumes:
+    #  - "./database.json:/database.json"
+    #  - "./payday.json:/Campaigns/payday.json"
+    #networks:
+    #  - rtb_net
+    depends_on:
+      - kafka
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
 
 
 networks:

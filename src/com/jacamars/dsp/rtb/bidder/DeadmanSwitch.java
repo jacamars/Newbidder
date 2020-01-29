@@ -65,9 +65,6 @@ public class DeadmanSwitch implements Runnable {
 						try {
 							if (!testmode) {
 								logger.warn("DeadmanSwitch, Switch error: {} does not exist, no bidding allowed!",key);
-								StopBidder cmd = new StopBidder();
-								cmd.from = Configuration.getInstance().instanceName;
-								Controller.getInstance().stopBidder(cmd);
 							} else {
 								System.out.println("Deadman Switch is thrown");
 							}
@@ -80,8 +77,8 @@ public class DeadmanSwitch implements Runnable {
 				} else {
 					if (sentStop) {
 						sentStop = false;
-						if (RTBServer.stopped) {
-							RTBServer.stopped = false;
+						if (RTBServer.isStopped()) {
+							RTBServer.startBidder();
 							StartBidder cmd = new StartBidder();
 							cmd.from = Configuration.getInstance().instanceName;
 							try {

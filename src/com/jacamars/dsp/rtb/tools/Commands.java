@@ -139,9 +139,10 @@ public class Commands implements WatchInterface {
 		}
 
 		if (cluster == null) {
-			cluster = new String[2];
+			cluster = new String[3];
 			cluster[0] = "localhost:5701";
 			cluster[1] = "localhost:5702";
+			cluster[2] = "localhost:5703";
 
 		}
 

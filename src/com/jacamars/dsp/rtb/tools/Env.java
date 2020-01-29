@@ -181,6 +181,10 @@ public enum  Env {
 		while (address.contains("$DEMODB"))
 			address = GetEnvironmentVariable(address, "$DEMODB", "");
 		
+		while(address.contains("$JDBC"))
+			address = GetEnvironmentVariable(address,"$JDBC","jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres");
+
+		
 		address = GetEnvironmentVariable(address, "$TRACE", "false");
 
         return address;

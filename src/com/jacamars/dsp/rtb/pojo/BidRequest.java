@@ -245,24 +245,17 @@ public class BidRequest {
 	private static void stopBidder() {
 		compilerBusy = true;
 
-		if (RTBServer.stopped)
+		if (RTBServer.isStopped())
 			return;
 
 		needsRestart = true;
-		RTBServer.stopped = true;
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		;
+		RTBServer.stopBidder();
 	}
 
 	private static void startBidder() {
 		compilerBusy = false;
 		if (needsRestart)
-			RTBServer.stopped = false;
+			RTBServer.startBidder();
 	}
 
 	public static void compileBuiltIns() {

@@ -62,6 +62,7 @@ public class GetBiddersStatusCmd extends ApiCommand {
 				List<String> list = BidCachePool.getClientInstance(hz).getMembersNames();
 				for (String member : list) {
 					Echo m = BidCachePool.getClientInstance(hz).getMemberStatus(member);
+					m.from = member;
 					entries.add(m);
 				}
 				return;

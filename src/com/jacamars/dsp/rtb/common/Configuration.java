@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -667,7 +668,7 @@ public class Configuration {
 		Boolean bValue = false;
 		bValue = (Boolean) m.get("stopped");
 		if (bValue != null && bValue == true) {
-			RTBServer.stopped = true;
+			RTBServer.stopBidder();
 			pauseOnStart = true;
 		}
 
@@ -759,10 +760,6 @@ public class Configuration {
 		}
 		/********************************************************************/
 
-		if (deadmanKey != null) {
-			deadmanSwitch = new DeadmanSwitch(deadmanKey);
-			deadmanSwitch.start();
-		}
 
 		campaignsList.clear();
 		overrideList.clear();
@@ -806,6 +803,25 @@ public class Configuration {
 		printEnvironment();
 		
         RTBServer.getSharedInstance();
+        
+        Thread.sleep(1000);
+		if (deadmanKey != null) {
+			deadmanSwitch = new DeadmanSwitch(deadmanKey);
+			deadmanSwitch.start();
+			
+			ScheduledExecutorService deadman = Executors.newScheduledThreadPool(1);
+	        deadman.scheduleAtFixedRate(() -> {
+	            try {
+	            	if (RTBServer.isLeader()) {
+	            		deadmanSwitch.updateKey(deadmanKey);
+	            	}
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                System.exit(1);
+	            }
+	        }, 0L, 30000, TimeUnit.MILLISECONDS);
+
+		}
 	}
 
 	void printEnvironment() throws Exception {
@@ -1032,6 +1048,8 @@ public class Configuration {
 		String id = (String) x.get("id");
 		seats.put(name, id);
 
+		className = className.replace("=", "");
+		logger.info("Configuring {} for {}",className,name);
 		try {
 			Class<?> c = Class.forName(className);
 			BidRequest br = (BidRequest) c.newInstance();
@@ -1530,8 +1548,8 @@ public class Configuration {
 	 * we can shorten the time to no-bid
 	 */
 	public void sortCampaignsAndCreatives() {
-		boolean state = RTBServer.stopped;
-		RTBServer.stopped = true;
+		boolean state = RTBServer.isStopped();
+		RTBServer.stopBidder();
 
 		// Don't wait if the server is already stopped for some reason
 		try {
@@ -1546,7 +1564,7 @@ public class Configuration {
 			campaignsList.get(i).sortNodes();
 		}
 
-		RTBServer.stopped = state;
+		RTBServer.setState(state);
 	}
 
 	/**
@@ -1646,7 +1664,7 @@ public class Configuration {
 
 		CampaignBuilderWorker.total = campaigns.length;
 		CampaignBuilderWorker.counter = 0;
-		RTBServer.stopped = true;
+		RTBServer.stopBidder();
 		for (String adid : campaigns) {
 			Runnable w = new CampaignBuilderWorker(adid);
 			rets += adid + " ";
@@ -1655,7 +1673,7 @@ public class Configuration {
 		executor.shutdown();
 		while (!executor.isTerminated()) {
 		}
-		RTBServer.stopped = false;
+		RTBServer.startBidder();
 
 		logger.info("Mass load of campaigns complete {}", campaigns);
 		return rets;

@@ -11,12 +11,12 @@
   },
   "hazelcast": {
   	"mapstoredriver": "org.postgresql.Driver",
-  	"mapstorejdbc": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres"
+  	"mapstorejdbc": "$JDBC"
   },
   "crosstalk": {
   	"sql": {
   		"jdbcdriver": "org.postgresql.Driver",
-  		"login": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres"
+  		"login": "$JDBC"
   	},
   	"elk": {
     	"XsimFile": "simdata/debug.sim",

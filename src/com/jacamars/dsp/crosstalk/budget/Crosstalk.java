@@ -95,6 +95,9 @@ public enum Crosstalk {
 	
 	
 	static ResultSet rs;
+	
+	public static final String CAMPAIGNS_KEY =  "CONTEXT"; // "accountingCampaigns";
+	public static final String DELETED_CAMPAIGNS_KEY = "deletedCampaigns";
 	/**
      * The /log in memory queues
      */
@@ -113,19 +116,19 @@ public enum Crosstalk {
 		BudgetController.getInstance();
 
 		Config config = RTBServer.getSharedInstance().getConfig();
-		String name = "deletedCampaigns";
-		deletedCampaigns = RTBServer.getSharedInstance().getMap(name);
-		config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		deletedCampaigns = RTBServer.getSharedInstance().getMap(DELETED_CAMPAIGNS_KEY);
+		config.getMapConfig(DELETED_CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 		
-		name = "accountingCampaigns";
-		campaigns = RTBServer.getSharedInstance().getMap(name);
-		config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
+		config.getMapConfig(CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 
 		ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
 			try {
-				updateBudgets();
-				INSTANCE.scan();
+				if (RTBServer.isLeader()) {
+					updateBudgets();
+					INSTANCE.scan();
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -510,6 +513,9 @@ public enum Crosstalk {
 			try {
 				refresh();
 				
+				var name = "accountingCampaigns";
+				campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
+				
 				campaigns.entrySet().forEach(e->{
 					Campaign camp = e.getValue();
 					camp.runUsingElk();
@@ -551,8 +557,11 @@ public enum Crosstalk {
 					deletedCampaigns.remove(key);
 				}
 
-				logger.info("Heartbeat,runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
-						campaigns.size(),deletedCampaigns.size(),
+        		var canrun =  Configuration.getInstance().deadmanSwitch.canRun();
+				logger.info("Heartbeat, canbid: {}, runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
+						canrun,
+						campaigns.size(),
+						deletedCampaigns.size(),
 						BudgetController.getInstance().getCampaignDailySpend(null),
 						BudgetController.getInstance().getCampaignSpendAverage(null));
 			} catch (Exception error) {
@@ -623,8 +632,8 @@ public enum Crosstalk {
 	 */
 	public List<String> refresh() throws Exception {
 		ArrayNode array = createJson(); // get a copy of the SQL database
-		List<String> list = new ArrayList();
-		List<CampaignBuilderWorker> workers = new ArrayList();
+		List<String> list = new ArrayList<>();
+		List<CampaignBuilderWorker> workers = new ArrayList<>();
 
 		long time = System.currentTimeMillis();
 	

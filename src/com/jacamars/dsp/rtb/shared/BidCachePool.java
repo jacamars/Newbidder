@@ -102,20 +102,6 @@ public enum BidCachePool {
 				config.getMapConfig(name).setMapStoreConfig(mapStoreCfg);
 			}
 			//////////////////////////////////////////////////
-
-	        //config.getSerializationConfig()
-           // 	.addPortableFactory(SamplePortableFactory.FACTORY_ID, new SamplePortableFactory())
-            //	.addPortableFactory(PortableEchoFactory.FACTORY_ID, new PortableEchoFactory());
-	        name = "CUSTOMERS";
-			IMap<String,Customer> junk = RTBServer.getSharedInstance().getMap(name);
-			Customer crud = new Customer();
-			crud.name = "Ben";
-			crud.id = 123;
-			crud.lastOrder = new Date();
-			crud.list = new ArrayList();
-			crud.list.add("Heidi");
-			crud.list.add("Hodaka");
-			junk.put("Ben", crud);
 			
 			name = "MEMBER";
 			memberCache = RTBServer.getSharedInstance().getMap(name);

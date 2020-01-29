@@ -2,12 +2,12 @@
   "GDPR_MODE": "$GDPR_MODE",
   "hazelcast": {
   	"mapstoredriver": "org.postgresql.Driver",
-  	"mapstorejdbc": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres"
+  	"mapstorejdbc": "$JDBC"
   },
   "crosstalk": {
   	"sql": {
   		"jdbcdriver": "org.postgresql.Driver",
-  		"login": "jdbc:postgresql://127.0.0.1/postgres?user=postgres&password=postgres",
+  		"login": "$JDBC",
   		"Xlogin": "jdbc:postgresql://127.0.0.1/rtb4free?user=postgres&password=postgres"
   	},
   	"elk": {
@@ -30,7 +30,7 @@
   },
   "app" : {
     "concurrency" : "1",
-    "NOdeadmanswitch":"accountingsystem",
+    "deadmanswitch":"accountingsystem",
     "threads": "128",
     "trace": "$TRACE",
     "stopped" : false,

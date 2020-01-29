@@ -594,7 +594,7 @@ public class Campaign implements Comparable, Portable  {
 			}
 
 		} catch (Exception error) {
-			error.printStackTrace();
+			logger.error("Warning, ELK is not accessible, no accounting data is possible for: {}",adId);
 		}
 	}
 

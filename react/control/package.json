@@ -1,8 +1,8 @@
 {
-  "name": "black-dashboard-react",
+  "name": "rtb4free-control",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://creativetimofficial.github.io/black-dashboard-react/#/dashboard",
+  "homepage": "http://rtb4free.com/control",
   "dependencies": {
     "@types/react": "^16.9.12",
     "axios": "^0.19.0",

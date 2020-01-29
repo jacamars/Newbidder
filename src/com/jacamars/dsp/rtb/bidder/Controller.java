@@ -605,7 +605,7 @@ public enum Controller {
      * @throws Exception if there is a JSON parsing error.
      */
     public void stopBidder(BasicCommand cmd) throws Exception {
-        RTBServer.stopped = true;
+        RTBServer.stopBidder();
         BasicCommand m = new BasicCommand();
         m.msg = "stopped";
         m.to = cmd.from;
@@ -640,7 +640,7 @@ public enum Controller {
             }
         }
 
-        RTBServer.stopped = false;
+        RTBServer.startBidder();
         BasicCommand m = new BasicCommand();
         m.msg = "running";
         m.to = cmd.from;

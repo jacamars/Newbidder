@@ -731,7 +731,7 @@ public class WebCampaign {
 			HttpPostGet http = new HttpPostGet();
 			Map values = new HashMap();
 			if (member.equals(Configuration.getInstance().instanceName)) {
-				values.put("stopped", RTBServer.stopped);
+				values.put("stopped", RTBServer.isStopped());
 				values.put("ncampaigns", Configuration.getInstance().getCampaignsList().size());
 				values.put("loglevel", Configuration.getInstance().logLevel);
 				values.put("nobidreason", Configuration.getInstance().printNoBidReason);

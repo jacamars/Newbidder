@@ -80,19 +80,13 @@ RUN apt-get update
 RUN apt-get install bash
 RUN apt-get install -y curl
 
-
 RUN mkdir shell
 RUN mkdir www
-RUN mkdir www/js
-RUN mkdir www/css
-RUN mkdir www/SSI
-RUN mkdir www/jsoneditor
-RUN mkdir www/images
-RUN mkdir www/assets
 RUN mkdir web
 RUN mkdir js
 RUN mkdir target
 RUN mkdir data
+RUN mkdir data/postgres
 RUN mkdir logs
 RUN mkdir SampleBids
 RUN mkdir Campaigns
@@ -101,18 +95,21 @@ COPY stub.json /stub.json
 COPY target/*with-dependencies.jar /target
 
 COPY wait-for-it.sh /
+RUN chmod +x wait-for-it.sh
+
 COPY tools/* /
 COPY data/* data/
+COPY data/postgres/* data/postgres/
 COPY shell/ /shell
 
-COPY www/* /www/
-COPY www/assets/ /www/assets
+COPY www/control/* /www/control/
+COPY www/exchange/* /www/exchange/
+COPY www/index.html /www
 COPY www/js/* /www/js/
-COPY www/css/* /www/css/
-COPY www/SSI /www/SSI/
-COPY www/jsoneditor/ /www/jsoneditor
-COPY www/images/320* /www/images/
-copy www/images/alien* www/images/
+COPY www/css/* www/css/
+COPY www/SSI/* www/SSI/
+COPY www/assets/* www/assets/
+
 
 COPY web/* /web/
 COPY log4j.properties /
