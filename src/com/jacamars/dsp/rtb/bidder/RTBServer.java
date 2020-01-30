@@ -2172,6 +2172,8 @@ class AdminHandler extends Handler {
 							if (!f.exists()) {
 								response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 								baseRequest.setHandled(true);
+								
+								System.out.println("======= CANT FIND: ========> " + target);
 								return;
 							}
 						}

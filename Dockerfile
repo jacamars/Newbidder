@@ -102,13 +102,15 @@ COPY data/* data/
 COPY data/postgres/* data/postgres/
 COPY shell/ /shell
 
-COPY www/control/* /www/control/
-COPY www/exchange/* /www/exchange/
+COPY www/control/ /www/control/
+COPY www/exchange/ /www/exchange/
+COPY www/campaigns/ /www/campaigns/
+
 COPY www/index.html /www
-COPY www/js/* /www/js/
-COPY www/css/* www/css/
-COPY www/SSI/* www/SSI/
-COPY www/assets/* www/assets/
+COPY www/js/ /www/js/
+COPY www/css/ /www/css/
+COPY www/SSI/ www/SSI/
+COPY www/assets/ www/assets/
 
 
 COPY web/* /web/
