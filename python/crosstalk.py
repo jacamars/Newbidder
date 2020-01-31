@@ -22,6 +22,15 @@ def RemoveSymbol(symbolName):
         print('Connection error')
         return 503, None
 
+def GetAccounting():
+    try:
+        r = requests.post(globalHost, data='{"type":"GetAccounting#"}')
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+    
 def ListSymbols():
     try:
         r = requests.post(globalHost, data='{"type":"ListSymbols#"}')
@@ -344,7 +353,7 @@ def GetBiddersStatus():
 
 def SetHost(host):
     global globalHost
-    globalHost = "http://" + host + ":8100/api"
+    globalHost = "http://" + host + ":7379/api"
     return 200, globalHost
 
 def SetHostPort(hostPort):
@@ -355,6 +364,6 @@ def SetHostPort(hostPort):
 def PP(x):
     pp.pprint(x)
     
-globalHost = "http://localhost:8100/api"
+globalHost = "http://localhost:7379/api"
 pp = pprint.PrettyPrinter(indent=4)
 

@@ -113,8 +113,8 @@ var undef;
     vx.clearLogdata();
   }
 
-  const setInstances = async(list,selectedHost) => {
-    vx.loggerCallback(selectedHost,fromCallback);
+  const setInstances = async() => {
+    vx.loggerCallback(fromCallback);
   }
 
     return (

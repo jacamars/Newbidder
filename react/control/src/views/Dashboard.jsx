@@ -90,49 +90,59 @@ const Dashboard = (props) => {
   //  setBigChartData(name);
   //};
 
-  const setInstances = (list) => {
+  // Sets the selector
+  const setInstances = async (list) => {
     var output = '';
     var leader = '';
     var selected = vx.selectedHost;
     if (list.length===1) {
-      output  = <option>{list[0].name + '*'}</option>;
-      vx.setSelectedHost(list[0].name);
+      output  = <option>{list[0].from + '*'}</option>;
+      vx.setSelectedHost(list[0].from);
       setLeader(list[0].name);
     } else {
       for (var i=0;i<list.length;i++) {
-        if (setLeader(list[i].values.leader)) {
-          setLeader(list[i].name);
+        if (setLeader(list[i].leader)) {
+          setLeader(list[i].from);
           leader = '*';
         } else
           leader = '';
         if (selected !== '') {
-          if (selected === list[i].name)
+          if (selected === list[i].from)
             output += <option selected>{list[i].name + leader}</option>;
           else
-            output += <option>{list[i].name + leader}</option>;
+            output += <option>{list[i].from + leader}</option>;
         } else {
           if (i === 0) {
             output += <option selected>All Instances</option>;
           }
-          output += <option>{list[i].name + leader}</option>;
+          output += <option>{list[i].from + leader}</option>;
           vx.setSelectedInstance("All Instances");
         }
       }
     }
     setInstanceNames(output);
+    setSnapShotView(getSnapShotView(list));
+    setCampaignsView(list[0].campaigns);
+    redraw();
   }
 
-  const setCampaignsView = (rows) => {
-    setCampaigns(setCampaignsViewInternal(rows));
+  const setCampaignsView = async (rows) => {
+    var accounts = await vx.getAccounting();
+    setCampaigns(setCampaignsViewInternal(rows,accounts));
   }
 
-  const setCampaignsViewInternal = (rows) => {
+  const setCampaignsViewInternal = (rows,accounts) => {
     if (rows ===undef)
-      return null;
+      return null; 
 
     return(
       rows.map((row, i) => (<tr key={'"campaign-view-' + i + '"'}>
-          <td>{row}</td>
+          <td className="text-left">{row}</td>
+          <td className="text-right">{vx.getCount(accounts,row+".bids")}</td>
+          <td className="text-right">{vx.getCount(accounts,row+".wins")}</td>
+          <td className="text-right">{vx.getCount(accounts,row+".pixels")}</td>
+          <td className="text-right">{vx.getCount(accounts,row+".clicks")}</td>
+          <td class="text-right">{vx.getCount(accounts,row+".adspend")}</td>
         </tr>))
     )
   }
@@ -143,11 +153,7 @@ const Dashboard = (props) => {
       return;
       
     try {
-      var list;
-      if (vx.members.length === 0)
-        list = await vx.getMembers();
-      else 
-        list = vx.members;
+      var list = await vx.getBidders();
 
       if (list === undef)
         return;
@@ -157,22 +163,10 @@ const Dashboard = (props) => {
         return;
 
       setInstances(list);
-      setSnapShotView(getSnapShotView(list));
-      setCampaignsView(list[0].values.campaigns);
-      redraw();
     } catch (e) {
       alert (e);
     }
   }
-
-  /*const login = async (server) => {
-    var mx = await vx.getMembers(server);
-    console.log("MEMBERS = " + mx.length);
-    if (mx === undef)
-      return;
-    vx.changeLoginState(true);
-    setInstances(mx);
-  }*/
 
   function stringify(value) {
 		var seen = [];
@@ -189,18 +183,17 @@ const Dashboard = (props) => {
 	}
 
   const getSnapShotView = (rows) => {
-    console.log("GET SNAPSHOT VIEW: " + stringify(rows));
     if (rows === undef)
       return null;
     return(
       rows.map((row, index) => (
         <tr key={'snaphotview-' + row}>
-          <td>{row.name}</td>
-          <td key={'snaphotview-request-' + index} className="text-right">{row.values.request}</td>
-          <td key={'snaphotview-bid-' + index} className="text-right">{row.values.bid}</td>
-          <td key={'snaphotview-win-' + index} className="text-right">{row.values.win}</td>
-          <td key={'snaphotview-pixels-' + index} className="text-right">{row.values.pixels}</td>
-          <td key={'snaphotview-clicks-' + index} className="text-right">{row.values.clicks}</td>
+          <td>{row.from}</td>
+          <td key={'snaphotview-request-' + index} className="text-right">{row.request}</td>
+          <td key={'snaphotview-bid-' + index} className="text-right">{row.bid}</td>
+          <td key={'snaphotview-win-' + index} className="text-right">{row.win}</td>
+          <td key={'snaphotview-pixels-' + index} className="text-right">{row.pixels}</td>
+          <td key={'snaphotview-clicks-' + index} className="text-right">{row.clicks}</td>
         </tr>))
     )
   }
@@ -430,7 +423,7 @@ const Dashboard = (props) => {
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </CardHeader>
-                <CardBody>
+                <CardBody key={"camps-"+count}>
                   <div className="table-full-width table-responsive">
                     <Table>
                     <thead className="text-primary">
@@ -456,7 +449,7 @@ const Dashboard = (props) => {
                 <CardHeader>
                   <CardTitle tag="h4">Snapshot Counts<Button size="sm" color="info" onClick={doGetStatusCmd}>Refresh</Button></CardTitle>
                 </CardHeader>
-                <CardBody>
+                <CardBody key={"snapps-"+count}>
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>

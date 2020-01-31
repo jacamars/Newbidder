@@ -16,12 +16,17 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.logtap.ShortSubscriber;
+import com.jacamars.dsp.rtb.logtap.WebMQSubscriber;
 
 /**
  * Creates the HTTP handler for the Minimal server. This is an adaptation of the
@@ -35,6 +40,7 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 public class WebAccess implements Runnable {
 	/** A uuid to use with the web access */
 	public static final String uuid = "crosstalk:api";
+	protected static final Logger logger = LoggerFactory.getLogger(WebAccess.class);
 	
 	/** Thread this runs on */
 	Thread me;
@@ -157,6 +163,58 @@ class Handler extends AbstractHandler {
 			response.setStatus(200);
 			return;
 		}
+		
+		/**
+		 * Warning, never returns
+		 *  /subscribe?topic=xxx
+		 */
+		if (target.startsWith("/subscribe")) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("application/json;charset=utf-8");
+			baseRequest.setHandled(true);
+			
+			String topics = request.getParameter("topic");
+
+			if (topics == null) {
+				response.getWriter().println("{\"error\":\"no topic specified\"}");
+				return;
+			}
+			
+			try {
+			var wmq = new WebMQSubscriber(response,topics);       // does not return
+			WebAccess.logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
+			wmq.run();
+			WebAccess.logger.info("Client disconnected: {}" + getIpAddress(request));
+			} catch (Exception error) {
+				error.printStackTrace();
+			}
+			return;
+			
+		}
+		
+		if (target.startsWith("/shortsub")) {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("application/json;charset=utf-8");
+			baseRequest.setHandled(true);
+			
+			String topics = request.getParameter("topic");
+
+			if (topics == null) {
+				response.getWriter().println("{\"error\":\"no topic specified\"}");
+				return;
+			}
+			
+			try {
+			var ss = new ShortSubscriber(response,topics);       // does not return
+			WebAccess.logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
+			ss.run();
+			WebAccess.logger.info("Client disconnected: getIpAddress(request)" + ss);
+			} catch (Exception error) {
+				error.printStackTrace();
+			}
+			return;
+		}
+
 		
 		if (target.equals("/api")) {
 			response.setContentType("application/json;charset=utf-8");

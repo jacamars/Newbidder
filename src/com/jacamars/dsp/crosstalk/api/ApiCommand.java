@@ -123,6 +123,9 @@ public class ApiCommand {
      * Get the weights on a campaign
      */
     public static final String GetWeights = "GetWeights#";
+    
+    public static final String GetAccounting = "GetAccounting#";
+   
 
     /**
      * This class'es sl4j log object
@@ -368,6 +371,10 @@ public class ApiCommand {
                 
             case Refresh:
             	cmd = mapper.readValue(data, RefreshCmd.class);
+            	break;
+            	
+            case GetAccounting:
+            	cmd = mapper.readValue(data,  GetAccountingCmd.class);
             	break;
 
             default:

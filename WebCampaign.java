@@ -39,6 +39,7 @@ import com.jacamars.dsp.rtb.common.HttpPostGet;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
+import com.jacamars.dsp.rtb.tools.MemoryAccounting;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +155,9 @@ public class WebCampaign {
 		if (cmd.equalsIgnoreCase("getstatus")) {
 			return getStatusCmd();
 		}
+		
+		if (cmd.equalsIgnoreCase("getaccounting"))
+			return getAccountingCmd();
 
 		m.put("error", true);
 		m.put("message", "No such command: " + cmd);
@@ -762,6 +766,25 @@ public class WebCampaign {
 	 */
 	List<String> getMembers() throws Exception {
 		return BidCachePool.getInstance(RTBServer.getSharedInstance()).getMembersNames();
+	}
+	
+	public String getAccountingCmd() throws Exception {
+		Map outer = null;
+		var members = getMembers();
+		try {
+			for (var member : members) {
+				outer = new HashMap();
+				outer.put("name", member);
+				outer.put("values",Controller.getInstance().getMemberStatus(member));
+			}
+			return getString(MemoryAccounting.getInstance().getValues());
+		} catch (Exception error) {
+			outer = new HashMap();
+			error.printStackTrace();
+			outer.put("message", "failed: " + error.toString());
+			outer.put("error", true);
+			return getString(outer);
+		}
 	}
 	
 	public String getStatusCmd() throws Exception{

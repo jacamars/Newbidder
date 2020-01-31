@@ -31,6 +31,7 @@ import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.SharedTimer;
 import com.jacamars.dsp.rtb.tools.DbTools;
+import com.jacamars.dsp.rtb.tools.MemoryAccounting;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -912,6 +913,8 @@ public enum Controller {
 
         if (bidQueue != null)
             bidQueue.add(bid);
+        
+        MemoryAccounting.getInstance().increment(bid.adid+".bids");
     }
 
     /**
@@ -955,6 +958,7 @@ public enum Controller {
                         String image, String forward, String price, String adm, String adtype, String domain, String bidType) {
         if (winsQueue != null)
             winsQueue.add(new WinObject(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType));
+        MemoryAccounting.getInstance().increment(adId+".wins");
     }
 
     /**
@@ -971,6 +975,8 @@ public enum Controller {
             if (log.debug)
                 logger.info("Click record: {}",log);
             clicksQueue.add(log);
+            
+            MemoryAccounting.getInstance().increment(log.ad_id+".clicks");
         }
     }
 
@@ -992,6 +998,8 @@ public enum Controller {
                 logger.info("Pixel record: {}",log);
             }
             pixelsQueue.add(log);
+            
+            MemoryAccounting.getInstance().increment(log.ad_id+".pixels");
         }
     }
 

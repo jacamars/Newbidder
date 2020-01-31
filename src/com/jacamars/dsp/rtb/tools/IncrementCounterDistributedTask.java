@@ -1,6 +1,10 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.PartitionAware;
@@ -9,6 +13,8 @@ import com.jacamars.dsp.rtb.bidder.RTBServer;
 public final class IncrementCounterDistributedTask<K> implements Runnable, PartitionAware, Serializable {
 
 	private static final long serialVersionUID = 1L;
+	static ExecutorService service = Executors.newFixedThreadPool(256);
+	ConcurrentLinkedQueue<Long> queue = new ConcurrentLinkedQueue<>();
 	private final K key;
     private final String mapName;
 
@@ -16,10 +22,19 @@ public final class IncrementCounterDistributedTask<K> implements Runnable, Parti
         this.key = key;
         this.mapName = mapName;
     }
+    
+    public void increment(final long value) {
+        try {
+        	queue.add(value);
+        	service.execute(this);
+        } catch (RejectedExecutionException ignored) {
+        	
+        }
+    }
 
-    public int getCount() {
-    	  IMap<K, Integer> map = RTBServer.getSharedInstance().getMap(mapName);
-          Integer counter = map.get(key);
+    public long getCount() {
+    	  IMap<K, Long> map = RTBServer.getSharedInstance().getMap(mapName);
+          Long counter = map.get(key);
           return counter;
     }
     
@@ -30,13 +45,17 @@ public final class IncrementCounterDistributedTask<K> implements Runnable, Parti
 
     @Override
     public void run() {
-        IMap<K, Integer> map = RTBServer.getSharedInstance().getMap(mapName);
+    	Long value = queue.poll();
+    	if (value == null)
+    		return;
+    	
+        IMap<K, Long> map = RTBServer.getSharedInstance().getMap(mapName);
         map.lock(key);
-        Integer counter = map.get(key);
+        Long counter = map.get(key);
         if(counter == null) {
-            map.put(key, 1);
+            map.put(key, value);
         } else {
-            map.put(key, ++counter);
+            map.put(key, counter + value);
         }
         map.unlock(key);
     }

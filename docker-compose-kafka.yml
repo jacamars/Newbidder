@@ -1,0 +1,33 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
+# Does contain zookeeper and kafka.
+#
+version: "3"
+
+services:
+  zookeeper:
+    image: "zookeeper"
+    ports:
+     - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    ports:
+      - "9092:9092"
+    restart: always
+    depends_on:
+      - zookeeper
+
+  sqldb:
+    image: "postgres"
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - "5432:5432"
+#    networks:
+#      - rtb_net
+    volumes:
+      - /tmp/data:/var/lib/postgresql/data
+

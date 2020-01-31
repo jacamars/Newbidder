@@ -1919,24 +1919,6 @@ class AdminHandler extends Handler {
 				return;
 			}
 
-			/**
-			 * These are not part of RTB, but are used as part of the simulator and campaign
-			 * administrator that sit on the same port as the RTB.
-			 */
-
-			if (type != null && type.contains("multipart/form-data")) {
-				try {
-					json = WebCampaign.getInstance().multiPart(baseRequest, request, MULTI_PART_CONFIG);
-					response.setStatus(HttpServletResponse.SC_OK);
-				} catch (Exception err) {
-					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					logger.error("Bad non-bid transaction on multiform reqeues");
-				}
-				baseRequest.setHandled(true);
-				response.getWriter().println(json);
-				return;
-			}
-
 			if (target.contains("favicon")) {
 				RTBServer.handled--; // don't count this useless turd.
 				response.setStatus(HttpServletResponse.SC_OK);
@@ -1954,22 +1936,6 @@ class AdminHandler extends Handler {
 				baseRequest.setHandled(true);
 				page = SSI.convert(page);
 				response.getWriter().println(page);
-				return;
-			}
-			
-
-			// ///////////////////////////
-			if (target.contains("ajax")) {
-				response.setContentType("text/javascript;charset=utf-8");
-				response.setStatus(HttpServletResponse.SC_OK);
-				baseRequest.setHandled(true);
-				String data = WebCampaign.getInstance().handler(request, body);
-				
-				response.setHeader("Content-Encoding","gzip");
-				GZIPOutputStream gzipOutputStream = new GZIPOutputStream(response.getOutputStream());
-				gzipOutputStream.write(data.getBytes());
-				gzipOutputStream.close();
-				
 				return;
 			}
 
@@ -2065,51 +2031,7 @@ class AdminHandler extends Handler {
 					return;
 				}
 				
-				/**
-				 * Warning, never returns
-				 *  /subscribe?topic=xxx
-				 */
-				if (target.startsWith("/subscribe")) {
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json;charset=utf-8");
-					baseRequest.setHandled(true);
-					
-					String topics = request.getParameter("topic");
-		
-					if (topics == null) {
-						response.getWriter().println("{\"error\":\"no topic specified\"}");
-						return;
-					}
-					
-					
-					var wmq = new WebMQSubscriber(response,topics);       // does not return
-					logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
-					wmq.run();
-					logger.info("Client disconnected: {}" + getIpAddress(request));
-					return;
-					
-				}
-				
-				if (target.startsWith("/shortsub")) {
-					response.setStatus(HttpServletResponse.SC_OK);
-					response.setContentType("application/json;charset=utf-8");
-					baseRequest.setHandled(true);
-					
-					String topics = request.getParameter("topic");
-		
-					if (topics == null) {
-						response.getWriter().println("{\"error\":\"no topic specified\"}");
-						return;
-					}
-					
-					
-					var ss = new ShortSubscriber(response,topics);       // does not return
-					logger.info("Client {} has initialized for: {}", getIpAddress(request), topics);
-					ss.run();
-					logger.info("Client disconnected: getIpAddress(request)" + ss);
-					return;
-				}
-
+	
 			// /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		} catch (Exception e) {

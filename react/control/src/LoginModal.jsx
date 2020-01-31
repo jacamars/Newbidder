@@ -10,7 +10,7 @@ const LoginModal = (props) => {
 
   const [name, setName] = useState('rtb4free');
   const [password, setPassword] = useState('');
-  const [server, setServer] = useState('localhost:8080');
+  const [server, setServer] = useState('localhost:7379');
 
   const changeName = (event) => {
     setName(event.target.value);
@@ -25,13 +25,14 @@ const LoginModal = (props) => {
   }
 
   const login = async () => {
-    var mx = await vx.getMembers(server);
+    var mx = await vx.listCampaigns(name,password,server);
+    mx = await vx.getBidders();
     if (mx === undef)
       return;
-    console.log("MEMBERS = " + mx.length);
     vx.changeLoginState(true);
-    vx.loggerCallback(server);
-    props.callback(mx,server);
+    await vx.getAccounting();
+    vx.loggerCallback();
+    props.callback(mx);
   }
 
   // in dark mode, the text is white, but this won't work here.... It will appear invisible in the field

@@ -17,24 +17,13 @@ const axiosInstance = axios.create({
 
 const  ViewContext = () => {
 
+    const [jwt,setJwt] = useState('23skiddoo');
     const [loggedIn, setLoggedIn] = useState(false);
-    const [serverPrefix, setServerPrefix] = useState();
+    const [server, setServer] = useState('localhost:7379');
+    const [password, setPassword] = useState('');
+    const [runningCampaigns, setRunningCampaigns] = useState([])
     const [members, setMembers] = useState([]);
-
-    const test = () => {
-      var time = new Date().getTime();
-      var delta = (time - interval)/1000;
-      if (delta > 30) {
-        reset();
-        return;
-      }
-      setTimeout(test,5000);
-    }
-
-    const reset = () => {
-      clearLogdata();
-      setLoggedIn(false);
-    }
+    const [accounting, setAccounting] = useState({});
 
     const changeLoginState = async (value) => {
       if (value && loggedIn)
@@ -43,13 +32,6 @@ const  ViewContext = () => {
       if (!value && !loggedIn)
         return; 
 
-      if (value) {
-        setInterval(new Date().getTime());
-        setTimeout(test,5000);
-      } else {
-        reset();
-      }
-        
       await setLoggedIn(value);
       return loggedIn;
     }
@@ -140,7 +122,7 @@ const  ViewContext = () => {
         }
         interval = new Date().getTime();
         xhrLog = new XMLHttpRequest()
-        xhrLog.open("GET", "http://" + spec + "/subscribe?topic=logs", true);
+        xhrLog.open("GET", "http://" + server + "/subscribe?topic=logs", true);
         xhrLog.onreadystatechange = checkData;
         xhrLog.send(null);
         
@@ -182,19 +164,16 @@ const  ViewContext = () => {
 
     /////////////////////////////////////////
 
-    const  mapperCallback = (logname, server, callback) => {
+    const  mapperCallback = (logname, callback) => {
         var previous_response_length = 0;
         if (mapXhr !== undef) {
           mapXhr.abort();
         }
 
-        console.log("MAPPER SET TO " + serverPrefix);
+        console.log("MAPPER SET TO " + server);
         console.log("SERVER: " + server);
         mapXhr = new XMLHttpRequest();
-        if (serverPrefix != undef)
-           mapXhr.open("GET", "http://" + serverPrefix + "/shortsub"+ "?topic=" + logname, true);
-        else
-          mapXhr.open("GET", "http://" + server+ "/shortsub"+ "?topic=" + logname, true);
+        mapXhr.open("GET", "http://" + server + "/shortsub"+ "?topic=" + logname, true);
         mapXhr.onreadystatechange = checkData;
         mapXhr.send(null);
         
@@ -229,19 +208,66 @@ const  ViewContext = () => {
         };
       }
 
-      const getMembers = async (prefix) => {
-        if (prefix == undef)
-          prefix = serverPrefix;
+      const getBidders = async() => {
+        var cmd = {
+          token: jwt,
+          type:"GetBiddersStatus#"
+        };
+        var data = await execute(cmd);
+        if (data == undef)
+          return;
+        setMembers(data.entries);
+        return data.entries;
+      }
+
+      // acts as the login
+      const listCampaigns = async(name,password,server) => {
+        if (server != undef)
+          setServer(name);
+        if (password != undef)
+          setPassword(password);
+        if (server != undef) 
+          setServer(server);
+  
+        // get a token, if the tokken is valid, proceed
+  
+        var cmd = {
+          token: jwt,
+          type: "ListCampaigns#"
+        };
+        var data = await execute(cmd);
+  
+        if (data == undef)
+          return;
+        setRunningCampaigns(data.campaigns);
+        return data.campaigns;
+      }
+    
+      const getAccounting = async() => {
+        var cmd = {
+          token: jwt,
+          type: "GetAccounting#"
+        };
+        var data = await execute(cmd);
+  
+        console.log("GetAccounting returns: " + JSON.stringify(data,null,2));
+        if (data == undef)
+          return;
+        setAccounting(data.accounting);
+        return data.accounting;
+      }
+
+      const  execute = async (cmd) =>  {
         try {
-          var cmd = { command: 'getstatus' }
-          const response = await axiosInstance.post("http://" + prefix + "/ajax",JSON.stringify(cmd)); 
-          //console.log("Got Data Back: " + JSON.stringify(response.data,null,2));
-          setServerPrefix(prefix);
-          setUrl("http://" + prefix);
-          setMembers(response.data);
-          return  response.data;   
-        } catch (e) {
-          alert (e);
+          var response = await axiosInstance.post("http://" + server + "/api",JSON.stringify(cmd), { responseType: 'text' }); 
+          if (response.data && response.data.error) {
+            alert(response.data.message);
+            return;
+          }
+          // console.log("------>" + JSON.stringify(response,null,2));
+          return response.data;
+        } catch (error) {
+          alert(error);
         }
       }
 
@@ -249,11 +275,17 @@ const  ViewContext = () => {
         var rows = []
         for(var i=0; i<members.length;i++) {
           var m = members[i];
-          for (var j=0;j<m.values.events.length;j++) {
-            rows.push(m.values.events[j]);
+          for (var j=0;j<m.events.length;j++) {
+            rows.push(m.events[j]);
           }
         }
         return rows;
+      }
+
+      const getCount = (acc,id) => {
+        if (acc[id] === undef)
+          return 0;
+        return acc[id];
       }
 
       ///////////////////////////
@@ -263,8 +295,8 @@ const  ViewContext = () => {
         zoomLevel, setZoomLevel, ssp, changeSsp, uri, changeUri,
         url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, bidresponse, changeBidresponse,
         nurl, changeNurl, xtime, changeXtime, adm, changeAdm, winsent, changeWinsent,
-        consoleLogspec, logcount, logdata, addLogdata, clearLogdata, loggerCallback, getMembers, members,
-        getEvents
+        consoleLogspec, logcount, logdata, addLogdata, clearLogdata, loggerCallback, getBidders, members,
+        getEvents, accounting, getAccounting, listCampaigns, getCount
     };
 };
 

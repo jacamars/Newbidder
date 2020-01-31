@@ -135,6 +135,15 @@ public class Campaign implements Comparable, Portable  {
     // when it was last updated if by sql
     public long updated_at;
     
+    // ///////////// Crude accounting /////////////////////
+    public transient long bids = 0L;
+    public transient long wins = 0L;
+    public transient long pixels = 0L;
+    public transient long clicks = 0L;
+    public transient long adspend = 0L;
+    //////////////////////////////////////////////////////
+    
+    
     /**
      * Resources used to create campaign from JSON based SQL
      */
@@ -152,6 +161,19 @@ public class Campaign implements Comparable, Portable  {
 	transient String capTimeUnit;
 	//////////////////////////////////////////////////////////////////////
     
+	/**
+	 * Return the in-memory accounting
+	 * @return
+	 */
+	public Map<String,Long> getCrudeAccounting() {
+		Map<String,Long> map = new HashMap<>();
+		map.put("bids",bids);
+		map.put("wins", wins);
+		map.put("pixels", pixels);
+		map.put("clicks", clicks);
+		map.put("adspend", adspend);
+		return map;
+	}
     
     /**
 	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
