@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -1379,20 +1379,20 @@ class Handler extends AbstractHandler {
 					break;
 				case "redirect":
 					cookie = GetRtbCookie(debug, request, response, false);
-					Controller.getInstance().publishClick(rs, cookie);
-
 					String queryString = request.getQueryString();
 					String params[] = null;
 					if (queryString != null)
 						params = queryString.split("url=");
 					if (params != null) {
 						response.sendRedirect(URLDecoder.decode(params[1], "UTF-8"));
+						Controller.getInstance().publishClick(params[0], cookie);
 					}
 					RTBServer.clicks++;
 					return;
 					
 				case "conversion":
-					System.out.println("CONVERSION!");
+					queryString = request.getQueryString();
+					Controller.getInstance().publishConvert(queryString);
 					return;
 
 				default:
@@ -1466,15 +1466,15 @@ class Handler extends AbstractHandler {
 			if (target.contains("/redirect")) {
 				String starget = baseRequest.getOriginalURI();
 				String cookie = GetRtbCookie(false, request, response, false);
-				Controller.getInstance().publishClick(starget, cookie);
 
 				String queryString = request.getQueryString();
 				String params[] = null;
-				if (queryString != null)
+				if (queryString != null) 
 					params = queryString.split("url=");
 
 				baseRequest.setHandled(true);
-
+				Controller.getInstance().publishClick(params[1], cookie);
+				
 				if (params != null) {
 					response.sendRedirect(URLDecoder.decode(params[1], "UTF-8"));
 				}
@@ -1851,6 +1851,9 @@ class AdminHandler extends Handler {
 
 		response.setHeader("X-INSTANCE", config.instanceName);
 
+		
+		System.out.println("+++++++++++++++>" + target);
+		
 		try {
 			if (request.getHeader("Content-Encoding") != null && request.getHeader("Content-Encoding").equals("gzip"))
 				isGzip = true;

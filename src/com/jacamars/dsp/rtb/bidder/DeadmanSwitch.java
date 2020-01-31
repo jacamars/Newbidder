@@ -58,6 +58,7 @@ public class DeadmanSwitch implements Runnable {
      */
 	@Override
 	public void run() {
+		
 		while (true) {
 			try {
 				if (canRun() == false) {

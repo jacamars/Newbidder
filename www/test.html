@@ -3,7 +3,7 @@
 <title>Landing Page</title>
 <script>
 	function convert() {
-		 url = 'EXTERNAL/callback/type=conversion/exchange=EXCHANGE/ad_id=AD_ID/creative_id=$REATIVE_ID/price=1.23/bid_id=BID_ID';
+		 url = 'EXTERNAL/callback?target=conversion&exchange=EXCHANGE/ad_id=AD_ID/creative_id=CREATIVE_ID/price=1.23/bid_id=BID_ID';
 		 alert("You just bought it!");
 		
 		 var xmlHttp = new XMLHttpRequest();
@@ -12,7 +12,6 @@
 	}
 </script>
 </head>
-<img src="EXTERNAL/click/exchange=EXCHANGE/ad_id=AD_ID/creative_id=CREATIVE_ID/bid_id=BID_ID" width=1 height=1 alt="">
 <img src="http://jennyfenig.com/sell-out/wp-content/themes/gg-university/images/jenny-fenig-sell-out-program-selling-earning-sales.jpg" alt="oops no pic" class="shrinkToFit" width="827" height="383">
 <br/>
 <button onClick="convert();">Click to buy useless stuff for AD_ID/CREATIVE_ID</button>

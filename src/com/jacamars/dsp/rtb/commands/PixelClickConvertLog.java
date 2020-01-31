@@ -98,12 +98,14 @@ public class PixelClickConvertLog {
         if (i != -1) {
             str = str.substring(0,i);
         }
+        
+        System.out.println("============>PARSE: " + str);
         String[] parts = str.split("/");
 
         for (i = 0; i < parts.length; i++) {
             if (parts[i].indexOf("=") > -1) {
                 String[] items = parts[i].split("=");
-                switch (items[0]) {
+                switch (items[0].toLowerCase()) {
                     case "bid_type":
                         bidtype = items[1];
                         break;

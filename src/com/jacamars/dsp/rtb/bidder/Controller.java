@@ -956,8 +956,9 @@ public enum Controller {
      */
     public void sendWin(String hash, String cost, String lat, String lon, String adId, String cridId, String pubId,
                         String image, String forward, String price, String adm, String adtype, String domain, String bidType) {
-        if (winsQueue != null)
-            winsQueue.add(new WinObject(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType));
+    	WinObject win = new WinObject(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adtype, domain, bidType);
+    	if (winsQueue != null)
+            winsQueue.add(win);
         MemoryAccounting.getInstance().increment(adId+".wins");
     }
 
@@ -1009,13 +1010,14 @@ public enum Controller {
      * @param uid String. The cookue user id.
      */
     public void publishPostbackEvent(String query, String uid) {
+        PostbackEventLog e = new PostbackEventLog(query);
         if (postbackQueue != null) {
-            PostbackEventLog e = new PostbackEventLog(query);
             e.uid = uid;
             if (e.debug)
                 logger.info("Postback record {}",e);
             postbackQueue.add(e);
         }
+        MemoryAccounting.getInstance().increment(e.adid+".postback");
     }
 
     /**
@@ -1024,14 +1026,15 @@ public enum Controller {
      * @param uid String. The cookue user id.
      */
     public void publishVideoEvent(HttpServletRequest request, String uid) {
+        String queryString = request.getQueryString();
+    	VideoEventLog log = new VideoEventLog(queryString);
         if (videoeventsQueue != null) {
-            String queryString = request.getQueryString();
-            VideoEventLog log = new VideoEventLog(queryString);
             log.uid = uid;
             if (log.debug)
                 logger.info("Videoevent: {}", log);
             videoeventsQueue.add(log);
         }
+        MemoryAccounting.getInstance().increment(log.adid+".videoevent");
     }
 
     public void publishFraud(FraudLog m) {
@@ -1047,10 +1050,13 @@ public enum Controller {
      * @param target String. The URI of this pixel data
      */
     public void publishConvert(String target) {
+        PixelClickConvertLog log = new PixelClickConvertLog();
+        log.create(target);
+        log.type = log.CONVERT;
         if (clicksQueue != null) {
-            ConvertLog log = new ConvertLog(target);
             clicksQueue.add(log);
         }
+        MemoryAccounting.getInstance().increment(log.ad_id+".convert");
     }
 
     /**

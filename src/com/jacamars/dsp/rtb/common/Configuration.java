@@ -61,6 +61,7 @@ import com.jacamars.dsp.rtb.fraud.MMDBClient;
 import com.jacamars.dsp.rtb.geo.GeoTag;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
+import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.tools.*;
@@ -804,15 +805,17 @@ public class Configuration {
 		
         RTBServer.getSharedInstance();
         
-        Thread.sleep(1000);
 		if (deadmanKey != null) {
 			deadmanSwitch = new DeadmanSwitch(deadmanKey);
 			deadmanSwitch.start();
-			
+		
 			ScheduledExecutorService deadman = Executors.newScheduledThreadPool(1);
 	        deadman.scheduleAtFixedRate(() -> {
 	            try {
 	            	if (RTBServer.isLeader()) {
+	            		if (!BidCachePool.getInstance().ready())
+	            			Thread.sleep(1000);;
+	            			
 	            		deadmanSwitch.updateKey(deadmanKey);
 	            	}
 	            } catch (Exception e) {

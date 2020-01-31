@@ -9,6 +9,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.OpenRTB;
 import com.jacamars.dsp.rtb.exchanges.openx.OpenX;
+import com.jacamars.dsp.rtb.tools.MemoryAccounting;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -249,17 +250,22 @@ public class WinObject {
 	 *            String. The adm that was returned.
 	 *
 	 */
-	public static void convertBidToWin(String hash, String cost, String lat, String lon, String adId, String cridId,
+	public static double convertBidToWin(String hash, String cost, String lat, String lon, String adId, String cridId,
 			String pubId, String image, String forward, String price, String adm, String domain, String bidType) {
 		String adType = null;
+		double value = 0.0;
 		try {
 			Controller c = Controller.getInstance();
 			adType = c.deleteBidFromCache(hash);
 			c.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adType, domain, bidType);
-			double value = Double.parseDouble(price);
+			value = Double.parseDouble(price);
+			
+			MemoryAccounting.getInstance().increment(adId+".adspend",new Double(value * 100).longValue());
 			RTBServer.adspend += value;
 		} catch (Exception error) {
 			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());
 		}
+		return value;
 	}
+	
 }

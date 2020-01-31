@@ -326,6 +326,18 @@ public enum BidCachePool {
 		RecordedMisc msc = new RecordedMisc(key, arg, System.currentTimeMillis() + timeout * 1000);
 		miscCache.setAsync(key, msc, timeout, TimeUnit.SECONDS);
 	}
+	
+	public boolean ready() {
+		if (miscCache == null)
+			return false;
+		if (videoCache == null)
+			return false;
+		if (bidCache == null)
+			return false;
+		if (memberCache == null)
+			return false;
+		return true;
+	}
 
 	public Object get(String key) {
 		RecordedMisc msc = miscCache.get(key);
