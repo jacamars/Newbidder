@@ -21,7 +21,7 @@ import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
- * Web API access to add  a campaign to the bidders.
+ * Web API access to add  a campaign to the bidders. This is not the CreateCampaign command.
  * @author Ben M. Faul
  *
  */

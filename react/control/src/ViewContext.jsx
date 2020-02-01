@@ -251,7 +251,7 @@ const  ViewContext = () => {
         var data = await execute(cmd);
   
         console.log("GetAccounting returns: " + JSON.stringify(data,null,2));
-        if (data == undef)
+        if (data === undef)
           return;
         setAccounting(data.accounting);
         return data.accounting;

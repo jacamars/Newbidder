@@ -1,12 +1,9 @@
 package com.jacamars.dsp.crosstalk.api;
 
 
-import java.util.List;
-
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.hazelcast.core.HazelcastInstance;
 
 /**
@@ -43,7 +40,7 @@ public class GetCampaignCmd extends ApiCommand {
 	 * Targeted form of command. starts a specific bidder.
 	 * 
 	 * @param username
-	 *            String. User authorizatiom.
+	 *            String. User authorization.
 	 * @param password
 	 *            String. Password authorization.
 	 * @param target

@@ -10,7 +10,7 @@ const LoginModal = (props) => {
 
   const [name, setName] = useState('rtb4free');
   const [password, setPassword] = useState('');
-  const [server, setServer] = useState('localhost:8100');
+  const [server, setServer] = useState('localhost:7379');
 
   const changeName = (event) => {
     setName(event.target.value);
@@ -29,6 +29,7 @@ const LoginModal = (props) => {
     if (mx === undef)
       return;
     console.log("Campaigns = " + mx.length);
+    await vx.getAccounting();
     mx = await vx.getBidders();
     if (mx === undef)
       return;

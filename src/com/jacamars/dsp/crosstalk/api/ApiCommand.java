@@ -125,6 +125,10 @@ public class ApiCommand {
     public static final String GetWeights = "GetWeights#";
     
     public static final String GetAccounting = "GetAccounting#";
+    
+    public static final String  SQLLIST_CAMPAIGNS = "SqlListCampaigns#";
+    
+    public static final String SQLGET_NEW_CAMPAIGN = "SQLGetNewCampaign#";
    
 
     /**
@@ -375,6 +379,14 @@ public class ApiCommand {
             	
             case GetAccounting:
             	cmd = mapper.readValue(data,  GetAccountingCmd.class);
+            	break;
+            	
+            case SQLLIST_CAMPAIGNS:
+            	cmd = mapper.readValue(data, SQLListCampaigns.class);
+            	break;
+            	
+            case SQLGET_NEW_CAMPAIGN:
+            	cmd = mapper.readValue(data, SQLGetNewCampaignCmd.class);
             	break;
 
             default:

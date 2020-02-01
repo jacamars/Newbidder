@@ -53,20 +53,20 @@ var undef;
         )
       }
 
-    const setCampaignsView = (rows) => {
-        if (rows === undef)
-          return null;
+    const setCampaignsView = (rows,acc) => {
+        console.log("ACC: " + JSON.stringify(acc,null,2));
         return(
           rows.map((row, index) => (
             <tr key={'camps-' + index}>
               <td key={'camps-index-' + index}>{index+1}</td>
               <td key={'camps-name-' + index} className="text-left">{row}</td> 
-              <td key={'camps-bids-' + index} className="text-right">0</td>
-              <td key={'camps-wins-' + index} className="text-right">0</td>
-              <td key={'bidders-pixels-' + index} className="text-right">0</td>
-              <td key={'bidders-clicks-' + index} className="text-right">0</td>
+              <td key={'camps-bids-' + index} className="text-right">{vx.getCount(acc,row+".bids")}</td>
+              <td key={'camps-wins-' + index} className="text-right">{vx.getCount(acc,row+".wins")}</td>
+              <td key={'bidders-pixels-' + index} className="text-right">{vx.getCount(acc,row+".pixels")}</td>
+              <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row+".clicks")}</td>
+              <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row+".adspend")/100000}</td>
             </tr>))
-        )
+        );
       }
 
   return (
@@ -118,10 +118,11 @@ var undef;
                             <th className="text-right">Wins</th>
                             <th className="text-right">Pixels</th>
                             <th className="text-right">Clicks</th>
+                            <th className="text-right">Spend</th>
                           </tr>
                       </thead>
                       <tbody>
-                        { setCampaignsView(vx.runningCampaigns) }
+                        { setCampaignsView(vx.runningCampaigns,vx.accounting) }
                       </tbody>
                     </Table>
                   </CardBody>

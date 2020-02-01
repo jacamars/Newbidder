@@ -56,6 +56,8 @@ import com.jacamars.dsp.rtb.tools.JdbcTools;
 public class Campaign implements Comparable, Portable  {
 	public static final int CLASS_ID = 3;
 	
+	/** SQL id */
+	public int id; 
 	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
 	public boolean isAdx;
 	/** points back to the name of the owner of the campaign */

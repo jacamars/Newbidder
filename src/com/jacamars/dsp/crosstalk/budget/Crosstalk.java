@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,10 +36,8 @@ import com.hazelcast.core.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
-import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
-import com.jacamars.dsp.rtb.tools.Performance;
 
 /**
  * Class that loads,updates,deletes campaigns based on SQL queries. Runs once a minute to (a) handle the budgets and (b) update the

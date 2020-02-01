@@ -20,9 +20,10 @@ const  ViewContext = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [name,setName] = useState('');
     const [password,setPassword] = useState('');
-    const [server, setServer] = useState('localhost:8100');
+    const [server, setServer] = useState('localhost:7379');
     const [jwt, setJwt] = useState('23skiddoo');
-    const [members, setMembers] = ([]);
+    const [members, setMembers] = useState([]);
+    const [accounting, setAccounting] = useState({});
     const [runningCampaigns, setRunningCampaigns] = useState([])
     const [bidders, setBidders] = useState([]);
 
@@ -76,6 +77,35 @@ const  ViewContext = () => {
       return data.entries;
     }
 
+    const getAccounting = async() => {
+      var cmd = {
+        token: jwt,
+        type: "GetAccounting#"
+      };
+      var data = await execute(cmd);
+
+      console.log("GetAccounting returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+      setAccounting(data.accounting);
+      return data.accounting;
+    }
+
+    const getNewCampaign = async(name) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetNewCampaign#",
+        campaign: name
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLGetNewCampaign returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+
     const  execute = async (cmd) =>  {
       try {
         var response = await axiosInstance.post("http://" + server + "/api",JSON.stringify(cmd), { responseType: 'text' }); 
@@ -90,10 +120,17 @@ const  ViewContext = () => {
       }
     }
 
+    const getCount = (acc,id) => {
+      if (acc[id] === undef)
+        return 0;
+      return acc[id];
+    }
+
       ///////////////////////////
 
     return { 
-      members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders
+      members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
+      getAccounting, accounting, getCount, getNewCampaign
     };
 };
 
