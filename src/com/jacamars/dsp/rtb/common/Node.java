@@ -95,6 +95,8 @@ public class Node {
 	}
 
 	Set qvalue = null;
+	
+	public int id = 0;;
 
 	boolean testit = false;
 	/** Query TBD */

@@ -127,6 +127,25 @@ def SQLGetNewCampaign(camp):
         print('Connection error')
         return 503, None
 
+def SQLGetNewTarget(name):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLGetNewTarget#","name":"' + name + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+
+
+def SQLGetNewRule(name):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLGetNewRule#","name":"' + name + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+
 def GetWeights(camp):
     try:
         r = requests.post(globalHost, data='{"type":"GetWeights#","campaign":"' + camp + '"}')

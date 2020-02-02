@@ -105,6 +105,35 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const getNewTarget = async(name) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetNewTarget#",
+        name: name
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLGetNewTarget returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+    const getNewRule = async(name) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetNewRule#",
+        name: name
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLGetNewRule returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+
 
     const  execute = async (cmd) =>  {
       try {
@@ -130,7 +159,7 @@ const  ViewContext = () => {
 
     return { 
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
-      getAccounting, accounting, getCount, getNewCampaign
+      getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule
     };
 };
 

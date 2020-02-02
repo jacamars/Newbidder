@@ -52,6 +52,10 @@ var undef;
 
   const update = (e) => {
       setCampaign(null);
+      if (e !== null) {
+        // update database
+        setCampaign(null);
+      }
       redraw();
   }
 

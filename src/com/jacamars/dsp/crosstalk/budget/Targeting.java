@@ -18,6 +18,8 @@ public class Targeting {
 	public static final String BLACKLIST = "BLACKLIST";
 	public static final String WHITELIST = "WHITELIST";
 
+	public String name;
+	
 	public int campaignid;
 	public int targetingid;
 

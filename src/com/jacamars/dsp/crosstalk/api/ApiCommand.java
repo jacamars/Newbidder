@@ -129,6 +129,10 @@ public class ApiCommand {
     public static final String  SQLLIST_CAMPAIGNS = "SqlListCampaigns#";
     
     public static final String SQLGET_NEW_CAMPAIGN = "SQLGetNewCampaign#";
+    
+    public static final String SQLGET_NEW_TARGET = "SQLGetNewTarget#";
+    
+    public static final String SQLGET_NEW_RULE = "SQLGetNewRule#";
    
 
     /**
@@ -388,6 +392,15 @@ public class ApiCommand {
             case SQLGET_NEW_CAMPAIGN:
             	cmd = mapper.readValue(data, SQLGetNewCampaignCmd.class);
             	break;
+            	
+            case SQLGET_NEW_TARGET:
+            	cmd = mapper.readValue(data, SQLGetNewTargetCmd.class);
+            	break;
+            	
+            case SQLGET_NEW_RULE:
+            	cmd = mapper.readValue(data, SQLGetNewRuleCmd.class);
+            	break;
+
 
             default:
                 cmd = new UnknownCmd(token);

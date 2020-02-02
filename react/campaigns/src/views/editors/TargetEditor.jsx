@@ -32,28 +32,18 @@ import "react-datepicker/dist/react-datepicker.css";
 
 var undef;
 
-const CampaignEditor = (props) => {
+const TargetEditor = (props) => {
 
   const [count, setCount] = useState(0);
-  const [campaign, setCampaign] = useState(props.campaign);
+  const [target, setTarget] = useState(props.target);
   const [startDate, setStartDate] = useState(new Date());
   const vx = useViewContext();
 
   const nameChangedHandler = (event) => {
-      campaign.adId = event.target.value;
-      setCampaign(campaign);
+      target.name = event.target.value;
+      setTarget(target);
   }
-
-  const adxChangedHandler = (event) => {
-    campaign.isAdx = event.target.value;
-    setCampaign(campaign);
-}
-
-const domainChangedHandler = (event) => {
-    campaign.adomain = event.target.value;
-    setCampaign(campaign);
-    console.log(event.target.value);
-}
+  
 
 const getTrueFalseOptions = (value)  =>{
     if (value)
@@ -84,38 +74,66 @@ const getSelectedExchangeOptions = () => {
     );
 }
 
-const getSelectedRules = () => {
+const getDomainTypes = () => {
     return(
         <>
-        <option>Rule 1</option>
-        <option>Rule 2</option>
-        <option>Rule 3</option>
-        <option>Rule 4</option>
-        <option>Rule 5</option>
-        <option>Rule 6</option>
         </>
     );
 }
 
-const getSelectedTargets = () => {
+const getDomainValues = () => {
     return(
         <>
-        <option>Target 1</option>
-        <option>Target 2</option>
-        <option>Target 3</option>
-        <option>Target 4</option>
-        <option>Target 5</option>
         </>
     );
 }
 
-const getSelectedRegions = () => {
+
+const getBigDataSet = () => {
     return(
         <>
-        <option>US</option>
-        <option>APAC</option>
-        <option>EUROPE</option>
-        <option>Russia</option>
+        </>
+    );
+}
+
+const getSelectedCountries = () => {
+    return(
+        <>
+        </>
+    )
+}
+
+const getSelectedModels = () => {
+    return(
+        <>
+        </>
+    )
+}
+
+const getSelectedMakes = () => {
+    return(
+        <>
+        </>
+    )
+}
+
+const getSelectedDeviceTypes = () => {
+    return(
+        <>
+        </>
+    )
+}
+
+const getWhiteList = () => {
+    return(
+        <>
+        </>
+    )
+}
+
+const getBlackList = () => {
+    return(
+        <>
         </>
     )
 }
@@ -133,7 +151,7 @@ const getSelectedRegions = () => {
   }
 
   const getLabel = () => {
-      if (campaign.sqlid === -1)
+      if (target.id === 0)
         return (<div>Save</div>);
       return(<div>Update</div>);
   }
@@ -145,16 +163,16 @@ const getSelectedRegions = () => {
                   <Col>
                     <Card>
                       <CardHeader>
-                        <h5 className="title">Edit Campaign Details</h5>
+                        <h5 className="title">Edit Targeting Details</h5>
                       </CardHeader>
                       <CardBody>
                         <Form>
                           <Row>
-                            <Col className="pr-md-1" md="1">
+                            <Col className="pr-md-1" md="2">
                               <FormGroup>
                                 <label>SQL ID (disabled)</label>
                                 <Input
-                                  defaultValue={campaign.id}
+                                  defaultValue={target.id}
                                   disabled
                                   type="text"
                                 />
@@ -164,28 +182,10 @@ const getSelectedRegions = () => {
                               <FormGroup>
                                 <label>Ad Id</label>
                                 <Input
-                                  defaultValue={campaign.adId}
-                                  placeholder="Campaign Name (Required)"
+                                  defaultValue={target.name}
+                                  placeholder="Target Name (Required)"
                                   type="text"
                                 />
-                              </FormGroup>
-                            </Col>
-                            <Col className="pl-md-1" md="4">
-                              <FormGroup>
-                                <label htmlFor="addomain">
-                                  Ad Domain
-                                </label>
-                                <Input placeholder="Ad domain (required)"
-                                  defaultValue={campaign.adomain}
-                                  type="text" />
-                              </FormGroup>
-                            </Col>
-                            <Col className="pl-md-1" md="4">
-                              <FormGroup>
-                              <Label for="exampleSelect" >Fraud</Label>
-                                <Input type="select" name="select" id="exampleSelect">
-                                    {getTrueFalseOptions(campaign.forensiq)}
-                                </Input>               
                               </FormGroup>
                             </Col>
                           </Row>
@@ -222,110 +222,130 @@ const getSelectedRegions = () => {
                                 </Col>
                                 </FormGroup>
                              </Col>
-                             <Col className="px-md-1" md="3">
-                              <FormGroup>
-                                <label>Spend Rate/Minute</label>
-                                <Input id="spendRate"
-                                  defaultValue={campaign.assignedSpendRate}
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Cap Variable</label>
-                                <Input id="freq_variable"
-                                  defaultValue="request.device.ip"
-                                  placeholder="RTB variable to frequency cap on"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Limit</label>
-                                <Input id='freq_limit"'
-                                  defaultValue="0"
-                                  placeholder="Max number"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Duration</label>
-                                <Input id="duration"
-                                  defaultValue="0"
-                                  placeholder="Duration in minutes"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
                           </Row>
                           <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
-                                <label>Region</label>
-                                <Input type="select" id="region" multiple>
-                                    {getSelectedRegions()}
+                                <label>Domain List Type</label>
+                                <Input type="select" id="region" >
+                                    {getDomainTypes()}
                                 </Input>
                               </FormGroup>
                             </Col>
                             <Col className="px-md-1" md="4">
                               <FormGroup>
-                                <label>Exchanges</label>
+                                <label>Domain Values</label>
                                 <Input type="select" name="select" id="exchanges" multiple>
-                                    {getSelectedExchangeOptions()}
+                                    {getDomainValues()}
                                 </Input>     
                               </FormGroup>
                             </Col>
                             <Col className="pl-md-1" md="4">
                               <FormGroup>
-                                <label>Target</label>
+                                <label>Use Big Data Set for Domain Values</label>
                                 <Input type="select" id="target">
-                                    {getSelectedTargets()}
+                                    {getBigDataSet()}
                                 </Input>
                               </FormGroup>
                             </Col>
                           </Row>
-                          <Row>
+                          <Row>   
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
-                              <label>Rules</label>
-                                <Input type="select" name="select" id="rules" multiple>
-                                    {getSelectedRules()}
-                                </Input>     
+                              <label>Geo Latitude</label>
+                                <Input type="input" name="text" id="latitude" defaultValue={target.lat}/>   
                               </FormGroup>
                             </Col>
                             <Col className="px-md-1" md="2">
                               <FormGroup>
-                                <label>Total Budget</label>
-                                <Input placeholder="0" type="number" id="total_budget"/>
+                              <label>Geo Longitude</label>
+                                <Input type="input" name="text" id="longitude" defaultValue={target.lon}/>   
+                              </FormGroup>
+                              </Col>
+                              <Col className="px-md-1" md="2">
+                              <FormGroup>
+                              <label>Geo Range</label>
+                                <Input type="input" name="text" id="rane" defaultValue={target.range}/>   
                               </FormGroup>
                             </Col>
-                            <Col className="pl-md-1" md="2">
-                              <FormGroup>
-                                <label>Daily Budget</label>
-                                <Input placeholder="0" type="number" id="daily_budget"/>
+                          </Row>
+                          <Row>
+                          <Col className="pr-md-1" md="4">
+                            <FormGroup>
+                              <label>Geo Region</label>
+                                <Input type="input" name="text" id="region" defaultValue={target.region}/>   
                               </FormGroup>
                             </Col>
-                            <Col className="pl-md-1" md="2">
-                              <FormGroup>
-                                <label>Hourly Budget</label>
-                                <Input placeholder="0" type="number" id="hourly_budget" />
+                            <Col className="px-md-1" md="2">
+                             <FormGroup>
+                              <label>Rules</label>
+                                <Input type="select" name="select" id="countries" multiple>
+                                    {getSelectedCountries()}
+                                </Input>     
                               </FormGroup>
+                            </Col>
+                            <Col className="pr-md-1" md="4">
+                            <FormGroup>
+                              <label>Carrier</label>
+                                <Input type="input" name="text" id="region" defaultValue={target.region}/>   
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                           <Col className="pr-md-1" md="4">
+                            <FormGroup>
+                              <label>Operating System</label>
+                                <Input type="input" name="text" id="os" defaultValue={target.os}/>   
+                              </FormGroup>
+                            </Col>
+                            <Col className="px-md-1" md="2">
+                             <FormGroup>
+                              <label>Make</label>
+                                <Input type="select" name="select" id="makes" multiple>
+                                    {getSelectedMakes()}
+                                </Input>     
+                              </FormGroup>
+                            </Col>
+                            <Col className="pr-md-1" md="4">
+                            <FormGroup>
+                                <label>Make</label>
+                                <Input type="select" name="select" id="models" multiple>
+                                    {getSelectedModels()}
+                                </Input>     
+                            </FormGroup>
+                            </Col>     
+                            <Col className="pr-md-1" md="4">
+                                <FormGroup>
+                                    <label>Device Types</label>
+                                    <Input type="select" name="select" id="device-types" multiple>
+                                        {getSelectedDeviceTypes()}
+                                    </Input>     
+                                </FormGroup>
+                            </Col>                           
+                          </Row>
+                          <Row>
+                            <Col>
+                                <FormGroup>
+                                    <label>IAB Whitelist</label>
+                                    <Input type="select" name="select" id="whitelist" multiple>
+                                        {getWhiteList()}
+                                    </Input>     
+                                </FormGroup>    
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <label>IAB Blacklist</label>
+                                    <Input type="select" name="select" id="blacklist" multiple>
+                                        {getBlackList()}
+                                    </Input>     
+                                </FormGroup>    
                             </Col>
                           </Row>
                         </Form>
                       </CardBody>
                       <CardFooter>
-                        <Button className="btn-fill" c
-                          color="primary" 
-                          type="submit"
-                          onClick={() => props.callback(campaign)}
-                         >
+                        <Button className="btn-fill" color="primary" 
+                            type="submit" onClick={() => props.callback(target)}>
                           Save
                         </Button>
                         <Button className="btn-fill" color="danger" type="submit" 
@@ -335,10 +355,9 @@ const getSelectedRegions = () => {
                       </CardFooter>
                     </Card>
                   </Col>
-     
                 </Row>
               </div>
             </>
           );
  }
- export default CampaignEditor;
+ export default TargetEditor;
