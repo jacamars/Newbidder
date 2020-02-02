@@ -115,6 +115,7 @@ var undef;
 
   const setInstances = async() => {
     vx.loggerCallback(fromCallback);
+
   }
 
     return (

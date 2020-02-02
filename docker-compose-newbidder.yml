@@ -18,12 +18,12 @@ services:
       ZOOKEEPER_IP: "zookeeper"
 #    networks:
 #      - rtb_net
+
     ports:
       - "9092:9092"
     restart: always
     depends_on:
       - zookeeper
-
 
   sqldb:
     image: "postgres"
@@ -97,6 +97,6 @@ services:
     command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
 
 
-networks:
-  rtb_net:
-    external: true
+#networks:
+#  rtb_net:
+#    external: true

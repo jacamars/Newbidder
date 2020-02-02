@@ -196,7 +196,7 @@ public class Commands implements WatchInterface {
 				var accounting = MemoryAccounting.getInstance().getValues();
 				System.out.println(accounting);
 				break;
-				
+
 			case "getkey":
 				key = sub.get(0);
 				Object x = BidCachePool.getClientInstance(client).get(key);

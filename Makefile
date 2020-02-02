@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .PHONY: clean local docker react
 
 build: application react docker
@@ -22,6 +23,20 @@ react:
 application:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 
+=======
+.PHONY: clean local docker
+
+build: application 
+
+application:
+	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+
+pookie:
+	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+	docker build -t pookie-w:5000/rtb4free:J11 .
+	docker push pookie-w:5000/rtb4free:J11
+
+>>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
 local:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 	docker build -t newbidder .

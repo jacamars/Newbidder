@@ -59,7 +59,9 @@ import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.SSL;
 import com.jacamars.dsp.rtb.fraud.ForensiqClient;
+
 import com.jacamars.dsp.rtb.logtap.WebMQPublisher;
+
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
@@ -1941,7 +1943,6 @@ class AdminHandler extends Handler {
 			}
 
 			// ///////////////////////////
-
 			if (target.contains(RTBServer.CAMPAIGN_URL)) {
 				String page = Charset.defaultCharset()
 						.decode(ByteBuffer.wrap(Files.readAllBytes(Paths.get(RTBServer.CAMPAIGN_ROOT)))).toString();
@@ -2031,8 +2032,7 @@ class AdminHandler extends Handler {
 					
 					return;
 				}
-				
-	
+
 			// /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		} catch (Exception e) {

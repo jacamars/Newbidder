@@ -78,9 +78,15 @@ const LeafMap = () => {
     setPositions([]);
   }
 
+<<<<<<< HEAD
   const setType = (data) => {
     vx.setMapType(data);
     vx.mapperCallback(data, handlePositions);
+=======
+  const setType = (data, server) => {
+    vx.setMapType(data);
+    vx.mapperCallback(data, server, handlePositions);
+>>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
   }
 
 
@@ -106,6 +112,7 @@ const LeafMap = () => {
 
   const setInstances = (na,server) => {
     setType("bids");
+
   }
 
   const show = () =>{

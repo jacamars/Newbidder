@@ -25,13 +25,13 @@ const  ViewContext = () => {
     const [members, setMembers] = useState([]);
     const [accounting, setAccounting] = useState({});
 
+
     const changeLoginState = async (value) => {
       if (value && loggedIn)
         return;
 
       if (!value && !loggedIn)
         return; 
-
       await setLoggedIn(value);
       return loggedIn;
     }
@@ -123,6 +123,7 @@ const  ViewContext = () => {
         interval = new Date().getTime();
         xhrLog = new XMLHttpRequest()
         xhrLog.open("GET", "http://" + server + "/subscribe?topic=logs", true);
+
         xhrLog.onreadystatechange = checkData;
         xhrLog.send(null);
         
@@ -174,6 +175,7 @@ const  ViewContext = () => {
         console.log("SERVER: " + server);
         mapXhr = new XMLHttpRequest();
         mapXhr.open("GET", "http://" + server + "/shortsub"+ "?topic=" + logname, true);
+
         mapXhr.onreadystatechange = checkData;
         mapXhr.send(null);
         
