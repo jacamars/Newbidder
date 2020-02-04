@@ -117,6 +117,9 @@ public class Creative  {
 	// If this creative is tagged with categories. Used by bidswitch for example
 	public List<String> categories;
 
+	/** SQL Name of this campaign */
+	public String name;
+	
 	// /////////////////////////////////////////////
 	/** Native content assets */
 	public NativeCreative nativead;

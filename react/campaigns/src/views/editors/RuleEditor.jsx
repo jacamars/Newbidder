@@ -64,96 +64,46 @@ const getTrueFalseOptions = (value)  =>{
 const getOperator = () => {
     return(
         <>
+        <option>Domain</option>
         <option>Equals</option>
-        <option>Not Equals</option>
-        <option>Less Than</option>
-        <option>Less Than Equals</option>
+        <option>Exists</option>
         <option>Greater Than</option>
         <option>Greater Than Equals</option>
+        <option>Inrange</option>
+        <option>Less Than</option>
+        <option>Less Than Equals</option>
+        <option>Member</option>
+        <option>Not Domain</option>
+        <option>Not Equals</option>
+        <option>Not Member</option>
+        <option>Not Regex</option>
+        <option>Not Stringin</option>
+        <option>Stringin</option>
         </>
     );
 }
 
-const getDomainTypes = () => {
-    return(
-        <>
-        </>
-    );
+const getOperandType = () => {
+  return(
+    <>
+    <option>Integer</option>
+    <option>String</option>
+    <option>Double</option>
+    </>
+  );
 }
 
-const getDomainValues = () => {
-    return(
-        <>
-        </>
-    );
-}
-
-
-const getBigDataSet = () => {
-    return(
-        <>
-        </>
-    );
-}
-
-const getSelectedCountries = () => {
-    return(
-        <>
-        </>
-    )
-}
-
-const getSelectedModels = () => {
-    return(
-        <>
-        </>
-    )
-}
-
-const getSelectedMakes = () => {
-    return(
-        <>
-        </>
-    )
-}
-
-const getSelectedDeviceTypes = () => {
-    return(
-        <>
-        </>
-    )
-}
-
-const getWhiteList = () => {
-    return(
-        <>
-        </>
-    )
-}
-
-const getBlackList = () => {
-    return(
-        <>
-        </>
-    )
+const getOperandOrdinal = () => {
+  return(
+    <>
+    <option>Scalar</option>
+    <option>List</option>
+    </>
+  );
 }
 
   const redraw = () => {
       setCount(count+1);
-  }
-
-  const update = () => {
-      props.callback(true);
-  }
-
-  const discard = () => {
-      props.callback(false);
-  }
-
-  const getLabel = () => {
-      if (rule.id === 0)
-        return (<div>Save</div>);
-      return(<div>Update</div>);
   }
 
         return (
@@ -209,7 +159,7 @@ const getBlackList = () => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                                 <label>Operator</label>
-                                <Input type="select" name="select" id="exchanges">
+                                <Input type="select" name="select" id="operator">
                                     {getOperator()}
                                 </Input>     
                               </FormGroup>
@@ -234,13 +184,17 @@ const getBlackList = () => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                               <label>Operand Type</label>
-                                <Input type="input" name="text" id="operand-type" defaultValue={rule.optype}/>   
+                                <Input type="select" name="text" id="operand-type"> 
+                                  {getOperandType()}
+                                </Input>
                               </FormGroup>
                               </Col>
                               <Col className="px-md-1" md="4">
                               <FormGroup>
-                              <label>Operand Value</label>
-                                <Input type="input" name="text" id="rane" defaultValue={rule.opvalue}/>   
+                              <label>Operand Ordinal</label>
+                                <Input type="select" name="text" id="ordinal">   
+                                  {getOperandOrdinal()}
+                                </Input>
                               </FormGroup>
                             </Col>
                           </Row>

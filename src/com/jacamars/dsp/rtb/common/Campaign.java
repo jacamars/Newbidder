@@ -1,7 +1,10 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -136,6 +139,10 @@ public class Campaign implements Comparable, Portable  {
     
     // when it was last updated if by sql
     public long updated_at;
+    /** points to the regions in the sql database */
+    public String regions;
+    /** points to the target id for this guy (used to make rules from the campaign manager) */
+    public int target_id;
     
     // ///////////// Crude accounting /////////////////////
     public transient long bids = 0L;
@@ -729,14 +736,18 @@ public class Campaign implements Comparable, Portable  {
 	
 	void setup() throws Exception {
 		// process
+		name = myNode.get("name").asText();
+		id = myNode.get(CAMPAIGN_ID).asInt();
 		adId = myNode.get(CAMPAIGN_ID).asText();
 		budget = new Budget();
 		
 		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
 		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost"));
 		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost"));
-		budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
-		budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
+		if (myNode.get(EXPIRE_TIME) != null)
+				budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
+		if (myNode.get(ACTIVATE_TIME) != null)
+			budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
 		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
 
 		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
@@ -781,7 +792,7 @@ public class Campaign implements Comparable, Portable  {
 			budget.hourlyBudget = null;
 
 		x = myNode.get("targetting");
-		if (x instanceof NullNode) {
+		if (x == null || x instanceof NullNode) {
 			if (!isActive())
 				return;
 			throw new Exception("Can't have null targetting for campaign " + adId);
@@ -828,9 +839,15 @@ public class Campaign implements Comparable, Portable  {
 				return;
 			throw new Exception("No targeting record was found. for " + adId);
 		}
-
+ 
 		ObjectNode targ = (ObjectNode) getMyNode().get("targetting");
-		targeting = new Targeting(targ);
+		if (targ != null)
+			targeting = new Targeting(targ); 
+		else {
+			if (target_id != 0) {
+				/** TBD Get from SQL db */
+			}
+		}
 
 		instantiate("banner", true);
 		instantiate("banner_video", false);
@@ -1011,4 +1028,77 @@ public class Campaign implements Comparable, Portable  {
 		return true;
 	}
 
+	public static PreparedStatement toSql(Campaign c, Connection conn) throws Exception {
+		if (c.id == 0) 
+			return doNew(c, conn);
+		return doUpdate(c, conn);
+	}
+	
+	static PreparedStatement doNew(Campaign c, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String sql = "INSERT INTO campaigns (" 
+		 +"activate_time,"
+		 +"expire_time,"
+		 +"cost,"
+		 +"ad_domain,"
+		 +"name,"
+		 +"status,"
+		 +"budget_limit_daily,"
+		 +"budget_limit_hourly,"
+		 +"total_budget,"
+		 +"forensiq,"
+		 +"created_at,"
+		 +"exchanges,"
+		 +"regions,"
+		 +"target_id) VALUES("
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		p = conn.prepareStatement(sql);
+		
+		if (c.date != null && c.date.size() == 2) {
+			p.setTimestamp(1,new Timestamp(c.date.get(0)));
+			p.setTimestamp(2,new Timestamp(c.date.get(1)));
+		} else {
+			p.setNull(1, Types.TIMESTAMP);
+			p.setNull(2, Types.TIMESTAMP);
+		}
+		p.setDouble(3, c.costAsDouble());
+		p.setString(4, c.adomain);
+		p.setString(5, c.name);
+		p.setString(6, c.status);
+		if (c.budget==null || c.budget.dailyBudget == null) {
+			p.setNull(7, Types.DECIMAL);
+			p.setNull(8, Types.DECIMAL);
+			p.setNull(9, Types.DECIMAL);
+		}  else {
+			p.setDouble(7,  c.budget.dailyBudget.doubleValue());
+			p.setDouble(8,  c.budget.hourlyBudget.doubleValue());
+			p.setDouble(9,  c.budget.totalBudget.doubleValue());
+		}
+		if (c.forensiq == null)
+			p.setNull(10,  Types.VARCHAR);
+		else
+			p.setString(10, ""+c.forensiq);
+		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
+		if (c.exchanges == null || c.exchanges.size() == 0)
+			p.setNull(12, Types.VARCHAR);
+		else
+			p.setString(12, ""+c.exchanges);
+		if (c.regions == null)
+			p.setNull(13, Types.VARCHAR);
+		else
+			p.setString(13,  c.regions);
+		if (c.target_id == 0)
+			p.setNull(14, Types.INTEGER);
+		else
+			p.setInt(14,  c.target_id);
+		
+		return p;
+	}
+	
+	static PreparedStatement doUpdate(Campaign c,  Connection conn) {
+		PreparedStatement p = null;
+		
+		return null;
+	}
 }

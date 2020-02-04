@@ -35,35 +35,10 @@ var undef;
 const CampaignEditor = (props) => {
 
   const [count, setCount] = useState(0);
-  const [campaign, setCampaign] = useState(props.campaign);
+  const [creative, setCreative] = useState(props.creative);
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
   const vx = useViewContext();
 
-const getAttachedCreatives = () => {
-    return(
-        <>
-        <option>Creative 1</option>
-        <option>Creative 2</option>
-        <option>Creative 3</option>
-        </>
-    );
-}
-
-const  addNewCampaign = async () => {
-    var x = campaign;
-    x.name = document.getElementById("name").value;
-    x.target = document.getElementById("target").value;
-    x.adomain = document.getElementById("adomain").value;
-    if (startDate != null) {
-      x.date = [];
-      x.date.push(startDate.getTime());
-      x.date.push(endDate.getTime());
-    }
-    if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
-
-    props.callback(x);
-}
 
 const getTrueFalseOptions = (value)  =>{
     if (value)
@@ -81,18 +56,14 @@ const getTrueFalseOptions = (value)  =>{
         );
 }
 
-const getSelectedExchangeOptions = () => {
+const getAttachedCampaign = () => {
     return(
         <>
-        <option>Adx</option>
-        <option>Bidswitch</option>
-        <option>Nexage</option>
-        <option>Openx</option>
-        <option>Smaato</option>
-        <option>Stroer</option>
+        <option>None</option>
         </>
     );
 }
+
 
 const getSelectedRules = () => {
     return(
@@ -105,29 +76,6 @@ const getSelectedRules = () => {
         <option>Rule 6</option>
         </>
     );
-}
-
-const getSelectedTargets = () => {
-    return(
-        <>
-        <option>Target 1</option>
-        <option>Target 2</option>
-        <option>Target 3</option>
-        <option>Target 4</option>
-        <option>Target 5</option>
-        </>
-    );
-}
-
-const getSelectedRegions = () => {
-    return(
-        <>
-        <option>US</option>
-        <option>APAC</option>
-        <option>EUROPE</option>
-        <option>Russia</option>
-        </>
-    )
 }
 
   const redraw = () => {
@@ -143,7 +91,7 @@ const getSelectedRegions = () => {
   }
 
   const getLabel = () => {
-      if (campaign.sqlid === -1)
+      if (creative.id === 0)
         return (<div>Save</div>);
       return(<div>Update</div>);
   }
@@ -155,7 +103,7 @@ const getSelectedRegions = () => {
                   <Col>
                     <Card>
                       <CardHeader>
-                        <h5 className="title">Edit Campaign Details</h5>
+                        <h5 className="title">Edit Creative Details</h5>
                       </CardHeader>
                       <CardBody>
                         <Form>
@@ -164,7 +112,7 @@ const getSelectedRegions = () => {
                               <FormGroup>
                                 <label>SQL ID (disabled)</label>
                                 <Input
-                                  defaultValue={campaign.id}
+                                  defaultValue={creative.id}
                                   disabled
                                   type="text"
                                 />
@@ -175,41 +123,54 @@ const getSelectedRegions = () => {
                                 <label>Name</label>
                                 <Input
                                   id="name"
-                                  defaultValue={campaign.name}
-                                  placeholder="Campaign Name/Ad Id (Required)"
+                                  defaultValue={creative.name}
+                                  placeholder="Creative Name (Required)"
                                   type="text"
                                 />
                               </FormGroup>
                             </Col>
-                            <Col className="pl-md-1" md="5">
+                            <Col className="pr-md-1" md="2">
                               <FormGroup>
-                                <label htmlFor="addomain">
-                                  Ad Domain
-                                </label>
-                                <Input 
-                                  id="adomain"
-                                  placeholder="Ad domain (required)"
-                                  defaultValue={campaign.adomain}
-                                  type="text" />
+                                <label>ECPM/Price</label>
+                                <Input
+                                  id="price"
+                                  defaultValue={creative.price}
+                                  placeholder="Creative Price (Required)"
+                                  type="text"
+                                />
                               </FormGroup>
                             </Col>
-                            <Col className="pl-md-1" md="2">
+                            <Col className="px-md-1" md="2">
                               <FormGroup>
-                              <Label for="exampleSelect" >Fraud</Label>
-                                <Input type="select" name="select" id="exampleSelect">
-                                    {getTrueFalseOptions(campaign.forensiq)}
-                                </Input>               
+                                <label>Currency</label>
+                                <Input
+                                  id="currency"
+                                  defaultValue={creative.cur}
+                                  placeholder="Creative Currency (Required)"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col className="px-md-1" md="2">
+                              <FormGroup>
+                                <label>Weight</label>
+                                <Input
+                                  id="currency"
+                                  defaultValue={creative.weight}
+                                  placeholder="Creative weight (Required)"
+                                  type="text"
+                                />
                               </FormGroup>
                             </Col>
                           </Row>
                           <Row>
                             <Col className="pr-md-1" md="12">
                               <FormGroup>
-                                <label>Creatives</label>
+                                <label>Campaign</label>
                                 <Input
                                     id="campaign"
-                                    type="select" multiple>
-                                    {getAttachedCreatives()}
+                                    type="select">
+                                    {getAttachedCampaign()}>
                                 </Input>
                               </FormGroup>
                             </Col>
@@ -238,8 +199,8 @@ const getSelectedRegions = () => {
                                 <Col>
                                 <DatePicker
                                     id="end"
-                                    selected={endDate}
-                                    onChange={date => setEndDate(date)}
+                                    selected={startDate}
+                                    onChange={date => setStartDate(date)}
                                     showTimeSelect
                                     timeFormat="HH:mm"
                                     timeIntervals={15}
@@ -249,15 +210,6 @@ const getSelectedRegions = () => {
                                 </Col>
                                 </FormGroup>
                              </Col>
-                             <Col className="px-md-1" md="3">
-                              <FormGroup>
-                                <label>Spend Rate/Minute</label>
-                                <Input id="spendRate"
-                                  defaultValue={campaign.assignedSpendRate}
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
                           </Row>
                           <Row>
                             <Col md="4">
@@ -290,33 +242,7 @@ const getSelectedRegions = () => {
                                 />
                               </FormGroup>
                             </Col>
-                          </Row>
-                          <Row>
-                            <Col className="pr-md-1" md="4">
-                              <FormGroup>
-                                <label>Region</label>
-                                <Input type="select" id="region" multiple>
-                                    {getSelectedRegions()}
-                                </Input>
-                              </FormGroup>
-                            </Col>
-                            <Col className="px-md-1" md="4">
-                              <FormGroup>
-                                <label>Exchanges</label>
-                                <Input type="select" name="select" id="exchanges" multiple>
-                                    {getSelectedExchangeOptions()}
-                                </Input>     
-                              </FormGroup>
-                            </Col>
-                            <Col className="pl-md-1" md="4">
-                              <FormGroup>
-                                <label>Target</label>
-                                <Input type="select" id="target">
-                                    {getSelectedTargets()}
-                                </Input>
-                              </FormGroup>
-                            </Col>
-                          </Row>
+                          </Row>                  
                           <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
@@ -351,7 +277,7 @@ const getSelectedRegions = () => {
                         <Button className="btn-fill" c
                           color="primary" 
                           type="submit"
-                          onClick={() => addNewCampaign()}
+                          onClick={() => props.callback(creative)}
                          >
                           Save
                         </Button>

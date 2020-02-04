@@ -111,7 +111,16 @@ def SetWeights(camp,weights):
 
 def SQLListCampaigns():
     try:
-        r = requests.post(globalHost, data='{"type":"SqlListCampaigns#"}')
+        r = requests.post(globalHost, data='{"type":"SQLListCampaigns#"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def SQLListCreatives():
+    try:
+        r = requests.post(globalHost, data='{"type":"SqlListCreatives#"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -121,6 +130,15 @@ def SQLListCampaigns():
 def SQLGetNewCampaign(camp):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetNewCampaign#","campaign":"' + camp + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def SQLGetNewCreative(name):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLGetNewCreative#","name":"' + name + '"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

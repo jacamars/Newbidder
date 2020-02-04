@@ -34,6 +34,10 @@ var undef;
 
   };
 
+  const refresh = async() => {
+      await vx.getDbCampaigns();
+  }
+
   const makeNew = async() => {
     if (campaign !== null)
         return;
@@ -42,18 +46,54 @@ var undef;
     setCampaign(camp);
   }
 
+  const editCampaign = async (id) => {
+    for(var i=0;i<vx.campaigns.length;i++) {
+      var x = vx.campaigns[i];
+      if (x.id === id) {
+        setCampaign(x);
+        return;
+      }
+    }
+  }
+
+  const deleteCampaign = async (id) => {
+    for(var i=0;i<vx.campaigns.length;i++) {
+      var x = vx.campaigns[i];
+      if (x.id === id) {
+        vx.deleteCampaign(id);
+        vx.getDbCampaigns();
+        redraw();
+        return;
+      }
+    }
+  }
+
   const getCampaignsView = () => {
 
-    return(
-        <div>
-        </div>
-    );
+    console.log("GetCampaigsView, rows = " + vx.campaigns.length);
+
+   return(
+      vx.campaigns.map((row, index) => (
+        <tr key={'campaignsview-' + row}>
+          <td>{index}</td>
+          <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
+          <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
+          <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
+          <td key={'campaignsview-running-'+ index} className="text-right">{""+row.running}</td>
+          <td key={'campaignsview-edit-'+ index} className="text-right">
+            <Button color="success" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button></td>
+            <td key={'campaignsview-edit-'+ index} className="text-right">
+          <Button color="danger" size="sm" onClick={()=>deleteCampaign(row.id)}>Delete</Button></td>
+        </tr>))
+    ); 
   }
 
   const update = (e) => {
       setCampaign(null);
       if (e !== null) {
-        // update database
+        alert("NEW CAMPAIGN: " + JSON.stringify(e,null,2));
+        vx.addNewCampaign(JSON.stringify(e));
+        vx.getDbCampaigns();
         setCampaign(null);
       }
       redraw();
@@ -65,7 +105,7 @@ var undef;
         <Row>
             <Col xs="12">
             { campaign == null && <>
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>

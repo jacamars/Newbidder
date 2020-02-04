@@ -30,6 +30,7 @@ const LoginModal = (props) => {
       return;
     console.log("Campaigns = " + mx.length);
     await vx.getAccounting();
+    await vx.getDbCampaigns();
     mx = await vx.getBidders();
     if (mx === undef)
       return;

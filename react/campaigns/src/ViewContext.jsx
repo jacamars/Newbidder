@@ -25,6 +25,7 @@ const  ViewContext = () => {
     const [members, setMembers] = useState([]);
     const [accounting, setAccounting] = useState({});
     const [runningCampaigns, setRunningCampaigns] = useState([])
+    const [campaigns, setCampaigns] = useState([]);               // db campaigns
     const [bidders, setBidders] = useState([]);
 
     const reset = () => {
@@ -58,7 +59,7 @@ const  ViewContext = () => {
       };
       var data = await execute(cmd);
 
-      if (data == undef)
+      if (data === undef)
         return;
       setRunningCampaigns(data.campaigns);
       return data.campaigns;
@@ -89,6 +90,61 @@ const  ViewContext = () => {
         return;
       setAccounting(data.accounting);
       return data.accounting;
+    }
+
+    const getNewCreative = async () => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetNewCreative#",
+        campaign: name
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLGetNewCreative returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+    const deleteCampaign = async (id) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLDeleteCampaign#",
+        id: id
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLDeleteCampaign returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+    const getDbCampaigns = async () => {
+      var cmd = {
+        token: jwt,
+        type: "SQLListCampaigns#"
+      };
+      var data = await execute(cmd);
+     console.log("=====> GetDbCampaigns returns: " + JSON.stringify(data,null,2));
+     setCampaigns(data.campaigns);
+     return data.campaigns;
+    }
+
+    const addNewCampaign = async(e) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLAddNewCampaign#",
+        campaign: e
+      };
+
+      console.log("==========>" + JSON.stringify(cmd,null,2));
+      var result = await execute(cmd);
+
+      console.log("SQLAddNewCampaign returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
     }
 
     const getNewCampaign = async(name) => {
@@ -142,7 +198,7 @@ const  ViewContext = () => {
           alert(response.data.error);
           return;
         }
-        // console.log("------>" + JSON.stringify(response,null,2));
+        //console.log("------>" + JSON.stringify(response,null,2));
         return response.data;
       } catch (error) {
         alert(error);
@@ -159,7 +215,8 @@ const  ViewContext = () => {
 
     return { 
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
-      getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule
+      getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, 
+      getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign
     };
 };
 

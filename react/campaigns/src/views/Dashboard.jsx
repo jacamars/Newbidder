@@ -64,7 +64,7 @@ var undef;
               <td key={'camps-wins-' + index} className="text-right">{vx.getCount(acc,row+".wins")}</td>
               <td key={'bidders-pixels-' + index} className="text-right">{vx.getCount(acc,row+".pixels")}</td>
               <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row+".clicks")}</td>
-              <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row+".adspend")/100000}</td>
+              <td key={'bidders-adspend-' + index} className="text-right">{vx.getCount(acc,row+".adspend")/100000}</td>
             </tr>))
         );
       }

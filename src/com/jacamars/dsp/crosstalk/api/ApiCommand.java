@@ -126,13 +126,23 @@ public class ApiCommand {
     
     public static final String GetAccounting = "GetAccounting#";
     
-    public static final String  SQLLIST_CAMPAIGNS = "SqlListCampaigns#";
+    public static final String  SQLLIST_CAMPAIGNS = "SQLListCampaigns#";
     
     public static final String SQLGET_NEW_CAMPAIGN = "SQLGetNewCampaign#";
     
     public static final String SQLGET_NEW_TARGET = "SQLGetNewTarget#";
     
+    public static final String SQLGET_NEW_CREATIVE = "SQLGetNewCreative#";
+    
     public static final String SQLGET_NEW_RULE = "SQLGetNewRule#";
+    
+    public static final String SQLLIST_CREATIVES = "SQLListCreatives#";
+    
+    public static final String SQLADD_NEW_CAMPAIGN= "SQLAddNewCampaign#";
+    
+    public static final String SQLDELETE_CAMPAIGN= "SQLDeleteCampaign#";
+    
+    
    
 
     /**
@@ -400,7 +410,23 @@ public class ApiCommand {
             case SQLGET_NEW_RULE:
             	cmd = mapper.readValue(data, SQLGetNewRuleCmd.class);
             	break;
-
+            	
+            case SQLLIST_CREATIVES:
+            	cmd = mapper.readValue(data, SQLListCreatives.class);
+            	break;
+            	
+            case SQLGET_NEW_CREATIVE:
+            	cmd = mapper.readValue(data, SQLGetNewCreativeCmd.class);
+            	break;
+            	
+            case SQLADD_NEW_CAMPAIGN:
+            	cmd = mapper.readValue(data, SQLAddNewCampaignCmd.class);
+            	break;
+            	
+            case SQLDELETE_CAMPAIGN:
+            	cmd = mapper.readValue(data, SQLDeleteCampaignCmd.class);
+            	break;
+            	
 
             default:
                 cmd = new UnknownCmd(token);

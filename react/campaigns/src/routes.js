@@ -26,10 +26,7 @@ import Simulator from "views/Simulator.jsx"
 import ConsoleLog from "views/ConsoleLog.jsx"
 import Campaigns from "views/Campaigns.jsx"
 import Targets from "views/Targets.jsx"
-import Videos from "views/Videos.jsx"
-import Banners from "views/Banners.jsx"
-import Audio from "views/Audio.jsx"
-import Native from "views/Native.jsx"
+import Creatives from "views/Creatives.jsx"
 import Rules from "views/Rules.jsx"
 
 
@@ -56,31 +53,10 @@ var routes = [
     layout: "/admin"
   },
   {
-    path: "/videos",
-    name: "Videos",
+    path: "/creatives",
+    name: "Creatives",
     icon: "tim-icons icon-video-66",
-    component: Videos,
-    layout: "/admin"
-  },
-  {
-    path: "/banners",
-    name: "Banners",
-    icon: "tim-icons icon-mobile",
-    component: Banners,
-    layout: "/admin"
-  },
-  {
-    path: "/audio",
-    name: "Audio",
-    icon: "tim-icons icon-headphones",
-    component: Audio,
-    layout: "/admin"
-  },
-  {
-    path: "/native",
-    name: "Native",
-    icon: "tim-icons icon-camera-18",
-    component: Native,
+    component: Creatives,
     layout: "/admin"
   },
   {
