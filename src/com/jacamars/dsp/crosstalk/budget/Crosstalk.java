@@ -411,6 +411,10 @@ public enum Crosstalk {
 		Configuration config = Configuration.getInstance();
 		var stmt = conn.createStatement();
 		List<Integer> list = new ArrayList<Integer>();
+		globalRtbSpecification = new HashMap<Integer, JsonNode>();
+		bannerRtbStd = JdbcTools.factory.arrayNode();
+		campaignRtbStd = JdbcTools.factory.arrayNode();
+		videoRtbStd = JdbcTools.factory.arrayNode();
 
 		for (int i = 0; i < nodes.size(); i++) {
 			ObjectNode x = (ObjectNode) nodes.get(i);
@@ -441,7 +445,6 @@ public enum Crosstalk {
 			return;
 
 		// /////////////////////////// GLOBAL rtb_spec
-		globalRtbSpecification = new HashMap<Integer, JsonNode>();
 		rs = stmt.executeQuery("select * from " + RTB_STD);
 		ArrayNode std = JdbcTools.convertToJson(rs);
 		Iterator<JsonNode> it = std.iterator();
@@ -450,7 +453,6 @@ public enum Crosstalk {
 			globalRtbSpecification.put(child.get("id").asInt(), child);
 		}
 
-		campaignRtbStd = JdbcTools.factory.arrayNode();
 		rs = stmt.executeQuery("select * from " + CAMP_RTB_STD);
 		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();
@@ -459,7 +461,6 @@ public enum Crosstalk {
 			campaignRtbStd.add(child);
 		}
 
-		bannerRtbStd = JdbcTools.factory.arrayNode();
 		rs = stmt.executeQuery("select * from " + BANNER_RTB_STD);
 		std = JdbcTools.convertToJson(rs);
 		it = std.iterator();

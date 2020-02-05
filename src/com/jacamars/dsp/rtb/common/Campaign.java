@@ -98,7 +98,7 @@ public class Campaign implements Comparable, Portable  {
 	public String weightAssignment;
 	
 	/** Set to runnable to make it actually loadable in the bidder. */
-	public String status;
+	public String status = "offline";
 	
 	public transient volatile ProportionalEntry weights;
 	
@@ -214,7 +214,7 @@ public class Campaign implements Comparable, Portable  {
 	 * Empty constructor, simply takes all defaults, useful for testing.
 	 */
 	public Campaign() {
-
+		budget = new Budget();
 	}
 	
 	/**
@@ -274,6 +274,8 @@ public class Campaign implements Comparable, Portable  {
 		this.adId = camp.adId;
 		this.name = camp.name;
 		this.forensiq = camp.forensiq;
+		this.status = camp.status;
+		this.name = camp.name;
 		this.frequencyCap = camp.frequencyCap;
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
@@ -790,6 +792,13 @@ public class Campaign implements Comparable, Portable  {
 			}
 		} else
 			budget.hourlyBudget = null;
+		
+		status = myNode.get("status").asText();
+		adomain = myNode.get("ad_domain").asText(); 
+		forensiq = myNode.get("forensiq").asBoolean();
+		/**
+		 * Do this last
+		 */
 
 		x = myNode.get("targetting");
 		if (x == null || x instanceof NullNode) {
@@ -798,7 +807,6 @@ public class Campaign implements Comparable, Portable  {
 			throw new Exception("Can't have null targetting for campaign " + adId);
 		}
 
-		adomain = myNode.get("ad_domain").asText();
 	}
 	
 	public boolean process() throws Exception {
@@ -861,7 +869,7 @@ public class Campaign implements Comparable, Portable  {
 		}
 		
 		if (forensiq != null) {
-			if (forensiq.equals("Y") || forensiq.equals("y"))
+			if (forensiq)
 				forensiq = true;
 			else
 				forensiq = false;
@@ -1076,9 +1084,9 @@ public class Campaign implements Comparable, Portable  {
 			p.setDouble(9,  c.budget.totalBudget.doubleValue());
 		}
 		if (c.forensiq == null)
-			p.setNull(10,  Types.VARCHAR);
+			p.setNull(10,  Types.BOOLEAN);
 		else
-			p.setString(10, ""+c.forensiq);
+			p.setBoolean(10,c.forensiq);
 		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
 		if (c.exchanges == null || c.exchanges.size() == 0)
 			p.setNull(12, Types.VARCHAR);
@@ -1096,9 +1104,67 @@ public class Campaign implements Comparable, Portable  {
 		return p;
 	}
 	
-	static PreparedStatement doUpdate(Campaign c,  Connection conn) {
+	static PreparedStatement doUpdate(Campaign c,  Connection conn) throws Exception {
 		PreparedStatement p = null;
+		String sql = "UPDATE campaigns SET "
+		 +"activate_time=?,"
+		 +"expire_time=?,"
+		 +"cost=?,"
+		 +"ad_domain=?,"
+		 +"name=?,"
+		 +"status=?,"
+		 +"budget_limit_daily=?,"
+		 +"budget_limit_hourly=?,"
+		 +"total_budget=?,"
+		 +"forensiq=?,"
+		 +"updated_at=?,"
+		 +"exchanges=?,"
+		 +"regions=?,"
+		 +"target_id=? WHERE id=?";
+
 		
-		return null;
+		p = conn.prepareStatement(sql);
+		
+		if (c.date != null && c.date.size() == 2) {
+			p.setTimestamp(1,new Timestamp(c.date.get(0)));
+			p.setTimestamp(2,new Timestamp(c.date.get(1)));
+		} else {
+			p.setNull(1, Types.TIMESTAMP);
+			p.setNull(2, Types.TIMESTAMP);
+		}
+		p.setDouble(3, c.costAsDouble());
+		p.setString(4, c.adomain);
+		p.setString(5, c.name);
+		p.setString(6, c.status);
+		if (c.budget==null || c.budget.dailyBudget == null) {
+			p.setNull(7, Types.DECIMAL);
+			p.setNull(8, Types.DECIMAL);
+			p.setNull(9, Types.DECIMAL);
+		}  else {
+			p.setDouble(7,  c.budget.dailyBudget.doubleValue());
+			p.setDouble(8,  c.budget.hourlyBudget.doubleValue());
+			p.setDouble(9,  c.budget.totalBudget.doubleValue());
+		}
+		if (c.forensiq == null)
+			p.setNull(10,  Types.VARCHAR);
+		else
+			p.setBoolean(10, c.forensiq);
+		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
+		if (c.exchanges == null || c.exchanges.size() == 0)
+			p.setNull(12, Types.VARCHAR);
+		else
+			p.setString(12, ""+c.exchanges);
+		if (c.regions == null)
+			p.setNull(13, Types.VARCHAR);
+		else
+			p.setString(13,  c.regions);
+		if (c.target_id == 0)
+			p.setNull(14, Types.INTEGER);
+		else
+			p.setInt(14,  c.target_id);
+		
+		p.setInt(15, c.id);
+		
+		return p;
 	}
 }

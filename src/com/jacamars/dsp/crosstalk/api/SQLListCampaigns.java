@@ -81,6 +81,8 @@ public class SQLListCampaigns extends ApiCommand {
 					int id = rs.getInt("id");
 					String name = rs.getString("name");
 					String status = rs.getString("status");
+					if (status == null)
+						status = "offline";
 					Map m= new HashMap();
 					m.put("id", id);
 					m.put("name", name);

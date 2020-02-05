@@ -47,25 +47,29 @@ var undef;
   }
 
   const editCampaign = async (id) => {
-    for(var i=0;i<vx.campaigns.length;i++) {
-      var x = vx.campaigns[i];
-      if (x.id === id) {
-        setCampaign(x);
-        return;
-      }
-    }
+    var x = await vx.getDbCampaign(id);
+    setCampaign(x);
   }
 
   const deleteCampaign = async (id) => {
     for(var i=0;i<vx.campaigns.length;i++) {
       var x = vx.campaigns[i];
       if (x.id === id) {
-        vx.deleteCampaign(id);
-        vx.getDbCampaigns();
+        await vx.deleteCampaign(id);
+        await vx.getDbCampaigns();
         redraw();
         return;
       }
     }
+  }
+
+  const checkRunning = (name) => {
+    for (var i=0;i<vx.runningCampaigns;i++) {
+      var x = vx.runningCampaigns[i];
+      if (x.name === name)
+        return true;
+    }
+    return false;
   }
 
   const getCampaignsView = () => {
@@ -79,10 +83,10 @@ var undef;
           <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
           <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
-          <td key={'campaignsview-running-'+ index} className="text-right">{""+row.running}</td>
+          <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
           <td key={'campaignsview-edit-'+ index} className="text-right">
             <Button color="success" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button></td>
-            <td key={'campaignsview-edit-'+ index} className="text-right">
+            <td key={'campaignsview-delete-'+ index} className="text-right">
           <Button color="danger" size="sm" onClick={()=>deleteCampaign(row.id)}>Delete</Button></td>
         </tr>))
     ); 
@@ -91,7 +95,7 @@ var undef;
   const update = (e) => {
       setCampaign(null);
       if (e !== null) {
-        alert("NEW CAMPAIGN: " + JSON.stringify(e,null,2));
+        //alert("NEW CAMPAIGN: " + JSON.stringify(e,null,2));
         vx.addNewCampaign(JSON.stringify(e));
         vx.getDbCampaigns();
         setCampaign(null);
@@ -102,7 +106,7 @@ var undef;
   return (
     <div className="content">
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
-        <Row>
+        <Row id={"running-"+count}>
             <Col xs="12">
             { campaign == null && <>
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>

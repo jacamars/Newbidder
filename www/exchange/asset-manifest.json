@@ -1,13 +1,13 @@
 {
   "main.css": "/exchange/static/css/main.52062955.chunk.css",
-  "main.js": "/exchange/static/js/main.0b7689fe.chunk.js",
-  "main.js.map": "/exchange/static/js/main.0b7689fe.chunk.js.map",
+  "main.js": "/exchange/static/js/main.f46c0ee1.chunk.js",
+  "main.js.map": "/exchange/static/js/main.f46c0ee1.chunk.js.map",
   "runtime~main.js": "/exchange/static/js/runtime~main.0d992388.js",
   "runtime~main.js.map": "/exchange/static/js/runtime~main.0d992388.js.map",
-  "static/js/2.bb8fe6e6.chunk.js": "/exchange/static/js/2.bb8fe6e6.chunk.js",
-  "static/js/2.bb8fe6e6.chunk.js.map": "/exchange/static/js/2.bb8fe6e6.chunk.js.map",
+  "static/js/2.faca00f7.chunk.js": "/exchange/static/js/2.faca00f7.chunk.js",
+  "static/js/2.faca00f7.chunk.js.map": "/exchange/static/js/2.faca00f7.chunk.js.map",
   "index.html": "/exchange/index.html",
-  "precache-manifest.872d4d77004b617423debd8a4bb68760.js": "/exchange/precache-manifest.872d4d77004b617423debd8a4bb68760.js",
+  "precache-manifest.330a9d386a1d7aaac33c9106477a6613.js": "/exchange/precache-manifest.330a9d386a1d7aaac33c9106477a6613.js",
   "service-worker.js": "/exchange/service-worker.js",
   "static/css/main.52062955.chunk.css.map": "/exchange/static/css/main.52062955.chunk.css.map"
 }

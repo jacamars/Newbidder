@@ -78,7 +78,10 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				JsonNode node = mapper.readValue(campaign,JsonNode.class);
+				System.out.println("NEW CAMPAIGN: " + campaign);
+				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
+				node.put("ad_domain", node.get("adomain").asText()); // normalize to SQL origin
+				
 				Campaign c = new Campaign(node);
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();

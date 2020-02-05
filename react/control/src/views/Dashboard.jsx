@@ -96,13 +96,8 @@ const Dashboard = (props) => {
     var leader = '';
     var selected = vx.selectedHost;
     if (list.length===1) {
-<<<<<<< HEAD
       output  = <option>{list[0].from + '*'}</option>;
       vx.setSelectedHost(list[0].from);
-=======
-      output  = <option>{list[0].name + '*'}</option>;
-      vx.setSelectedHost(list[0].name);
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
       setLeader(list[0].name);
     } else {
       for (var i=0;i<list.length;i++) {
@@ -112,11 +107,7 @@ const Dashboard = (props) => {
         } else
           leader = '';
         if (selected !== '') {
-<<<<<<< HEAD
           if (selected === list[i].from)
-=======
-          if (selected === list[i].name)
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
             output += <option selected>{list[i].name + leader}</option>;
           else
             output += <option>{list[i].from + leader}</option>;
@@ -124,11 +115,7 @@ const Dashboard = (props) => {
           if (i === 0) {
             output += <option selected>All Instances</option>;
           }
-<<<<<<< HEAD
           output += <option>{list[i].from + leader}</option>;
-=======
-          output += <option>{list[i].name + leader}</option>;
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
           vx.setSelectedInstance("All Instances");
         }
       }
@@ -144,15 +131,9 @@ const Dashboard = (props) => {
     setCampaigns(setCampaignsViewInternal(rows,accounts));
   }
 
-<<<<<<< HEAD
   const setCampaignsViewInternal = (rows,accounts) => {
     if (rows ===undef)
       return null; 
-=======
-  const setCampaignsViewInternal = (rows) => {
-    if (rows ===undef)
-      return null;
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
 
     return(
       rows.map((row, i) => (<tr key={'"campaign-view-' + i + '"'}>
@@ -187,18 +168,6 @@ const Dashboard = (props) => {
     }
   }
 
-<<<<<<< HEAD
-=======
-  /*const login = async (server) => {
-    var mx = await vx.getMembers(server);
-    console.log("MEMBERS = " + mx.length);
-    if (mx === undef)
-      return;
-    vx.changeLoginState(true);
-    setInstances(mx);
-  }*/
-
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
   function stringify(value) {
 		var seen = [];
 
@@ -214,30 +183,17 @@ const Dashboard = (props) => {
 	}
 
   const getSnapShotView = (rows) => {
-<<<<<<< HEAD
-=======
-    console.log("GET SNAPSHOT VIEW: " + stringify(rows));
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
     if (rows === undef)
       return null;
     return(
       rows.map((row, index) => (
         <tr key={'snaphotview-' + row}>
-<<<<<<< HEAD
           <td>{row.from}</td>
           <td key={'snaphotview-request-' + index} className="text-right">{row.request}</td>
           <td key={'snaphotview-bid-' + index} className="text-right">{row.bid}</td>
           <td key={'snaphotview-win-' + index} className="text-right">{row.win}</td>
           <td key={'snaphotview-pixels-' + index} className="text-right">{row.pixels}</td>
           <td key={'snaphotview-clicks-' + index} className="text-right">{row.clicks}</td>
-=======
-          <td>{row.name}</td>
-          <td key={'snaphotview-request-' + index} className="text-right">{row.values.request}</td>
-          <td key={'snaphotview-bid-' + index} className="text-right">{row.values.bid}</td>
-          <td key={'snaphotview-win-' + index} className="text-right">{row.values.win}</td>
-          <td key={'snaphotview-pixels-' + index} className="text-right">{row.values.pixels}</td>
-          <td key={'snaphotview-clicks-' + index} className="text-right">{row.values.clicks}</td>
->>>>>>> 1ed300a25d45ec953eba229f9cb52ade266fb891
         </tr>))
     )
   }

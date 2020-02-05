@@ -142,6 +142,8 @@ public class ApiCommand {
     
     public static final String SQLDELETE_CAMPAIGN= "SQLDeleteCampaign#";
     
+    public static final String SQLGET_CAMPAIGN= "SQLGetCampaign#";
+    
     
    
 
@@ -427,6 +429,9 @@ public class ApiCommand {
             	cmd = mapper.readValue(data, SQLDeleteCampaignCmd.class);
             	break;
             	
+            case SQLGET_CAMPAIGN:
+            	cmd = mapper.readValue(data, SQLGetCampaignCmd.class);
+            	break;
 
             default:
                 cmd = new UnknownCmd(token);

@@ -135,6 +135,15 @@ def SQLGetNewCampaign(camp):
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
+    
+def SQLGetCampaign(id):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '"}')
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
         
 def SQLGetNewCreative(name):
     try:

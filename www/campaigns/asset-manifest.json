@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/campaigns/static/css/main.25dfc104.chunk.css",
-    "main.js": "/campaigns/static/js/main.f8c728fb.chunk.js",
-    "main.js.map": "/campaigns/static/js/main.f8c728fb.chunk.js.map",
+    "main.css": "/campaigns/static/css/main.96b86008.chunk.css",
+    "main.js": "/campaigns/static/js/main.ae865a75.chunk.js",
+    "main.js.map": "/campaigns/static/js/main.ae865a75.chunk.js.map",
     "runtime-main.js": "/campaigns/static/js/runtime-main.d1c1e605.js",
     "runtime-main.js.map": "/campaigns/static/js/runtime-main.d1c1e605.js.map",
-    "static/css/2.9e63dcda.chunk.css": "/campaigns/static/css/2.9e63dcda.chunk.css",
-    "static/js/2.053cd35c.chunk.js": "/campaigns/static/js/2.053cd35c.chunk.js",
-    "static/js/2.053cd35c.chunk.js.map": "/campaigns/static/js/2.053cd35c.chunk.js.map",
+    "static/css/2.ad6377a1.chunk.css": "/campaigns/static/css/2.ad6377a1.chunk.css",
+    "static/js/2.cad91c2e.chunk.js": "/campaigns/static/js/2.cad91c2e.chunk.js",
+    "static/js/2.cad91c2e.chunk.js.map": "/campaigns/static/js/2.cad91c2e.chunk.js.map",
     "index.html": "/campaigns/index.html",
-    "precache-manifest.b01e15e8f1f58efaf75c65cbe625d8e5.js": "/campaigns/precache-manifest.b01e15e8f1f58efaf75c65cbe625d8e5.js",
+    "precache-manifest.534da8cbee3eee52b3fd64a620346c64.js": "/campaigns/precache-manifest.534da8cbee3eee52b3fd64a620346c64.js",
     "service-worker.js": "/campaigns/service-worker.js",
-    "static/css/2.9e63dcda.chunk.css.map": "/campaigns/static/css/2.9e63dcda.chunk.css.map",
-    "static/css/main.25dfc104.chunk.css.map": "/campaigns/static/css/main.25dfc104.chunk.css.map",
-    "static/js/2.053cd35c.chunk.js.LICENSE": "/campaigns/static/js/2.053cd35c.chunk.js.LICENSE",
-    "static/js/main.f8c728fb.chunk.js.LICENSE": "/campaigns/static/js/main.f8c728fb.chunk.js.LICENSE",
+    "static/css/2.ad6377a1.chunk.css.map": "/campaigns/static/css/2.ad6377a1.chunk.css.map",
+    "static/css/main.96b86008.chunk.css.map": "/campaigns/static/css/main.96b86008.chunk.css.map",
+    "static/js/2.cad91c2e.chunk.js.LICENSE.txt": "/campaigns/static/js/2.cad91c2e.chunk.js.LICENSE.txt",
+    "static/js/main.ae865a75.chunk.js.LICENSE.txt": "/campaigns/static/js/main.ae865a75.chunk.js.LICENSE.txt",
     "static/media/anime3.png": "/campaigns/static/media/anime3.bd6820f1.png",
     "static/media/emilyz.jpg": "/campaigns/static/media/emilyz.9fcf69e5.jpg",
     "static/media/nucleo-icons.css": "/campaigns/static/media/nucleo.f0b489a5.woff",
@@ -22,9 +22,9 @@
   },
   "entrypoints": [
     "static/js/runtime-main.d1c1e605.js",
-    "static/css/2.9e63dcda.chunk.css",
-    "static/js/2.053cd35c.chunk.js",
-    "static/css/main.25dfc104.chunk.css",
-    "static/js/main.f8c728fb.chunk.js"
+    "static/css/2.ad6377a1.chunk.css",
+    "static/js/2.cad91c2e.chunk.js",
+    "static/css/main.96b86008.chunk.css",
+    "static/js/main.ae865a75.chunk.js"
   ]
 }
