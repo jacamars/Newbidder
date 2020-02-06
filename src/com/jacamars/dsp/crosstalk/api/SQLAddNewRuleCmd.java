@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Node;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
@@ -25,15 +26,15 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
  * @author Ben M. Faul
  *
  */
-public class SQLDeleteCampaignCmd extends ApiCommand {
+public class SQLAddNewRuleCmd extends ApiCommand {
 	
 	ResultSet rs = null;
-	public int id;
+	public String rule;
 
 	/**
 	 * Default constructor
 	 */
-	public SQLDeleteCampaignCmd() {
+	public SQLAddNewRuleCmd() {
 
 	}
 
@@ -45,9 +46,9 @@ public class SQLDeleteCampaignCmd extends ApiCommand {
 	 * @param password
 	 *            String. Password authorization for command.
 	 */
-	public SQLDeleteCampaignCmd(String username, String password) {
+	public SQLAddNewRuleCmd(String username, String password) {
 		super(username, password);
-		type = SQLADD_NEW_CAMPAIGN;
+		type = SQLADD_NEW_RULE;
 	}
 
 	/**
@@ -60,9 +61,9 @@ public class SQLDeleteCampaignCmd extends ApiCommand {
 	 * @param target
 	 *            String. The bidder to start.
 	 */
-	public SQLDeleteCampaignCmd(String username, String password, String target) {
+	public SQLAddNewRuleCmd(String username, String password, String target) {
 		super(username, password);
-		type = SQLADD_NEW_CAMPAIGN;
+		type = SQLADD_NEW_RULE;
 	}
 
 	/**
@@ -79,12 +80,15 @@ public class SQLDeleteCampaignCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-						prepareStatement("delete from campaigns where id=?");
-				st.setInt(1, id);
+				System.out.println("NEW RULE: " + rule);
+				ObjectNode x = mapper.readValue(rule,ObjectNode.class);
+				Node n = new Node(x);
+	
+				PreparedStatement st = Node.toSql(n, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
 				st.close();
-				 
+				
+				
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

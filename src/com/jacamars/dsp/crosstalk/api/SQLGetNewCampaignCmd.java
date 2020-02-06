@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.rtb.common.Budget;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
@@ -83,6 +84,7 @@ public class SQLGetNewCampaignCmd extends ApiCommand {
 			super.execute();
 			try {
 				data =  new Campaign();
+				data.budget = new Budget();
 				data.adId = campaign;
 				return;
 			} catch (Exception err) {

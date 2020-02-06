@@ -26,6 +26,7 @@ const  ViewContext = () => {
     const [accounting, setAccounting] = useState({});
     const [runningCampaigns, setRunningCampaigns] = useState([])
     const [campaigns, setCampaigns] = useState([]);               // db campaigns
+    const [rules, setRules] = useState([]);
     const [bidders, setBidders] = useState([]);
 
     const reset = () => {
@@ -66,7 +67,26 @@ const  ViewContext = () => {
 
       if (data === undef)
         return;
+      
+        console.log("ListCampaigns returns: " + JSON.stringify(data,null,2));
       setRunningCampaigns(data.campaigns);
+      return data.campaigns;
+    }
+
+    const listRules = async() => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        type: "SQLListRules#"
+      };
+      var data = await execute(cmd);
+
+      if (data === undef)
+        return;
+      
+      console.log("ListRules returns: " + JSON.stringify(data,null,2));
+      setRules(data.rules);
       return data.campaigns;
     }
 
@@ -90,7 +110,7 @@ const  ViewContext = () => {
       };
       var data = await execute(cmd);
 
-      console.log("GetAccounting returns: " + JSON.stringify(data,null,2));
+      //console.log("GetAccounting returns: " + JSON.stringify(data,null,2));
       if (data === undef)
         return;
       setAccounting(data.accounting);
@@ -172,6 +192,24 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const addNewRule = async(e) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLAddNewRule#",
+        rule: JSON.stringify(e)
+      };
+
+      console.log("==========>" + JSON.stringify(cmd,null,2));
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLAddNewRule returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
     const getNewCampaign = async(name) => {
       var cmd = {
         token: jwt,
@@ -247,7 +285,8 @@ const  ViewContext = () => {
     return { 
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
-      getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign
+      getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
+      listRules, rules, addNewRule
     };
 };
 

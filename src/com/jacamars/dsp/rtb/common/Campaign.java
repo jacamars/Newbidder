@@ -56,6 +56,7 @@ import com.jacamars.dsp.rtb.tools.JdbcTools;
  * @author Ben M. Faul
  *
  */
+
 public class Campaign implements Comparable, Portable  {
 	public static final int CLASS_ID = 3;
 	
@@ -72,9 +73,7 @@ public class Campaign implements Comparable, Portable  {
 	/** The list of constraint nodes for this campaign */
 	public List<Node> attributes = new ArrayList<Node>();
 	/** The list of creatives for this campaign */
-	public List<Creative> creatives = new ArrayList<Creative>();
-	/** Start and end date for this campaign */
-	public List<Integer> date = new ArrayList<Integer>();
+	public List<Creative> creatives = new ArrayList<Creative>();;
 	/** IAB Categories */
 	public List<String> category;
 	/** encoded IAB category */
@@ -159,7 +158,7 @@ public class Campaign implements Comparable, Portable  {
     transient JsonNode myNode;
     transient Targeting targeting;
 	/** The exchanges this campaign can be used with */
-	transient List<String> exchanges = new ArrayList<String>();
+	public List<String> exchanges = new ArrayList<String>();
 	transient List<String> bcat = new ArrayList<String>();
 	transient String capSpec;	
 	/** Number of seconds before the frequency cap expires */
@@ -214,7 +213,7 @@ public class Campaign implements Comparable, Portable  {
 	 * Empty constructor, simply takes all defaults, useful for testing.
 	 */
 	public Campaign() {
-		budget = new Budget();
+
 	}
 	
 	/**
@@ -228,7 +227,6 @@ public class Campaign implements Comparable, Portable  {
 		process();
 		doTargets();
 	}
-
 	
 	/**
 	 * Constructor using a string JSON. This is used by file readers.
@@ -240,6 +238,7 @@ public class Campaign implements Comparable, Portable  {
 		Campaign camp = DbTools.mapper.readValue(data, Campaign.class);
 		init(camp);
 	}
+	
 	
 	/**
 	 * Crosstalk updates a campaign using this.
@@ -270,7 +269,6 @@ public class Campaign implements Comparable, Portable  {
 		this.adomain = camp.adomain;
 		this.attributes = camp.attributes;
 		this.creatives = camp.creatives;
-		this.date = camp.date;
 		this.adId = camp.adId;
 		this.name = camp.name;
 		this.forensiq = camp.forensiq;
@@ -279,6 +277,7 @@ public class Campaign implements Comparable, Portable  {
 		this.frequencyCap = camp.frequencyCap;
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
+		this.assignedSpendRate = camp.assignedSpendRate;
 		if (camp.category != null)
 			this.category = camp.category;
 		
@@ -771,6 +770,7 @@ public class Campaign implements Comparable, Portable  {
 
 		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
 			exchanges.clear();
+			
 			String str = getMyNode().get("exchanges").asText(null);
 			if (str != null) {
 				Targeting.getList(exchanges, str);
@@ -796,6 +796,8 @@ public class Campaign implements Comparable, Portable  {
 		status = myNode.get("status").asText();
 		adomain = myNode.get("ad_domain").asText(); 
 		forensiq = myNode.get("forensiq").asBoolean();
+		assignedSpendRate = myNode.get("spendrate").asInt();
+		regions = myNode.get("regions").asText();
 		/**
 		 * Do this last
 		 */
@@ -1058,14 +1060,15 @@ public class Campaign implements Comparable, Portable  {
 		 +"created_at,"
 		 +"exchanges,"
 		 +"regions,"
-		 +"target_id) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		 +"target_id,"
+		 +"spendrate) VALUES("
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 		
 		p = conn.prepareStatement(sql);
 		
-		if (c.date != null && c.date.size() == 2) {
-			p.setTimestamp(1,new Timestamp(c.date.get(0)));
-			p.setTimestamp(2,new Timestamp(c.date.get(1)));
+		if (c.budget != null) {
+			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
 		} else {
 			p.setNull(1, Types.TIMESTAMP);
 			p.setNull(2, Types.TIMESTAMP);
@@ -1090,8 +1093,16 @@ public class Campaign implements Comparable, Portable  {
 		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
 		if (c.exchanges == null || c.exchanges.size() == 0)
 			p.setNull(12, Types.VARCHAR);
-		else
-			p.setString(12, ""+c.exchanges);
+		else {
+			var s = "";
+			for (int i=0;i<c.exchanges.size();i++) {
+				s += c.exchanges.get(i);
+				if (i+1 < c.exchanges.size())
+					s += ",";
+			}
+			p.setString(12, s);
+		}
+
 		if (c.regions == null)
 			p.setNull(13, Types.VARCHAR);
 		else
@@ -1100,6 +1111,7 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(14, Types.INTEGER);
 		else
 			p.setInt(14,  c.target_id);
+		p.setInt(15,(int)c.assignedSpendRate);
 		
 		return p;
 	}
@@ -1120,14 +1132,15 @@ public class Campaign implements Comparable, Portable  {
 		 +"updated_at=?,"
 		 +"exchanges=?,"
 		 +"regions=?,"
-		 +"target_id=? WHERE id=?";
+		 +"target_id=?,"
+		 +"spendrate=? WHERE id=?";
 
 		
 		p = conn.prepareStatement(sql);
 		
-		if (c.date != null && c.date.size() == 2) {
-			p.setTimestamp(1,new Timestamp(c.date.get(0)));
-			p.setTimestamp(2,new Timestamp(c.date.get(1)));
+		if (c.budget != null) {
+			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
 		} else {
 			p.setNull(1, Types.TIMESTAMP);
 			p.setNull(2, Types.TIMESTAMP);
@@ -1150,10 +1163,20 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setBoolean(10, c.forensiq);
 		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
+		
 		if (c.exchanges == null || c.exchanges.size() == 0)
 			p.setNull(12, Types.VARCHAR);
-		else
-			p.setString(12, ""+c.exchanges);
+		else {
+			var s = "";
+			for (int i=0;i<c.exchanges.size();i++) {
+				s += c.exchanges.get(i);
+				if (i+1 < c.exchanges.size())
+					s += ",";
+			}
+			System.out.println("=======>" + c.exchanges);
+			p.setString(12, s);
+		}
+		
 		if (c.regions == null)
 			p.setNull(13, Types.VARCHAR);
 		else
@@ -1163,7 +1186,11 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setInt(14,  c.target_id);
 		
-		p.setInt(15, c.id);
+		System.out.println("============> " + c.assignedSpendRate);
+		p.setInt(15, (int)c.assignedSpendRate);
+		
+		p.setInt(16, c.id);
+
 		
 		return p;
 	}

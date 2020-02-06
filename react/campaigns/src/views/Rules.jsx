@@ -30,6 +30,11 @@ const Rules = (props) => {
         setCount(count+1);
     }
 
+    const refresh = async () => {
+      await vx.listRules();
+      redraw();
+    }
+
   const setInstances = () => {
 
   };
@@ -43,19 +48,37 @@ const Rules = (props) => {
   }
 
   const getRulesView = () => {
+    console.log("GetRulesView, rows = " + vx.rules.length);
 
     return(
-        <div>
-        </div>
-    );
-  }
+       vx.rules.map((row, index) => (
+         <tr key={'rulesview-' + row}>
+           <td>{index}</td>
+           <td key={'rules-name-' + index} className="text-left">{row.name}</td>
+           <td key={'rules-id-' + index} className="text-right">{row.id}</td>
+           <td key={'rules-description' + index} className="text-right">{row.name}</td>
+           <td key={'rules-edit-'+ index} className="text-right">
+             <Button color="success" size="sm" onClick={()=>editRule(row.id)}>Edit</Button></td>
+             <td key={'campaignsview-delete-'+ index} className="text-right">
+           <Button color="danger" size="sm" onClick={()=>deleteRule(row.id)}>Delete</Button></td>
+         </tr>))
+     ); 
+   }
 
-  const update = (e) => {
-      setRule(null);
+   const editRule = (id) => {
+
+   }
+
+   const deleteRule = (id) => {
+
+   }
+
+  const update = async(e) => {
       if (e !== null) {
-        // update database
-        setRule(null);
+        await vx.addNewRule(e);
+        await vx.listRules();
       }
+      setRule(null);
       redraw();
   }
 
@@ -65,7 +88,7 @@ const Rules = (props) => {
         <Row>
             <Col xs="12">
             { rule == null && <>
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>
@@ -80,7 +103,7 @@ const Rules = (props) => {
                             <th>#</th>
                             <th className="text-center">Name</th>
                             <th className="text-right">SQL-ID</th>
-                            <th className="text-right">Rule</th>
+                            <th className="text-right">Hierarchy</th>
                           </tr>
                       </thead>
                       <tbody>

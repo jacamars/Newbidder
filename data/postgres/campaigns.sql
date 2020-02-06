@@ -25,5 +25,6 @@ CREATE TABLE IF NOT EXISTS campaigns (
   exchanges varchar(255) DEFAULT NULL,
   regions varchar(255) DEFAULT NULL,
   target_id int DEFAULT NULL,
+  spendrate int DEFAULT NULL,
   PRIMARY KEY (id)
 );

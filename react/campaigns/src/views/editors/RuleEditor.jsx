@@ -29,6 +29,10 @@ import { useViewContext } from "../../ViewContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+var ops = [ "Domain","Equals","Exists","Greater Than","Greater Than Equals","Inrange","Less Than","Less Than Equals",
+  "Member","Not Domain","Not Equals","Not Member","Not Regex","Not Stringin","Regex","Stringin"];
+var types =["Integer","String","Double"];
+var ords =["Scalar","List"];
 
 var undef;
 
@@ -61,45 +65,57 @@ const getTrueFalseOptions = (value)  =>{
         );
 }
 
+const addNewRule = (r) => {
+  if (!rule.id)
+    rule.id = 0;
+  rule.name = document.getElementById("name").value;
+  rule.rtbspecification = document.getElementById("hierarchy").value;
+  rule.op = document.getElementById("operator").value;
+  rule.operand = document.getElementById("operand").value;
+  rule.operand_type = document.getElementById("type").value;
+  rule.operand_ordinal = document.getElementById("ordinal").value;
+  if (document.getElementById("required").value ==="true")
+    rule.notPresentOk=false;
+  else
+    rule.notPresentOk=true;
+  alert(JSON.stringify(r,null,2));
+  props.callback(rule);
+}
+
 const getOperator = () => {
-    return(
-        <>
-        <option>Domain</option>
-        <option>Equals</option>
-        <option>Exists</option>
-        <option>Greater Than</option>
-        <option>Greater Than Equals</option>
-        <option>Inrange</option>
-        <option>Less Than</option>
-        <option>Less Than Equals</option>
-        <option>Member</option>
-        <option>Not Domain</option>
-        <option>Not Equals</option>
-        <option>Not Member</option>
-        <option>Not Regex</option>
-        <option>Not Stringin</option>
-        <option>Stringin</option>
-        </>
-    );
+  var items = []; 
+    for (var i=0;i<ops.length;i++) {
+      var x = ops[i];
+      if (rule.op === x)
+        items.push(<option key={"regions-"+x} selected>{x}</option>);
+      else
+        items.push(<option key={"exchanges-"+x}>{x}</option>);
+    }
+    return(items);
 }
 
 const getOperandType = () => {
-  return(
-    <>
-    <option>Integer</option>
-    <option>String</option>
-    <option>Double</option>
-    </>
-  );
+  var items = []; 
+    for (var i=0;i<types.length;i++) {
+      var x = types[i];
+      if (rule.operand_type === x)
+        items.push(<option key={"operand-"+x} selected>{x}</option>);
+      else
+        items.push(<option key={"operand-"+x}>{x}</option>);
+    }
+    return(items);
 }
 
 const getOperandOrdinal = () => {
-  return(
-    <>
-    <option>Scalar</option>
-    <option>List</option>
-    </>
-  );
+  var items = []; 
+  for (var i=0;i<ords.length;i++) {
+    var x = ords[i];
+    if (rule.operand_ordinal === x)
+      items.push(<option key={"ords-"+x} selected>{x}</option>);
+    else
+      items.push(<option key={"ords-"+x}>{x}</option>);
+  }
+  return(items);
 }
 
   const redraw = () => {
@@ -132,6 +148,7 @@ const getOperandOrdinal = () => {
                               <FormGroup>
                                 <label>Name</label>
                                 <Input
+                                  id="name"
                                   defaultValue={rule.name}
                                   placeholder="Target Name (Required)"
                                   type="text"
@@ -151,9 +168,7 @@ const getOperandOrdinal = () => {
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                                 <label>RTB Specification</label>
-                                <Input type="input" id="region" >
-                                    {rule.specification}
-                                </Input>
+                                <Input type="input" id="hierarchy" defaultValue={rule.hierarchy}/>
                               </FormGroup>
                             </Col>
                             <Col className="px-md-1" md="4">
@@ -184,7 +199,7 @@ const getOperandOrdinal = () => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                               <label>Operand Type</label>
-                                <Input type="select" name="text" id="operand-type"> 
+                                <Input type="select" name="text" id="type"> 
                                   {getOperandType()}
                                 </Input>
                               </FormGroup>
@@ -203,7 +218,7 @@ const getOperandOrdinal = () => {
                       </CardBody>
                       <CardFooter>
                         <Button className="btn-fill" color="primary" 
-                            type="submit" onClick={() => props.callback(rule)}>
+                            type="submit" onClick={() => addNewRule(rule)}>
                           Save
                         </Button>
                         <Button className="btn-fill" color="danger" type="submit" 

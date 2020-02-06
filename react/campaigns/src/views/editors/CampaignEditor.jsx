@@ -29,6 +29,8 @@ import { useViewContext } from "../../ViewContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+var ssp = ["Adx","Nexage","Openx","Stroer"];
+var regions = ["US","APAC","EUROPE","Russia"];
 
 var undef;
 
@@ -42,11 +44,8 @@ const CampaignEditor = (props) => {
 
 const getAttachedCreatives = () => {
     return(
-        <>
-        <option>Creative 1</option>
-        <option>Creative 2</option>
-        <option>Creative 3</option>
-        </>
+      <>
+      </>
     );
 }
 
@@ -57,11 +56,17 @@ const  addNewCampaign = async () => {
     x.adomain = document.getElementById("adomain").value;
     var forensiq = document.getElementById("fraudSelect").value;
     x.status = document.getElementById("statusSelect").value;
-    x.total_budget = Number(document.getElementById("totalBudget").value);
-    x.budget_limit_daily = Number(document.getElementById("dailyBudget").value);
-    x.budget_limit_hourly = Number(document.getElementById("hourlyBudget").value);
+    x.budget.totalBudget = Number(document.getElementById("totalBudget").value);
+    x.budget.dailyBudget = Number(document.getElementById("dailyBudget").value);
+    x.budget.hourlyBudget= Number(document.getElementById("hourlyBudget").value);
     x.assignedSpendRate = Number(document.getElementById("spendRate").value);
+    x.regions = document.getElementById("regions").value;
+
   
+    x.exchanges = [...document.getElementById("exchanges").options]
+                     .filter((x) => x.selected)
+                     .map((x)=>x.value);
+    
    
     if (x.name === "") { alert("Name cannot be blank"); return; }
 
@@ -83,7 +88,6 @@ const  addNewCampaign = async () => {
 
 const getTrueFalseOptions = (value)  =>{
     if (value === true) {
-      console.log("SETTING TRUE VALUE");
         return(
             <>
             <option>true</option>
@@ -91,7 +95,6 @@ const getTrueFalseOptions = (value)  =>{
             </>
         );
     }
-    console.log("SETTING FALSE VALUE");
     return(
         <>
         <option>true</option>
@@ -100,16 +103,16 @@ const getTrueFalseOptions = (value)  =>{
 }
 
 const getSelectedExchangeOptions = () => {
-    return(
-        <>
-        <option>Adx</option>
-        <option>Bidswitch</option>
-        <option>Nexage</option>
-        <option>Openx</option>
-        <option>Smaato</option>
-        <option>Stroer</option>
-        </>
-    );
+    var items = []; 
+    items.push();
+    for (var i=0;i<ssp.length;i++) {
+      var x = ssp[i];
+      if (campaign.exchanges.indexOf(x) != -1)
+        items.push(<option key={"exchanges-"+x} selected>{x}</option>);
+      else
+        items.push(<option key={"exchanges-"+x}>{x}</option>);
+    }
+    return(items);
 }
 
 const getStatusOptions = (status) => {
@@ -153,14 +156,15 @@ const getSelectedTargets = () => {
 }
 
 const getSelectedRegions = () => {
-    return(
-        <>
-        <option>US</option>
-        <option>APAC</option>
-        <option>EUROPE</option>
-        <option>Russia</option>
-        </>
-    )
+   var items = []; 
+    for (var i=0;i<regions.length;i++) {
+      var x = regions[i];
+      if (campaign.regions === x)
+        items.push(<option key={"regions-"+x} selected>{x}</option>);
+      else
+        items.push(<option key={"exchanges-"+x}>{x}</option>);
+    }
+    return(items);
 }
 
   const redraw = () => {
@@ -301,42 +305,10 @@ const getSelectedRegions = () => {
                             </Col>
                           </Row>
                           <Row>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Cap Variable</label>
-                                <Input id="freq_variable"
-                                  defaultValue="request.device.ip"
-                                  placeholder="RTB variable to frequency cap on"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Limit</label>
-                                <Input id='freq_limit"'
-                                  defaultValue="0"
-                                  placeholder="Max number"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Duration</label>
-                                <Input id="duration"
-                                  defaultValue="0"
-                                  placeholder="Duration in minutes"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                                 <label>Region</label>
-                                <Input type="select" id="region" multiple>
+                                <Input type="select" id="regions">
                                     {getSelectedRegions()}
                                 </Input>
                               </FormGroup>

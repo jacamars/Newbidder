@@ -164,7 +164,7 @@ public class Creative  {
 	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
 	
 	/** The budget for this creative */
-	public Budget budget;
+	public Budget budget = new Budget();
 	
 	/** This class's logger */
 	static final Logger logger = LoggerFactory.getLogger(Creative.class);

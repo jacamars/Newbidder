@@ -185,7 +185,6 @@ public enum CampaignCache  {
          
          for (Campaign c : list) {
          	cache.set(c.adId, c);
-         	
          	Campaign x = cache.get(c.adId);
          }
          

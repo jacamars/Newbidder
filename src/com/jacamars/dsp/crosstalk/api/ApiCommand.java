@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.crosstalk.budget.CommandController;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
@@ -144,6 +145,9 @@ public class ApiCommand {
     
     public static final String SQLGET_CAMPAIGN= "SQLGetCampaign#";
     
+    public static final String SQLADD_NEW_RULE= "SQLAddNewRule#";
+    
+    public static final String SQLLIST_RULES= "SQLListRules#";
     
    
 
@@ -188,6 +192,8 @@ public class ApiCommand {
 
     static {
         mapper.setSerializationInclusion(Include.NON_NULL);
+    	mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     }
 
     /**
@@ -432,7 +438,15 @@ public class ApiCommand {
             case SQLGET_CAMPAIGN:
             	cmd = mapper.readValue(data, SQLGetCampaignCmd.class);
             	break;
-
+            	
+            case SQLADD_NEW_RULE:
+            	cmd = mapper.readValue(data, SQLAddNewRuleCmd.class);
+            	break;
+            	
+            case SQLLIST_RULES:
+            	cmd = mapper.readValue(data, SQLListRulesCmd.class);
+            	break;
+            	
             default:
                 cmd = new UnknownCmd(token);
                 return cmd;

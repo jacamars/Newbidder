@@ -1,5 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
 import java.util.Collection;
@@ -96,7 +98,7 @@ public class Node {
 
 	Set qvalue = null;
 	
-	public int id = 0;;
+	public int id = 0;
 
 	boolean testit = false;
 	/** Query TBD */
@@ -203,7 +205,12 @@ public class Node {
 	/** campaign identifier */
 	public String name;
 	/** dotted form of the item in the bid to pull (eg user.geo.lat) */
-	transient public String hierarchy;
+	public String hierarchy;
+	
+	public String operand;
+	public String operand_type;
+	public String operand_ordinal;
+	
 	/** which operator to use */
 	transient public int operator = -1;
 	/** the sub operator if operator is query */
@@ -233,6 +240,8 @@ public class Node {
 	/** text name of the operator */
 	public String op;
 	/** text name of the query sub op */
+	/** description */
+	String description;
 	transient String subop = null;
 	/** A pattern matcher */
 	transient Pattern pattern;
@@ -248,6 +257,173 @@ public class Node {
 	public Node() {
 
 	}
+	
+	public Node(JsonNode n) throws Exception {
+		 id = n.get("id").asInt();
+		 hierarchy = n.get("rtbspecification").asText();
+		 if (n.get("operator") != null)
+			 op = n.get("operator").asText().toUpperCase();
+		 else
+			 op = n.get("op").asText().toUpperCase();
+		 
+		 operand = n.get("operand").asText();
+		 operand_type = n.get("operand_type").asText();
+		 
+		 operand_ordinal = n.get("operand_ordinal").asText();
+		 
+		 if (operand_ordinal.equalsIgnoreCase("scalar)")) {
+			 switch(operand_type.toLowerCase()) {
+			 case "double":
+				 value = Double.parseDouble(operand);
+			 case "int":
+				 value = Integer.parseInt(operand);
+				 break;
+			 case "string":
+				 value = operand;
+				 break;
+			 }
+		 } else {
+			 String [] v = operand.split(",");
+			 switch(operand_type.toLowerCase()) {
+			 case "double":
+				value = new Double[v.length];
+			 	for (int i=0;i<v.length;i++) {
+			 		((Double[])value)[i] = Double.parseDouble(v[i]);
+			 	}
+			 	break;
+			 case "int":
+				 for (int i=0;i<v.length;i++) {
+				 		((Integer[])value)[i] = Integer.parseInt(v[i]);
+				 	}
+				 break;
+			 case "string":
+				 for (int i=0;i<v.length;i++) {
+				 		((String[])value)[i] = v[i];
+				 	}
+				 break;
+			 }
+		 }
+		 
+		 if (n.get("rtb_required") != null)
+			 notPresentOk = n.get("rtb_required").asBoolean();
+		 else
+			 notPresentOk = n.get("notPresentOk").asBoolean();
+		 name  = n.get("name").asText();
+		 if (n.get("description") != null)
+			 description = n.get("description").asText(); 
+		 
+		setBRvalues();
+		setValues();
+	}
+	
+	public static PreparedStatement toSql(Node n, Connection conn) throws Exception {
+		if (n.id == 0) 
+			return doNew(n, conn);
+		return doUpdate(n, conn);
+	}
+	
+	static PreparedStatement doNew(Node n, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String sql = "INSERT INTO rtb_standards (" 
+		 +"rtbspecification,"
+		 +"operator,"
+		 +"operand,"
+		 +"operand_type,"
+		 +"operand_ordinal,"
+		 +"rtb_required,"
+		 +"name,"
+		 +"description) VALUES("
+		 +"?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		p = conn.prepareStatement(sql);
+		
+		String str = getValue(n);
+		String type = getType(n);
+		String ord = getOrdinal(n);
+		
+		p.setString(1, n.hierarchy);
+		p.setString(2, n.op);
+		p.setString(3,str);
+		p.setString(4,type);
+		p.setString(5, ord);
+		if (n.notPresentOk)
+			p.setInt(6,1);
+		else
+			p.setInt(6, 0);
+		p.setString(7, n.name);
+		p.setString(8, n.description);;
+		
+		return p;
+	}
+	
+	static String getValue(Node n) {
+		String str = "";
+		if (n.value instanceof Object[]) {
+			Object[] list = (Object[])n.value;
+			for (int i=0; i<list.length;i++) {
+				str += list[i];
+				if (i+1 < list.length)
+					str += ",";
+			}
+		}
+		return str;
+	}
+	
+	static String getType(Node n) {
+		Object x = n.value;
+		if (n.value instanceof Object[]) {
+			x = ((Object[])n.value)[0];
+		}
+		if (x instanceof Double)
+			return "double";
+		if (x instanceof Integer)
+			return "int";
+		if (x instanceof String)
+			return "string";
+		return "???";
+	}
+	
+	static String getOrdinal(Node n) {
+		Object x = n.value;
+		if (n.value instanceof Object[])
+			return "list";
+		return "scalar";
+	}
+	
+	static PreparedStatement doUpdate(Node n, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String sql = "UPDATE  rtb_standards " 
+		 +"rtbspecification=?,"
+		 +"operator=?,"
+		 +"operand=?,"
+		 +"operand_type=?,"
+		 +"operand_ordinal=?,"
+		 +"rtb_required=?,"
+		 +"name=?,"
+		 +"description=? WHERE id=?";
+		
+		p = conn.prepareStatement(sql);
+			
+		String str = getValue(n);
+		String type = getType(n);
+		String ord = getOrdinal(n);
+		
+		p.setString(1, n.hierarchy);
+		p.setString(2, n.op);
+		p.setString(3,str);
+		p.setString(4,type);
+		p.setString(5, ord);
+		if (n.notPresentOk)
+			p.setInt(6,1);
+		else
+			p.setInt(6, 0);
+		p.setString(7, n.name);
+		p.setString(8, n.description);
+		p.setInt(9,n.id);
+
+		return p;
+	}
+	
 
 	/**
 	 * Get the false count for this node

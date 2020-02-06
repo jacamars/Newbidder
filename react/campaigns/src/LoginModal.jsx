@@ -31,6 +31,7 @@ const LoginModal = (props) => {
     console.log("Campaigns = " + mx.length);
     await vx.getAccounting();
     await vx.getDbCampaigns();
+    await vx.listRules();
     mx = await vx.getBidders();
     if (mx === undef)
       return;
