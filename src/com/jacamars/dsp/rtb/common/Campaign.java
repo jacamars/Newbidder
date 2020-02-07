@@ -143,6 +143,9 @@ public class Campaign implements Comparable, Portable  {
     /** points to the target id for this guy (used to make rules from the campaign manager) */
     public int target_id;
     
+    /** Identifies standard rules associated with this campaign */
+    public List<Integer>rules;
+    
     // ///////////// Crude accounting /////////////////////
     public transient long bids = 0L;
     public transient long wins = 0L;
@@ -767,6 +770,15 @@ public class Campaign implements Comparable, Portable  {
 					Targeting.getList(bcat, str);
 			}
 		}
+		
+		if (myNode.get("rules") != null) {
+			String str = myNode.get("rules").asText();
+			rules = new ArrayList<>();
+			if (str.trim().length() != 0) {
+				if (str.equals("null")==false)
+					Targeting.getIntegerList(rules, str);
+			}
+		}
 
 		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
 			exchanges.clear();
@@ -1061,8 +1073,9 @@ public class Campaign implements Comparable, Portable  {
 		 +"exchanges,"
 		 +"regions,"
 		 +"target_id,"
+		 +"rules,"
 		 +"spendrate) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -1077,6 +1090,13 @@ public class Campaign implements Comparable, Portable  {
 		p.setString(4, c.adomain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
+		
+		String rules = "";
+		for (int i=0;i<c.rules.size();i++) {
+			rules += c.rules.get(i);
+			if (i+1 < c.rules.size()) rules += ",";
+		}
+		
 		if (c.budget==null || c.budget.dailyBudget == null) {
 			p.setNull(7, Types.DECIMAL);
 			p.setNull(8, Types.DECIMAL);
@@ -1111,7 +1131,8 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(14, Types.INTEGER);
 		else
 			p.setInt(14,  c.target_id);
-		p.setInt(15,(int)c.assignedSpendRate);
+		p.setString(15, rules);
+		p.setInt(16,(int)c.assignedSpendRate);
 		
 		return p;
 	}
@@ -1133,6 +1154,7 @@ public class Campaign implements Comparable, Portable  {
 		 +"exchanges=?,"
 		 +"regions=?,"
 		 +"target_id=?,"
+		 +"rules=?,"
 		 +"spendrate=? WHERE id=?";
 
 		
@@ -1144,6 +1166,12 @@ public class Campaign implements Comparable, Portable  {
 		} else {
 			p.setNull(1, Types.TIMESTAMP);
 			p.setNull(2, Types.TIMESTAMP);
+		}
+		
+		String rules = "";
+		for (int i=0;i<c.rules.size();i++) {
+			rules += c.rules.get(i);
+			if (i+1 < c.rules.size()) rules += ",";
 		}
 		p.setDouble(3, c.costAsDouble());
 		p.setString(4, c.adomain);
@@ -1186,10 +1214,10 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setInt(14,  c.target_id);
 		
-		System.out.println("============> " + c.assignedSpendRate);
-		p.setInt(15, (int)c.assignedSpendRate);
+		p.setString(15,  rules);
+		p.setInt(16, (int)c.assignedSpendRate);
 		
-		p.setInt(16, c.id);
+		p.setInt(17, c.id);
 
 		
 		return p;

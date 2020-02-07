@@ -2,29 +2,34 @@ package com.jacamars.dsp.crosstalk.api;
 
 
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Node;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 
 /**
  * Deletes a campaign
  * @author Ben M. Faul
  *
  */
-public class SQLListRulesCmd extends ApiCommand {
+public class SQLGetRuleCmd extends ApiCommand {
 
 	/** The list of deletions/updates */
-	public List<Map> rules;
+	public int id;
+	public Node rule;
 
 	/**
 	 * Default constructor
 	 */
-	public SQLListRulesCmd() {
+	public SQLGetRuleCmd() {
 
 	}
 
@@ -36,9 +41,9 @@ public class SQLListRulesCmd extends ApiCommand {
 	 * @param password
 	 *            String. Password authorization for command.
 	 */
-	public SQLListRulesCmd(String username, String password) {
+	public SQLGetRuleCmd(String username, String password) {
 		super(username, password);
-		type = SQLLIST_RULES;
+		type = SQLGET_RULE;
 	}
 
 	/**
@@ -51,10 +56,10 @@ public class SQLListRulesCmd extends ApiCommand {
 	 * @param target
 	 *            String. The bidder to start.
 	 */
-	public SQLListRulesCmd(String username, String password, String target) {
+	public SQLGetRuleCmd(String username, String password, String target) {
 		super(username, password);
 		campaign = target;
-		type = SQLLIST_RULES;
+		type = SQLGET_RULE;
 	}
 
 	/**
@@ -71,34 +76,21 @@ public class SQLListRulesCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				String select = "select * from rtb_standards";
+				String select = "select * from rtb_standards where id="+id;
 				var conn = CrosstalkConfig.getInstance().getConnection();
 				var stmt = conn.createStatement();
 				var prep = conn.prepareStatement(select);
 				ResultSet rs = prep.executeQuery();
 				
-				rules = convertToJson(rs); 
-							
+				ArrayNode inner = JdbcTools.convertToJson(rs);
+				ObjectNode y = (ObjectNode) inner.get(0);
+				rule = new Node(y);
+				
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}
-			message = "Timed out";
 		}
-	
-	List<Map> convertToJson(ResultSet rs) throws Exception {
-		List<Map> list = new ArrayList<>();
-		while(rs.next()) {
-			int id = rs.getInt("id");
-			String name = rs.getString("name");
-			String h = rs.getString("rtbspecification");
-			Map m= new HashMap();
-			m.put("id", id);
-			m.put("name", name);
-			m.put("hierarchy",h );
-			list.add(m);
-		}
-		return list;
-	}
 }

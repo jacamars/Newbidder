@@ -56,7 +56,7 @@ const Rules = (props) => {
            <td>{index}</td>
            <td key={'rules-name-' + index} className="text-left">{row.name}</td>
            <td key={'rules-id-' + index} className="text-right">{row.id}</td>
-           <td key={'rules-description' + index} className="text-right">{row.name}</td>
+           <td key={'rules-hierarchy' + index} className="text-right">{row.hierarchy}</td>
            <td key={'rules-edit-'+ index} className="text-right">
              <Button color="success" size="sm" onClick={()=>editRule(row.id)}>Edit</Button></td>
              <td key={'campaignsview-delete-'+ index} className="text-right">
@@ -65,19 +65,23 @@ const Rules = (props) => {
      ); 
    }
 
-   const editRule = (id) => {
-
+   const editRule = async(id) => {
+      var r = await vx.getRule(id);
+      setRule(r);
    }
 
-   const deleteRule = (id) => {
-
+   const deleteRule = async(id) => {
+      await vx.deleteRule(id);
+      await vx.listRules();
+      setRule(null);
+      redraw();
    }
 
   const update = async(e) => {
-      if (e !== null) {
+      if (e != null) {
         await vx.addNewRule(e);
-        await vx.listRules();
       }
+
       setRule(null);
       redraw();
   }

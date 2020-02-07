@@ -271,11 +271,17 @@ public class Node {
 		 
 		 operand_ordinal = n.get("operand_ordinal").asText();
 		 
-		 if (operand_ordinal.equalsIgnoreCase("scalar)")) {
+		 if (operand_ordinal.equalsIgnoreCase("scalar")) {
 			 switch(operand_type.toLowerCase()) {
 			 case "double":
+				 if (operand.equals(""))
+					 operand = "0";
 				 value = Double.parseDouble(operand);
+				 break;
 			 case "int":
+			 case "integer":
+				 if (operand.equals(""))
+					 operand = "0";
 				 value = Integer.parseInt(operand);
 				 break;
 			 case "string":
@@ -284,6 +290,7 @@ public class Node {
 			 }
 		 } else {
 			 String [] v = operand.split(",");
+			 value = new Object[v.length];
 			 switch(operand_type.toLowerCase()) {
 			 case "double":
 				value = new Double[v.length];
@@ -292,14 +299,19 @@ public class Node {
 			 	}
 			 	break;
 			 case "int":
+			 case "integer":
+				 value = new Integer[v.length];
 				 for (int i=0;i<v.length;i++) {
 				 		((Integer[])value)[i] = Integer.parseInt(v[i]);
 				 	}
 				 break;
 			 case "string":
+				 value = new String[v.length];
 				 for (int i=0;i<v.length;i++) {
-				 		((String[])value)[i] = v[i];
-				 	}
+					if (v[i] == null)
+						 v[i] = "";
+				 	((String[])value)[i] = v[i];
+				 }
 				 break;
 			 }
 		 }
@@ -365,19 +377,28 @@ public class Node {
 				if (i+1 < list.length)
 					str += ",";
 			}
-		}
+		} if (n.value instanceof List) {
+			for (Object x : (List)n.value) {
+				str +=  x + ",";
+			}
+			str = str.substring(0,str.length()-1);
+		} else
+			str = "" + n.value;
 		return str;
 	}
 	
 	static String getType(Node n) {
 		Object x = n.value;
-		if (n.value instanceof Object[]) {
-			x = ((Object[])n.value)[0];
+		if (n.value instanceof Object[] || n.value instanceof List) {
+			if (n.value instanceof List) 
+				x = ((List)n.value).get(0);
+			else
+				x = ((Object[])n.value)[0];
 		}
 		if (x instanceof Double)
 			return "double";
 		if (x instanceof Integer)
-			return "int";
+			return "integer";
 		if (x instanceof String)
 			return "string";
 		return "???";
@@ -385,14 +406,14 @@ public class Node {
 	
 	static String getOrdinal(Node n) {
 		Object x = n.value;
-		if (n.value instanceof Object[])
+		if (n.value instanceof Object[] || n.value instanceof List)
 			return "list";
 		return "scalar";
 	}
 	
 	static PreparedStatement doUpdate(Node n, Connection conn) throws Exception {
 		PreparedStatement p = null;
-		String sql = "UPDATE  rtb_standards " 
+		String sql = "UPDATE  rtb_standards SET " 
 		 +"rtbspecification=?,"
 		 +"operator=?,"
 		 +"operand=?,"

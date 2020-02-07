@@ -15,6 +15,7 @@ const axiosInstance = axios.create({
   httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
 });
 
+
 const  ViewContext = () => {
 
     const [loggedIn, setLoggedIn] = useState(false);
@@ -39,6 +40,7 @@ const  ViewContext = () => {
       setRunningCampaigns([]);
       setCampaigns([]);
       setBidders([]);
+      setRules([]);
     }
 
     const changeLoginState = async (value) => {
@@ -144,6 +146,21 @@ const  ViewContext = () => {
         return;
       return result.data;
     }
+
+    const deleteRule = async (id) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLDeleteRule#",
+        id: id
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLDeleteRule returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
 
     const getDbCampaigns = async () => {
       var cmd = {
@@ -258,6 +275,22 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const getRule = async(id) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetRule#",
+        id: id
+      };
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLNewRule returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.rule;
+    }
+
 
 
     const  execute = async (cmd) =>  {
@@ -286,7 +319,7 @@ const  ViewContext = () => {
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
-      listRules, rules, addNewRule
+      listRules, rules, addNewRule, getRule, deleteRule
     };
 };
 

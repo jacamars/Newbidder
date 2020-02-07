@@ -149,7 +149,14 @@ public class ApiCommand {
     
     public static final String SQLLIST_RULES= "SQLListRules#";
     
-   
+    public static final String SQLGET_RULE = "SQLGetRule#";
+    
+    public static final String SQLDELETE_RULE = "SQLDeleteRule#";
+    
+    public static final String SQLADD_NEW_TARGET = "SQLAddNewTarget#";
+    
+    public static final String SQLDELETE_TARGET = "SQLDeleteTarget#";
+
 
     /**
      * This class'es sl4j log object
@@ -445,6 +452,22 @@ public class ApiCommand {
             	
             case SQLLIST_RULES:
             	cmd = mapper.readValue(data, SQLListRulesCmd.class);
+            	break;
+            	
+            case SQLGET_RULE:
+            	cmd = mapper.readValue(data, SQLGetRuleCmd.class);
+            	break;
+            	
+            case SQLDELETE_RULE:
+            	cmd = mapper.readValue(data, SQLDeleteRuleCmd.class);
+            	break;
+            	
+            case SQLADD_NEW_TARGET:
+            	cmd = mapper.readValue(data, SQLAddNewTargetCmd.class);
+            	break;
+            	
+            case SQLDELETE_TARGET:
+            	cmd = mapper.readValue(data, SQLDeleteTargetCmd.class);
             	break;
             	
             default:

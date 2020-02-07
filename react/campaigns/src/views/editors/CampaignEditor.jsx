@@ -66,6 +66,10 @@ const  addNewCampaign = async () => {
     x.exchanges = [...document.getElementById("exchanges").options]
                      .filter((x) => x.selected)
                      .map((x)=>x.value);
+
+    x.rules = [...document.getElementById("rules").options]
+                     .filter((x) => x.selected)
+                     .map((x)=>Number(x.value));
     
    
     if (x.name === "") { alert("Name cannot be blank"); return; }
@@ -131,16 +135,16 @@ const getStatusOptions = (status) => {
 }
 
 const getSelectedRules = () => {
-    return(
-        <>
-        <option>Rule 1</option>
-        <option>Rule 2</option>
-        <option>Rule 3</option>
-        <option>Rule 4</option>
-        <option>Rule 5</option>
-        <option>Rule 6</option>
-        </>
-    );
+  var items = []; 
+  for (var i=0;i<vx.rules.length;i++) {
+    var x = vx.rules[i];
+    //alert("x = " + JSON.stringify(x,null,2) + ", rules = " + JSON.stringify(campaign.rules,null,2));
+    if (campaign.rules.indexOf(x.id) != -1)
+      items.push(<option key={"rules-"+x.id} selected value={x.id}>{x.name}</option>);
+    else
+      items.push(<option key={"rules-"+x.id} value={x.id}>{x.name}</option>);
+  }
+  return(items);
 }
 
 const getSelectedTargets = () => {
@@ -162,7 +166,7 @@ const getSelectedRegions = () => {
       if (campaign.regions === x)
         items.push(<option key={"regions-"+x} selected>{x}</option>);
       else
-        items.push(<option key={"exchanges-"+x}>{x}</option>);
+        items.push(<option key={"regions-"+x}>{x}</option>);
     }
     return(items);
 }
@@ -334,7 +338,7 @@ const getSelectedRegions = () => {
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                               <label>Rules</label>
-                                <Input type="select" name="select" id="rules" multiple>
+                                <Input type="select" id="rules" multiple>
                                     {getSelectedRules()}
                                 </Input>     
                               </FormGroup>

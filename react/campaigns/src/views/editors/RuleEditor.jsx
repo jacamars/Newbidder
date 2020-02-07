@@ -29,10 +29,10 @@ import { useViewContext } from "../../ViewContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-var ops = [ "Domain","Equals","Exists","Greater Than","Greater Than Equals","Inrange","Less Than","Less Than Equals",
-  "Member","Not Domain","Not Equals","Not Member","Not Regex","Not Stringin","Regex","Stringin"];
-var types =["Integer","String","Double"];
-var ords =["Scalar","List"];
+var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","INRANGE","LESS THAN","LESS THAN EQUALS",
+  "MEMBER","NOT DOMAIN","NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
+var types =["integer","string","double"];
+var ords =["scalar","list"];
 
 var undef;
 
@@ -40,7 +40,6 @@ const RuleEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [rule, setRule] = useState(props.rule);
-  const [startDate, setStartDate] = useState(new Date());
   const vx = useViewContext();
 
   const nameChangedHandler = (event) => {
@@ -185,13 +184,13 @@ const getOperandOrdinal = () => {
                              <Col className="pl-md-1" md="4">
                               <FormGroup>
                                 <label>Operand Value</label>
-                                <Input type="input" name="text" id="operand" defaultValue={rule.operand}/>   
+                                <Input type="input" id="operand" defaultValue={rule.operand}/>   
                               </FormGroup>
                             </Col> 
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                               <label>Use Set as Operand</label>
-                                <Input type="input" name="text" id="set-operand"/>   
+                                <Input type="input" id="set-operand"/>   
                               </FormGroup>
                             </Col>
                             </Row>
@@ -199,7 +198,7 @@ const getOperandOrdinal = () => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                               <label>Operand Type</label>
-                                <Input type="select" name="text" id="type"> 
+                                <Input type="select" id="type"> 
                                   {getOperandType()}
                                 </Input>
                               </FormGroup>
@@ -207,7 +206,7 @@ const getOperandOrdinal = () => {
                               <Col className="px-md-1" md="4">
                               <FormGroup>
                               <label>Operand Ordinal</label>
-                                <Input type="select" name="text" id="ordinal">   
+                                <Input type="select" id="ordinal">   
                                   {getOperandOrdinal()}
                                 </Input>
                               </FormGroup>

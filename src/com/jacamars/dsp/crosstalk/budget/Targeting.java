@@ -1,5 +1,10 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.sql.Connection;
+
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -18,25 +23,19 @@ public class Targeting {
 	public static final String BLACKLIST = "BLACKLIST";
 	public static final String WHITELIST = "WHITELIST";
 
+	public int id;
 	public String name;
-	
-	public int campaignid;
-	public int targetingid;
-
-	public String domainstring = "";
 	
 	/**
 	 * Its either a listofdomains or a symbol that is al ist.
 	 */
+	
 	public List<String> listofdomains = new ArrayList<String>();
 	public String listofdomainsSYMBOL = null;
-			
-	public String domaintargetting = "";
 
 	public String carrier = "";
 	public String connectionType = "";
 
-	public String user_agent;
 	public String os = "";
 	public String make = "";
 	public String model = "";
@@ -58,13 +57,12 @@ public class Targeting {
 	List<String> listofpages = new ArrayList<String>();
 	List<String> transparency = new ArrayList<String>();
 	List<String> devicetypes = new ArrayList<String>();
-	List<Integer> rtbStandardIds = new ArrayList<Integer>();
 	List<Integer> connectionTypes = new ArrayList<>();
 
 	protected ObjectNode myNode;
 
-	protected String LIST_OF_DOMAINS = "list_of_domains";
-	protected String DOMAIN_TARGETTING = "domain_targetting";
+	protected String list_of_domains; // converts to listofdomains
+	protected String domain_targetting; 
 
 	protected String LIST_OF_PAGES = "listofpages";
 	protected String TRANSPARENCY = "pagetransparency";
@@ -82,8 +80,8 @@ public class Targeting {
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void process() throws Exception {
-		if (myNode.get(LIST_OF_DOMAINS) != null) {
-			String str = myNode.get(LIST_OF_DOMAINS).asText(null);
+		if (myNode.get("list_of_domains") != null) {
+			String str = myNode.get("list_of_domains").asText(null);
 			if (str != null && str.trim().length()>0) {
 				
 				if (str.startsWith("$")) {
@@ -93,8 +91,8 @@ public class Targeting {
 			}
 		}
 
-		if (myNode.get(DOMAIN_TARGETTING) != null)
-			domaintargetting = myNode.get(DOMAIN_TARGETTING).asText();
+		if (myNode.get("domain_targetting") != null)
+			domain_targetting = myNode.get("domain_targetting").asText();
 		carrier = myNode.get("carrier").asText();
 
 		country = myNode.get("country").asText("");
@@ -139,13 +137,7 @@ public class Targeting {
 		if (myNode.get("IAB_category") != null)
 			IAB_category = myNode.get("IAB_category").asText();
 		if (myNode.get("IAB_category_blklist") != null)
-			IAB_category_blklst = myNode.get("IAB_category_blklist").asText();
-		
-		
-		if (myNode.get(RTB_STANDARD) != null) {
-			String rtbs =  myNode.get(RTB_STANDARD).asText();
-			getIntegerList(rtbStandardIds, rtbs);
-		}
+			IAB_category_blklst = myNode.get("IAB_category_blklist").asText();	
 
 		if (myNode.get("connectiontype") != null && myNode.get("connectiontype") instanceof MissingNode == false) {
 			String connections = myNode.get("connectiontype").asText();
@@ -229,10 +221,10 @@ public class Targeting {
 		//
 		if (listofdomains != null && listofdomains.size() != 0) {
 			boolean bl = true;
-			if ((bl=domaintargetting.equalsIgnoreCase("BLACKLIST"))==true)
+			if ((bl=domain_targetting.equalsIgnoreCase("BLACKLIST"))==true)
 				n = new Node("blacklist", "domain", Node.NOT_MEMBER,
 						listofdomains);
-			else if (domaintargetting.equalsIgnoreCase("WHITELIST"))
+			else if (domain_targetting.equalsIgnoreCase("WHITELIST"))
 				n = new Node("whitelist", "domain", Node.MEMBER,
 						listofdomains);
 
@@ -260,13 +252,13 @@ public class Targeting {
 			if (listofdomainsSYMBOL != null) {
 				Node n1 = null;
 				boolean bl = true;
-				if ((bl=domaintargetting.equalsIgnoreCase("BLACKLIST"))==true) {
+				if ((bl=domain_targetting.equalsIgnoreCase("BLACKLIST"))==true) {
 					n = new Node("blacklist", "domain", Node.NOT_MEMBER,
 							listofdomainsSYMBOL);
 					//n1 = new Node("blacklist", "app.domain", Node.NOT_MEMBER,
 					//		listofdomainsSYMBOL);
 				}
-				else if (domaintargetting.equalsIgnoreCase("WHITELIST")) {
+				else if (domain_targetting.equalsIgnoreCase("WHITELIST")) {
 					n = new Node("whitelist", "domain", Node.MEMBER,
 							listofdomainsSYMBOL);
 					//n1 = new Node("whitelist", "app.domain", Node.MEMBER,
@@ -459,5 +451,131 @@ public class Targeting {
 			}
 		}
 		return countries;
+	}
+	
+	public static PreparedStatement toSql(Targeting c, Connection conn) throws Exception {
+		if (c.id == 0) 
+			return doNew(c, conn);
+		return doUpdate(c, conn);
+	}
+	
+	static PreparedStatement doNew(Targeting c, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String sql = "INSERT INTO targets (" 
+				+"list_of_domains,"
+				+"domain_targetting,"
+				+"geo_latitude,"
+				+"geo_longitude,"
+				+"geo_range,"
+				+"country,"
+				+"carrier,"
+				+"os,"
+				+"make,"
+				+"model,"
+				+"devicetype,"
+				+"IAB_category,"
+				+"IAB_category_blklist,"
+				+"updated_at,"
+				+"domaintargetting"
+				+"name) VALUES ("
+				+"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		
+		p = conn.prepareStatement(sql);
+		
+		return p;
+	}
+	
+	static PreparedStatement doUpdate(Targeting c, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String sql = "UPDATE targets SET " 
+		  +"list_of_domains=?,"
+		  +"domain_targetting=?,"
+		  +"geo_latitude=?,"
+		  +"geo_longitude=?,"
+		  +"geo_range=?,"
+		  +"country=?,"
+		  +"carrier=?,"
+		  +"os=?,"
+		  +"make=?,"
+		  +"model=?,"
+		  +"devicetype=?,"
+		  +"IAB_category=?,"
+		  +"IAB_category_blklist=?,"
+		  +"updated_at=?,"
+		  +"domain_targetting=?"
+		  +"name=? WHERE id=?";
+		
+		if (c.listofdomainsSYMBOL != null)
+			p.setString(1, c.listofdomainsSYMBOL);
+		else
+			p.setString(1, asStringList(c.listofdomains));
+		
+		if (c.domain_targetting == null)
+			p.setNull(2,Types.VARCHAR);
+		p.setString(2, c.domain_targetting);
+		if (c.geo_latitude == 0)
+			p.setDouble(3,Types.DOUBLE);
+		else
+			p.setDouble(3,c.geo_latitude);
+		if (c.geo_longitude == 0)
+			p.setDouble(4,Types.DOUBLE);
+		else
+			p.setDouble(4,c.geo_longitude);
+		if (c.geo_range == 0)
+			p.setDouble(5,Types.DOUBLE);
+		else
+		p.setDouble(5,c.geo_range);
+		
+		if (c.country == null)
+			p.setNull(6, Types.VARCHAR);
+		else
+			p.setString(6,c.country);
+		if (c.carrier == null)
+			p.setNull(7, Types.VARCHAR);
+		else
+			p.setString(7,c.carrier);
+		if (c.os == null)
+			p.setNull(8, Types.VARCHAR);
+		else		
+			p.setString(8,c.os);
+		if (c.make == null)
+			p.setNull(9, Types.VARCHAR);
+		else
+			p.setString(9,c.make);
+		if (c.model == null)
+			p.setNull(10, Types.VARCHAR);
+		else
+			p.setString(10,c.model);
+		if (c.devicetypes.size() == 0)
+			p.setNull(11, Types.VARCHAR);
+		else
+			p.setString(11, asStringList(c.devicetypes));
+		if (c.IAB_category == null)
+			p.setNull(12, Types.VARCHAR);
+		else
+			p.setString(12,c.IAB_category);
+		if (c.IAB_category_blklst == null)
+			p.setNull(13, Types.VARCHAR);
+		else
+			p.setString(13,c.IAB_category_blklst);
+		p.setTimestamp(14,new Timestamp(System.currentTimeMillis()));
+		if (c.domain_targetting == null)
+			p.setNull(15, Types.VARCHAR);
+		else
+			p.setString(15,c.domain_targetting);
+		p.setString(16, c.name);
+		p.setInt(17, c.id);
+		p = conn.prepareStatement(sql);
+		
+		return p;
+	}
+	
+	public static String asStringList(List<String> s) {
+		String str = "";
+		for (int i=0;i<s.size();i++) {
+			str += s.get(i);
+			if (i+1<s.size()) str += ",";
+		}
+		return str;
 	}
 }

@@ -1,49 +1,58 @@
 package com.jacamars.dsp.crosstalk.api;
 
-
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
- * Deletes a campaign
+ * Returns an empty campaign object.
  * @author Ben M. Faul
  *
  */
-public class SQLListRulesCmd extends ApiCommand {
-
-	/** The list of deletions/updates */
-	public List<Map> rules;
+public class SQLDeleteRuleCmd extends ApiCommand {
+	
+	ResultSet rs = null;
+	public int id;
 
 	/**
 	 * Default constructor
 	 */
-	public SQLListRulesCmd() {
+	public SQLDeleteRuleCmd() {
 
 	}
 
 	/**
 	 * Deletes a campaign from the bidders.
-	 * 
+	 *
 	 * @param username
 	 *            String. User authorization for command.
 	 * @param password
 	 *            String. Password authorization for command.
 	 */
-	public SQLListRulesCmd(String username, String password) {
+	public SQLDeleteRuleCmd(String username, String password) {
 		super(username, password);
-		type = SQLLIST_RULES;
+		type = SQLDELETE_RULE;
 	}
 
 	/**
 	 * Targeted form of command. starts a specific bidder.
-	 * 
+	 *
 	 * @param username
 	 *            String. User authorizatiom.
 	 * @param password
@@ -51,10 +60,9 @@ public class SQLListRulesCmd extends ApiCommand {
 	 * @param target
 	 *            String. The bidder to start.
 	 */
-	public SQLListRulesCmd(String username, String password, String target) {
+	public SQLDeleteRuleCmd(String username, String password, String target) {
 		super(username, password);
-		campaign = target;
-		type = SQLLIST_RULES;
+		type = SQLDELETE_RULE;
 	}
 
 	/**
@@ -65,40 +73,24 @@ public class SQLListRulesCmd extends ApiCommand {
 	}
 
 	/**
-	 * Execute the command, msrshall the results.
+	 * Execute the command, masrshall the results.
 	 */
 	@Override
 		public void execute() {
 			super.execute();
 			try {
-				String select = "select * from rtb_standards";
-				var conn = CrosstalkConfig.getInstance().getConnection();
-				var stmt = conn.createStatement();
-				var prep = conn.prepareStatement(select);
-				ResultSet rs = prep.executeQuery();
-				
-				rules = convertToJson(rs); 
-							
+				PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+						prepareStatement("delete from rtb_standards where id=?");
+				st.setInt(1, id);
+				st.executeUpdate();
+				st.close();
+				 
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}
-			message = "Timed out";
 		}
 	
-	List<Map> convertToJson(ResultSet rs) throws Exception {
-		List<Map> list = new ArrayList<>();
-		while(rs.next()) {
-			int id = rs.getInt("id");
-			String name = rs.getString("name");
-			String h = rs.getString("rtbspecification");
-			Map m= new HashMap();
-			m.put("id", id);
-			m.put("name", name);
-			m.put("hierarchy",h );
-			list.add(m);
-		}
-		return list;
-	}
 }
