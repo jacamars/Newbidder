@@ -160,6 +160,7 @@ public class ApiCommand {
     public static final String SQLLIST_TARGETS = "SQLListTargets#";
     
     public static final String SQLGET_TARGET = "SQLGetTarget#";
+   
 
 
     /**

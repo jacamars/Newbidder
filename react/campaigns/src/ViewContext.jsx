@@ -30,6 +30,7 @@ const  ViewContext = () => {
     const [rules, setRules] = useState([]);
     const [bidders, setBidders] = useState([]);
     const [targets, setTargets] = useState([]);
+    const [creatives, setCreatives] = useState([]);
 
     const reset = () => {
       setLoggedIn(false);
@@ -209,6 +210,20 @@ const  ViewContext = () => {
      return data.campaigns;
     }
 
+    const getCreatives = async () => {
+      var cmd = {
+        token: jwt,
+        type: "SQLListCreatives#"
+      };
+      var data = await execute(cmd);
+      if (!data)
+        return;
+
+     //console.log("=====> GetDbCampaigns returns: " + JSON.stringify(data,null,2));
+     setCreatives(data.creatives);
+     return data.creatives;
+    }
+
     const getDbCampaign = async (id) => {
       var cmd = {
         token: jwt,
@@ -385,7 +400,8 @@ const  ViewContext = () => {
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
-      listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget
+      listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
+      creatives, getCreatives
     };
 };
 

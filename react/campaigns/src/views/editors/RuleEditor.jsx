@@ -217,7 +217,7 @@ const getOperandOrdinal = () => {
                       </CardBody>
                       <CardFooter>
                         <Button className="btn-fill" color="primary" 
-                            type="submit" onClick={() => addNewRule(rule)}>
+                            type="submit" onClick={() => addNewRule(rule)} disabled={rule.readOnly}>
                           Save
                         </Button>
                         <Button className="btn-fill" color="danger" type="submit" 

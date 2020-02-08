@@ -19,10 +19,12 @@ import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 public class SQLListCreatives extends ApiCommand {
 
 	/** The list of deletions/updates */
-	public List<Map> banners;
-	public List<Map> videos;
-	public List<Map> natives;
-	public List<Map> audios;
+	public List<Map> creatives;
+	
+	List<Map> banners;
+	List<Map> videos;
+	List<Map> natives;
+	List<Map> audios;
 
 	/**
 	 * Default constructor
@@ -78,17 +80,25 @@ public class SQLListCreatives extends ApiCommand {
 				var conn = CrosstalkConfig.getInstance().getConnection();
 				var stmt = conn.createStatement();
 				var prep = conn.prepareStatement(select);
-				ResultSet rs = prep.executeQuery();
-				
-				banners = convertToJson(rs); 
+				ResultSet rs = prep.executeQuery();	
+				banners = convertToJson(rs,"banner");	
 				
 				select = "select * from banner_videos";
 				rs = prep.executeQuery();
-				videos = convertToJson(rs); 
+				videos = convertToJson(rs,"video"); 
 			
-				natives = new ArrayList<>();
-				audios = new ArrayList<>();
+				select = "select * from banner_natives";
+				rs = prep.executeQuery();
+				natives = convertToJson(rs,"native"); 
 				
+				select = "select * from banner_audios";
+				rs = prep.executeQuery();
+				audios =  convertToJson(rs,"audio");
+				
+				creatives.addAll(banners);
+				creatives.addAll(videos);
+				creatives.addAll(audios);
+				creatives.addAll(natives);
 				
 				return;
 			} catch (Exception err) {
@@ -98,20 +108,19 @@ public class SQLListCreatives extends ApiCommand {
 			message = "Timed out";
 		}
 	
-	List<Map> convertToJson(ResultSet rs) throws Exception {
+	List<Map> convertToJson(ResultSet rs, String key) throws Exception {
 		List<Map> list = new ArrayList<>();
 		while(rs.next()) {
 			int id = rs.getInt("id");
 			String name = rs.getString("name");
-			Timestamp start = rs.getTimestamp("interval_start");
-			Timestamp stop = rs.getTimestamp("interval_end");
-			int campaign_id = rs.getInt("campaign_id");
+			long start = rs.getTimestamp("activate_time").getTime();
+			long end = rs.getTimestamp("expire_time").getTime();
 			Map m= new HashMap();
 			m.put("id", id);
 			m.put("name", name);
-			m.put("campaign_id", id);
-			m.put("start", start.getTime());
-			m.put("end", stop.getTime());
+			m.put("start", start);
+			m.put("end", end);
+			m.put(type, key);
 			list.add(m);
 		}
 		return list;

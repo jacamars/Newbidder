@@ -51,6 +51,12 @@ var undef;
     setCampaign(x);
   }
 
+  const viewCampaign = async (id) => {
+    var x = await vx.getDbCampaign(id);
+    x.readOnly = true;
+    setCampaign(x);
+  }
+
   const deleteCampaign = async (id) => {
     for(var i=0;i<vx.campaigns.length;i++) {
       var x = vx.campaigns[i];
@@ -84,10 +90,12 @@ var undef;
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
           <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
           <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
-          <td key={'campaignsview-edit-'+ index} className="text-right">
-            <Button color="success" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button></td>
-            <td key={'campaignsview-delete-'+ index} className="text-right">
-          <Button color="danger" size="sm" onClick={()=>deleteCampaign(row.id)}>Delete</Button></td>
+          <td key={'campaignsview-edit-'+ index} className="text-center">
+            <Button color="success" size="sm" onClick={()=>viewCampaign(row.id)}>View</Button>
+             &nbsp;
+            <Button color="warning" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button>
+            &nbsp;
+            <Button color="danger" size="sm" onClick={()=>deleteCampaign(row.id)}>Delete</Button></td>
         </tr>))
     ); 
   }
@@ -126,8 +134,7 @@ var undef;
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Runnable</th>
                             <th className="text-right">Is Running</th>
-                            <th className="text-right"></th>
-                            <th className="text-right"></th>
+                            <th className="text-center">Actions</th>
                           </tr>
                       </thead>
                       <tbody>

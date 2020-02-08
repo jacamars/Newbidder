@@ -27,18 +27,7 @@ import {
 import { useViewContext } from "../../ViewContext";
 
 import "react-datepicker/dist/react-datepicker.css";
-import IAB from '../../IAB';
-import CampaignEditor from "./CampaignEditor";
-
-const deviceTypes = [
-  "unknown",
-  "mobile",
-  "desktop",
-  "smarttv",
-  "phone",
-  "tablet",
-  "mobile-not(phone or tablet)"];
-
+import {deviceTypes, fromCommaList} from "../../Utils.js"
 
 var undef;
 
@@ -53,23 +42,6 @@ const TargetEditor = (props) => {
       setTarget(target);
   }
   
-
-const getTrueFalseOptions = (value)  =>{
-    if (value)
-        return(
-            <>
-            <option selected>true</option>
-            <option>false</option>
-            </>
-        );
-        return(
-            <>
-            <option>true</option>
-            <option selected>false</option>
-            </>
-        );
-}
-
 const domainType = ()  =>{
   if (target.domain_targetting === 'BLACKLIST')
       return(
@@ -212,19 +184,6 @@ const getWBList = (s) => {
       if (target.id === 0)
         return (<div>Save</div>);
       return(<div>Update</div>);
-  }
-
-  const asTextAreaList = (list) => {
-    var str = "";
-    if (!list)
-      return str;
-    return list.join();
-  }
-
-  const fromCommaList = (str) => {
-    if (!str)
-      return "";
-    return str.split(",").join("\n");
   }
 
         return (

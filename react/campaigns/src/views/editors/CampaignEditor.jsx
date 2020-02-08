@@ -28,8 +28,8 @@ import { useViewContext } from "../../ViewContext";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import {getTrueFalseOptions, ssp} from "../../Utils.js"
 
-var ssp = ["Adx","Nexage","Openx","Stroer"];
 var regions = ["US","APAC","EUROPE","Russia"];
 
 var undef;
@@ -43,10 +43,16 @@ const CampaignEditor = (props) => {
   const vx = useViewContext();
 
 const getAttachedCreatives = () => {
-    return(
-      <>
-      </>
-    );
+  var items = []; 
+  items.push();
+  for (var i=0;i<vx.creatives.length;i++) {
+    var x = vx.creatives[i];
+    if (campaign.creatives.indexOf(x.id) != -1)
+      items.push(<option key={"creatives-"+i} selected>{x.name}</option>);
+    else
+      items.push(<option key={"creatives-"+i}>{x.name}</option>);
+  }
+  return(items);
 }
 
 const getIdOf = (name) => {
@@ -105,22 +111,6 @@ const  addNewCampaign = async () => {
 
     props.callback(x);
     return false;
-}
-
-const getTrueFalseOptions = (value)  =>{
-    if (value === true) {
-        return(
-            <>
-            <option>true</option>
-            <option>false</option>
-            </>
-        );
-    }
-    return(
-        <>
-        <option>true</option>
-        <option>false</option> 
-    </>);
 }
 
 const getSelectedExchangeOptions = () => {
@@ -251,7 +241,7 @@ const getSelectedRegions = () => {
                             </Col>
                             <Col className="pl-md-1" md="2">
                               <FormGroup>
-                              <Label >Fraud</Label>
+                              <Label >Fraud Suppression</Label>
                                 <Input type="select" id="fraudSelect" defaultValue={campaign.forensiq}>
                                     {getTrueFalseOptions(campaign.forensiq)}
                                 </Input>               
@@ -259,7 +249,7 @@ const getSelectedRegions = () => {
                             </Col>
                             <Col className="pl-md-1" md="2">
                               <FormGroup>
-                              <Label>Status</Label>
+                              <Label>Bidder Status</Label>
                                 <Input type="select"  id="statusSelect">
                                     {getStatusOptions(campaign.status)}
                                 </Input>               
@@ -326,7 +316,7 @@ const getSelectedRegions = () => {
                           <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
-                                <label>Region</label>
+                                <label>Bidding Region</label>
                                 <Input type="select" id="regions">
                                     {getSelectedRegions()}
                                 </Input>
@@ -382,7 +372,7 @@ const getSelectedRegions = () => {
                       <CardFooter>
                         <Button className="btn-fill"
                           color="primary" 
-                          onClick={() => addNewCampaign()}>
+                          onClick={() => addNewCampaign()} disabled={campaign.readOnly}>
                           Save
                         </Button>
                         <Button className="btn-fill" color="danger"

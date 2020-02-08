@@ -57,10 +57,13 @@ const Rules = (props) => {
            <td key={'rules-name-' + index} className="text-left">{row.name}</td>
            <td key={'rules-id-' + index} className="text-right">{row.id}</td>
            <td key={'rules-hierarchy' + index} className="text-right">{row.hierarchy}</td>
-           <td key={'rules-edit-'+ index} className="text-right">
-             <Button color="success" size="sm" onClick={()=>editRule(row.id)}>Edit</Button></td>
-             <td key={'campaignsview-delete-'+ index} className="text-right">
-           <Button color="danger" size="sm" onClick={()=>deleteRule(row.id)}>Delete</Button></td>
+           <td key={'rules-edit-'+ index} className="text-center">
+             <Button color="success" size="sm" onClick={()=>viewRule(row.id)}>View</Button>
+             &nbsp;
+             <Button color="warning" size="sm" onClick={()=>editRule(row.id)}>Edit</Button>
+             &nbsp;
+             <Button color="danger" size="sm" onClick={()=>deleteRule(row.id)}>Delete</Button>
+           </td>
          </tr>))
      ); 
    }
@@ -69,6 +72,12 @@ const Rules = (props) => {
       var r = await vx.getRule(id);
       setRule(r);
    }
+
+   const viewRule = async(id) => {
+    var r = await vx.getRule(id);
+    r.readOnly = true;
+    setRule(r);
+  }
 
    const deleteRule = async(id) => {
       await vx.deleteRule(id);
@@ -108,6 +117,7 @@ const Rules = (props) => {
                             <th className="text-center">Name</th>
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Hierarchy</th>
+                            <th className="text-center">Actions</th>
                           </tr>
                       </thead>
                       <tbody>
