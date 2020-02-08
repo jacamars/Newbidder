@@ -30,5 +30,6 @@ CREATE TABLE IF NOT EXISTS banners (
   width_range varchar(255) DEFAULT NULL,
   height_range varchar(255) DEFAULT NULL,
   width_height_list varchar(255)  DEFAULT NULL,
+  rules varchar(1024) DEFAULT NULL,
   PRIMARY KEY (id)
 );

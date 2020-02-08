@@ -30,6 +30,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import IAB from '../../IAB';
 import CampaignEditor from "./CampaignEditor";
 
+const deviceTypes = [
+  "unknown",
+  "mobile",
+  "desktop",
+  "smarttv",
+  "phone",
+  "tablet",
+  "mobile-not(phone or tablet)"];
+
 
 var undef;
 
@@ -37,7 +46,6 @@ const TargetEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [target, setTarget] = useState(props.target);
-  const [startDate, setStartDate] = useState(new Date());
   const vx = useViewContext();
 
   const nameChangedHandler = (event) => {
@@ -63,7 +71,7 @@ const getTrueFalseOptions = (value)  =>{
 }
 
 const domainType = ()  =>{
-  if (target.domaintargetting === 'BLACKLIST')
+  if (target.domain_targetting === 'BLACKLIST')
       return(
           <>
           <option selected>BLACKLIST</option>
@@ -85,11 +93,35 @@ const getSelectedCountries = () => {
     )
 }
 
+
+const getDeviceTypes = (s) => {
+  var checks = [];
+  if (s != undef && s.length > 0) {
+    checks = s.split(",");
+  }
+  var items = []; 
+  for (var i=1;i<deviceTypes.length;i++) {
+    var dt = deviceTypes[i];
+    if (checks.indexOf(dt)>-1)
+      items.push(<option key={"dt-"+i} selected>{dt}</option>);
+    else
+      items.push(<option dt={"iab-"+i}>{dt}</option>)
+  }
+  return(items);
+}
+
 const getWBList = (s) => {
+  var checks = [];
+  if (s.length > 0) {
+    checks = s.split(",");
+  }
   var items = []; 
   for (var i=1;i<26;i++) {
     var iab = "IAB"+i;
-    items.push(<option key={"iab-"+i}>{iab}</option>)
+    if (checks.indexOf(iab)>-1)
+      items.push(<option key={"iab-"+i} selected>{iab}</option>);
+    else
+      items.push(<option key={"iab-"+i}>{iab}</option>)
   }
   return(items);
 }
@@ -116,9 +148,14 @@ const getWBList = (s) => {
     } else
       target.domain_targetting = null;
 
+    var country = document.getElementById("country").value;
     var lat = document.getElementById("lat").value;
     var lon = document.getElementById("lon").value;
     var range = document.getElementById("range").value;
+    if (country == "")
+      target.country = null;
+    else
+      target.country = country;
     if (lat === "" || lat === "0")
       target.geo_latitude = null;
     else
@@ -134,10 +171,20 @@ const getWBList = (s) => {
      
     var car = document.getElementById("carrier").value;
     var os = document.getElementById("os").value;
-
     var make = document.getElementById("makes").value;
     var model = document.getElementById("models").value;
-    var devicetypes = document.getElementById("device-types").value;
+    target.devicetype = ([...document.getElementById("device-types").options]
+      .filter((x) => x.selected)
+      .map((x)=>x.value)).join();
+  
+    if (car === "")
+      target.carrier = null;
+    else
+      target.carrier = car;
+    if (os === "")
+      target.os = null;
+    else
+      target.os = os;     
     if (make === "")
       target.make = null;
     else
@@ -146,23 +193,15 @@ const getWBList = (s) => {
       target.model = null;
     else
       target.model = model.split("\n").join(",");
-    if (devicetypes === "")
-      target.devicetypes = null;
-    else
-      target.devicetypes = devicetypes.split("\n").join(",");
  
-    target.IAB_category = ([...document.getElementById("whitelist").options]
+    target.iab_category = ([...document.getElementById("whitelist").options]
         .filter((x) => x.selected)
         .map((x)=>x.value)).join();
-    target.IAB_category_blklst = ([...document.getElementById("blacklist").options]
+    target.iab_category_blklist = ([...document.getElementById("blacklist").options]
         .filter((x) => x.selected)
         .map((x)=>x.value)).join(); 
-    
-    
 
-    alert(JSON.stringify(target,null,2));
-
-    props.callback(true);
+    props.callback(target);
   }
 
   const discard = () => {
@@ -226,8 +265,7 @@ const getWBList = (s) => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                                 <label>Domain Values</label>
-                                <Input type="textarea" id="domain" defaultValue={asTextAreaList(target.listofdomains)}/>
-   
+                                <Input type="textarea" id="domain" defaultValue={fromCommaList(target.list_of_domains)}/>   
                               </FormGroup>
                             </Col>
                             <Col className="pl-md-1" md="4">
@@ -246,22 +284,28 @@ const getWBList = (s) => {
                             </Col>
                           </Row>
                           <Row>   
+                          <Col className="pr-md-1" md="2">
+                                <FormGroup>
+                                    <label>country</label>
+                                    <Input type="textarea" id="country" defaultValue={fromCommaList(target.country)}/>
+                                </FormGroup>
+                            </Col> 
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                               <label>Geo Latitude</label>
-                                <Input type="input" id="lat" defaultValue={target.lat}/>   
+                                <Input type="input" id="lat" defaultValue={target.geo_latitude}/>   
                               </FormGroup>
                             </Col>
                             <Col className="px-md-1" md="2">
                               <FormGroup>
                               <label>Geo Longitude</label>
-                                <Input type="input"  id="lon" defaultValue={target.lon}/>   
+                                <Input type="input"  id="lon" defaultValue={target.geo_longitude}/>   
                               </FormGroup>
                               </Col>
                               <Col className="px-md-1" md="2">
                               <FormGroup>
                               <label>Geo Range</label>
-                                <Input type="input" id="range" defaultValue={target.range}/>   
+                                <Input type="input" id="range" defaultValue={target.geo_range}/>   
                               </FormGroup>
                             </Col>
                           </Row>
@@ -293,7 +337,9 @@ const getWBList = (s) => {
                             <Col className="pr-md-1" md="2">
                                 <FormGroup>
                                     <label>Device Types</label>
-                                    <Input type="textarea" id="device-types" defaultValue={fromCommaList(target.devicetypes)}/>   
+                                    <Input type="select" id="device-types" multiple>
+                                      {getDeviceTypes(target.devicetypes_str)}
+                                    </Input>
                                 </FormGroup>
                             </Col>                           
                           </Row>
@@ -302,7 +348,7 @@ const getWBList = (s) => {
                                 <FormGroup>
                                     <label>IAB Whitelist</label>
                                     <Input type="select" id="whitelist" multiple>
-                                        {getWBList(target.IAB_category)}
+                                        {getWBList(target.iab_category)}
                                     </Input>     
                                 </FormGroup>    
                             </Col>
@@ -310,7 +356,7 @@ const getWBList = (s) => {
                                 <FormGroup>
                                     <label>IAB Blacklist</label>
                                     <Input type="select" id="blacklist" multiple>
-                                        {getWBList(target.IAB_category_blklst)}
+                                        {getWBList(target.iab_category_blklist)}
                                     </Input>     
                                 </FormGroup>    
                             </Col>

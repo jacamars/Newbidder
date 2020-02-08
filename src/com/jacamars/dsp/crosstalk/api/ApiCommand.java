@@ -156,6 +156,10 @@ public class ApiCommand {
     public static final String SQLADD_NEW_TARGET = "SQLAddNewTarget#";
     
     public static final String SQLDELETE_TARGET = "SQLDeleteTarget#";
+    
+    public static final String SQLLIST_TARGETS = "SQLListTargets#";
+    
+    public static final String SQLGET_TARGET = "SQLGetTarget#";
 
 
     /**
@@ -468,6 +472,14 @@ public class ApiCommand {
             	
             case SQLDELETE_TARGET:
             	cmd = mapper.readValue(data, SQLDeleteTargetCmd.class);
+            	break;
+            	
+            case SQLLIST_TARGETS:
+            	cmd = mapper.readValue(data, SQLListTargetsCmd.class);
+            	break;
+            	
+            case SQLGET_TARGET:
+            	cmd = mapper.readValue(data, SQLGetTargetCmd.class);
             	break;
             	
             default:

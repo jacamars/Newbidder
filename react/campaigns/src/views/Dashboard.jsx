@@ -25,8 +25,10 @@ var undef;
   const [count, setCount] = useState(0);
 
   const refresh = async() => {
-    await vx.getBidders();
-    await vx.listCampaigns();
+    await vx.getAccounting();
+    await vx.getDbCampaigns();
+    await vx.listRules();
+    await vx.listTargets();
     setCount(count+1);
   }
 

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,10 +22,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.RtbStandard;
 import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
@@ -150,8 +152,7 @@ public class Creative  {
 	/* Only Active creative is allowed to bid */
 	public static String ALLOWED_STATUS = "Active";
 
-	/* ad-exchange name */
-	public String exchange;
+	public List<Integer> rules = new ArrayList<>();
 
 	/** When this is not null, this means this creative is a proxy for a list of rotating creatives */
 	public Map<String,Creative> subCreatives;
@@ -186,7 +187,10 @@ public class Creative  {
 	transient JsonNode node;
 	// //////////////// BANNER SPECIFIC TARGETING	
 	/** When true, this is a banner, else it is a video. Will need updating for native and audio support */
-	transient boolean isBanner;
+	public boolean isBanner;
+	public boolean isVideo;
+	public boolean isAudio;
+	public boolean isNative;
 	/** The content type of the banner template */
 	transient String contenttype = "";
 	/** The HTML snippet for the banner */
@@ -243,6 +247,74 @@ public class Creative  {
 	private static final  String VAST_DATA = "vast_video_outgoing_file";
 
 
+	public static Creative getBannerInstance(int id) {
+		try {
+		String select = "select * from banners where id="+id;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		var prep = conn.prepareStatement(select);
+		ResultSet rs = prep.executeQuery();
+		
+		ArrayNode inner = JdbcTools.convertToJson(rs);
+		ObjectNode y = (ObjectNode) inner.get(0);
+		Creative c = new Creative(y,"banner");
+		return c;
+		} catch (Exception error) {
+			throw (RuntimeException)error;
+		}
+	
+	}
+	
+	public static Creative getVideoInstance(int id) {
+		try {
+			String select = "select * from banner_videos where id="+id;
+			var conn = CrosstalkConfig.getInstance().getConnection();
+			var stmt = conn.createStatement();
+			var prep = conn.prepareStatement(select);
+			ResultSet rs = prep.executeQuery();
+			
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			ObjectNode y = (ObjectNode) inner.get(0);
+			Creative c = new Creative(y,"video");
+			return c;
+			} catch (Exception error) {
+				throw (RuntimeException)error;
+			}
+	}
+	
+	public static Creative getAudioInstance(int id) {
+		try {
+			String select = "select * from banner_audios where id="+id;
+			var conn = CrosstalkConfig.getInstance().getConnection();
+			var stmt = conn.createStatement();
+			var prep = conn.prepareStatement(select);
+			ResultSet rs = prep.executeQuery();
+			
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			ObjectNode y = (ObjectNode) inner.get(0);
+			Creative c = new Creative(y,"audio");
+			return c;
+			} catch (Exception error) {
+				throw (RuntimeException)error;
+			}
+	}
+	
+	public static Creative getNativeInstance(int id) {
+		try {
+			String select = "select * from banner_natives where id="+id;
+			var conn = CrosstalkConfig.getInstance().getConnection();
+			var stmt = conn.createStatement();
+			var prep = conn.prepareStatement(select);
+			ResultSet rs = prep.executeQuery();
+			
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			ObjectNode y = (ObjectNode) inner.get(0);
+			Creative c = new Creative(y,"native");
+			return c;
+			} catch (Exception error) {
+				throw (RuntimeException)error;
+			}
+	}
 
 	/**
 	 * Empty constructor for creation using json.
@@ -257,6 +329,26 @@ public class Creative  {
 			tableName = "banners";
 		else
 			tableName = "banner_videos";
+		update(node);
+	}
+	Creative(JsonNode node, String type) throws Exception {
+		switch(type) {
+		case "banner":
+			isBanner = true;
+			tableName = "banners";
+			break;
+		case "video":
+			isVideo = true;
+			tableName = "banner_videos";
+			break;
+		case "audio":
+			isAudio = true;
+			tableName = "banner_audios";
+			break;
+		case "native":
+			isNative = true;
+			tableName = "banner_natives";
+		}
 		update(node);
 	}
 	
@@ -561,7 +653,6 @@ public class Creative  {
 		// assign the fixed nodes
 		fixedNodes.add(new FixedNodeStatus());
         fixedNodes.add(new FixedNodeNonStandard());
-        fixedNodes.add(new FixedNodeExchange());
 
         // These are impression releated
 		attributes.add(new FixedNodeRequiresDeal());

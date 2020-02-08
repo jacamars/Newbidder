@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.common;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 import java.util.Collection;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.hash.BloomFilter;
+import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
@@ -34,6 +36,7 @@ import com.jacamars.dsp.rtb.blocks.SimpleSet;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
+import com.jacamars.dsp.rtb.tools.JdbcTools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,6 +254,17 @@ public class Node {
 	/** decomposed hierarchy */
 	public List<String> bidRequestValues = new ArrayList<String>();
 
+	public static Node getInstance(int id) throws Exception {
+		String select = "select * from rtb_standards where id="+id;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		var prep = conn.prepareStatement(select);
+		ResultSet rs = prep.executeQuery();
+		
+		ArrayNode inner = JdbcTools.convertToJson(rs);
+		ObjectNode y = (ObjectNode) inner.get(0);
+		return new Node(y);	
+	}
 	/**
 	 * Simple constructor useful for testing.
 	 */

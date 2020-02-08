@@ -29,6 +29,7 @@ const  ViewContext = () => {
     const [campaigns, setCampaigns] = useState([]);               // db campaigns
     const [rules, setRules] = useState([]);
     const [bidders, setBidders] = useState([]);
+    const [targets, setTargets] = useState([]);
 
     const reset = () => {
       setLoggedIn(false);
@@ -41,6 +42,7 @@ const  ViewContext = () => {
       setCampaigns([]);
       setBidders([]);
       setRules([]);
+      setTargets([]);
     }
 
     const changeLoginState = async (value) => {
@@ -90,6 +92,23 @@ const  ViewContext = () => {
       console.log("ListRules returns: " + JSON.stringify(data,null,2));
       setRules(data.rules);
       return data.campaigns;
+    }
+
+    const listTargets = async() => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        type: "SQLListTargets#"
+      };
+      var data = await execute(cmd);
+
+      if (data === undef)
+        return;
+      
+      console.log("ListTargets returns: " + JSON.stringify(data,null,2));
+      setTargets(data.targets);
+      return data.targets;
     }
 
     const getBidders = async() => {
@@ -161,6 +180,20 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const deleteTarget = async (id) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLDeleteTarget#",
+        id: id
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLDeleteTarget returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
 
     const getDbCampaigns = async () => {
       var cmd = {
@@ -227,6 +260,25 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const addNewTarget = async(e) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLAddNewTarget#",
+        target: JSON.stringify(e)
+      };
+
+      console.log("==========>" + JSON.stringify(cmd,null,2));
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLAddNewTarget returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
+
     const getNewCampaign = async(name) => {
       var cmd = {
         token: jwt,
@@ -285,10 +337,24 @@ const  ViewContext = () => {
       if (!result)
         return;
 
-      console.log("SQLNewRule returns: " + JSON.stringify(result,null,2));
+      console.log("SQLGetRule returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
       return result.rule;
+    }
+
+    const getTarget = async(id) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetTarget#",
+        id: id
+      };
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLGetTarget returns: " + JSON.stringify(result.target,null,2));
+      return result.target;
     }
 
 
@@ -319,7 +385,7 @@ const  ViewContext = () => {
       members, loggedIn, changeLoginState, listCampaigns, runningCampaigns, getBidders, bidders,
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
-      listRules, rules, addNewRule, getRule, deleteRule
+      listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget
     };
 };
 

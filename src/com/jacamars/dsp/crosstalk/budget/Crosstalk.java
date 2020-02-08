@@ -1,5 +1,6 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
@@ -9,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
@@ -140,9 +142,31 @@ public enum Crosstalk {
 		var conn = CrosstalkConfig.getInstance().getConnection();
 		if (conn == null)
 			throw new Exception("Crosstalk database connection was not established");
+
+		List<String> specs = Arrays.asList(
+				"data/postgres/banner_videos.sql",
+				"data/postgres/banners_rtb_standards.sql",
+				"data/postgres/banner_videos_rtb_standards.sql",
+				"data/postgres/banners.sql",
+				"data/postgres/campaigns_rtb_standards.sql",
+				"data/postgres/campaigns.sql",
+				"data/postgres/rtb_standards.sql",
+				"data/postgres/exchange_attributes.sql",
+				"data/postgres/targets.sql",
+				"data/postgres/banner_audios.sql",
+				"data/postgres/banner_natives.sql");
 		
-		var stmt = conn.createStatement();
-		String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);
+		final var stmt = conn.createStatement();
+		specs.stream().forEach(e->{
+			try {
+				stmt.execute(new String(Files.readAllBytes(Paths.get(e)), StandardCharsets.UTF_8));
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		
+		/*String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
 		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners_rtb_standards.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
@@ -160,6 +184,10 @@ public enum Crosstalk {
 		stmt.execute(content);
 		content = new String(Files.readAllBytes(Paths.get("data/postgres/targets.sql")), StandardCharsets.UTF_8);
 		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_audios.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);
+		content = new String(Files.readAllBytes(Paths.get("data/postgres/targets.sql")), StandardCharsets.UTF_8);
+		stmt.execute(content);*/
 	}
 
 	static void updateBudgets() {

@@ -38,11 +38,25 @@ var undef;
     setTarget(targ);
   }
 
-  const update = (x) => {
+  const deleteTarget = async(id) => {
+    await vx.deleteTarget(id);
+    await vx.listTargets();
+    redraw();
+  }
+
+  const editTarget = async(id) => {
+    var t = await vx.getTarget(id);
+    if (t) {
+      setTarget(t);
+    }
+  }
+
+  const update = async (x) => {
     if (x !== null) {
-        // update database;
+      await vx.addNewTarget(x);
     }
     setTarget(null)
+    await vx.listTargets();
     redraw();
   }
 
@@ -51,11 +65,19 @@ var undef;
   };
 
   const getTargetsView = () => {
+    console.log("GetTargetsView, rows = " + vx.targets.length);
 
     return(
-        <div>
-        </div>
-    );
+       vx.targets.map((row, index) => (
+         <tr key={'targetsview-' + row}>
+           <td>{index}</td>
+           <td key={'targets-name-' + index} className="text-left">{row.name}</td>
+           <td key={'targets-id-' + index} className="text-right">{row.id}</td>
+           <td className="text-center"><Button color="success" size="sm" onClick={()=>editTarget(row.id)}>Edit</Button>
+           &nbsp;
+           <Button color="danger" size="sm" onClick={()=>deleteTarget(row.id)}>Delete</Button></td>
+         </tr>))
+     ); 
   }
 
   return (
@@ -79,7 +101,7 @@ var undef;
                             <th>#</th>
                             <th className="text-center">Name</th>
                             <th className="text-right">SQL-ID</th>
-                            <th className="text-right">Target</th>
+                            <th className="text-center">Actions</th>
                           </tr>
                       </thead>
                       <tbody>

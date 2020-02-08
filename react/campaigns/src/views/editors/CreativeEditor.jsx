@@ -66,16 +66,16 @@ const getAttachedCampaign = () => {
 
 
 const getSelectedRules = () => {
-    return(
-        <>
-        <option>Rule 1</option>
-        <option>Rule 2</option>
-        <option>Rule 3</option>
-        <option>Rule 4</option>
-        <option>Rule 5</option>
-        <option>Rule 6</option>
-        </>
-    );
+    var items = []; 
+    for (var i=0;i<vx.rules.length;i++) {
+      var x = vx.rules[i];
+      //alert("x = " + JSON.stringify(x,null,2) + ", rules = " + JSON.stringify(campaign.rules,null,2));
+      if (creative.rules.indexOf(x.id) != -1)
+        items.push(<option key={"rules-"+x.id} selected value={x.id}>{x.name}</option>);
+      else
+        items.push(<option key={"rules-"+x.id} value={x.id}>{x.name}</option>);
+    }
+    return(items);
 }
 
   const redraw = () => {
@@ -94,6 +94,18 @@ const getSelectedRules = () => {
       if (creative.id === 0)
         return (<div>Save</div>);
       return(<div>Update</div>);
+  }
+
+  const addNewCreative = () => {
+    var x = creative;
+
+    x.rules = [...document.getElementById("rules").options]
+      .filter((x) => x.selected)
+      .map((x)=>Number(x.value));
+
+
+    alert(JSON.stringify(x,null,2));
+    props.callback(x);
   }
 
         return (
@@ -277,7 +289,7 @@ const getSelectedRules = () => {
                         <Button className="btn-fill" c
                           color="primary" 
                           type="submit"
-                          onClick={() => props.callback(creative)}
+                          onClick={() => addNewCreative()}
                          >
                           Save
                         </Button>

@@ -49,10 +49,18 @@ const getAttachedCreatives = () => {
     );
 }
 
+const getIdOf = (name) => {
+  for (var i=0;i<vx.targets.length;i++) {
+    var x = vx.targets[i];
+    if (x.name === name)
+      return x.id;
+  }
+  return 0;
+}
+
 const  addNewCampaign = async () => {
     var x = campaign;
     x.name = document.getElementById("name").value;
-    x.target = document.getElementById("target").value;
     x.adomain = document.getElementById("adomain").value;
     var forensiq = document.getElementById("fraudSelect").value;
     x.status = document.getElementById("statusSelect").value;
@@ -61,6 +69,13 @@ const  addNewCampaign = async () => {
     x.budget.hourlyBudget= Number(document.getElementById("hourlyBudget").value);
     x.assignedSpendRate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
+
+    var tid = document.getElementById("target").value;
+    tid = getIdOf(tid);
+    if (tid === "")
+      x.target_id = null;
+    else
+      x.target_id = Number(tid);
 
   
     x.exchanges = [...document.getElementById("exchanges").options]
@@ -85,6 +100,8 @@ const  addNewCampaign = async () => {
       x.date.push(endDate.getTime());
     }
     if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
+
+    alert(JSON.stringify(x,null,2));
 
     props.callback(x);
     return false;
@@ -148,15 +165,17 @@ const getSelectedRules = () => {
 }
 
 const getSelectedTargets = () => {
-    return(
-        <>
-        <option>Target 1</option>
-        <option>Target 2</option>
-        <option>Target 3</option>
-        <option>Target 4</option>
-        <option>Target 5</option>
-        </>
-    );
+  var items = []; 
+  items.push(<option key={"target-0"}></option>);
+  for (var i=0;i<vx.targets.length;i++) {
+    var x = vx.targets[i];
+    console.log("Check: " + x.id + " vs " + campaign.target_id);
+    if (campaign.target_id === x.id)
+      items.push(<option key={"target-"+i} selected>{x.name}</option>);
+    else
+      items.push(<option key={"target-"+i}>{x.name}</option>);
+  }
+  return(items);
 }
 
 const getSelectedRegions = () => {
@@ -173,10 +192,6 @@ const getSelectedRegions = () => {
 
   const redraw = () => {
       setCount(count+1);
-  }
-
-  const update = () => {
-      props.callback(true);
   }
 
   const discard = () => {

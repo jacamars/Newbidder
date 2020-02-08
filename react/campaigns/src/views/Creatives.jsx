@@ -34,17 +34,25 @@ var undef;
     if (creative !== null)
     return;
 
-    var banner = await vx.getNewCreative("My New Banner");
-    banner.isBanner = true;
-    setCreative(banner);
+    var c = await vx.getNewCreative("My New Banner");
+    c.isVideo = false;
+    c.isAudio = false;
+    c.isNative = false;
+    c.isBanner = true;
+    setCreative(c);
   }
 
   const makeNewVideo = async() => {
     if (creative !== null)
     return;
 
-    var video = await vx.getNewVideo("My New Video");
-    setCreative(video);
+    var c = await vx.getNewVideo("My New Video");
+    c.isVideo = true;
+    c.isAudio = false;
+    c.isNative = false;
+    c.isBanner = false;
+
+    setCreative(clearInterval);
   }
 
 
@@ -52,8 +60,12 @@ var undef;
     if (creative !== null)
     return;
 
-    var native = await vx.getNewNative("My New Native");
-    setCreative(native);
+    var c = await vx.getNewNative("My New Native");
+    c.isVideo = false;
+    c.isAudio = false;
+    c.isNative = true;
+    c.isBanner = false;
+    setCreative(c);
   }
 
 
@@ -61,8 +73,12 @@ var undef;
     if (creative !== null)
     return;
 
-    var audio = await vx.getNewAudio("My New Audio");
-    setCreative(audio);
+    var c = await vx.getNewAudio("My New Audio");
+    c.isVideo = false;
+    c.isAudio = true;
+    c.isNative = false;
+    c.isBanner = false;
+    setCreative(c);
   }
 
   const update = (x) => {
@@ -87,6 +103,19 @@ var undef;
     );
 }
 
+const getAudiosView = () => {
+  return(
+    <>
+    </>
+  );
+}
+
+const getNativesView = () => {
+  return(
+    <>
+    </>
+  );
+}
 
   const setInstances = () => {
 
@@ -155,6 +184,64 @@ var undef;
                       </thead>
                       <tbody>
                         { getVideosView() }
+                      </tbody>
+                    </Table>
+                  </CardBody>           
+                </Card>
+            </Col>
+        </Row>
+
+        <Row>
+            <Col xs="12">
+            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
+                <Card className="card-chart">
+                    <CardHeader>
+                        <Row>
+                            <CardTitle tag="h2">Audio</CardTitle>
+                        </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <Table key={"banners-table-"+count} size="sm">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th className="text-center">Name</th>
+                            <th className="text-right">SQL-ID</th>
+                            <th className="text-right">Name</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        { getAudiosView() }
+                      </tbody>
+                    </Table>
+                  </CardBody>           
+                </Card>
+            </Col>
+        </Row>
+
+        <Row>
+            <Col xs="12">
+            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
+                <Card className="card-chart">
+                    <CardHeader>
+                        <Row>
+                            <CardTitle tag="h2">Native</CardTitle>
+                        </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <Table key={"banners-table-"+count} size="sm">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th className="text-center">Name</th>
+                            <th className="text-right">SQL-ID</th>
+                            <th className="text-right">Name</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        { getNativesView() }
                       </tbody>
                     </Table>
                   </CardBody>           

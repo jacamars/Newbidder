@@ -27,5 +27,9 @@ CREATE TABLE IF NOT EXISTS campaigns (
   target_id int DEFAULT NULL,
   rules varchar(1024) DEFAULT NULL,
   spendrate int DEFAULT NULL,
+  banners varchar(1024) DEFAULT NULL,
+  videos varchar(1024) DEFAULT NULL,
+  audios varchar(1024) DEFAULT NULL,
+  natives varchar(1024) DEFAULT NULL,
   PRIMARY KEY (id)
 );

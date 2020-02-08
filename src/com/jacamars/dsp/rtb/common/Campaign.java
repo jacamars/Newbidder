@@ -3,6 +3,7 @@ package com.jacamars.dsp.rtb.common;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.DayPart;
 import com.jacamars.dsp.crosstalk.budget.RtbStandard;
 import com.jacamars.dsp.crosstalk.budget.Targeting;
@@ -103,6 +105,13 @@ public class Campaign implements Comparable, Portable  {
 	
 	public Budget budget;
 	
+	/** Database keys for the creatives */
+	public String banners;
+	public String videos;
+	public String audios;
+	public String natives;
+	/////////////////////////////////////
+	
 	/** The SQL name for this campaign id */
 	protected final String CAMPAIGN_ID = "id";
 	
@@ -141,10 +150,10 @@ public class Campaign implements Comparable, Portable  {
     /** points to the regions in the sql database */
     public String regions;
     /** points to the target id for this guy (used to make rules from the campaign manager) */
-    public int target_id;
+    public int target_id = 0;
     
     /** Identifies standard rules associated with this campaign */
-    public List<Integer>rules;
+    public List<Integer>rules = new ArrayList<>();
     
     // ///////////// Crude accounting /////////////////////
     public transient long bids = 0L;
@@ -212,12 +221,26 @@ public class Campaign implements Comparable, Portable  {
 		config.getSerializationConfig().addClassDefinition(portableCampaignClassDefinition);
 	}
 	
+	public static Campaign getInstance(int id) throws Exception {
+		String select = "select * from campaigns where id="+id;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		var prep = conn.prepareStatement(select);
+		ResultSet rs = prep.executeQuery();
+		
+		ArrayNode inner = JdbcTools.convertToJson(rs);
+		ObjectNode y = (ObjectNode) inner.get(0);
+		Campaign c = new Campaign(y);
+		return c;
+	}
+	
 	/**
 	 * Empty constructor, simply takes all defaults, useful for testing.
 	 */
 	public Campaign() {
 
 	}
+	
 	
 	/**
 	 * Constructor using a JSON Node. Crosstalk uses this to create this object from SQL
@@ -281,6 +304,10 @@ public class Campaign implements Comparable, Portable  {
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
 		this.assignedSpendRate = camp.assignedSpendRate;
+		this.banners = banners;
+		this.videos = videos;
+		this.natives = natives;
+		this.audios = audios;
 		if (camp.category != null)
 			this.category = camp.category;
 		
@@ -814,13 +841,49 @@ public class Campaign implements Comparable, Portable  {
 		 * Do this last
 		 */
 
-		x = myNode.get("targetting");
-		if (x == null || x instanceof NullNode) {
+		x = myNode.get("target_id");
+		if (x == null || x instanceof NullNode || ((JsonNode)x).asInt() == 0) {
 			if (!isActive())
 				return;
 			throw new Exception("Can't have null targetting for campaign " + adId);
 		}
-
+		if (x != null)
+			target_id = ((JsonNode)x).asInt();
+		
+		if (myNode.get("banners") != null) 
+			banners = myNode.get("banners").asText();
+		if (myNode.get("videos") != null)
+			videos = myNode.get("videos").asText();
+		if (myNode.get("audios") != null)
+			audios = myNode.get("audios").asText();
+		if (myNode.get("natives") != null)
+			natives = myNode.get("natives").asText();
+		
+		processCreatives();
+	}
+	
+	/**
+	 * Load the creatives from the db and attach them to the the campaign.
+	 * @throws Exception if there is a database error.
+	 */
+	void processCreatives() throws Exception {
+		if (creatives == null) 
+			creatives = new ArrayList<>();
+		List<Integer> ids = new ArrayList<>();
+		Targeting.getIntegerList(ids, banners);
+		ids.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
+		
+		ids.clear();
+		Targeting.getIntegerList(ids, videos);
+		ids.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
+		
+		ids.clear();
+		Targeting.getIntegerList(ids, audios);
+		ids.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
+		
+		ids.clear();
+		Targeting.getIntegerList(ids, natives);
+		ids.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
 	}
 	
 	public boolean process() throws Exception {
@@ -856,20 +919,13 @@ public class Campaign implements Comparable, Portable  {
 	}
 	
 	protected void doTargets() throws Exception {
-		if (getMyNode().get("targetting") instanceof NullNode) {
+		if (target_id == 0) {
 			if (!isActive())
 				return;
 			throw new Exception("No targeting record was found. for " + adId);
 		}
  
-		ObjectNode targ = (ObjectNode) getMyNode().get("targetting");
-		if (targ != null)
-			targeting = new Targeting(targ); 
-		else {
-			if (target_id != 0) {
-				/** TBD Get from SQL db */
-			}
-		}
+		targeting = Targeting.getInstance(target_id); 
 
 		instantiate("banner", true);
 		instantiate("banner_video", false);

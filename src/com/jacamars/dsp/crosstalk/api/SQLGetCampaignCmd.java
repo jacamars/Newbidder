@@ -74,22 +74,13 @@ public class SQLGetCampaignCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				String select = "select * from campaigns where id="+id;
-				var conn = CrosstalkConfig.getInstance().getConnection();
-				var stmt = conn.createStatement();
-				var prep = conn.prepareStatement(select);
-				ResultSet rs = prep.executeQuery();
-				
-				ArrayNode inner = JdbcTools.convertToJson(rs);
-				ObjectNode y = (ObjectNode) inner.get(0);
-				Campaign c = new Campaign(y);
-				campaign = c.toJson();
-				
+				campaign = Campaign.getInstance(id).toJson();		
 				return;
 			} catch (Exception err) {
 				error = true;
 				message = err.toString();
+				err.printStackTrace();
+				return;
 			}
-			message = "Timed out";
 		}
 }
