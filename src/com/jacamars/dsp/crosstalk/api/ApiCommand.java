@@ -160,6 +160,12 @@ public class ApiCommand {
     public static final String SQLLIST_TARGETS = "SQLListTargets#";
     
     public static final String SQLGET_TARGET = "SQLGetTarget#";
+    
+    public static final String SQLADD_NEW_CREATIVE = "SQLAddNewCreative#";
+    
+    public static final String SQLGET_CREATIVE = "SQLGetCreative#";
+    
+    public static final String SQLDELETE_CREATIVE = "SQLDeleteCreative#";
    
 
 
@@ -481,6 +487,18 @@ public class ApiCommand {
             	
             case SQLGET_TARGET:
             	cmd = mapper.readValue(data, SQLGetTargetCmd.class);
+            	break;
+            	
+            case SQLADD_NEW_CREATIVE:
+            	cmd = mapper.readValue(data, SQLAddNewCreativeCmd.class);
+            	break;
+            	
+            case SQLGET_CREATIVE:
+            	cmd = mapper.readValue(data, SQLGetCreativeCmd.class);
+            	break;
+            	
+            case SQLDELETE_CREATIVE:
+            	cmd = mapper.readValue(data, SQLDeleteCreativeCmd.class);
             	break;
             	
             default:

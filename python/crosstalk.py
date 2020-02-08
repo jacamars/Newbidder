@@ -120,7 +120,7 @@ def SQLListCampaigns():
         
 def SQLListCreatives():
     try:
-        r = requests.post(globalHost, data='{"type":"SqlListCreatives#"}')
+        r = requests.post(globalHost, data='{"type":"SQLListCreatives#"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -139,6 +139,15 @@ def SQLGetNewCampaign(camp):
 def SQLGetCampaign(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '"}')
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def SQLGetCreative(id,x):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLGetCreative#","id":' + id + ', "key":"' + x  +'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

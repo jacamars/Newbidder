@@ -75,6 +75,7 @@ public class SQLListCreatives extends ApiCommand {
 	@Override
 		public void execute() {
 			super.execute();
+			creatives = new ArrayList<>();
 			try {
 				String select = "select * from banners";
 				var conn = CrosstalkConfig.getInstance().getConnection();
@@ -83,16 +84,13 @@ public class SQLListCreatives extends ApiCommand {
 				ResultSet rs = prep.executeQuery();	
 				banners = convertToJson(rs,"banner");	
 				
-				select = "select * from banner_videos";
-				rs = prep.executeQuery();
+				rs = conn.prepareStatement("select * from banner_videos").executeQuery();
 				videos = convertToJson(rs,"video"); 
 			
-				select = "select * from banner_natives";
-				rs = prep.executeQuery();
+				rs = conn.prepareStatement("select * from banner_natives").executeQuery();
 				natives = convertToJson(rs,"native"); 
 				
-				select = "select * from banner_audios";
-				rs = prep.executeQuery();
+				rs = conn.prepareStatement("select * from banner_audios").executeQuery();
 				audios =  convertToJson(rs,"audio");
 				
 				creatives.addAll(banners);
@@ -105,7 +103,6 @@ public class SQLListCreatives extends ApiCommand {
 				error = true;
 				message = err.toString();
 			}
-			message = "Timed out";
 		}
 	
 	List<Map> convertToJson(ResultSet rs, String key) throws Exception {
@@ -113,14 +110,14 @@ public class SQLListCreatives extends ApiCommand {
 		while(rs.next()) {
 			int id = rs.getInt("id");
 			String name = rs.getString("name");
-			long start = rs.getTimestamp("activate_time").getTime();
-			long end = rs.getTimestamp("expire_time").getTime();
+			long start = rs.getTimestamp("interval_start").getTime();
+			long end = rs.getTimestamp("interval_end").getTime();
 			Map m= new HashMap();
 			m.put("id", id);
 			m.put("name", name);
 			m.put("start", start);
 			m.put("end", end);
-			m.put(type, key);
+			m.put("type", key);
 			list.add(m);
 		}
 		return list;

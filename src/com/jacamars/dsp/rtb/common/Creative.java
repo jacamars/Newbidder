@@ -1,11 +1,14 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.File;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,6 +58,8 @@ public class Creative  {
 	public String forwardurl;
 	/** The encoded version of the forward url used by this creative */
 	private transient String encodedFurl;
+	/** Database id */
+	int id;
 	/* The image url used by this creative */
 	public String imageurl;
 	/** The encoded image URL used by this creative */
@@ -69,6 +74,8 @@ public class Creative  {
 	
 	public Dimensions dimensions;
 	
+	/** The string specification of deals */
+	public String dealSpec;
 	/** sub-template for banner */
 	public String subtemplate;
 	/** Private/preferred deals */
@@ -93,6 +100,12 @@ public class Creative  {
 	public Map<String,String> extensions = null;
 	// Currency
 	public String cur = "USD";
+	/** Width range specification */
+	public String width_range;
+	/** height range specification */
+	public String  height_range;
+	/** Bith w and h specification */
+	public String width_height_list;
 	
 	/** if this is a video creative (NOT a native content video) its protocol */
 	public Integer videoProtocol;
@@ -119,7 +132,7 @@ public class Creative  {
 	// If this creative is tagged with categories. Used by bidswitch for example
 	public List<String> categories;
 
-	/** SQL Name of this campaign */
+	/** SQL Name of this creative */
 	public String name;
 	
 	// /////////////////////////////////////////////
@@ -173,8 +186,6 @@ public class Creative  {
 	/**
 	 * Components used for creating creatives from JSON derived from SQL
 	 */
-	/** The campaign this creative belongs to */
-	transient int campaignid;	
 	/** The id of the cre4ative, as a string */
 	transient String bannerid; 
 	/** Width of the creative */
@@ -217,7 +228,7 @@ public class Creative  {
 	/** The table name where this thing is stored in sql */
 	transient String tableName = null;
 	/** The position on the page for the creative */
-	transient String position;
+	public String position;
 	transient AtomicBigDecimal bid_ecpm = new AtomicBigDecimal(0);
 	transient boolean interstitialOnly = false;
 	private final String INTERSTITIAL = "interstitial";
@@ -227,8 +238,6 @@ public class Creative  {
 	private static final String HOURLY_COST = "hourly_cost";	
 	/** SQL name for the daily cost attribute */
 	private static final String DAILY_COST = "daily_cost";	
-	/** SQL name for the id of this creative */
-	private static final String BANNER_ID = "id";	
 	/** SQL name for the campaign that owns this record */
 	private static final String CAMPAIGN_ID = "campaign_id";	
 	/** SQL name for the image URL attribute */
@@ -246,6 +255,19 @@ public class Creative  {
 	/** SQL name for the vast data attribute */
 	private static final  String VAST_DATA = "vast_video_outgoing_file";
 
+	public static Creative getInstance(int id, String key) {
+		switch(key.toLowerCase()) {
+		case "banner":
+			return getBannerInstance(id);
+		case "video":
+			return getVideoInstance(id);
+		case "audio":
+			return getAudioInstance(id);
+		case "native":
+			return getNativeInstance(id);
+		}
+		throw new RuntimeException("Can't instantiate unknown type: " + key);
+	}
 
 	public static Creative getBannerInstance(int id) {
 		try {
@@ -315,6 +337,166 @@ public class Creative  {
 				throw (RuntimeException)error;
 			}
 	}
+	
+	public static PreparedStatement toSql(Creative c, Connection conn) throws Exception {
+		String table = null;
+		if (c.id == 0) 
+			return doNew(c, conn);
+		return doUpdate(c, conn);
+	}
+	
+	static PreparedStatement doNew(Creative c, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		String table = getTable(c);
+		String rules = "";
+		for (int i=0;i<c.rules.size();i++) {
+			rules += c.rules.get(i);
+			if (i+1 < c.rules.size()) rules += ",";
+		}
+		
+		String sql = "INSERT INTO " + table + " ("
+				+"interval_start,"
+				+"interval_end,"
+				+"total_basket_value,"
+				+"daily_budget,"
+				+"hourly_budget,"
+				+"bid_ecpm,"
+				+"total_cost,"
+				+"daily_cost,"
+				+"hourly_cost,"
+				+"created_at,"
+				+"updated_at,"
+				+"rules,"
+				+"deals,"
+				+"interstitial,"
+				+"width_range,"
+				+"height_range,"
+				+"width_height_list,"
+				+"name,";
+		
+		if (c.isBanner) {
+			sql += "iurl,"
+					+"width,"
+					+"height,"
+					+"contenttype,"
+					+"htmltemplate,"
+					+"position) VALUES ("
+			+"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+			p = conn.prepareStatement(sql);	
+			p.setString(19, c.imageurl);
+			p.setInt(20, c.width);
+			p.setInt(21, c.height);
+			p.setString(22, c.contenttype);
+			p.setString(23, c.htmltemplate);
+			if (c.position != null)
+				p.setString(24,c.position);
+			else
+				p.setNull(24, Types.VARCHAR);
+		} else
+		if (c.isVideo) {
+			
+		} else 
+		if (c.isAudio) {
+			
+		} else
+		if (c.isNative) {
+			
+		} else
+			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
+		
+		
+		if (c.budget != null) {
+			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
+		} else {
+			p.setNull(1, Types.TIMESTAMP);
+			p.setNull(2, Types.TIMESTAMP);
+		}
+		
+		if (c.budget != null && c.budget.totalBudget != null)
+			p.setDouble(3,c.budget.totalBudget.doubleValue());
+		else
+			p.setNull(3, Types.DOUBLE);
+		
+		if (c.budget != null && c.budget.dailyBudget != null)
+			p.setDouble(4,c.budget.dailyBudget.doubleValue());
+		else
+			p.setNull(4, Types.DOUBLE);
+		
+		if (c.budget != null && c.budget.hourlyBudget != null)
+			p.setDouble(5,c.budget.hourlyBudget.doubleValue());
+		else
+			p.setNull(5, Types.DOUBLE);
+		
+		p.setDouble(6, c.price);
+
+		if (c.budget != null) {
+			if (c.budget.totalCost != null)
+				p.setDouble(7,c.budget.totalCost.doubleValue());
+			else
+				p.setNull(7, Types.DOUBLE);
+			if (c.budget.dailyCost != null)
+				p.setDouble(8,c.budget.dailyCost.doubleValue());
+			else
+				p.setNull(8, Types.DOUBLE);
+			if (c.budget.hourlyCost != null)
+				p.setDouble(9,c.budget.hourlyCost.doubleValue());
+			else
+				p.setNull(9, Types.DOUBLE);
+		} else {
+			p.setNull(7, Types.DOUBLE);
+			p.setNull(8, Types.DOUBLE);
+			p.setNull(9, Types.DOUBLE);
+		}
+		
+		p.setTimestamp(10,new Timestamp(System.currentTimeMillis()));
+		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
+		p.setString(12, rules);
+		p.setString(13, c.dealSpec);
+		if (c.interstitialOnly)
+			p.setInt(14, 1);
+		else
+			p.setInt(14, 0);
+		if (c.width_range != null)
+			p.setString(15, c.width_range);
+		else
+			p.setNull(15,  Types.VARCHAR);
+		if (c.height_range != null)
+			p.setString(16, c.width_range);
+		else
+			p.setNull(16,  Types.VARCHAR);
+		if (c.width_height_list != null)
+			p.setString(17, c.width_range);
+		else
+			p.setNull(17,  Types.VARCHAR);
+		p.setString(18, c.name);		
+		
+		return p;
+	}
+	
+	static String getTable(Creative c) throws Exception {
+		String table = null;
+	if (c.isAudio)
+		table = "banner_audios";
+	else
+	if (c.isNative)
+		table = "banner_natives";
+	else
+	if (c.isVideo)
+		table = "banner_videos";
+	else
+	if (c.isBanner)
+		table = "banners";
+	else
+		throw new Exception("Can't tell what kind of creative id: " + c.id + " is.");
+	return table;
+	}
+	
+	static PreparedStatement doUpdate(Creative c, Connection conn) throws Exception {
+		PreparedStatement p = null;
+		
+		return null;
+	}
 
 	/**
 	 * Empty constructor for creation using json.
@@ -331,8 +513,9 @@ public class Creative  {
 			tableName = "banner_videos";
 		update(node);
 	}
-	Creative(JsonNode node, String type) throws Exception {
-		switch(type) {
+	
+	public Creative(JsonNode node, String type) throws Exception {
+		switch(type.toLowerCase()) {
 		case "banner":
 			isBanner = true;
 			tableName = "banners";
@@ -382,6 +565,12 @@ public class Creative  {
 
 		c.encodeUrl();
 		return c;
+	}
+	
+	public void saveToDatabase() throws Exception {	
+		PreparedStatement st = toSql(this, CrosstalkConfig.getInstance().getConnection());
+		st.executeUpdate();
+		st.close();	
 	}
 
 	/**
@@ -1171,14 +1360,13 @@ public class Creative  {
 	void addDimensions() {
 		String[] parts = null;
 		Dimension d = null;
-		String key = null;
 
 		// Is this a width dimension?
 		if (node.get("width_range") != null) {
-			key = node.get("width_range").asText(null);
-			if (key != null) {
+			width_range = node.get("width_range").asText(null);
+			if (width_range != null) {
 				dimensions = new Dimensions();
-				parts = key.split("-");
+				parts = width_range.split("-");
 				int leftX = Integer.parseInt(parts[0].trim());
 				int rightX = Integer.parseInt(parts[1].trim());
 				d = new Dimension(leftX, rightX, -1, -1);
@@ -1189,10 +1377,10 @@ public class Creative  {
 
 		// Is this a height dimension
 		if (node.get("height_range") != null) {
-			key = node.get("height_range").asText(null);
-			if (key != null) {
+			height_range = node.get("height_range").asText(null);
+			if (height_range != null) {
 				dimensions = new Dimensions();
-				parts = key.split("-");
+				parts = height_range.split("-");
 				int leftY = Integer.parseInt(parts[0].trim());
 				int rightY = Integer.parseInt(parts[1].trim());
 				d = new Dimension(-1, -1, leftY, rightY);
@@ -1203,10 +1391,10 @@ public class Creative  {
 
 		// Is this WxH, ... list
 		if (node.get("width_height_list") != null) {
-			key = node.get("width_height_list").asText(null);
-			if (key != null && key.length() > 0) {
+			width_height_list = node.get("width_height_list").asText(null);
+			if (width_height_list != null && width_height_list.length() > 0) {
 				dimensions = new Dimensions();
-				String[] elements = key.split(",");
+				String[] elements = width_height_list.split(",");
 				for (String s : elements) {
 					parts = s.split("x");
 					int w = Integer.parseInt(parts[0].trim());
@@ -1251,11 +1439,11 @@ public class Creative  {
 		if (node.get("deals") == null)
 			return;
 
-		String spec = node.get("deals").asText(null);
-		if (spec == null || spec.trim().length() == 0)
+		dealSpec = node.get("deals").asText(null);
+		if (dealSpec == null || dealSpec.trim().length() == 0)
 			return;
 		deals = new Deals();
-		String[] parts = spec.split(",");
+		String[] parts = dealSpec.split(",");
 		for (String part : parts) {
 			Deal d = new Deal();
 			String[] subpart = part.split(":");
@@ -1298,6 +1486,7 @@ public class Creative  {
 	public void update(JsonNode myNode) throws Exception {
 		node = myNode;
 		budget = new Budget();
+		name = myNode.get("name").asText();
 		double dt = myNode.get(TOTAL_COST).asDouble(0);
 		budget.totalCost.set(dt);
 		budget.hourlyCost = new AtomicBigDecimal(myNode.get(HOURLY_COST).asDouble(0.0));
@@ -1317,8 +1506,6 @@ public class Creative  {
 	}
 
 	public void process() throws Exception {
-		bannerid = node.get(BANNER_ID).asText();
-		campaignid = node.get(CAMPAIGN_ID).asInt();
 		if (isBanner) {
 			imageurl = node.get(IMAGE_URL).asText(null);
 		}
@@ -1342,7 +1529,8 @@ public class Creative  {
 
 			if (node.get("position") != null)
 				position = node.get("position").asText(null);
-		} else {
+		} else 
+		if (isVideo) {
 			video_duration = node.get("vast_video_duration").asInt();
 			video_width = node.get("vast_video_width").asInt();
 			video_height = node.get("vast_video_height").asInt();
@@ -1360,6 +1548,14 @@ public class Creative  {
 				video_bitrate = new Integer(node.get("bitrate").asInt());
 			}
 		}
+		else
+		if (isAudio) {
+			
+		} else 
+		if (isNative) {
+			
+		} else 
+			throw new Exception("Can't tell what kind of creative " + name + " is.");
 
 		if (node.get(INTERSTITIAL) != null && node.get(INTERSTITIAL) instanceof MissingNode == false) {
 			int x = node.get(INTERSTITIAL).asInt();

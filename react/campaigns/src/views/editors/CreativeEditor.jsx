@@ -32,29 +32,12 @@ import "react-datepicker/dist/react-datepicker.css";
 
 var undef;
 
-const CampaignEditor = (props) => {
+const CreativeEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [creative, setCreative] = useState(props.creative);
   const [startDate, setStartDate] = useState(new Date());
   const vx = useViewContext();
-
-
-const getTrueFalseOptions = (value)  =>{
-    if (value)
-        return(
-            <>
-            <option selected>true</option>
-            <option>false</option>
-            </>
-        );
-        return(
-            <>
-            <option>true</option>
-            <option selected>false</option>
-            </>
-        );
-}
 
 const getAttachedCampaign = () => {
     return(
@@ -63,7 +46,6 @@ const getAttachedCampaign = () => {
         </>
     );
 }
-
 
 const getSelectedRules = () => {
     var items = []; 
@@ -99,10 +81,24 @@ const getSelectedRules = () => {
   const addNewCreative = () => {
     var x = creative;
 
+    x.name = document.getElementById("name").value;
+    x.bid_ecpm = Number(document.getElementById("price").value);
+    x.cur = document.getElementById("currency").value;
+    x.total_cost = 0;
+    x.hourly_cost = 0;
+    x.daily_cost = 0;
+    x.interval_start = 0;
+    x.interval_end = 0;
+
+    x.iurl = "";
+    x.contenttype = "html";
+    x.width = 0;
+    x.height = 0;
+    x.htmltemplate = "helpme";
+
     x.rules = [...document.getElementById("rules").options]
       .filter((x) => x.selected)
       .map((x)=>Number(x.value));
-
 
     alert(JSON.stringify(x,null,2));
     props.callback(x);
@@ -115,7 +111,7 @@ const getSelectedRules = () => {
                   <Col>
                     <Card>
                       <CardHeader>
-                        <h5 className="title">Edit Creative Details</h5>
+                        <h5 className="title">Edit Creative Details ({creative.react_type})</h5>
                       </CardHeader>
                       <CardBody>
                         <Form>
@@ -159,17 +155,6 @@ const getSelectedRules = () => {
                                   id="currency"
                                   defaultValue={creative.cur}
                                   placeholder="Creative Currency (Required)"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col className="px-md-1" md="2">
-                              <FormGroup>
-                                <label>Weight</label>
-                                <Input
-                                  id="currency"
-                                  defaultValue={creative.weight}
-                                  placeholder="Creative weight (Required)"
                                   type="text"
                                 />
                               </FormGroup>
@@ -224,38 +209,6 @@ const getSelectedRules = () => {
                              </Col>
                           </Row>
                           <Row>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Cap Variable</label>
-                                <Input id="freq_variable"
-                                  defaultValue="request.device.ip"
-                                  placeholder="RTB variable to frequency cap on"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Frequency Limit</label>
-                                <Input id='freq_limit"'
-                                  defaultValue="0"
-                                  placeholder="Max number"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col md="4">
-                              <FormGroup>
-                                <label>Duration</label>
-                                <Input id="duration"
-                                  defaultValue="0"
-                                  placeholder="Duration in minutes"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>                  
-                          <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>
                               <label>Rules</label>
@@ -267,19 +220,19 @@ const getSelectedRules = () => {
                             <Col className="px-md-1" md="2">
                               <FormGroup>
                                 <label>Total Budget</label>
-                                <Input placeholder="0" type="number" id="total_budget"/>
+                                <Input placeholder="0" type="number" id="total_budget" defaultValue={creative.budget.totalBudget}/>
                               </FormGroup>
                             </Col>
                             <Col className="pl-md-1" md="2">
                               <FormGroup>
                                 <label>Daily Budget</label>
-                                <Input placeholder="0" type="number" id="daily_budget"/>
+                                <Input placeholder="0" type="number" id="daily_budget" defaultValue={creative.budget.dailyBudget}/>
                               </FormGroup>
                             </Col>
                             <Col className="pl-md-1" md="2">
                               <FormGroup>
                                 <label>Hourly Budget</label>
-                                <Input placeholder="0" type="number" id="hourly_budget" />
+                                <Input placeholder="0" type="number" id="hourly_budget" defaultValue={creative.budget.hourlyBudget}/>
                               </FormGroup>
                             </Col>
                           </Row>
@@ -289,8 +242,7 @@ const getSelectedRules = () => {
                         <Button className="btn-fill" c
                           color="primary" 
                           type="submit"
-                          onClick={() => addNewCreative()}
-                         >
+                          onClick={() => addNewCreative()} disabled={creative.readOnly}>
                           Save
                         </Button>
                         <Button className="btn-fill" color="danger" type="submit" 
@@ -306,4 +258,4 @@ const getSelectedRules = () => {
             </>
           );
  }
- export default CampaignEditor;
+ export default CreativeEditor;

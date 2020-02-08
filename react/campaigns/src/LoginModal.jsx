@@ -33,6 +33,7 @@ const LoginModal = (props) => {
     await vx.getDbCampaigns();
     await vx.listRules();
     await vx.listTargets();
+    await vx.listCreatives();
     mx = await vx.getBidders();
     if (mx === undef)
       return;

@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS banners (
   id SERIAL,
-  campaign_id int DEFAULT NULL,
   interval_start timestamp NOT NULL,
   interval_end timestamp DEFAULT NULL,
   total_basket_value decimal DEFAULT NULL,
@@ -31,5 +30,7 @@ CREATE TABLE IF NOT EXISTS banners (
   height_range varchar(255) DEFAULT NULL,
   width_height_list varchar(255)  DEFAULT NULL,
   rules varchar(1024) DEFAULT NULL,
+  position text DEFAULT NULL,
+  interstitial int DEFAULT NULL,
   PRIMARY KEY (id)
 );

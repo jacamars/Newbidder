@@ -195,6 +195,21 @@ const  ViewContext = () => {
       return result.data;
     }
 
+    const deleteCreative = async (id,key) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLDeleteCreative#",
+        id: id,
+        key: key
+      };
+      var result = await execute(cmd);
+
+      console.log("SQLDeleteCreative returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
 
     const getDbCampaigns = async () => {
       var cmd = {
@@ -210,7 +225,7 @@ const  ViewContext = () => {
      return data.campaigns;
     }
 
-    const getCreatives = async () => {
+    const listCreatives = async () => {
       var cmd = {
         token: jwt,
         type: "SQLListCreatives#"
@@ -219,7 +234,7 @@ const  ViewContext = () => {
       if (!data)
         return;
 
-     //console.log("=====> GetDbCampaigns returns: " + JSON.stringify(data,null,2));
+     console.log("=====> kuarXewRUCWA returns: " + JSON.stringify(data,null,2));
      setCreatives(data.creatives);
      return data.creatives;
     }
@@ -256,6 +271,25 @@ const  ViewContext = () => {
         return;
       return result.data;
     }
+
+    const addNewCreative = async(e) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLAddNewCreative#",
+        creative: JSON.stringify(e)
+      };
+
+      //console.log("==========>" + JSON.stringify(cmd,null,2));
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLAddNewCreative returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
 
     const addNewRule = async(e) => {
       var cmd = {
@@ -358,6 +392,25 @@ const  ViewContext = () => {
       return result.rule;
     }
 
+
+    const getCreative = async(id, key) => {
+      var cmd = {
+        token: jwt,
+        type: "SQLGetCreative#",
+        id: id,
+        key: key
+      };
+
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("SQLGetCreative returns: " + JSON.stringify(result,null,2));
+      if (result === undef)
+        return;
+      return result.data;
+    }
+
     const getTarget = async(id) => {
       var cmd = {
         token: jwt,
@@ -401,7 +454,7 @@ const  ViewContext = () => {
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
-      creatives, getCreatives
+      creatives, listCreatives, addNewCreative, getCreative, deleteCreative
     };
 };
 

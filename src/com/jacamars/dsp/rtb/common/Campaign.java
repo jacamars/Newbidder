@@ -48,6 +48,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
+import com.jacamars.dsp.rtb.tools.ChattyErrors;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
@@ -656,7 +657,8 @@ public class Campaign implements Comparable, Portable  {
 			}
 
 		} catch (Exception error) {
-			logger.error("Warning, ELK is not accessible, no accounting data is possible for: {}",adId);
+			var msg = "ELK is not accessible, no accounting data is possible for: " + adId;
+			ChattyErrors.printErrorEveryHour(logger, msg);
 		}
 	}
 
@@ -1097,6 +1099,7 @@ public class Campaign implements Comparable, Portable  {
 			}
 		}
 	}
+
 	
 	public boolean isRunnable() throws Exception {
 		if (status == null)

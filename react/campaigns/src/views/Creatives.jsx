@@ -39,8 +39,27 @@ var undef;
     c.isAudio = false;
     c.isNative = false;
     c.isBanner = true;
+    c.react_type = "BANNER";
     setCreative(c);
   }
+
+  const editCreative = async(id, key) => {
+    var c = await vx.getCreative(id,key);
+    setCreative(c);
+  }
+
+  const viewCreative = async(id, key) => {
+    var c = await vx.getCreative(id,key);
+    c.readOnly = true;
+    setCreative(c);
+  }
+
+  const deleteCreative = async(id,key) => {
+    await vx.deleteCreative(id,key);
+    await vx.listCreatives();
+    setCreative(null);
+    redraw();
+ }
 
   const makeNewVideo = async() => {
     if (creative !== null)
@@ -55,7 +74,6 @@ var undef;
     setCreative(clearInterval);
   }
 
-
   const makeNewNative = async() => {
     if (creative !== null)
     return;
@@ -68,6 +86,10 @@ var undef;
     setCreative(c);
   }
 
+  const refresh = async() => {
+    await vx.listCreatives();
+    redraw();
+  }
 
   const makeNewAudio = async() => {
     if (creative !== null)
@@ -83,17 +105,28 @@ var undef;
 
   const update = (x) => {
     if (x !== null) {
-        // update database;
+      vx.addNewCreative(x);
     }
     setCreative(null)
     redraw();
   }
 
   const getBannersView = () => {
-      return(
-        <>
-        </>
-      );
+    return(
+      vx.creatives.filter((e) => e.type === "banner").map((row, index) => (
+        <tr key={'banner-' + row}>
+          <td>{index}</td>
+          <td key={'banner-name-' + index} className="text-left">{row.name}</td>
+          <td key={'banner-id-' + index} className="text-right">{row.id}</td>
+          <td className="text-center">
+            <Button color="success" size="sm" onClick={()=>viewCreative(row.id,'banner')}>View</Button>
+            &nbsp;
+            <Button color="warning" size="sm" onClick={()=>editCreative(row.id,'banner')}>Edit</Button>
+            &nbsp;
+            <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'banner')}>Delete</Button>
+          </td>
+        </tr>))
+    ); 
   }
 
   const getVideosView = () => {
@@ -135,7 +168,7 @@ const getNativesView = () => {
     { creative === null && <>
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNewBanner}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>
@@ -150,7 +183,7 @@ const getNativesView = () => {
                             <th>#</th>
                             <th className="text-center">Name</th>
                             <th className="text-right">SQL-ID</th>
-                            <th className="text-right">Name</th>
+                            <th className="text-center">Actions</th>
                           </tr>
                       </thead>
                       <tbody>
