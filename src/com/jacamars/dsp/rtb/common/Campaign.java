@@ -996,19 +996,16 @@ public class Campaign implements Comparable, Portable  {
 	 * @throws Exception on JSON errors.
 	 */
 	void doStandardRtb() throws Exception {
-
-		ArrayNode array = JdbcTools.factory.arrayNode();
-		for (int i = 0; i < Crosstalk.getInstance().campaignRtbStd.size(); i++) {
-			JsonNode node = Crosstalk.getInstance().campaignRtbStd.get(i);
-			if (adId == node.get("campaign_id").asText()) {
-				Integer key = node.get("rtb_standard_id").asInt();
-				JsonNode x = Crosstalk.getInstance().globalRtbSpecification.get(key);
-				array.add(x);
+		rules.forEach(id->{
+			try {
+				attributes.add(Node.getInstance(id));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}
-		RtbStandard.processStandard(array, attributes);
-	}
+		});
 	
+	}
 	/**
 	 * Report why the campaign is not runnable.
 	 * @return String. The reasons why...

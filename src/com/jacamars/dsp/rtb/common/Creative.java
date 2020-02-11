@@ -31,6 +31,7 @@ import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.RtbStandard;
+import com.jacamars.dsp.crosstalk.budget.Targeting;
 import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.exchanges.Nexage;
@@ -59,7 +60,7 @@ public class Creative  {
 	/** The encoded version of the forward url used by this creative */
 	private transient String encodedFurl;
 	/** Database id */
-	int id;
+	public int id;
 	/* The image url used by this creative */
 	public String imageurl;
 	/** The encoded image URL used by this creative */
@@ -94,8 +95,6 @@ public class Creative  {
 	public transient String encodedAdm;
 	// unencoded adm of the
 	public transient String unencodedAdm;
-	/** currency of this creative */
-	public String currency = null;
 	/** Extensions needed by SSPs */
 	public Map<String,String> extensions = null;
 	// Currency
@@ -189,9 +188,9 @@ public class Creative  {
 	/** The id of the cre4ative, as a string */
 	transient String bannerid; 
 	/** Width of the creative */
-	transient int width = 0;	
+	public int width = 0;	
 	/** Height of the creative */
-	transient int height = 0;
+	public int height = 0;
 	/** The type, as in 'banner' or 'video' */
 	transient String type;
 	/** The json node derived from SQL */
@@ -203,9 +202,9 @@ public class Creative  {
 	public boolean isAudio;
 	public boolean isNative;
 	/** The content type of the banner template */
-	transient String contenttype = "";
+	public String contenttype = "";
 	/** The HTML snippet for the banner */
-	transient String htmltemplate = "";
+	public String htmltemplate = "";
 	// ////////////// VIDEO SPECIFIC TARGETTING	
 	/** The video duration */
 	transient int video_duration = 0;	
@@ -240,8 +239,6 @@ public class Creative  {
 	private static final String DAILY_COST = "daily_cost";	
 	/** SQL name for the campaign that owns this record */
 	private static final String CAMPAIGN_ID = "campaign_id";	
-	/** SQL name for the image URL attribute */
-	private static final String IMAGE_URL = "iurl";	
 	/** SQL name for the updated attribute */
 	private static final String UPDATED = "updated_at";	
 	/** SQL name for the content type attribute */
@@ -280,6 +277,7 @@ public class Creative  {
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Creative c = new Creative(y,"banner");
+		c.id = id;
 		return c;
 		} catch (Exception error) {
 			throw (RuntimeException)error;
@@ -298,6 +296,7 @@ public class Creative  {
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
 			Creative c = new Creative(y,"video");
+			c.id = id;
 			return c;
 			} catch (Exception error) {
 				throw (RuntimeException)error;
@@ -315,6 +314,7 @@ public class Creative  {
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
 			Creative c = new Creative(y,"audio");
+			c.id = id;
 			return c;
 			} catch (Exception error) {
 				throw (RuntimeException)error;
@@ -332,6 +332,7 @@ public class Creative  {
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
 			Creative c = new Creative(y,"native");
+			c.id = id;
 			return c;
 			} catch (Exception error) {
 				throw (RuntimeException)error;
@@ -357,7 +358,7 @@ public class Creative  {
 		String sql = "INSERT INTO " + table + " ("
 				+"interval_start,"
 				+"interval_end,"
-				+"total_basket_value,"
+				+"total_budget,"
 				+"daily_budget,"
 				+"hourly_budget,"
 				+"bid_ecpm,"
@@ -372,26 +373,27 @@ public class Creative  {
 				+"width_range,"
 				+"height_range,"
 				+"width_height_list,"
-				+"name,";
+				+"name,"
+				+"cur,";
 		
 		if (c.isBanner) {
-			sql += "iurl,"
+			sql += "imageurl,"
 					+"width,"
 					+"height,"
 					+"contenttype,"
 					+"htmltemplate,"
 					+"position) VALUES ("
-			+"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+			+"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);	
-			p.setString(19, c.imageurl);
-			p.setInt(20, c.width);
-			p.setInt(21, c.height);
-			p.setString(22, c.contenttype);
-			p.setString(23, c.htmltemplate);
+			p.setString(20, c.imageurl);
+			p.setInt(21, c.width);
+			p.setInt(22, c.height);
+			p.setString(23, c.contenttype);
+			p.setString(24, c.htmltemplate);
 			if (c.position != null)
-				p.setString(24,c.position);
+				p.setString(25,c.position);
 			else
-				p.setNull(24, Types.VARCHAR);
+				p.setNull(25, Types.VARCHAR);
 		} else
 		if (c.isVideo) {
 			
@@ -470,6 +472,7 @@ public class Creative  {
 		else
 			p.setNull(17,  Types.VARCHAR);
 		p.setString(18, c.name);		
+		p.setString(19, c.cur);
 		
 		return p;
 	}
@@ -494,8 +497,133 @@ public class Creative  {
 	
 	static PreparedStatement doUpdate(Creative c, Connection conn) throws Exception {
 		PreparedStatement p = null;
+		String table = getTable(c);
+		String rules = "";
+		for (int i=0;i<c.rules.size();i++) {
+			rules += c.rules.get(i);
+			if (i+1 < c.rules.size()) rules += ",";
+		}
 		
-		return null;
+		String sql = "UPDATE " + table + " SET "
+				+"interval_start=?,"
+				+"interval_end=?,"
+				+"total_budget=?,"
+				+"daily_budget=?,"
+				+"hourly_budget=?,"
+				+"bid_ecpm=?,"
+				+"total_cost=?,"
+				+"daily_cost=?,"
+				+"hourly_cost=?,"
+				+"updated_at=?,"
+				+"rules=?,"
+				+"deals=?,"
+				+"interstitial=?,"
+				+"width_range=?,"
+				+"height_range=?,"
+				+"width_height_list=?,"
+				+"name=?,"
+				+"cur=?,";
+		
+		if (c.isBanner) {
+			sql += "imageurl=?,"
+					+"width=?,"
+					+"height=?,"
+					+"contenttype=?,"
+					+"htmltemplate=?,"
+					+"position=? WHERE id=?";
+			p = conn.prepareStatement(sql);	
+			
+			p.setString(19, c.imageurl);
+			p.setInt(20, c.width);
+			p.setInt(21, c.height);
+			p.setString(22, c.contenttype);
+			p.setString(23, c.htmltemplate);
+			if (c.position != null)
+				p.setString(24,c.position);
+			else
+				p.setNull(24, Types.VARCHAR);
+			
+			p.setInt(25, c.id);
+		} else
+		if (c.isVideo) {
+			
+		} else 
+		if (c.isAudio) {
+			
+		} else
+		if (c.isNative) {
+			
+		} else
+			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
+		
+		
+		if (c.budget != null) {
+			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
+		} else {
+			p.setNull(1, Types.TIMESTAMP);
+			p.setNull(2, Types.TIMESTAMP);
+		}
+		
+		if (c.budget != null && c.budget.totalBudget != null)
+			p.setDouble(3,c.budget.totalBudget.doubleValue());
+		else
+			p.setNull(3, Types.DOUBLE);
+		
+		if (c.budget != null && c.budget.dailyBudget != null)
+			p.setDouble(4,c.budget.dailyBudget.doubleValue());
+		else
+			p.setNull(4, Types.DOUBLE);
+		
+		if (c.budget != null && c.budget.hourlyBudget != null)
+			p.setDouble(5,c.budget.hourlyBudget.doubleValue());
+		else
+			p.setNull(5, Types.DOUBLE);
+		
+		p.setDouble(6, c.price);
+
+		if (c.budget != null) {
+			if (c.budget.totalCost != null)
+				p.setDouble(7,c.budget.totalCost.doubleValue());
+			else
+				p.setNull(7, Types.DOUBLE);
+			if (c.budget.dailyCost != null)
+				p.setDouble(8,c.budget.dailyCost.doubleValue());
+			else
+				p.setNull(8, Types.DOUBLE);
+			if (c.budget.hourlyCost != null)
+				p.setDouble(9,c.budget.hourlyCost.doubleValue());
+			else
+				p.setNull(9, Types.DOUBLE);
+		} else {
+			p.setNull(7, Types.DOUBLE);
+			p.setNull(8, Types.DOUBLE);
+			p.setNull(9, Types.DOUBLE);
+		}
+		
+		p.setTimestamp(10,new Timestamp(System.currentTimeMillis()));
+		p.setString(11, rules);
+		p.setString(12, c.dealSpec);
+		if (c.interstitialOnly)
+			p.setInt(13, 1);
+		else
+			p.setInt(13, 0);
+		if (c.width_range != null)
+			p.setString(14, c.width_range);
+		else
+			p.setNull(14,  Types.VARCHAR);
+		if (c.height_range != null)
+			p.setString(15, c.width_range);
+		else
+			p.setNull(15,  Types.VARCHAR);
+		if (c.width_height_list != null)
+			p.setString(16, c.width_height_list);
+		else
+			p.setNull(16,  Types.VARCHAR);
+		p.setString(17, c.name);		
+		p.setString(18, c.cur);
+		
+		return p;
 	}
 
 	/**
@@ -546,7 +674,6 @@ public class Creative  {
 		c.alternateAdId = alternateAdId;
 		c.adm_override = adm_override;
 		c.cur = cur;
-		c.currency = currency;
 		c.w = w;
 		c.h = h;
 		c.strW = strW;
@@ -1362,8 +1489,7 @@ public class Creative  {
 		Dimension d = null;
 
 		// Is this a width dimension?
-		if (node.get("width_range") != null) {
-			width_range = node.get("width_range").asText(null);
+		if (width_range != null) {
 			if (width_range != null) {
 				dimensions = new Dimensions();
 				parts = width_range.split("-");
@@ -1376,25 +1502,25 @@ public class Creative  {
 		}
 
 		// Is this a height dimension
-		if (node.get("height_range") != null) {
-			height_range = node.get("height_range").asText(null);
-			if (height_range != null) {
-				dimensions = new Dimensions();
-				parts = height_range.split("-");
-				int leftY = Integer.parseInt(parts[0].trim());
-				int rightY = Integer.parseInt(parts[1].trim());
-				d = new Dimension(-1, -1, leftY, rightY);
-				dimensions.add(d);
-				return;
-			}
+		if (height_range != null) {
+			dimensions = new Dimensions();
+			parts = height_range.split("-");
+			int leftY = Integer.parseInt(parts[0].trim());
+			int rightY = Integer.parseInt(parts[1].trim());
+			d = new Dimension(-1, -1, leftY, rightY);
+			dimensions.add(d);
+			return;
 		}
 
 		// Is this WxH, ... list
 		if (node.get("width_height_list") != null) {
-			width_height_list = node.get("width_height_list").asText(null);
 			if (width_height_list != null && width_height_list.length() > 0) {
 				dimensions = new Dimensions();
-				String[] elements = width_height_list.split(",");
+				String [] elements;
+				if (width_height_list.contains(","))
+					elements = width_height_list.split(",");
+				else
+					elements = width_height_list.split("\n");
 				for (String s : elements) {
 					parts = s.split("x");
 					int w = Integer.parseInt(parts[0].trim());
@@ -1460,46 +1586,66 @@ public class Creative  {
 	 *             on JSON errors
 	 */
 	void doStandardRtb() throws Exception {
-		ArrayNode array = JdbcTools.factory.arrayNode();
-		ArrayNode list;
-		String rkey;
-		int theId = Integer.parseInt(bannerid);
-		if (isBanner) {
-			list = Crosstalk.getInstance().bannerRtbStd;
-			rkey = "banner_id";
-		} else {
-			list = Crosstalk.getInstance().videoRtbStd;
-			rkey = "banner_video_id";
-
-		}
-		for (int i = 0; i < list.size(); i++) {
-			JsonNode node = list.get(i);
-			if (theId == node.get(rkey).asInt()) {
-				Integer key = node.get("rtb_standard_id").asInt();
-				JsonNode x = Crosstalk.getInstance().globalRtbSpecification.get(key);
-				array.add(x);
+		rules.forEach(id->{
+			try {
+				attributes.add(Node.getInstance(id));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}
-		RtbStandard.processStandard(array, attributes);
+		});
+	
 	}
 	
 	public void update(JsonNode myNode) throws Exception {
 		node = myNode;
-		budget = new Budget();
+		
+		if (node.get("width_range") != null)
+			width_range = node.get("width_range").asText();
+		if (node.get("height_range") != null)
+			height_range = node.get("width_range").asText();
+		if (node.get("width_height_list") != null)
+			width_height_list = node.get("width_height_list").asText();
+		
+		if (width_range != null && (width_range.equals("") || width_range.equals("null")))
+				width_range = null;
+		if (height_range != null && (height_range.equals("") || height_range.equals("null")))
+			height_range = null;
+		if (width_height_list != null && (width_height_list.equals("") || width_height_list.equals("null")))
+			width_height_list = null;
+		
+		id = node.get("id").asInt();
+		if (node.get("bid_ecpm") != null)
+			price = node.get("bid_ecpm").asDouble();
+		else
+			price = node.get("price").asDouble();
+		bid_ecpm = new AtomicBigDecimal(price);
+		cur = node.get("cur").asText();
 		name = myNode.get("name").asText();
-		double dt = myNode.get(TOTAL_COST).asDouble(0);
-		budget.totalCost.set(dt);
-		budget.hourlyCost = new AtomicBigDecimal(myNode.get(HOURLY_COST).asDouble(0.0));
-		budget.dailyCost = new AtomicBigDecimal(myNode.get(DAILY_COST).asDouble(0.0));
+		
+		Object x = myNode.get(TOTAL_COST);  // this will be null on network update, but not when instantiating from the db
+		if (x != null) {
+			double dt = myNode.get(TOTAL_COST).asDouble(0);
+			budget.totalCost.set(dt);
+			budget.hourlyCost = new AtomicBigDecimal(myNode.get(HOURLY_COST).asDouble());
+			budget.dailyCost = new AtomicBigDecimal(myNode.get(DAILY_COST).asDouble());
 
-		Object x = myNode.get(DAILY_BUDGET);
-		if (x != null && !(x instanceof NullNode)) {
-			budget.dailyBudget = new AtomicBigDecimal(myNode.get(DAILY_BUDGET).asDouble());
 		}
-
-		x = myNode.get(HOURLY_BUDGET);
-		if (x != null && !(x instanceof NullNode)) {
+		
+		x = myNode.get("total_budget");
+		if (x != null) {
+			budget.totalBudget =  new AtomicBigDecimal(myNode.get("total_budget").asDouble());
+			budget.dailyBudget = new AtomicBigDecimal(myNode.get(DAILY_BUDGET).asDouble());
 			budget.hourlyBudget = new AtomicBigDecimal(myNode.get(HOURLY_BUDGET).asDouble());
+		}
+		
+		if (myNode.get("rules") != null) {
+			String str = myNode.get("rules").asText();
+			rules = new ArrayList<>();
+			if (str.trim().length() != 0) {
+				if (str.equals("null")==false)
+					Targeting.getIntegerList(rules, str);
+			}
 		}
 
 		process();
@@ -1507,18 +1653,16 @@ public class Creative  {
 
 	public void process() throws Exception {
 		if (isBanner) {
-			imageurl = node.get(IMAGE_URL).asText(null);
+			imageurl = node.get("imageurl").asText(null);
 		}
-		budget = new Budget();
-		budget.totalBudget.set(node.get("total_basket_value"));
-		budget.activate_time = node.get("interval_start").asLong();
-		budget.expire_time = node.get("interval_end").asLong();
-
+	
 		bid_ecpm.set(node.get("bid_ecpm").asDouble());
 
 		if (isBanner) {
-			width = node.get("width").asInt();
-			height = node.get("height").asInt();
+			if (node.get("width") != null)
+				width = node.get("width").asInt();
+			if (node.get("height") != null)
+				height = node.get("height").asInt();
 
 			contenttype = node.get(CONTENT_TYPE).asText();
 

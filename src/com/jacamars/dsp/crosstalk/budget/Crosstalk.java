@@ -82,7 +82,7 @@ public enum Crosstalk {
 	public static ArrayNode campaignRtbStd;
 	public static ArrayNode bannerRtbStd;
 	public static ArrayNode videoRtbStd;
-	public static ArrayNode exchangeAttributes;
+	public static ArrayNode exchangeAttributes = JdbcTools.factory.arrayNode();
 	
 	/**
 	 * The list of RTB rules not specified in campaigns, creatives and targets.
@@ -205,47 +205,9 @@ public enum Crosstalk {
 	}
 	
 	static void initialize() throws Exception {
-		// /////////////////////////// GLOBAL rtb_spec
-		globalRtbSpecification = new HashMap<Integer, JsonNode>();
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + RTB_STD);
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from exchange_attributes");
 		ArrayNode std = JdbcTools.convertToJson(rs);
 		Iterator<JsonNode> it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			globalRtbSpecification.put(child.get("id").asInt(), child);
-		}
-
-		campaignRtbStd = JdbcTools.factory.arrayNode();
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + CAMP_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			campaignRtbStd.add(child);
-		}
-
-		bannerRtbStd = JdbcTools.factory.arrayNode();
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + BANNER_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			bannerRtbStd.add(child);
-		}
-
-		videoRtbStd = JdbcTools.factory.arrayNode();
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from " + VIDEO_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			videoRtbStd.add(child);
-		}
-
-		exchangeAttributes = JdbcTools.factory.arrayNode();
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from exchange_attributes");
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
 		while (it.hasNext()) {
 			JsonNode child = it.next();
 			exchangeAttributes.add(child);

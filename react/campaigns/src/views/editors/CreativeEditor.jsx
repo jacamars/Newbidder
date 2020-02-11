@@ -24,6 +24,9 @@ import {
   Row,
   Col
 } from "reactstrap";
+import BannerEditor from "./BannerEditor";
+import DealEditor from "./DealEditor";
+import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
 
 import DatePicker from "react-datepicker";
@@ -80,28 +83,95 @@ const getSelectedRules = () => {
 
   const addNewCreative = () => {
     var x = creative;
+    if (x.isBanner)
+      x.react_type = "BANNER";
+    else
+    if (x.isVideo)
+      x.react_type = "VIDEO";
+    else
+    if (x.isAudio)
+      x.react_type = "AUDIO";
+    else
+    if (x.isNative)
+      x.react_type = "NATIVE";
+    else {
+      alert("Type can't be set for " + JSON.stringify(x,null,2))
+      return;
+    }
+    if (x.id === undef) {
+      alert("NO ID field in creative!");
+      return;
+    }
 
     x.name = document.getElementById("name").value;
     x.bid_ecpm = Number(document.getElementById("price").value);
     x.cur = document.getElementById("currency").value;
-    x.total_cost = 0;
-    x.hourly_cost = 0;
-    x.daily_cost = 0;
+    x.total_budget = Number(document.getElementById("total_budget").value);
+    x.hourly_budget = Number(document.getElementById("hourly_budget").value);
+    x.daily_budget = Number(document.getElementById("daily_budget").value);
     x.interval_start = 0;
     x.interval_end = 0;
-
-    x.iurl = "";
-    x.contenttype = "html";
-    x.width = 0;
-    x.height = 0;
-    x.htmltemplate = "helpme";
 
     x.rules = [...document.getElementById("rules").options]
       .filter((x) => x.selected)
       .map((x)=>Number(x.value));
-
+    x.rules = x.rules.join();
+    switch(x.sizeType) {
+      case 1: // width and height are 0
+        x.width = 0;
+        x.height = 0;
+        break;
+      case 2:
+        x.width = Number(x.width);
+        x.height = Number(x.height);
+        x.width_height_list = undef;
+        x.width_range = undef;
+        x.height_range = undef;
+        break;
+      case 3:
+        x.width = 0;
+        x.height = 0;
+        x.width_height_list = undef;
+        break;
+      case 4:
+        x.width = 0;
+        x.height = 0;
+        x.width_range = undef;
+        x.height_range = undef;
+        break;
+      default:
+        alert("Don't know what size type this creative is");
+        return;
+    }
     alert(JSON.stringify(x,null,2));
     props.callback(x);
+  }
+
+  // Callback for w/h in CreativeSizeEditor
+  const setSize = (e, key) => {
+    if (e == null) {
+      creative[key] = "0";
+      return;
+    }
+    creative[key] = e.target.value;
+    setCreative(creative);
+  }
+
+  // Set the dimension type
+  const setSizeType = (t) => {
+    creative.sizeType = t;
+    setCreative(creative);
+  }
+
+  // Set the deal
+  const setDealType = (t) => {
+    alert("New Deal type: " + t);
+    creative.dealType = t;
+  }
+
+  const setHtml = (e,type) => {
+    creative[type]=e.target.value;
+    setCreative(creative);
   }
 
         return (
@@ -111,7 +181,7 @@ const getSelectedRules = () => {
                   <Col>
                     <Card>
                       <CardHeader>
-                        <h5 className="title">Edit Creative Details ({creative.react_type})</h5>
+                        <h5 className="title">Edit Creative Details ({creative.name})</h5>
                       </CardHeader>
                       <CardBody>
                         <Form>
@@ -160,6 +230,11 @@ const getSelectedRules = () => {
                               </FormGroup>
                             </Col>
                           </Row>
+
+                          <CreativeSizeEditor creative={creative} callback={setSize} selector={setSizeType}/>
+                          <DealEditor creative={creative} selector={setDealType}/>
+                          <BannerEditor creative={creative} callback={setHtml}/>
+
                           <Row>
                             <Col className="pr-md-1" md="12">
                               <FormGroup>
@@ -239,7 +314,7 @@ const getSelectedRules = () => {
                         </Form>
                       </CardBody>
                       <CardFooter>
-                        <Button className="btn-fill" c
+                        <Button className="btn-fill"
                           color="primary" 
                           type="submit"
                           onClick={() => addNewCreative()} disabled={creative.readOnly}>

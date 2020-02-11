@@ -99,10 +99,10 @@ public class OpenXBidResponse extends BidResponse {
 		 * response.append(camp.encodedIab); }
 		 */
 
-        if (creat.currency != null && creat.currency.length() != 0) { // fyber
+        if (creat.cur != null && creat.cur.length() != 0) { // fyber
             response.append(",");
             response.append("\"cur\":\"");
-            response.append(creat.currency);
+            response.append(creat.cur);
             response.append("\"");
         }
 

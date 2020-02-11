@@ -243,10 +243,10 @@ public class BidResponse {
 		response.append(br.id);						// the request bid id
 		response.append("\"");
 
-		if (creat.currency != null && creat.currency.length() != 0) {
+		if (creat.cur != null && creat.cur.length() != 0) {
 			response.append(",");
 			response.append("\"cur\":\"");
-			response.append(creat.currency);
+			response.append(creat.cur);
 			response.append("\"");
 		}
 
@@ -656,7 +656,7 @@ public class BidResponse {
 		 * response.append(camp.encodedIab); }
 		 */
 
-		if (creat.currency != null && creat.currency.length() != 0) { // fyber
+		if (creat.cur != null && creat.cur.length() != 0) { // fyber
 																		// uses
 																		// this,
 																		// but
@@ -665,7 +665,7 @@ public class BidResponse {
 																		// standard.
 			response.append(",");
 			response.append("\"cur\":\"");
-			response.append(creat.currency);
+			response.append(creat.cur);
 			response.append("\"");
 		}
 

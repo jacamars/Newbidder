@@ -78,6 +78,10 @@ var undef;
     return false;
   }
 
+  const startCampaign = (id) => {
+
+  }
+
   const getCampaignsView = () => {
 
     console.log("GetCampaigsView, rows = " + vx.campaigns.length);

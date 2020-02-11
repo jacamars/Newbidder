@@ -81,8 +81,9 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 			try {
 				System.out.println("NEW CAMPAIGN: " + creative);
 				ObjectNode node = mapper.readValue(creative,ObjectNode.class);
-				String type = node.get("react_type").asText();
-				Creative c = new Creative(node,type);
+				String stype = node.get("react_type").asText();
+				Creative c = new Creative(node,stype);
+				c.compile();
 				c.saveToDatabase();
 				return;
 			} catch (Exception err) {

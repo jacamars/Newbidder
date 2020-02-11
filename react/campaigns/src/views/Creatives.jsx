@@ -35,6 +35,7 @@ var undef;
     return;
 
     var c = await vx.getNewCreative("My New Banner");
+    c.id = 0;
     c.isVideo = false;
     c.isAudio = false;
     c.isNative = false;
@@ -43,14 +44,14 @@ var undef;
     setCreative(c);
   }
 
-  const editCreative = async(id, key) => {
+  const editCreative = async(mode,id, key) => {
     var c = await vx.getCreative(id,key);
-    setCreative(c);
-  }
-
-  const viewCreative = async(id, key) => {
-    var c = await vx.getCreative(id,key);
-    c.readOnly = true;
+    if (!c) {
+      alert("Server error!");
+      return;
+    }
+    if (mode === 'VIEW')
+      c.readOnly = true;
     setCreative(c);
   }
 
@@ -119,9 +120,9 @@ var undef;
           <td key={'banner-name-' + index} className="text-left">{row.name}</td>
           <td key={'banner-id-' + index} className="text-right">{row.id}</td>
           <td className="text-center">
-            <Button color="success" size="sm" onClick={()=>viewCreative(row.id,'banner')}>View</Button>
+            <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'banner')}>View</Button>
             &nbsp;
-            <Button color="warning" size="sm" onClick={()=>editCreative(row.id,'banner')}>Edit</Button>
+            <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'banner')}>Edit</Button>
             &nbsp;
             <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'banner')}>Delete</Button>
           </td>

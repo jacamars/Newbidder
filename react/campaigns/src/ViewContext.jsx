@@ -408,6 +408,21 @@ const  ViewContext = () => {
       console.log("SQLGetCreative returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
+
+      if (result.data.width_range !== undef)
+        result.data.sizeType =  3;
+      else
+      if (result.data.width_height_list !== undef)
+          result.data.sizeType = 4;
+      else
+      if (result.data.width > 0)
+        result.data.sizeType = 2;
+      else
+        result.data.sizeType = 1
+
+      if (result.data.dealSpec === undef)
+        result.data.dealType = 1;           // no deals
+
       return result.data;
     }
 

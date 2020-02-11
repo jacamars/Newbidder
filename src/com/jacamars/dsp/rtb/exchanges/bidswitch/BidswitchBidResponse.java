@@ -148,8 +148,8 @@ public class BidswitchBidResponse extends BidResponse {
 			response.append("\"impid\":\"").append(imp.getImpid()).append("\",");
 			
 
-			if (creat.currency != null && creat.currency.length() != 0) {
-				response.append("\"cur\":\"").append(creat.currency).append("\",");
+			if (creat.cur != null && creat.cur.length() != 0) {
+				response.append("\"cur\":\"").append(creat.cur).append("\",");
 			}
 	
 			if (dealId != null)

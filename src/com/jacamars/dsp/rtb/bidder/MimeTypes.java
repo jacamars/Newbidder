@@ -66,6 +66,6 @@ public class MimeTypes {
 			if (str.contains(test))
 				return e.getValue();
 		}
-		return null;
+		return "text/plain";
 	}
 }
