@@ -46,6 +46,7 @@ const VideoEditor = (props) => {
         <label>Mime Type</label>
         <Input
           id="fixed-width"
+          spellCheck={false}
           onChange={ (e) => props.callback(e,"mime_type")}
           type="select">
             {mimeTypes(props.creative.mime_type)}

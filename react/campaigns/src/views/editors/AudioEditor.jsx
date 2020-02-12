@@ -124,6 +124,7 @@ const AudioEditor = (props) => {
         <label>Outgoing File</label>
         <Input
           id="height"
+          spellCheck={false}
           onChange={ (e) => props.callback(e,"audio_outgoing_file")}
           defaultValue={props.creative.audio_outgoing_file}
           type="textarea"

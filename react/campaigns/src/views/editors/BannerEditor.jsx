@@ -73,6 +73,7 @@ const BannerEditor = (props) => {
           id="height"
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}
+          spellCheck={false}
           type="textarea"
         />
       </FormGroup>

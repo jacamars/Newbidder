@@ -245,8 +245,12 @@ const getWBList = (s) => {
                           <Row>   
                           <Col className="pr-md-1" md="2">
                                 <FormGroup>
-                                    <label>country</label>
-                                    <Input type="textarea" id="country" defaultValue={fromCommaList(target.country)}/>
+                                    <label>Country</label>
+                                    <Input type="textarea" 
+                                      id="country" 
+                                      spellCheck={false}
+                                      placeHolder="ISO-3 Countries."
+                                      defaultValue={fromCommaList(target.country)}/>
                                 </FormGroup>
                             </Col> 
                             <Col className="pr-md-1" md="4">
@@ -284,13 +288,19 @@ const getWBList = (s) => {
                             <Col className="px-md-1" md="2">
                              <FormGroup>
                               <label>Make</label>
-                                <Input type="textarea" id="makes" defaultValue={fromCommaList(target.make)}/>
+                                <Input type="textarea" id="makes" 
+                                  spellCheck={false}
+                                  defaultValue={fromCommaList(target.make)}/>
                               </FormGroup>
                             </Col>
                             <Col className="pr-md-1" md="2">
                             <FormGroup>
                                 <label>models</label>
-                                <Input type="textarea" id="models" defaultValue={fromCommaList(target.model)}/>
+                                <Input type="textarea" 
+                                  id="models" 
+                                  spellCheck={false}
+                                  placeHolder="Models, one per line"
+                                  defaultValue={fromCommaList(target.model)}/>
                             </FormGroup>
                             </Col>     
                             <Col className="pr-md-1" md="2">
