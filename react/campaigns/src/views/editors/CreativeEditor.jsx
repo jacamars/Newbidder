@@ -25,6 +25,8 @@ import {
   Col
 } from "reactstrap";
 import BannerEditor from "./BannerEditor";
+import VideoEditor from "./VideoEditor";
+import AudioEditor from "./AudioEditor";
 import DealEditor from "./DealEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
@@ -115,7 +117,7 @@ const getSelectedRules = () => {
     x.rules = [...document.getElementById("rules").options]
       .filter((x) => x.selected)
       .map((x)=>Number(x.value));
-    x.rules = x.rules.join();
+
     switch(x.sizeType) {
       case 1: // width and height are 0
         x.width = 0;
@@ -143,6 +145,19 @@ const getSelectedRules = () => {
         alert("Don't know what size type this creative is");
         return;
     }
+
+    if (x.isVideo) {
+      x.vast_video_width = x.width;
+      x.vast_video_height = x.height;
+      x.width = null;
+      x.height = null;
+      x.vast_video_linearity = Number(x.vast_video_linearity);
+      x.vast_video_duration = Number(x.vast_video_duration);
+      x.vast_video_bitrate = Number(x.vast_video_bitrate);
+      x.vast_video_protocol = Number(x.vast_video_protocol);
+      x.vast_video_inearity = Number(x.vast_video_linearity);
+    }
+
     alert(JSON.stringify(x,null,2));
     props.callback(x);
   }
@@ -165,13 +180,13 @@ const getSelectedRules = () => {
 
   // Set the deal
   const setDealType = (t) => {
-    alert("New Deal type: " + t);
     creative.dealType = t;
   }
 
   const setHtml = (e,type) => {
     creative[type]=e.target.value;
     setCreative(creative);
+    setCount(count+1);
   }
 
         return (
@@ -231,9 +246,27 @@ const getSelectedRules = () => {
                             </Col>
                           </Row>
 
-                          <CreativeSizeEditor creative={creative} callback={setSize} selector={setSizeType}/>
+                          {!creative.isAudio && 
+                            <CreativeSizeEditor 
+                              creative={creative} 
+                              callback={setSize} 
+                              selector={setSizeType}/>}
+
                           <DealEditor creative={creative} selector={setDealType}/>
-                          <BannerEditor creative={creative} callback={setHtml}/>
+                          { creative.isBanner &&
+                            <BannerEditor key={"banner-creative-"-count} 
+                              creative={creative} 
+                              callback={setHtml}/>}
+
+                          { creative.isVideo && 
+                            <VideoEditor key={'video-creative'-count} 
+                              creative={creative} 
+                              callback={setHtml}/>}
+
+                          { creative.isAudio && 
+                            <AudioEditor key={'audio-creative'-count} 
+                              creative={creative} 
+                              callback={setHtml}/>}
 
                           <Row>
                             <Col className="pr-md-1" md="12">

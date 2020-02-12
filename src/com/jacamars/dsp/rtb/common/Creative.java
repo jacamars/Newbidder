@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -115,8 +116,8 @@ public class Creative  {
 	public Integer videoDuration;
 	/** If this is a video (Not a native content, the linearity */
 	public Integer videoLinearity;
-	/** The videoMimeType */
-	public String videoMimeType;
+	/** The video audio MimeType */
+	public String mime_type;
 	/**
 	 * vast-url, a non standard field for passing an http reference to a file
 	 * for the XML VAST
@@ -133,6 +134,15 @@ public class Creative  {
 
 	/** SQL Name of this creative */
 	public String name;
+	
+	/** Audio support */
+	public Integer audio_min_duration;
+	public Integer audio_max_duration;
+	public Integer audio_min_bitrate;
+	public Integer audio_max_bitrate;
+	public Integer audio_start_delay;
+	public Integer audio_protocol;
+	
 	
 	// /////////////////////////////////////////////
 	/** Native content assets */
@@ -207,23 +217,17 @@ public class Creative  {
 	public String htmltemplate = "";
 	// ////////////// VIDEO SPECIFIC TARGETTING	
 	/** The video duration */
-	transient int video_duration = 0;	
+	public Integer vast_video_duration;;	
 	/** The video width */
-	transient int video_width = 0;
+	public Integer vast_video_width;
 	/** The video height */
-	transient int video_height = 0;	
-	/** The video type */
-	transient String video_type = "";
-	/** The video XML */
-	transient String video_data = null;
-	/** The video VAST protcol */
-	transient int video_protocol = 2;	
+	public Integer vast_video_height;	
+	public Integer vast_video_protocol = 2;	
 	/** The video linearity */
-	transient int video_linearity = 1;
+	public Integer vast_video_linearity = 1;
 	/** The bitrate of the video */
-	transient Integer video_bitrate;
+	public Integer vast_video_bitrate;
 	/** The mime type of the video */
-	transient String video_mimetype = null;
 	/** The table name where this thing is stored in sql */
 	transient String tableName = null;
 	/** The position on the page for the creative */
@@ -250,7 +254,6 @@ public class Creative  {
 	/** SQL name for the hourly budget */
 	private static final String HOURLY_BUDGET = "hourly_budget";
 	/** SQL name for the vast data attribute */
-	private static final  String VAST_DATA = "vast_video_outgoing_file";
 
 	public static Creative getInstance(int id, String key) {
 		switch(key.toLowerCase()) {
@@ -349,12 +352,11 @@ public class Creative  {
 	static PreparedStatement doNew(Creative c, Connection conn) throws Exception {
 		PreparedStatement p = null;
 		String table = getTable(c);
-		String rules = "";
-		for (int i=0;i<c.rules.size();i++) {
-			rules += c.rules.get(i);
-			if (i+1 < c.rules.size()) rules += ",";
+		Array rulesArray  = null;
+		if (c.rules != null) {
+			rulesArray = conn.createArrayOf("int",c.rules.toArray());
 		}
-		
+	
 		String sql = "INSERT INTO " + table + " ("
 				+"interval_start,"
 				+"interval_end,"
@@ -396,9 +398,81 @@ public class Creative  {
 				p.setNull(25, Types.VARCHAR);
 		} else
 		if (c.isVideo) {
+			sql += 	"mime_type,"
+					+"vast_video_bitrate,"
+					+"vast_video_duration,"
+					+"vast_video_height,"
+					+"vast_video_width,"
+					+"vast_video_protocol,"
+					+"vast_video_linearity,"
+					+"htmltemplate) VALUES ("
+								
+					+"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			p = conn.prepareStatement(sql);	
+			
+			if (c.mime_type != null)
+				p.setString(20,c.mime_type);
+			else
+				p.setNull(20, Types.VARCHAR);
+			if (c.vast_video_bitrate != null)
+				p.setInt(21, c.vast_video_bitrate);
+			else
+				p.setNull(21, Types.INTEGER);
+			if (c.vast_video_duration != null)
+				p.setInt(22, c.vast_video_duration);
+			else
+				p.setNull(22, Types.INTEGER);
+			if (c.vast_video_height != null)
+				p.setInt(23, c.vast_video_height);
+			else
+				p.setNull(23, Types.INTEGER);
+			if (c.vast_video_width != null)
+				p.setInt(24, c.vast_video_width);
+			else
+				p.setNull(24, Types.INTEGER);
+			if (c.vast_video_protocol != null)
+				p.setInt(25, c.vast_video_protocol);
+			else
+				p.setNull(25, Types.INTEGER);
+			if (c.vast_video_linearity != null)
+				p.setInt(26, c.vast_video_linearity);
+			else
+				p.setNull(26,Types.INTEGER);
+			p.setString(27,c.htmltemplate);
 			
 		} else 
 		if (c.isAudio) {
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			
+			if (c.mime_type != null)
+				p.setString(20,c.mime_type);
+			else
+				p.setNull(20, Types.VARCHAR);
+			if (c.audio_max_bitrate != null)
+				p.setInt(21, c.audio_max_bitrate);
+			else
+				p.setNull(21, Types.INTEGER);
+			if (c.audio_min_bitrate != null)
+				p.setInt(22, c.audio_min_bitrate);
+			else
+				p.setNull(22, Types.INTEGER);
+			if (c.audio_max_duration != null)
+				p.setInt(23, c.audio_max_duration);
+			else
+				p.setNull(23, Types.INTEGER);
+			if (c.audio_min_duration!= null)
+				p.setInt(24, c.audio_min_duration);
+			else
+				p.setNull(24, Types.INTEGER);
+			if (c.audio_start_delay != null)
+				p.setInt(25, c.audio_start_delay);
+			else
+				p.setNull(25, Types.INTEGER);
+			p.setString(26, c.htmltemplate);
+			if (c.audio_protocol != null)
+				p.setInt(27, c.audio_protocol);
+			else
+				p.setNull(27, Types.INTEGER);	
 			
 		} else
 		if (c.isNative) {
@@ -453,7 +527,10 @@ public class Creative  {
 		
 		p.setTimestamp(10,new Timestamp(System.currentTimeMillis()));
 		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
-		p.setString(12, rules);
+		if (rulesArray != null)
+			p.setArray(12, rulesArray);
+		else
+			p.setNull(12, Types.ARRAY);
 		p.setString(13, c.dealSpec);
 		if (c.interstitialOnly)
 			p.setInt(14, 1);
@@ -498,12 +575,11 @@ public class Creative  {
 	static PreparedStatement doUpdate(Creative c, Connection conn) throws Exception {
 		PreparedStatement p = null;
 		String table = getTable(c);
-		String rules = "";
-		for (int i=0;i<c.rules.size();i++) {
-			rules += c.rules.get(i);
-			if (i+1 < c.rules.size()) rules += ",";
+		Array rulesArray  = null;
+		if (c.rules != null) {
+			rulesArray = conn.createArrayOf("int",c.rules.toArray());
 		}
-		
+	
 		String sql = "UPDATE " + table + " SET "
 				+"interval_start=?,"
 				+"interval_end=?,"
@@ -546,10 +622,88 @@ public class Creative  {
 			p.setInt(25, c.id);
 		} else
 		if (c.isVideo) {
+			sql +="mime_type=?,"
+				+"vast_video_bitrate=?,"
+				+"vast_video_duration=?,"
+				+"vast_video_height=?,"
+				+"vast_video_width=?,"
+				+"vast_video_protocol=?,"
+				+"vast_video_linearity=?,"
+				+"htmltemplate=? WHERE id = ?";
+			p = conn.prepareStatement(sql);	
 			
+			if (c.mime_type != null)
+				p.setString(19,c.mime_type);
+			else
+				p.setNull(19, Types.VARCHAR);
+			if (c.vast_video_bitrate != null)
+				p.setInt(20, c.vast_video_bitrate);
+			else
+				p.setNull(20, Types.INTEGER);
+			if (c.vast_video_duration != null)
+				p.setInt(21, c.vast_video_duration);
+			else
+				p.setNull(21, Types.INTEGER);
+			if (c.vast_video_height != null)
+				p.setInt(22, c.vast_video_height);
+			else
+				p.setNull(22, Types.INTEGER);
+			if (c.vast_video_width != null)
+				p.setInt(23, c.vast_video_width);
+			else
+				p.setNull(23, Types.INTEGER);
+			if (c.vast_video_protocol != null)
+				p.setInt(24, c.vast_video_protocol);
+			else
+				p.setNull(24, Types.INTEGER);
+			if (c.vast_video_linearity != null)
+				p.setInt(25, c.vast_video_linearity);
+			else
+				p.setNull(25,Types.INTEGER);
+			p.setString(26,c.htmltemplate);
+			
+			p.setInt(27,c.id);
 		} else 
 		if (c.isAudio) {
+			sql += "mime_type=?,"
+					+"audio_max_bitrate=?,"
+					+"audio_min_bitrate=?,"
+					+"audio_max_duration=?,"
+					+"audio_min_duration=?,"
+					+"audio_start_delay=?,"
+					+"htmltemplate=?,"
+					+"audio_protocol=? WHERE id=?";
 			
+			if (c.mime_type != null)
+				p.setString(19,c.mime_type);
+			else
+				p.setNull(19, Types.VARCHAR);
+			if (c.audio_max_bitrate != null)
+				p.setInt(20, c.audio_max_bitrate);
+			else
+				p.setNull(20, Types.INTEGER);
+			if (c.audio_min_bitrate != null)
+				p.setInt(21, c.audio_min_bitrate);
+			else
+				p.setNull(21, Types.INTEGER);
+			if (c.audio_max_duration != null)
+				p.setInt(22, c.audio_max_duration);
+			else
+				p.setNull(22, Types.INTEGER);
+			if (c.audio_min_duration!= null)
+				p.setInt(23, c.audio_min_duration);
+			else
+				p.setNull(23, Types.INTEGER);
+			if (c.audio_start_delay != null)
+				p.setInt(24, c.audio_start_delay);
+			else
+				p.setNull(24, Types.INTEGER);
+			p.setString(25, c.htmltemplate);
+			if (c.audio_protocol != null)
+				p.setInt(26, c.audio_protocol);
+			else
+				p.setNull(26, Types.INTEGER);	
+			p.setInt(27,c.id);
 		} else
 		if (c.isNative) {
 			
@@ -602,7 +756,10 @@ public class Creative  {
 		}
 		
 		p.setTimestamp(10,new Timestamp(System.currentTimeMillis()));
-		p.setString(11, rules);
+		if (rulesArray != null)
+			p.setArray(11, rulesArray);
+		else
+			p.setNull(11, Types.ARRAY);
 		p.setString(12, c.dealSpec);
 		if (c.interstitialOnly)
 			p.setInt(13, 1);
@@ -979,6 +1136,7 @@ public class Creative  {
 		attributes.add(new FixedNodeDoNative());
         attributes.add(new FixedNodeDoSize());
 		attributes.add(new FixedNodeDoVideo());
+		attributes.add(new FixedNodeDoAudio());
 	}
 
     /**
@@ -1441,39 +1599,38 @@ public class Creative  {
 	 *             on JSON parsing errors.
 	 */
 	protected void compileVideo() throws Exception {
-		videoDuration = video_duration;
-		videoMimeType = video_type;
+		videoDuration = vast_video_duration;
 
 		///////////// Handle width and height /////////////////////////////
-		if (video_width == 0 || video_height == 0) {
+		if (vast_video_width !=null || vast_video_height == 0) {
 			addDimensions();
 		} else {
 			// Old Style
-			w = video_width;
-			h = video_height;
+			w = vast_video_width;
+			h = vast_video_height;
 		}
 		//////////////////////////////////////////////////////////////////
 
-		videoProtocol = video_protocol;
+		videoProtocol = vast_video_protocol;
 		attributes = new ArrayList<Node>();
 
-		if (video_bitrate != null) {
-			Node n = new Node("contenttype", "imp.0.video.bitrate", Node.GREATER_THAN_EQUALS, video_bitrate);
+		if (vast_video_bitrate != null) {
+			Node n = new Node("contenttype", "imp.0.video.bitrate", Node.GREATER_THAN_EQUALS, vast_video_bitrate);
 			n.notPresentOk = true;
 			attributes.add(n);
 		}
 
 		String theVideo;
 
-		videoLinearity = video_linearity;
-		if (video_data.startsWith("http")) {
+		videoLinearity = vast_video_linearity;
+		if (htmltemplate.startsWith("http")) {
 			HttpPostGet hp = new HttpPostGet();
-			theVideo = hp.sendGet(video_data, 5000, 5000);
-		} else if (video_data.startsWith("file")) {
-			String fname = video_data.substring(7);
+			theVideo = hp.sendGet(htmltemplate, 5000, 5000);
+		} else if (htmltemplate.startsWith("file")) {
+			String fname = htmltemplate.substring(7);
 			theVideo = new String(Files.readAllBytes(Paths.get(fname)), StandardCharsets.UTF_8);
 		} else {
-			theVideo = video_data;
+			theVideo = htmltemplate;
 		}
 
 		StringBuilder sb = new StringBuilder(theVideo);
@@ -1640,11 +1797,10 @@ public class Creative  {
 		}
 		
 		if (myNode.get("rules") != null) {
-			String str = myNode.get("rules").asText();
-			rules = new ArrayList<>();
-			if (str.trim().length() != 0) {
-				if (str.equals("null")==false)
-					Targeting.getIntegerList(rules, str);
+			ArrayNode n = (ArrayNode)myNode.get("rules");
+			rules = new ArrayList<Integer>();
+			for (int i=0;i<n.size();i++) {
+				rules.add(n.get(i).asInt());
 			}
 		}
 
@@ -1675,26 +1831,39 @@ public class Creative  {
 				position = node.get("position").asText(null);
 		} else 
 		if (isVideo) {
-			video_duration = node.get("vast_video_duration").asInt();
-			video_width = node.get("vast_video_width").asInt();
-			video_height = node.get("vast_video_height").asInt();
+			vast_video_duration = node.get("vast_video_duration").asInt();
+			vast_video_width = node.get("vast_video_width").asInt();
+			vast_video_height = node.get("vast_video_height").asInt();
 
-			video_type = node.get("mime_type").asText();
-			video_linearity = node.get("vast_video_linerarity").asInt();
+			mime_type = node.get("mime_type").asText();
+			vast_video_linearity = node.get("vast_video_linearity").asInt();
 
-			video_data = node.get(this.VAST_DATA).asText();
-			if (node.get("vast_video_protocol") != null) {
-				video_protocol = node.get("vast_video_protocol").asInt();
-			}
-			video_data = clean(video_data.trim());
+			htmltemplate = node.get(HTML_TEMPLATE).asText();
+			if (node.get("vast_video_protocol") != null) 
+				vast_video_protocol = node.get("vast_video_protocol").asInt();
+		
+			htmltemplate = clean(htmltemplate.trim());
 
-			if (node.get("bitrate") != null) {
-				video_bitrate = new Integer(node.get("bitrate").asInt());
-			}
+			if (node.get("vast_video_bitrate") != null) 
+				vast_video_bitrate = node.get("vast_video_bitrate").asInt();
+		
 		}
 		else
 		if (isAudio) {
-			
+			if (node.get("audio_min_duration")!=null)
+				audio_min_duration = node.get("audio_min_duration").asInt();
+			if (node.get("audio_max_duration")!=null)
+				audio_max_duration = node.get("audio_max_duration").asInt();
+			if (node.get("audio_min_bitrate")!=null)
+				audio_min_bitrate = node.get("audio_min_bitrate").asInt();
+			if (node.get("audio_max_bitrate")!=null)
+				audio_max_bitrate = node.get("audio_max_bitrate").asInt();
+			if (node.get("audio_start_delay")!=null)
+				audio_start_delay = node.get("audio_start_delay").asInt();
+			if (node.get("audio_max_bitrate")!=null) 
+				audio_protocol = node.get("audio_protocol").asInt();
+			if (node.get("mime_type")!=null) 
+				mime_type = node.get("mime_type").asText();
 		} else 
 		if (isNative) {
 			

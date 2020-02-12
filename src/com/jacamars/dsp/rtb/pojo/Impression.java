@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.pojo;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,8 @@ public class Impression {
 
 	/** A video object */
 	public Video video = null;
+	
+	public Audio audio = null;
 
 	/** native ad extension */
 	public transient NativePart nativePart;
@@ -182,6 +185,8 @@ public class Impression {
 			doBanner();
 		else if (rnode.get("video") != null)
 			doVideo();
+		else if (rnode.get("audio") != null)
+			doAudio();
 		else
 			doNative();
 	}
@@ -213,6 +218,43 @@ public class Impression {
 				format.add(f);
 			}
 		}
+	}
+	
+	/**
+	 * Handle Audio Impression
+	 */
+	void doAudio() {
+		JsonNode test;
+		JsonNode raudio = rnode.get("audio");
+		test = raudio.get("protocol");
+		test = raudio.get("protocols");
+		if (test != null && !(test instanceof MissingNode)) {
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.protocols.add(member.intValue());
+			}
+		}
+		test = raudio.get("minduration");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.minduration = test.intValue();
+		}
+		test = raudio.get("maxduration");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.minduration = test.intValue();
+		}
+		test = raudio.get("minbitrate");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.minbitrate = test.intValue();
+		}
+		test = raudio.get("maxbitrate");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.maxbitrate = test.intValue();
+		}
+		test = raudio.get("startdelay");
+		if (test != null && !(test instanceof MissingNode)) {
+			audio.startdelay = test.intValue();
+		}
+		nativead = false;
 	}
 
 	/**

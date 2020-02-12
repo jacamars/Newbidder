@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A class that comnprises the video part of a regular ad specified in the bid request
+ * A class that comprises the video part of a regular ad specified in the bid request
  * @author Ben M. Faul
  */
 

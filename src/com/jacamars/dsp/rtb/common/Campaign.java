@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -417,7 +418,7 @@ public class Campaign implements Comparable, Portable  {
 		} else
 		if (c.isVideo()) {
 			pre += "imp.video.w: " + c.w + " AND imp.video.h: " + c.h + " AND imp.video.maxduration:< " + c.videoDuration;
-			pre += " AND imp.video.mimes: *" + c.videoMimeType + "* AND imp.video.protocols: *" + c.videoProtocol + "*";
+			pre += " AND imp.video.mimes: *" + c.mime_type + "* AND imp.video.protocols: *" + c.videoProtocol + "*";
 		} else {
 			pre += "imp.banner.w: " + c.w + " AND imp.banner.h: " + c.h;
 		}
@@ -801,14 +802,13 @@ public class Campaign implements Comparable, Portable  {
 		}
 		
 		if (myNode.get("rules") != null) {
-			String str = myNode.get("rules").asText();
-			rules = new ArrayList<>();
-			if (str.trim().length() != 0) {
-				if (str.equals("null")==false)
-					Targeting.getIntegerList(rules, str);
+			ArrayNode n = (ArrayNode)myNode.get("rules");
+			rules = new ArrayList<Integer>();
+			for (int i=0;i<n.size();i++) {
+				rules.add(n.get(i).asInt());
 			}
 		}
-
+		
 		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
 			exchanges.clear();
 			
@@ -1114,6 +1114,11 @@ public class Campaign implements Comparable, Portable  {
 	
 	static PreparedStatement doNew(Campaign c, Connection conn) throws Exception {
 		PreparedStatement p = null;
+		Array rulesArray  = null;
+		if (c.rules != null) {
+			rulesArray = conn.createArrayOf("int",c.rules.toArray());
+		}
+		
 		String sql = "INSERT INTO campaigns (" 
 		 +"activate_time,"
 		 +"expire_time,"
@@ -1146,12 +1151,6 @@ public class Campaign implements Comparable, Portable  {
 		p.setString(4, c.adomain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
-		
-		String rules = "";
-		for (int i=0;i<c.rules.size();i++) {
-			rules += c.rules.get(i);
-			if (i+1 < c.rules.size()) rules += ",";
-		}
 		
 		if (c.budget==null || c.budget.dailyBudget == null) {
 			p.setNull(7, Types.DECIMAL);
@@ -1187,7 +1186,10 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(14, Types.INTEGER);
 		else
 			p.setInt(14,  c.target_id);
-		p.setString(15, rules);
+		if (rulesArray != null)
+			p.setArray(15, rulesArray);
+		else
+			p.setNull(15, Types.ARRAY);
 		p.setInt(16,(int)c.assignedSpendRate);
 		
 		return p;
@@ -1195,6 +1197,11 @@ public class Campaign implements Comparable, Portable  {
 	
 	static PreparedStatement doUpdate(Campaign c,  Connection conn) throws Exception {
 		PreparedStatement p = null;
+		Array rulesArray  = null;
+		if (c.rules != null) {
+			rulesArray = conn.createArrayOf("int",c.rules.toArray());
+		}
+		
 		String sql = "UPDATE campaigns SET "
 		 +"activate_time=?,"
 		 +"expire_time=?,"
@@ -1224,11 +1231,6 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(2, Types.TIMESTAMP);
 		}
 		
-		String rules = "";
-		for (int i=0;i<c.rules.size();i++) {
-			rules += c.rules.get(i);
-			if (i+1 < c.rules.size()) rules += ",";
-		}
 		p.setDouble(3, c.costAsDouble());
 		p.setString(4, c.adomain);
 		p.setString(5, c.name);
@@ -1270,7 +1272,10 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setInt(14,  c.target_id);
 		
-		p.setString(15,  rules);
+		if (rulesArray != null)
+			p.setArray(15, rulesArray);
+		else
+			p.setNull(15, Types.ARRAY);
 		p.setInt(16, (int)c.assignedSpendRate);
 		
 		p.setInt(17, c.id);

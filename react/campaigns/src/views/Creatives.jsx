@@ -64,15 +64,15 @@ var undef;
 
   const makeNewVideo = async() => {
     if (creative !== null)
-    return;
+      return;
 
-    var c = await vx.getNewVideo("My New Video");
+    var c = await vx.getNewCreative("My New Video");
     c.isVideo = true;
     c.isAudio = false;
     c.isNative = false;
     c.isBanner = false;
 
-    setCreative(clearInterval);
+    setCreative(c);
   }
 
   const makeNewNative = async() => {
@@ -94,9 +94,9 @@ var undef;
 
   const makeNewAudio = async() => {
     if (creative !== null)
-    return;
+      return;
 
-    var c = await vx.getNewAudio("My New Audio");
+    var c = await vx.getNewCreative("My New Audio");
     c.isVideo = false;
     c.isAudio = true;
     c.isNative = false;
@@ -132,36 +132,61 @@ var undef;
 
   const getVideosView = () => {
     return(
-      <>
-      </>
-    );
+      vx.creatives.filter((e) => e.type === "video").map((row, index) => (
+        <tr key={'video-' + row}>
+          <td>{index}</td>
+          <td key={'video-name-' + index} className="text-left">{row.name}</td>
+          <td key={'video-id-' + index} className="text-right">{row.id}</td>
+          <td className="text-center">
+            <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'video')}>View</Button>
+            &nbsp;
+            <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'video')}>Edit</Button>
+            &nbsp;
+            <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'video')}>Delete</Button>
+          </td>
+        </tr>))
+    ); 
 }
 
 const getAudiosView = () => {
   return(
-    <>
-    </>
-  );
+    vx.creatives.filter((e) => e.type === "audio").map((row, index) => (
+      <tr key={'audio-' + row}>
+        <td>{index}</td>
+        <td key={'audio-name-' + index} className="text-left">{row.name}</td>
+        <td key={'audio-id-' + index} className="text-right">{row.id}</td>
+        <td className="text-center">
+          <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'audio')}>View</Button>
+          &nbsp;
+          <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'audio')}>Edit</Button>
+          &nbsp;
+          <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'audio')}>Delete</Button>
+        </td>
+      </tr>))
+  ); 
 }
 
 const getNativesView = () => {
   return(
-    <>
-    </>
+    vx.creatives.filter((e) => e.type === "native").map((row, index) => (
+      <tr key={'native-' + row}>
+        <td>{index}</td>
+        <td key={'native-name-' + index} className="text-left">{row.name}</td>
+        <td key={'native-id-' + index} className="text-right">{row.id}</td>
+        <td className="text-center">
+          <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'native')}>View</Button>
+          &nbsp;
+          <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'native')}>Edit</Button>
+          &nbsp;
+          <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'native')}>Delete</Button>
+        </td>
+      </tr>))
   );
 }
 
   const setInstances = () => {
 
   };
-
-  const getTargetsView = () => {
-
-    return(
-        <div>
-        </div>
-    );
-  }
 
   return (
     <div className="content">
@@ -198,7 +223,7 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>
@@ -227,8 +252,8 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewAudio}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
@@ -256,7 +281,7 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>

@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS campaigns (
   exchanges varchar(255) DEFAULT NULL,
   regions varchar(255) DEFAULT NULL,
   target_id int DEFAULT NULL,
-  rules varchar(1024) DEFAULT NULL,
+  rules integer[] DEFAULT NULL,
   spendrate int DEFAULT NULL,
   banners varchar(1024) DEFAULT NULL,
   videos varchar(1024) DEFAULT NULL,

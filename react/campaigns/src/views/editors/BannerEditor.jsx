@@ -24,7 +24,8 @@ import {
   Row,
   Col
 } from "reactstrap";
-
+import DemoTag from "./DemoTag.jsx";
+import {mimeTypes} from "../../Utils";
 
 var undef;
 
@@ -47,8 +48,9 @@ const BannerEditor = (props) => {
           id="fixed-width"
           defaultValue={props.creative.contenttype}
           onChange={ (e) => props.callback(e,"contenttype")}
-          type="text"
-        />
+          type="select">
+            {mimeTypes(props.creative.contenttype)}
+        </Input>
       </FormGroup>
     </Col>
     <Col className="px-md-1" md="2">
@@ -74,6 +76,12 @@ const BannerEditor = (props) => {
           type="textarea"
         />
       </FormGroup>
+      </Col>
+      <Col className="px-md-1" md="6">
+        <FormGroup>
+          <label>Visualization</label>
+          <DemoTag isVideo={false} adm={props.creative.htmltemplate} />
+        </FormGroup>
       </Col>
    </Row>
    </>

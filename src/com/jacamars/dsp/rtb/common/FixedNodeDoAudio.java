@@ -10,9 +10,9 @@ import java.util.List;
  * Fixed node implements a chunk of fixed code, once found in the Creative
  * This handles video.
  */
-public class FixedNodeDoVideo extends Node {
+public class FixedNodeDoAudio extends Node {
 
-    public FixedNodeDoVideo() {
+    public FixedNodeDoAudio() {
         super();
         name = "FixedNodeDoVideo";
     }
@@ -20,7 +20,8 @@ public class FixedNodeDoVideo extends Node {
     @Override
     public boolean test(BidRequest br, Creative creative, String adId, Impression imp,
                         StringBuilder errorString, Probe probe, List<Deal> deals) throws Exception {
-        if (imp.video != null) {                                                // FixedNodeDoVideo
+    	
+        if (imp.audio != null) {                                                // FixedNodeDoVideo
             if (imp.video.linearity != -1 && creative.videoLinearity != null) {
                 if (imp.video.linearity != creative.videoLinearity) {
                     probe.process(br.getExchange(), adId, creative.impid, Probe.VIDEO_LINEARITY);

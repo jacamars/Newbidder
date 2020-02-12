@@ -85,7 +85,7 @@ public class SQLDeleteCreativeCmd extends ApiCommand {
 				case "banner":
 					sql = "delete from banners where id=?";
 					break;
-				case "videos":
+				case "video":
 					sql = "delete  from banner_videos where id=?";
 					break;
 				case "audio":

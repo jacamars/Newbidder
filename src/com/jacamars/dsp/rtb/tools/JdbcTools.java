@@ -1,7 +1,7 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.math.BigDecimal;
-
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
@@ -11,8 +11,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 public class JdbcTools {
 	public static ObjectMapper mapper = new ObjectMapper();
@@ -90,6 +94,28 @@ public class JdbcTools {
 					break;
 				case java.sql.Types.NUMERIC:
 					child.put(column_name, rs.getBigDecimal(column_name));
+					break;
+				case java.sql.Types.ARRAY:
+					Array arr = rs.getArray(column_name);
+					Object[] o1 = (Object[])arr.getArray();
+					var an = mapper.createArrayNode();
+					for (Object x : o1) {
+						if (x instanceof Integer) {
+							an.add(new IntNode((Integer)x));
+						} else
+						if (x instanceof Double) {
+							an.add(new DoubleNode((Double)x));
+						} else
+						if (x instanceof Float) {
+							an.add(new DoubleNode((Float)x));
+						} else
+						if (x instanceof Long) {
+							an.add(new LongNode((Long)x));
+						} else if (x instanceof String) {
+							an.add(new TextNode((String)x));
+						}
+					}
+					child.set(column_name,an);
 					break;
 				default:
 					if  (rsmd.getColumnTypeName(i).equals("TINYINT")) {
