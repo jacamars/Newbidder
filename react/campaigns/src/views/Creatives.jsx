@@ -79,11 +79,18 @@ var undef;
     if (creative !== null)
     return;
 
-    var c = await vx.getNewNative("My New Native");
+    var c = await vx.getNewCreative("My New Native");
     c.isVideo = false;
     c.isAudio = false;
     c.isNative = true;
     c.isBanner = false;
+    c.native_assets = [];
+    c.native_link = "";
+    c.native_trk_urls = [];
+    c.native_js_tracker = "";
+    c.native_context = [1];
+    c.native_contextsubtype = [10];
+
     setCreative(c);
   }
 
@@ -282,7 +289,7 @@ const getNativesView = () => {
         <Row>
             <Col xs="12">
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewNative}>New</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>

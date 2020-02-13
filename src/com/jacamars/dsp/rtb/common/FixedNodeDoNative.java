@@ -24,15 +24,15 @@ public class FixedNodeDoNative extends Node {
     public boolean test(BidRequest br, Creative creative, String adId, Impression imp,
                         StringBuilder errorString, Probe probe, List<Deal> d) throws Exception {
         if (creative.isNative()) {                                                        // FixedNodeDoNative
-            if (imp.nativePart.layout != 0) {
+            /*if (imp.nativePart.layout != 0) {
                 if (imp.nativePart.layout != creative.nativead.nativeAdType) {
-                    probe.process(br.getExchange(), adId, creative.impid, Probe.BID_CREAT_IS_BANNER);
+                    probe.process(br.getExchange(), adId, creative.impid, Probe.NATIVE_LAYOUT);
                     if (errorString != null)
                         errorString.append(Probe.NATIVE_LAYOUT);
                     falseCount.incrementAndGet();
                     return false;
                 }
-            }
+            } deprecated*/
             if (imp.nativePart.title != null) {
                 if (imp.nativePart.title.required == 1 && creative.nativead.title == null) {
                     probe.process(br.getExchange(), adId, creative.impid, Probe.NATIVE_TITLE);

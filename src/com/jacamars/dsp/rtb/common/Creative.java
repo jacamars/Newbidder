@@ -136,16 +136,13 @@ public class Creative  {
 	public String name;
 	
 	/** Audio support */
-	public Integer audio_min_duration;
-	public Integer audio_max_duration;
-	public Integer audio_min_bitrate;
-	public Integer audio_max_bitrate;
+	public Integer audio_duration;
+	public Integer audio_bitrate;
 	public Integer audio_start_delay;
 	public Integer audio_protocol;
 	
 	
 	// /////////////////////////////////////////////
-	/** Native content assets */
 	public NativeCreative nativead;
 
 	/**
@@ -442,41 +439,74 @@ public class Creative  {
 			
 		} else 
 		if (c.isAudio) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+			p = conn.prepareStatement(sql);	
 			
 			if (c.mime_type != null)
 				p.setString(20,c.mime_type);
 			else
 				p.setNull(20, Types.VARCHAR);
-			if (c.audio_max_bitrate != null)
-				p.setInt(21, c.audio_max_bitrate);
+			if (c.audio_bitrate != null)
+				p.setInt(21, c.audio_bitrate);
 			else
 				p.setNull(21, Types.INTEGER);
-			if (c.audio_min_bitrate != null)
-				p.setInt(22, c.audio_min_bitrate);
+			if (c.audio_duration != null)
+				p.setInt(22, c.audio_duration);
 			else
 				p.setNull(22, Types.INTEGER);
-			if (c.audio_max_duration != null)
-				p.setInt(23, c.audio_max_duration);
+			if (c.audio_start_delay != null)
+				p.setInt(23, c.audio_start_delay);
 			else
 				p.setNull(23, Types.INTEGER);
-			if (c.audio_min_duration!= null)
-				p.setInt(24, c.audio_min_duration);
-			else
-				p.setNull(24, Types.INTEGER);
-			if (c.audio_start_delay != null)
-				p.setInt(25, c.audio_start_delay);
-			else
-				p.setNull(25, Types.INTEGER);
-			p.setString(26, c.htmltemplate);
+			p.setString(24, c.htmltemplate);
 			if (c.audio_protocol != null)
-				p.setInt(27, c.audio_protocol);
+				p.setInt(25, c.audio_protocol);
 			else
-				p.setNull(27, Types.INTEGER);	
+				p.setNull(25, Types.INTEGER);	
 			
 		} else
 		if (c.isNative) {
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			p = conn.prepareStatement(sql);	
 			
+			if (c.nativead.native_assets != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_assets.toArray());
+				p.setArray(20,arr);
+			} else {
+				p.setNull(20, Types.ARRAY);
+			}
+			if (c.nativead.native_link != null) 
+				p.setString(21, c.nativead.native_link);
+			else
+				p.setNull(21, Types.VARCHAR);
+			if (c.nativead.native_js_tracker != null) 
+				p.setString(22,c.nativead.native_js_tracker);
+			else
+				p.setNull(22, Types.VARCHAR);
+			if (c.nativead.native_trk_urls != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_trk_urls.toArray());
+				p.setArray(23,arr);
+			} else 
+				p.setNull(23, Types.ARRAY);
+			if (c.nativead.native_context != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_context.toArray());
+				p.setArray(24,arr);
+			} else 
+				p.setNull(24, Types.ARRAY);
+			if (c.nativead.native_contextsubtype!= null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_contextsubtype.toArray());
+				p.setArray(25,arr);
+			} else 
+				p.setNull(25, Types.ARRAY);
+			if (c.nativead.native_plcmttype != null) 
+				p.setInt(26,c.nativead.native_plcmttype);
+			else
+				p.setNull(26, Types.INTEGER);
+			if (c.nativead.native_plcmttype != null) 
+				p.setInt(27,c.nativead.native_plcmtct);
+			else
+				p.setNull(27, Types.INTEGER);
+		
 		} else
 			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
 		
@@ -666,47 +696,86 @@ public class Creative  {
 		} else 
 		if (c.isAudio) {
 			sql += "mime_type=?,"
-					+"audio_max_bitrate=?,"
-					+"audio_min_bitrate=?,"
-					+"audio_max_duration=?,"
-					+"audio_min_duration=?,"
+					+"audio_bitrate=?,"
+					+"audio_duration=?,"
 					+"audio_start_delay=?,"
 					+"htmltemplate=?,"
 					+"audio_protocol=? WHERE id=?";
+			p = conn.prepareStatement(sql);	
 			
 			if (c.mime_type != null)
 				p.setString(19,c.mime_type);
 			else
 				p.setNull(19, Types.VARCHAR);
-			if (c.audio_max_bitrate != null)
-				p.setInt(20, c.audio_max_bitrate);
+			if (c.audio_bitrate != null)
+				p.setInt(20, c.audio_bitrate);
 			else
 				p.setNull(20, Types.INTEGER);
-			if (c.audio_min_bitrate != null)
-				p.setInt(21, c.audio_min_bitrate);
+			if (c.audio_duration != null)
+				p.setInt(21, c.audio_duration);
 			else
 				p.setNull(21, Types.INTEGER);
-			if (c.audio_max_duration != null)
-				p.setInt(22, c.audio_max_duration);
+			if (c.audio_start_delay != null)
+				p.setInt(22, c.audio_start_delay);
 			else
 				p.setNull(22, Types.INTEGER);
-			if (c.audio_min_duration!= null)
-				p.setInt(23, c.audio_min_duration);
-			else
-				p.setNull(23, Types.INTEGER);
-			if (c.audio_start_delay != null)
-				p.setInt(24, c.audio_start_delay);
-			else
-				p.setNull(24, Types.INTEGER);
-			p.setString(25, c.htmltemplate);
+			p.setString(23, c.htmltemplate);
 			if (c.audio_protocol != null)
-				p.setInt(26, c.audio_protocol);
+				p.setInt(24, c.audio_protocol);
 			else
-				p.setNull(26, Types.INTEGER);	
-			p.setInt(27,c.id);
+				p.setNull(24, Types.INTEGER);	
+			p.setInt(25,c.id);
 		} else
 		if (c.isNative) {
+			sql +=	"native_assets=?,"
+					+"native_link=?,"
+					+"native_js_tracker=?,"
+					+"native_trk_urls=?,"
+					+"native_context=?,"
+					+"native_contextsubtype=?,"
+					+"native_plcmttype=?,"
+					+"native_plcmtct=? WHERE id=?";
 			
+			p = conn.prepareStatement(sql);	
+			
+			if (c.nativead.native_assets != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_assets.toArray());
+				p.setArray(19,arr);
+			} else {
+				p.setNull(19, Types.ARRAY);
+			}
+			if (c.nativead.native_link != null) 
+				p.setString(20, c.nativead.native_link);
+			else
+				p.setNull(20, Types.VARCHAR);
+			if (c.nativead.native_js_tracker != null) 
+				p.setString(21,c.nativead.native_js_tracker);
+			else
+				p.setNull(21, Types.VARCHAR);
+			if (c.nativead.native_trk_urls != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_trk_urls.toArray());
+				p.setArray(22,arr);
+			} else 
+				p.setNull(22, Types.ARRAY);
+			if (c.nativead.native_context != null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_context.toArray());
+				p.setArray(23,arr);
+			} else 
+				p.setNull(23, Types.ARRAY);
+			if (c.nativead.native_contextsubtype!= null) {
+				Array arr = conn.createArrayOf("varchar",c.nativead.native_contextsubtype.toArray());
+				p.setArray(24,arr);
+			} else 
+				p.setNull(24, Types.ARRAY);
+			if (c.nativead.native_plcmttype != null) 
+				p.setInt(25,c.nativead.native_plcmttype);
+			else
+				p.setNull(25, Types.INTEGER);
+			if (c.nativead.native_plcmttype != null) 
+				p.setInt(26,c.nativead.native_plcmtct);
+			else
+				p.setNull(26, Types.INTEGER);
+			p.setInt(27,c.id);
 		} else
 			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
 		
@@ -1091,9 +1160,7 @@ public class Creative  {
 	 */
 	@JsonIgnore
 	public boolean isNative() {
-		if (nativead != null)
-			return true;
-		return false;
+		return isNative;
 	}
 
 	/**
@@ -1850,14 +1917,10 @@ public class Creative  {
 		}
 		else
 		if (isAudio) {
-			if (node.get("audio_min_duration")!=null)
-				audio_min_duration = node.get("audio_min_duration").asInt();
-			if (node.get("audio_max_duration")!=null)
-				audio_max_duration = node.get("audio_max_duration").asInt();
+			if (node.get("audio_duration")!=null)
+				audio_duration = node.get("audio_duration").asInt();
 			if (node.get("audio_min_bitrate")!=null)
-				audio_min_bitrate = node.get("audio_min_bitrate").asInt();
-			if (node.get("audio_max_bitrate")!=null)
-				audio_max_bitrate = node.get("audio_max_bitrate").asInt();
+				audio_bitrate = node.get("audio_bitrate").asInt();
 			if (node.get("audio_start_delay")!=null)
 				audio_start_delay = node.get("audio_start_delay").asInt();
 			if (node.get("audio_max_bitrate")!=null) 

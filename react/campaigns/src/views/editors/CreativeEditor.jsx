@@ -28,6 +28,7 @@ import BannerEditor from "./BannerEditor";
 import VideoEditor from "./VideoEditor";
 import AudioEditor from "./AudioEditor";
 import DealEditor from "./DealEditor";
+import NativeEditor from "./NativeEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
 
@@ -149,13 +150,27 @@ const getSelectedRules = () => {
     if (x.isVideo) {
       x.vast_video_width = x.width;
       x.vast_video_height = x.height;
-      x.width = null;
-      x.height = null;
+      x.width = undef;
+      x.height = undef;
       x.vast_video_linearity = Number(x.vast_video_linearity);
       x.vast_video_duration = Number(x.vast_video_duration);
       x.vast_video_bitrate = Number(x.vast_video_bitrate);
       x.vast_video_protocol = Number(x.vast_video_protocol);
       x.vast_video_inearity = Number(x.vast_video_linearity);
+    }
+
+    if (x.isAudio) {
+      x.vast_video_width = undef;
+      x.vast_video_height = undef;
+      x.width = undef;
+      x.height = undef;
+      x.vast_video_linearity = undef;
+      x.vast_video_duration = undef;
+      x.vast_video_bitrate = undef;
+      x.vast_video_protocol = undef;
+      x.vast_video_inearity = undef;
+      x.audio_duration = Number(x.audio_duration);
+      x.audio_bitrate = Number(x.audio_bitrate);
     }
 
     alert(JSON.stringify(x,null,2));
@@ -187,6 +202,15 @@ const getSelectedRules = () => {
     creative[type]=e.target.value;
     setCreative(creative);
     setCount(count+1);
+  }
+
+  // Set multi selection keys in the creative (like from NativeEditor)
+  const setMulti = (e, key) => {
+    var s = [...document.getElementById(key).options]
+      .filter((x) => x.selected)
+      .map((x)=>Number(x.value));
+    creative[key] = s;
+    setCreative(creative);
   }
 
         return (
@@ -246,13 +270,14 @@ const getSelectedRules = () => {
                             </Col>
                           </Row>
 
-                          {!creative.isAudio && 
+                          {! (creative.isAudio || creative.isNative) && 
                             <CreativeSizeEditor 
                               creative={creative} 
                               callback={setSize} 
                               selector={setSizeType}/>}
 
                           <DealEditor creative={creative} selector={setDealType}/>
+
                           { creative.isBanner &&
                             <BannerEditor key={"banner-creative-"-count} 
                               creative={creative} 
@@ -266,6 +291,12 @@ const getSelectedRules = () => {
                           { creative.isAudio && 
                             <AudioEditor key={'audio-creative'-count} 
                               creative={creative} 
+                              callback={setHtml}/>}
+
+                          { creative.isNative && 
+                            <NativeEditor key={'native-creative'-count} 
+                              creative={creative} 
+                              multiHandler={setMulti}
                               callback={setHtml}/>}
 
                           <Row>

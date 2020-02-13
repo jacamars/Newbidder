@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.common.URIEncoder;
 import com.jacamars.dsp.rtb.nativeads.assets.Asset;
@@ -18,14 +20,22 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
  */
 public class NativeCreative {
 		/** The assets that belong to this creative */
+
+	 	
 		public List<Asset> assets = new ArrayList<Asset>();
 		/** The link asset for this creative */
 		public Link link;
-		/** The impression trackers used by this creative */
-		public List<String> imptrackers;
-		/** The native ad type of this creative */
-		public Integer nativeAdType;
 		
+		/** The impression trackers used by this creative */
+		public List<String> native_trk_urls;
+		public String native_link;
+		public List<String> native_assets;
+		public String native_js_tracker;
+		public List<Integer> native_context;
+		public List<Integer> native_contextsubtype;
+		public Integer native_plcmttype;
+		public Integer native_plcmtct;
+			
 		/** The data asset of this creative. Transient because in the campaign it is defined with all the assets in 
 		 * an  array, but we will pull out img, video, link, and title  so we can quickly find them later. Only
 		 * data assets are in the array after it is encoded.
@@ -41,17 +51,37 @@ public class NativeCreative {
 		 * we will pull it out when the campaign is created so we can quickly find it later
 		 */
 		transient public Asset title;
-		
+			
 		transient public String callToAction; /* when the link is not empty */
 
 		
-    /**
-     * An empty constructor for use by Jackson
-     */
 	public NativeCreative() {
 		
 	}
 	
+	public NativeCreative(JsonNode node) {
+		if (node.get("native_assets") != null) {
+			ArrayNode an = (ArrayNode)node.get("native_assets");
+			native_assets = new ArrayList<>();
+			for (int i=0;i<an.size();i++) {
+				native_assets.add(an.get(i).textValue());
+			}
+		}
+		if (node.get("native_link") != null) 
+			native_link = node.get("native_link").textValue();
+		if (node.get("native_js_tracker") != null)
+			native_js_tracker = node.get("native_js_tracker").textValue();
+		if (node.get("native_trk_urls") != null) {
+			ArrayNode an = (ArrayNode)node.get("native_trk_urls");
+			native_trk_urls = new ArrayList<>();
+			for (int i=0;i<an.size();i++) {
+				native_trk_urls.add(an.get(i).textValue());
+			}
+		}
+		
+			
+	}	
+		
 	/**
 	 * Pulls the image, video, link, and title assets out of the array and assigns them to objects. The
 	 * data assets are assigned to a hashmap by type for fast lookup O(1) in the selection of creatives.

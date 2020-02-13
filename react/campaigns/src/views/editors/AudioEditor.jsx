@@ -25,6 +25,7 @@ import {
   Col
 } from "reactstrap";
 import DemoTag from "./DemoTag.jsx"
+import {mimeTypes, protocolOptions} from "../../Utils"
 
 var undef;
 
@@ -44,32 +45,21 @@ const AudioEditor = (props) => {
       <FormGroup>
         <label>Mime Type</label>
         <Input
-          id="fixed-width"
-          defaultValue={props.creative.mimetype}
-          onChange={ (e) => props.callback(e,"mime_type")}
-          type="text"
-        />
+          id="protocol-width"
+          defaultValue={props.creative.mime_type}
+          type="select">
+            {mimeTypes(props.creative.mime_type)}
+          </Input>
       </FormGroup>
     </Col>
     <Col className="px-md-1" md="1">
       <FormGroup>
-        <label>Min Duration</label>
+        <label>Duration</label>
         <Input
-          id="height"
-          onChange={ (e) => props.callback(e,"audio_min_duration")}
-          defaultValue={props.creative.audio_min_duration}
-          type="text"
-        />
-      </FormGroup>
-   </Col>
-   <Col className="px-md-1" md="1">
-      <FormGroup>
-        <label>Max Duration</label>
-        <Input
-          id="height"
-          onChange={ (e) => props.callback(e,"audio_max_duration")}
-          defaultValue={props.creative.audio_max_duration}
-          type="text"
+          id="duration"
+          onChange={ (e) => props.callback(e,"audio_duration")}
+          defaultValue={props.creative.audio_duration}
+          type="number"
         />
       </FormGroup>
    </Col>
@@ -77,44 +67,33 @@ const AudioEditor = (props) => {
       <FormGroup>
         <label>Start Delay</label>
         <Input
-          id="height"
+          id="delay"
           onChange={ (e) => props.callback(e,"audio_start_delay")}
           defaultValue={props.creative.audio_start_delay}
-          type="text"
+          type="number"
         />
       </FormGroup>
    </Col>
    <Col className="px-md-1" md="1">
       <FormGroup>
-        <label>Min Bitrate</label>
+        <label>Bitrate</label>
         <Input
-          id="height"
-          onChange={ (e) => props.callback(e,"audio_min_bitrate")}
-          defaultValue={props.creative.audio_min_bitrate}
-          type="text"
+          id="bitrate"
+          onChange={ (e) => props.callback(e,"audio_bitrate")}
+          defaultValue={props.creative.audio_bitrate}
+          type="number"
         />
       </FormGroup>
    </Col>
-   <Col className="px-md-1" md="1">
-      <FormGroup>
-        <label>Max Bitrate</label>
-        <Input
-          id="height"
-          onChange={ (e) => props.callback(e,"audio_max_bitrate")}
-          defaultValue={props.creative.audio_max_bitrate}
-          type="text"
-        />
-      </FormGroup>
-    </Col>
     <Col className="px-md-1" md="2">
       <FormGroup>
         <label>Supported Protocols</label>
         <Input
           id="height"
           onChange={ (e) => props.callback(e,"audio_protocols")}
-          defaultValue={props.creative.audio_protocols}
-          type="text"
-        />
+          type="select">
+                {protocolOptions(props.creative.audio_protocols)}
+        </Input>
       </FormGroup>
     </Col>
     </Row>
@@ -125,8 +104,8 @@ const AudioEditor = (props) => {
         <Input
           id="height"
           spellCheck={false}
-          onChange={ (e) => props.callback(e,"audio_outgoing_file")}
-          defaultValue={props.creative.audio_outgoing_file}
+          onChange={ (e) => props.callback(e,"htmltemplate")}
+          defaultValue={props.creative.htmltemplate}
           type="textarea"
         />
       </FormGroup>

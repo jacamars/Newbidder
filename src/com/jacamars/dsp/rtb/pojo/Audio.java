@@ -67,14 +67,14 @@ public class Audio {
 			return false;
 		}
 		if (minduration != -1) {
-			if (c.audio_min_duration ==null) {
+			if (c.audio_duration ==null) {
 				if (errorString != null) {
 					errorString.append("Duration of audio creative not specified but impresssion demands it");
 				}
 				probe.process(br.getExchange(),  adId, c.impid, Probe.AUDIO_MISSING_DURATION);
 				return false;
 			}
-			if (c.audio_min_duration != null && c.audio_min_duration < minduration) {
+			if (c.audio_duration != null && c.audio_duration < minduration) {
 				if (errorString != null) {
 					errorString.append("Duration of audio creative is less than duration of impression");
 				}
@@ -83,14 +83,14 @@ public class Audio {
 			}
 		}
 		if (maxduration != -1) {
-			if (c.audio_max_duration ==null) {
+			if (c.audio_duration ==null) {
 				if (errorString != null) {
 					errorString.append("Duration of audio creative not specified but impression demands it");
 				}
 				probe.process(br.getExchange(),  adId, c.impid, Probe.AUDIO_MISSING_DURATION);
 				return false;
 			}
-			if (c.audio_max_duration != null && c.audio_max_duration > maxduration) {
+			if (c.audio_duration != null && c.audio_duration > maxduration) {
 				if (errorString != null) {
 					errorString.append("Duration of audio creative is greater than duration of impression");
 				}
@@ -132,14 +132,14 @@ public class Audio {
 		}
 		
 		if (minbitrate != -1) {
-			if (c.audio_min_bitrate == null) {
+			if (c.audio_bitrate == null) {
 				if (errorString != null) {
 					errorString.append("Impression requires a bitrate, but creative doesn't provide one.");
 				}
 				probe.process(br.getExchange(),  adId, c.impid, Probe.AUDIO_MISSING_BITRATE);
 				return false;
 			}
-			if (c.audio_min_bitrate < minbitrate) {
+			if (c.audio_bitrate < minbitrate) {
 				if (errorString != null) {
 					errorString.append("Bitrate of creative is less than min bit rate of the impression");
 				}
@@ -149,14 +149,14 @@ public class Audio {
 		}
 		
 		if (maxbitrate != -1) {
-			if (c.audio_max_bitrate == null) {
+			if (c.audio_bitrate == null) {
 				if (errorString != null) {
 					errorString.append("Impression requires a bitrate, but creative doesn't provide one.");
 				}
 				probe.process(br.getExchange(),  adId, c.impid, Probe.AUDIO_MISSING_BITRATE);
 				return false;
 			}
-			if (c.audio_max_bitrate > maxbitrate) {
+			if (c.audio_bitrate > maxbitrate) {
 				if (errorString != null) {
 					errorString.append("Bitrate of creative is greater than min bit rate of the impression");
 				}
