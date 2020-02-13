@@ -221,6 +221,14 @@ def GetWeights(camp):
         print('Connection error')
         return 503, None
 
+def MacroSub(data):
+    try:
+        r = requests.post(globalHost, data='{"type":"MacroSub#","data":"' + data + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
     
 def GetBudget(*arg):
     try:

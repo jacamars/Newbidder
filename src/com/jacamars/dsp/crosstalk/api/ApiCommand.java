@@ -166,6 +166,8 @@ public class ApiCommand {
     public static final String SQLGET_CREATIVE = "SQLGetCreative#";
     
     public static final String SQLDELETE_CREATIVE = "SQLDeleteCreative#";
+    
+    public static final String MACROSUB = "MacroSub#";
    
 
 
@@ -499,6 +501,10 @@ public class ApiCommand {
             	
             case SQLDELETE_CREATIVE:
             	cmd = mapper.readValue(data, SQLDeleteCreativeCmd.class);
+            	break;
+            	
+            case MACROSUB:
+            	cmd = mapper.readValue(data, MacroSubCmd.class);
             	break;
             	
             default:
