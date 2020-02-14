@@ -185,6 +185,8 @@ public class Creative  {
 	
 	/** The budget for this creative */
 	public Budget budget = new Budget();
+	public Long interval_start;
+	public long interval_end;
 	
 	/** This class's logger */
 	static final Logger logger = LoggerFactory.getLogger(Creative.class);
@@ -1193,17 +1195,19 @@ public class Creative  {
 		// assign the fixed nodes
 		fixedNodes.add(new FixedNodeStatus());
         fixedNodes.add(new FixedNodeNonStandard());
+        attributes.add(new FixedNodeDoSize());
 
-        // These are impression releated
+        // These are impression related
 		attributes.add(new FixedNodeRequiresDeal());
 		attributes.add(new FixedNodeNoDealMatch());
-		attributes.add(new FixedNodeIsVideo());
-		attributes.add(new FixedNodeIsNative());
-		attributes.add(new FixedNodeIsBanner());
-		attributes.add(new FixedNodeDoNative());
-        attributes.add(new FixedNodeDoSize());
-		attributes.add(new FixedNodeDoVideo());
-		attributes.add(new FixedNodeDoAudio());
+		if (isVideo)
+			attributes.add(new FixedNodeIsVideo());
+		if (isNative)
+			attributes.add(new FixedNodeIsNative());
+		if (isBanner)
+			attributes.add(new FixedNodeIsBanner());
+		if (isAudio)
+			attributes.add(new FixedNodeDoAudio());
 	}
 
     /**
@@ -1459,7 +1463,7 @@ public class Creative  {
 	
 	public boolean isActive(String cid) throws Exception {
 
-		if (budgetExceeded(cid))
+		if (budgetExceeded(cid)) 
 			return false;
 		return true;
 	}
@@ -1592,7 +1596,7 @@ public class Creative  {
 		doStandardRtb();
 	}
 	
-	/**
+	/** 1584205833725
 	 * Compiles the exchange specific attributes, like for Stroer and Adx.
 	 * 
 	 * @param creative
@@ -1848,6 +1852,8 @@ public class Creative  {
 		name = myNode.get("name").asText();
 		
 		Object x = myNode.get(TOTAL_COST);  // this will be null on network update, but not when instantiating from the db
+		interval_start = budget.activate_time = myNode.get("interval_start").asLong();
+		interval_end = budget.expire_time = myNode.get("interval_end").asLong();
 		if (x != null) {
 			double dt = myNode.get(TOTAL_COST).asDouble(0);
 			budget.totalCost.set(dt);

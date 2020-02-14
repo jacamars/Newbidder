@@ -85,7 +85,7 @@ public class SQLGetNewCampaignCmd extends ApiCommand {
 			try {
 				data =  new Campaign();
 				data.budget = new Budget();
-				data.adId = campaign;
+				data.name = campaign;
 				return;
 			} catch (Exception err) {
 				error = true;

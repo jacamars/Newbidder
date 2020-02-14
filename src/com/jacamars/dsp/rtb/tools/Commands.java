@@ -229,7 +229,7 @@ public class Commands implements WatchInterface {
 				List<Campaign> clist = CampaignCache.getClientInstance(client).getCampaigns();
 				List<String> names = new ArrayList();
 				for (Campaign cm : clist) {
-					names.add(cm.adId);
+					names.add(cm.name);
 				}
 				System.out.println(names);
 				break;
@@ -251,7 +251,7 @@ public class Commands implements WatchInterface {
 				String fileName = sub.get(0);
 				String contents = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
 		    	c = mapper.readValue(contents, Campaign.class);
-				CampaignCache.getClientInstance(client).addCampaign(c.adId,c);
+				CampaignCache.getClientInstance(client).addCampaign(c.name,c);
 				break;
 
 			case "add-campaigns":

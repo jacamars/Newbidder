@@ -133,7 +133,7 @@ public class Entry {
      */
     public static void main( String [] args)  {
         Campaign c = new Campaign();
-        c.adId = "test";
+        c.name = "test";
         Entry e = new Entry(c,(long)(.0833*1000000));
         System.out.println("MAX SPEND/SECOND: " + e.spendRate);
 

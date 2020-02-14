@@ -77,7 +77,7 @@ public class AdxBidResponse extends BidResponse {
 		this.creat = creat;
 		this.br = br;
 		this.imp = imp;
-		adid = camp.adId;
+		adid = camp.name;
 		
 		
 		slotBuilder = RealtimeBidding.BidResponse.Ad.AdSlot.newBuilder();
@@ -90,7 +90,7 @@ public class AdxBidResponse extends BidResponse {
 		AdSlot  adSlot = slotBuilder.build();
 		Ad ad = adBuilder.addAdslot(adSlot).build();	
 
-		adBuilder.setBuyerCreativeId(camp.adId + ":" + creat.impid);
+		adBuilder.setBuyerCreativeId(camp.name + ":" + creat.impid);
 		adList.add(adBuilder.build());
 	
 		internal = RealtimeBidding.BidResponse.newBuilder()
@@ -264,7 +264,7 @@ class SeatBid {
 		Bid x = new Bid();
 
 		x.bidid = x.id = Integer.toString(bx.adSlotId);
-		x.adId = parent.camp.adId;
+		x.adId = parent.camp.name;
 		x.price = parent.cost;			// PRICE BID ON ADX is Micros, not Millis, we expect Millis
 		x.adm = parent.admAsString;
 		x.crid = parent.creat.impid;

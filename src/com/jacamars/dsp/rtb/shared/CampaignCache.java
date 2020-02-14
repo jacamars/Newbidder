@@ -159,7 +159,7 @@ public enum CampaignCache  {
                     mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
             
             for (Campaign c : list) {
-            	cache.set(c.adId, c);
+            	cache.set(c.name, c);
             }
            
         } catch (Exception error) {
@@ -174,8 +174,8 @@ public enum CampaignCache  {
     public void deleteCampaigns() throws Exception {
     	List<Campaign> camps = getCampaigns();
     	for (Campaign c : camps) {
-    		System.out.println("=-->" + c.adId);
-    		deleteCampaign(c.adId);
+    		System.out.println("=-->" + c.name);
+    		deleteCampaign(c.name);
     	}
     }
     
@@ -184,8 +184,8 @@ public enum CampaignCache  {
                  mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
          
          for (Campaign c : list) {
-         	cache.set(c.adId, c);
-         	Campaign x = cache.get(c.adId);
+         	cache.set(c.name, c);
+         	Campaign x = cache.get(c.name);
          }
          
     }
@@ -206,7 +206,7 @@ public enum CampaignCache  {
      * @throws Exception on access errors.
      */
     public Campaign editCampaign(Campaign x) throws Exception  {
-    	cache.set(x.adId, x);
+    	cache.set(x.name, x);
         return x;
     }
     
@@ -220,7 +220,7 @@ public enum CampaignCache  {
 	public Campaign createStub(String name, String id) throws Exception {
 		String content = new String(Files.readAllBytes(Paths.get("stub.json")));
 		Campaign c = new Campaign(content);
-		c.adId = name + ":" + id;
+		c.name = name + ":" + id;
 		return c;
 	}
 	

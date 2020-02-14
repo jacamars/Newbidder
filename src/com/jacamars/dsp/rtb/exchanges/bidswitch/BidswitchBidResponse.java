@@ -36,7 +36,7 @@ public class BidswitchBidResponse extends BidResponse {
 		this.camp = camp;
 		this.creat = creat;
 		this.price = Double.toString(price);
-		this.adid = camp.adId;
+		this.adid = camp.name;
 		this.imageUrl = substitute(creat.imageurl);
 		this.crid = creat.impid;
 		this.domain = br.siteDomain;
@@ -51,7 +51,7 @@ public class BidswitchBidResponse extends BidResponse {
 		this.timestamp = System.currentTimeMillis();
 
 		impid = imp.getImpid();
-		adid = camp.adId;
+		adid = camp.name;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
 
@@ -133,7 +133,7 @@ public class BidswitchBidResponse extends BidResponse {
 			snurl.append(oidStr.replaceAll("#", "%23"));
 			response.append("\"nurl\":\"").append(snurl.toString()).append("\",");
 			
-			response.append("\"cid\":\"").append(camp.adId).append("\",");
+			response.append("\"cid\":\"").append(camp.name).append("\",");
 			
 			response.append("\"crid\":\"").append(creat.impid).append("\",");
 			

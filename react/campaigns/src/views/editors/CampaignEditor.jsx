@@ -38,16 +38,23 @@ const CampaignEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [campaign, setCampaign] = useState(props.campaign);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(props.campaign.activate_time));
+  const [endDate, setEndDate] = useState(new Date(props.campaign.expire_time));
   const vx = useViewContext();
 
 const getAttachedCreatives = () => {
   var items = []; 
   items.push();
+  var mt = {
+    banner:campaign.banners,
+    video: campaign.videos,
+    audio: campaign.audios,
+    native:campaign.natives
+  };
   for (var i=0;i<vx.creatives.length;i++) {
     var x = vx.creatives[i];
-    if (campaign.creatives.indexOf(x.id) != -1)
+    var list = mt[x.type];
+    if (list.indexOf(x.id) != -1)
       items.push(<option key={"creatives-"+i} selected>{x.name}</option>);
     else
       items.push(<option key={"creatives-"+i}>{x.name}</option>);
@@ -67,13 +74,13 @@ const getIdOf = (name) => {
 const  addNewCampaign = async () => {
     var x = campaign;
     x.name = document.getElementById("name").value;
-    x.adomain = document.getElementById("adomain").value;
+    x.ad_domain = document.getElementById("adomain").value;
     var forensiq = document.getElementById("fraudSelect").value;
     x.status = document.getElementById("statusSelect").value;
     x.budget.totalBudget = Number(document.getElementById("totalBudget").value);
     x.budget.dailyBudget = Number(document.getElementById("dailyBudget").value);
     x.budget.hourlyBudget= Number(document.getElementById("hourlyBudget").value);
-    x.assignedSpendRate = Number(document.getElementById("spendRate").value);
+    x.spendrate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
 
     var tid = document.getElementById("target").value;
@@ -92,6 +99,40 @@ const  addNewCampaign = async () => {
                      .filter((x) => x.selected)
                      .map((x)=>Number(x.value));
     
+    var cnames = [...document.getElementById("creatives").options]
+                     .filter((x) => x.selected)
+                     .map((x)=>x.value);
+    x.banners = [];
+    x.videos = [];
+    x.audios = [];
+    x.natives = [];
+    for(var i=0;i<cnames.length;i++) {
+      var name = cnames[i];
+      var cr = vx.findCreativeByName(name);
+      if (cr === undef) {
+        alert("DB problem, creative: " + name + " is missing");
+        return;
+      }
+      alert(cr.type);
+      switch(cr.type) {
+        case "banner":
+          x.banners.push(cr.id);
+          break;
+        case "video":
+          x.videos.push(cr.id);
+          break;
+        case "audio":
+          x.audios.push(cr.id);
+          break;
+        case "native":
+          x.natives.push(cr.id);
+          break;
+        default:
+          alert("Type " + cr.type + " unknown for creative " + cr.name);
+          return;
+      }
+    }
+    alert("CNAMES = " + JSON.stringify(cnames,null,2));
    
     if (x.name === "") { alert("Name cannot be blank"); return; }
 
@@ -105,6 +146,9 @@ const  addNewCampaign = async () => {
       x.date.push(startDate.getTime());
       x.date.push(endDate.getTime());
     }
+
+    x.activate_time = startDate.getTime();
+    x.expire_time = endDate.getTime();
     if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
 
     alert(JSON.stringify(x,null,2));
@@ -261,7 +305,7 @@ const getSelectedRegions = () => {
                               <FormGroup>
                                 <label>Creatives</label>
                                 <Input
-                                    id="campaign"
+                                    id="creatives"
                                     type="select" multiple>
                                     {getAttachedCreatives()}
                                 </Input>

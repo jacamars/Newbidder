@@ -24,7 +24,7 @@ public class CampaignBuilderWorker implements Runnable {
 	public CampaignBuilderWorker(JsonNode jnode) {
 		this.jnode = jnode;
 	}
-
+ 
 	@Override
 	public void run() {
 		String campaign = jnode.get("id").asText();
@@ -47,6 +47,7 @@ public class CampaignBuilderWorker implements Runnable {
 					logger.info("New campaign {} going active", campaign);
 					msg = "New campaign going active: " + campaign;
 					Crosstalk.getInstance().addCampaignToRTB(c);
+					Crosstalk.commands.addString(msg);
 				} else {
 					logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
 					Crosstalk.getInstance().parkCampaign(c); 
@@ -77,9 +78,9 @@ public class CampaignBuilderWorker implements Runnable {
 							try {
 								Crosstalk.getInstance().addCampaignToRTB(c);
 							} catch (Exception err) {
-								logger.error("Failed to load campaign {} into bidders, reason: {}", c.adId,
+								logger.error("Failed to load campaign {} into bidders, reason: {}", c.name,
 										err.toString());
-								msg = "Failed to load campaign: " + c.adId + ", error"+ err.toString();
+								msg = "Failed to load campaign: " + c.name + ", error"+ err.toString();
 							}
 						}
 					} else {

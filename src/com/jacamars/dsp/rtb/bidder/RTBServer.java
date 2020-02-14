@@ -676,12 +676,15 @@ public class RTBServer implements Runnable {
 			Thread nthread = new Thread(admin);
 			nthread.start();
 
-			Crosstalk.getInstance();
 			SharedTimer.getInstance("timebase",60);
 
-			
+			 
 			Thread.sleep(1000);
 			int count = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
+			
+			// Start crosstalk after hazelcast comes up
+			Crosstalk.getInstance();
+			
 			if (count > 1) {
 				if (Configuration.getInstance().deadmanSwitch != null) {
 					if (Configuration.getInstance().deadmanSwitch.canRun() == false) {
@@ -1013,7 +1016,7 @@ public class RTBServer implements Runnable {
 		List<Campaign> list = Configuration.getInstance().getCampaignsList();
 		myStatus.campaigns.clear();
 		for (Campaign c : list) {
-			myStatus.campaigns.add(c.adId);
+			myStatus.campaigns.add(c.name);
 		}
 		myStatus.avgx.add(avgx);
 		myStatus.exchanges = BidRequest.getExchangeCounts();

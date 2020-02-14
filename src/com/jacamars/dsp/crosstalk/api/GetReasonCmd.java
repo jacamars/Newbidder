@@ -77,7 +77,7 @@ public class GetReasonCmd extends ApiCommand {
 					Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
 						var camp = e.getValue();
 						try {
-							reasons.add(camp.adId + ": " + camp.report());
+							reasons.add(camp.name + ": " + camp.report());
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -87,7 +87,7 @@ public class GetReasonCmd extends ApiCommand {
 					Crosstalk.getInstance().deletedCampaigns.entrySet().forEach(e->{
 						var camp = e.getValue();
 						try {
-							reasons.add(camp.adId + ": " + camp.report());
+							reasons.add(camp.name + ": " + camp.report());
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();

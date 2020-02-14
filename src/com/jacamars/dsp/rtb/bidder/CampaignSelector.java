@@ -189,11 +189,11 @@ public class CampaignSelector {
 		if (Configuration.getInstance().printNoBidReason) {
 			for (int i = 0; i < candidates.size(); i++) {
 				SelectedCreative cr = candidates.get(i);
-				logger.info("Selected winner {}/{}", cr.campaign.adId, cr.creative.impid);
+				logger.info("Selected winner {}/{}", cr.campaign.name, cr.creative.impid);
 			}
 		}
 		if (RTBServer.frequencyGoverner != null)
-			RTBServer.frequencyGoverner.add(winner.camp.adId, br);
+			RTBServer.frequencyGoverner.add(winner.camp.name, br);
 
 		return winner;
 	}
@@ -258,9 +258,9 @@ class SelectionWorker implements Runnable {
 
 					if (test.isGoverned(br)) {
 						if (Configuration.getInstance().printNoBidReason || this.test)
-							logger.info("This campaign is governed: {}, spec: {}", test.adId, br.synthkey);
+							logger.info("This campaign is governed: {}, spec: {}", test.name, br.synthkey);
 						try {
-							CampaignProcessor.probe.process(br.getExchange(), test.adId, Probe.GLOBAL,
+							CampaignProcessor.probe.process(br.getExchange(), test.name, Probe.GLOBAL,
 									Probe.FREQUENCY_GOVERNED);
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -273,10 +273,10 @@ class SelectionWorker implements Runnable {
 						if (select != null && select.size() != 0) {
 							if (test.isCapped(br, capSpecs)) {
 								if (Configuration.getInstance().printNoBidReason || this.test)
-									logger.info("This campaign is capped: {}, spec: {}", test.adId,
-											capSpecs.get(test.adId));
+									logger.info("This campaign is capped: {}, spec: {}", test.name,
+											capSpecs.get(test.name));
 								try {
-									CampaignProcessor.probe.process(br.getExchange(), test.adId, Probe.GLOBAL,
+									CampaignProcessor.probe.process(br.getExchange(), test.name, Probe.GLOBAL,
 											Probe.FREQUENCY_CAPPED);
 								} catch (Exception error) {
 									error.printStackTrace();
@@ -284,7 +284,7 @@ class SelectionWorker implements Runnable {
 							} else {
 								if (test.frequencyCap != null) {
 									FrequencyCap f = test.frequencyCap.copy();
-									f.capKey = capSpecs.get(test.adId);
+									f.capKey = capSpecs.get(test.name);
 									frequencyCap.add(f);
 								}
 

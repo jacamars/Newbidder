@@ -82,6 +82,7 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
 				
 				Campaign c = mapper.readValue(campaign,Campaign.class);
+				c.setup(node);
 	
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();

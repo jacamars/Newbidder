@@ -71,13 +71,13 @@ public class Stroer extends BidRequest {
 		
 		
 		if (creat.extensions == null || creat.extensions.size() == 0)
-			throw new Exception(camp.adId + "/"+ creat.impid + " is missing required extensions for Stroer SSP");
+			throw new Exception(camp.name + "/"+ creat.impid + " is missing required extensions for Stroer SSP");
 		
 		String avr = creat.extensions.get("avr");
 		String avn = creat.extensions.get("avn");
 		
 		if (avr == null || avn == null)
-			throw new Exception(camp.adId + "/" + creat.impid + " is missing required avn or avr extension for Stroer SSP");
+			throw new Exception(camp.name + "/" + creat.impid + " is missing required avn or avr extension for Stroer SSP");
 		
 		String rets = getExtension(avr,avn);
 		
@@ -103,13 +103,13 @@ public class Stroer extends BidRequest {
 			SelectedCreative x = multi.get(i);
 			Creative c = x.getCreative();
 			if (c.extensions == null || c.extensions.size() == 0)
-				throw new Exception(x.getCampaign().adId + "/" + c.impid + " is missing required extensions for Stroer SSP");
+				throw new Exception(x.getCampaign().name + "/" + c.impid + " is missing required extensions for Stroer SSP");
 			
 			avr = c.extensions.get("avr");
 			avn = c.extensions.get("avn");
 			
 			if (avr == null || avn == null)
-				throw new Exception(x.getCampaign().adId + "/" + c.impid + " is missing required avn or avr extension for Stroer SSP");
+				throw new Exception(x.getCampaign().name + "/" + c.impid + " is missing required avn or avr extension for Stroer SSP");
 			
 			String rets = getExtension(avr,avn);
 			

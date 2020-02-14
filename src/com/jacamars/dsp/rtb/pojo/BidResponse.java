@@ -132,7 +132,7 @@ public class BidResponse {
 		this.timestamp = System.currentTimeMillis();
 
 		impid = imp.getImpid();
-		adid = camp.adId;
+		adid = camp.name;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
 
@@ -204,7 +204,7 @@ public class BidResponse {
 			this.creat = x.getCreative();
 			this.price = Double.toString(x.price);
 			this.dealId = x.dealId;
-			this.adid = camp.adId;
+			this.adid = camp.name;
 			this.imageUrl = substitute(creat.imageurl);
 			this.crid = creat.impid;
 			this.domain = br.siteDomain;

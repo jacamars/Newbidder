@@ -42,7 +42,8 @@ const CreativeEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [creative, setCreative] = useState(props.creative);
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(props.creative.interval_start));
+  const [endDate, setEndDate] = useState(new Date(props.creative.interval_end));
   const vx = useViewContext();
 
 const getAttachedCampaign = () => {
@@ -112,8 +113,9 @@ const getSelectedRules = () => {
     x.total_budget = Number(document.getElementById("total_budget").value);
     x.hourly_budget = Number(document.getElementById("hourly_budget").value);
     x.daily_budget = Number(document.getElementById("daily_budget").value);
-    x.interval_start = 0;
-    x.interval_end = 0;
+
+    x.interval_start = startDate.getTime();
+    x.interval_end = endDate.getTime();
 
     x.rules = [...document.getElementById("rules").options]
       .filter((x) => x.selected)
@@ -145,6 +147,13 @@ const getSelectedRules = () => {
       default:
         alert("Don't know what size type this creative is");
         return;
+    }
+
+    if (x.isBanner) {
+      if (!x.imageurl) {
+        alert("You must provide an image url");
+        return;
+      }
     }
 
     if (x.isVideo) {
@@ -335,8 +344,8 @@ const getSelectedRules = () => {
                                 <Col>
                                 <DatePicker
                                     id="end"
-                                    selected={startDate}
-                                    onChange={date => setStartDate(date)}
+                                    selected={endDate}
+                                    onChange={date => setEndDate(date)}
                                     showTimeSelect
                                     timeFormat="HH:mm"
                                     timeIntervals={15}

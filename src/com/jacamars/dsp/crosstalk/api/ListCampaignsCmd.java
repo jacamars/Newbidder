@@ -8,6 +8,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 /**
@@ -54,10 +55,10 @@ public class ListCampaignsCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				campaigns = new ArrayList<String>();
-				Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
-					Campaign c = e.getValue();
-					campaigns.add(c.adId);
+				campaigns = new ArrayList<String>(); 
+				var list = Configuration.getInstance().getCampaignsList();
+				list.stream().forEach(e->{
+					campaigns.add(e.name);
 				});
 				return;
 			} catch (Exception err) {

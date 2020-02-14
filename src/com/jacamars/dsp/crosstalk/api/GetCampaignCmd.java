@@ -69,7 +69,7 @@ public class GetCampaignCmd extends ApiCommand {
 				HazelcastInstance hz = RTBServer.getSharedInstance();
 				var clist = CampaignCache.getClientInstance(hz).getCampaigns();
 				for (Campaign c : clist) {
-					if (c.adId.equals(campaign)) {
+					if (c.name.equals(campaign)) {
 						node = c;
 						return;
 					}

@@ -74,7 +74,7 @@ public enum Limiter {
      */
     public void addCampaign(Campaign c) {
         Entry e = new Entry(c, c.effectiveSpendRate);
-        map.put(c.adId,e);
+        map.put(c.name,e);
     }
 
     /**
@@ -84,7 +84,7 @@ public enum Limiter {
      */
     public void addCampaign(Campaign c, long limit) {
         Entry e = new Entry(c, limit);
-        map.put(c.adId,e);
+        map.put(c.name,e);
     }
 
     /**

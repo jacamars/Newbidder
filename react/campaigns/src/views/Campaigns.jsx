@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
+  Alert,
   Badge,
   Button,
   ButtonGroup,
@@ -36,6 +37,8 @@ var undef;
 
   const refresh = async() => {
       await vx.getDbCampaigns();
+      await vx.listCampaigns();
+      redraw();
   }
 
   const makeNew = async() => {
@@ -43,6 +46,10 @@ var undef;
         return;
 
     var camp = await vx.getNewCampaign("My New Campaign");
+    var date = new Date();
+    camp.activate_time = date.getTime();
+    date.setDate(date.getDate() + 30);
+    camp.expire_time = date.getTime();
     setCampaign(camp);
   }
 
@@ -70,9 +77,9 @@ var undef;
   }
 
   const checkRunning = (name) => {
-    for (var i=0;i<vx.runningCampaigns;i++) {
+    for (var i=0;i<vx.runningCampaigns.length;i++) {
       var x = vx.runningCampaigns[i];
-      if (x.name === name)
+      if (x === name)
         return true;
     }
     return false;

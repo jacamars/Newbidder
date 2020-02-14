@@ -69,8 +69,6 @@ public class Campaign implements Comparable, Portable  {
 	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
 	public boolean isAdx;
 	/** points back to the name of the owner of the campaign */
-	public String adId = "default-campaign";
-	/** The campaign name */
 	public String name;
 	/** The default ad domain */
 	public String adomain = "default-domain";
@@ -105,13 +103,15 @@ public class Campaign implements Comparable, Portable  {
 	
 	public transient volatile ProportionalEntry weights;
 	
+	public Long activate_time;
+	public Long expire_time;
 	public Budget budget;
 	
 	/** Database keys for the creatives */
-	public String banners;
-	public String videos;
-	public String audios;
-	public String natives;
+	public List<Integer> banners;
+	public List<Integer> videos;
+	public List<Integer> audios;
+	public List<Integer> natives;
 	/////////////////////////////////////
 	
 	/** The SQL name for this campaign id */
@@ -172,7 +172,7 @@ public class Campaign implements Comparable, Portable  {
     transient JsonNode myNode;
     transient Targeting targeting;
 	/** The exchanges this campaign can be used with */
-	public List<String> exchanges = new ArrayList<String>();
+	public List<String> exchanges = new ArrayList<String>(); 
 	transient List<String> bcat = new ArrayList<String>();
 	transient String capSpec;	
 	/** Number of seconds before the frequency cap expires */
@@ -194,7 +194,7 @@ public class Campaign implements Comparable, Portable  {
 		map.put("pixels", pixels);
 		map.put("clicks", clicks);
 		map.put("adspend", adspend);
-		return map;
+		return map; 
 	}
     
     /**
@@ -297,11 +297,9 @@ public class Campaign implements Comparable, Portable  {
 		this.adomain = camp.adomain;
 		this.attributes = camp.attributes;
 		this.creatives = camp.creatives;
-		this.adId = camp.adId;
 		this.name = camp.name;
 		this.forensiq = camp.forensiq;
 		this.status = camp.status;
-		this.name = camp.name;
 		this.frequencyCap = camp.frequencyCap;
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
@@ -356,7 +354,7 @@ public class Campaign implements Comparable, Portable  {
 	public boolean isCapped(BidRequest br, Map<String, String> capSpecs) {
 		if (frequencyCap == null)
 			return false;
-		return frequencyCap.isCapped(br,capSpecs,adId);
+		return frequencyCap.isCapped(br,capSpecs,name);
 	}
 
 	/**
@@ -368,7 +366,7 @@ public class Campaign implements Comparable, Portable  {
 		if (RTBServer.frequencyGoverner == null || FrequencyGoverner.silent)
 			return false;
 
-		return RTBServer.frequencyGoverner.contains(adId,br);
+		return RTBServer.frequencyGoverner.contains(name,br);
 	}
 	/**
 	 * Return the Lucene query string for this campaign's attributes
@@ -469,7 +467,7 @@ public class Campaign implements Comparable, Portable  {
 	 * @param nodes nodes. List - the list of nodes to add.
 	 */
 	public Campaign(String id, List<Node> nodes) {
-		this.adId = id;
+		this.name = id;
 		this.attributes.addAll(nodes);
 	}
 	
@@ -539,7 +537,7 @@ public class Campaign implements Comparable, Portable  {
 		if (k == 0)
 			k = 1;
 		effectiveSpendRate = assignedSpendRate / k;
-		Limiter.getInstance().setSpendRate(adId, effectiveSpendRate);
+		Limiter.getInstance().setSpendRate(name, effectiveSpendRate);
 	}
 
 	/**
@@ -559,7 +557,7 @@ public class Campaign implements Comparable, Portable  {
 	@Override
 	public int compareTo(Object o) {
 		Campaign other = (Campaign)o;
-		if (this.adId.equals(other.adId))
+		if (this.name.equals(other.name))
 			return 1;
 		
 		return 0;
@@ -645,20 +643,20 @@ public class Campaign implements Comparable, Portable  {
 	public void runUsingElk() {
 		try {
 
-			budget.totalCost.set(BudgetController.getInstance().getCampaignTotalSpend(adId));
-			budget.dailyCost.set(BudgetController.getInstance().getCampaignDailySpend(adId));
-			budget.hourlyCost.set(BudgetController.getInstance().getCampaignHourlySpend(adId));
+			budget.totalCost.set(BudgetController.getInstance().getCampaignTotalSpend(name));
+			budget.dailyCost.set(BudgetController.getInstance().getCampaignDailySpend(name));
+			budget.hourlyCost.set(BudgetController.getInstance().getCampaignHourlySpend(name));
 
-			logger.debug("*** ELK TEST: Updating budgets CAMPAIGN:{}", adId);
+			logger.debug("*** ELK TEST: Updating budgets CAMPAIGN:{}", name);
 			logger.debug("Total cost: {}, daily cost: {}, hourly cost: {}", budget.totalCost.getDoubleValue(),
 					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
 
 			for (Creative c : creatives) {
-				c.runUsingElk(adId);
+				c.runUsingElk(name);
 			}
 
 		} catch (Exception error) {
-			var msg = "ELK is not accessible, no accounting data is possible for: " + adId;
+			var msg = "ELK is not accessible, no accounting data is possible for: " + name;
 			ChattyErrors.printErrorEveryHour(logger, msg);
 		}
 	}
@@ -706,7 +704,7 @@ public class Campaign implements Comparable, Portable  {
 		}
 
 		if (budgetExceeded()) {
-			logger.debug("BUDGET EXCEEDED: {}", adId);
+			logger.debug("BUDGET EXCEEDED: {}", name);
 			return false;
 		}
 		
@@ -717,15 +715,15 @@ public class Campaign implements Comparable, Portable  {
 
 			if (budget.daypart != null) {
 				if (budget.daypart.isActive() != true) {
-					logger.debug("Daypart is not active: {}", adId);
+					logger.debug("Daypart is not active: {}", name);
 					return false;
 				}
 			}
 
-			logger.debug("IS ACTIVE: {}", adId);
+			logger.debug("IS ACTIVE: {}", name);
 			return true;
 		} else {
-			logger.debug("ACTIVATION TIME NOT IN RANGE: {}", adId);
+			logger.debug("ACTIVATION TIME NOT IN RANGE: {}", name);
 			return false;
 		}
 	}
@@ -736,7 +734,7 @@ public class Campaign implements Comparable, Portable  {
 		if (budget == null || budget.totalBudget.doubleValue()==0)
 			return false;
 
-		return BudgetController.getInstance().checkCampaignBudgets(adId,budget.totalBudget, 
+		return BudgetController.getInstance().checkCampaignBudgets(name,budget.totalBudget, 
 				budget.dailyBudget, budget.hourlyBudget);
 	}
 
@@ -752,7 +750,7 @@ public class Campaign implements Comparable, Portable  {
 	public boolean canBePurged() throws Exception {
 		if (isExpired())
 			return true;
-		return BudgetController.getInstance().checkCampaignTotalBudgetExceeded(adId, budget.totalBudget);
+		return BudgetController.getInstance().checkCampaignTotalBudgetExceeded(name, budget.totalBudget);
 	}
 
 	public boolean addToRTB() throws Exception {
@@ -768,20 +766,24 @@ public class Campaign implements Comparable, Portable  {
 		this.status = status;
 	}
 	
+	public void setup(JsonNode n) throws Exception {
+		myNode = n;
+		setup();
+	}
+	
 	void setup() throws Exception {
 		// process
 		name = myNode.get("name").asText();
 		id = myNode.get(CAMPAIGN_ID).asInt();
-		adId = myNode.get(CAMPAIGN_ID).asText();
 		budget = new Budget();
 		
 		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
 		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost"));
 		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost"));
 		if (myNode.get(EXPIRE_TIME) != null)
-				budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
+				expire_time = budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
 		if (myNode.get(ACTIVATE_TIME) != null)
-			budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
+			activate_time = budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
 		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
 
 		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
@@ -839,6 +841,14 @@ public class Campaign implements Comparable, Portable  {
 		forensiq = myNode.get("forensiq").asBoolean();
 		assignedSpendRate = myNode.get("spendrate").asInt();
 		regions = myNode.get("regions").asText();
+		if (myNode.get("banners") != null)
+			banners = getList(myNode.get("banners"));
+		if (myNode.get("videos") != null)
+			videos = getList(myNode.get("videos"));
+		if (myNode.get("audios") != null)
+			audios = getList(myNode.get("audios"));
+		if (myNode.get("natives") != null)
+			natives = getList(myNode.get("natives"));
 		/**
 		 * Do this last
 		 */
@@ -847,21 +857,23 @@ public class Campaign implements Comparable, Portable  {
 		if (x == null || x instanceof NullNode || ((JsonNode)x).asInt() == 0) {
 			if (!isActive())
 				return;
-			throw new Exception("Can't have null targetting for campaign " + adId);
+			throw new Exception("Can't have null targetting for campaign " + name);
 		}
 		if (x != null)
 			target_id = ((JsonNode)x).asInt();
 		
-		if (myNode.get("banners") != null) 
-			banners = myNode.get("banners").asText();
-		if (myNode.get("videos") != null)
-			videos = myNode.get("videos").asText();
-		if (myNode.get("audios") != null)
-			audios = myNode.get("audios").asText();
-		if (myNode.get("natives") != null)
-			natives = myNode.get("natives").asText();
-		
 		processCreatives();
+	}
+	
+	List<Integer> getList(JsonNode n) {
+		List<Integer> list = new ArrayList<>();
+		if (n instanceof ArrayNode == false)
+			throw new RuntimeException("Node is not not an array");
+		ArrayNode an = (ArrayNode)n;
+		for (int i=0;i<an.size();i++) {
+			list.add(an.get(i).asInt());
+		}
+		return list;
 	}
 	
 	/**
@@ -871,21 +883,10 @@ public class Campaign implements Comparable, Portable  {
 	void processCreatives() throws Exception {
 		if (creatives == null) 
 			creatives = new ArrayList<>();
-		List<Integer> ids = new ArrayList<>();
-		Targeting.getIntegerList(ids, banners);
-		ids.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
-		
-		ids.clear();
-		Targeting.getIntegerList(ids, videos);
-		ids.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
-		
-		ids.clear();
-		Targeting.getIntegerList(ids, audios);
-		ids.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
-		
-		ids.clear();
-		Targeting.getIntegerList(ids, natives);
-		ids.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
+		banners.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
+		videos.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
+		audios.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
+		natives.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
 	}
 	
 	public boolean process() throws Exception {
@@ -894,14 +895,14 @@ public class Campaign implements Comparable, Portable  {
 		List<Creative> list = new ArrayList<Creative>();
 
 		for (Creative c : parkedCreatives) {
-			if (!c.budgetExceeded(adId)) {
+			if (!c.budgetExceeded(name)) {
 				unpark(c);
 				change = true;
 			}
 		}
 
 		for (Creative creative : creatives) {
-			if (creative.budgetExceeded(adId)) {
+			if (creative.budgetExceeded(name)) {
 				list.add(creative);
 				change = true;
 			}
@@ -924,7 +925,7 @@ public class Campaign implements Comparable, Portable  {
 		if (target_id == 0) {
 			if (!isActive())
 				return;
-			throw new Exception("No targeting record was found. for " + adId);
+			throw new Exception("No targeting record was found. for " + name);
 		}
  
 		targeting = Targeting.getInstance(target_id); 
@@ -1011,16 +1012,16 @@ public class Campaign implements Comparable, Portable  {
 	 * @return String. The reasons why...
 	 * @throws Exception on ES errors.
 	 */
-	public String report() throws Exception {
+	public String report() throws Exception { 
 		String reason = "";
 		if (budgetExceeded()) {
 			if (reason.length() != 0)
 				reason += " ";
-			if (BudgetController.getInstance().checkCampaignBudgetsTotal(adId, budget.totalBudget))
+			if (BudgetController.getInstance().checkCampaignBudgetsTotal(name, budget.totalBudget))
 				reason += "Campaign total budget exceeded. ";
-			if (BudgetController.getInstance().checkCampaignBudgetsDaily(adId, budget.dailyBudget))
+			if (BudgetController.getInstance().checkCampaignBudgetsDaily(name, budget.dailyBudget))
 				reason += "Campaign daily budget exceeded. ";
-			if (BudgetController.getInstance().checkCampaignBudgetsHourly(adId, budget.hourlyBudget))
+			if (BudgetController.getInstance().checkCampaignBudgetsHourly(name, budget.hourlyBudget))
 				reason += "Campaign hourly budget exceeded. ";
 		}
 		
@@ -1051,7 +1052,7 @@ public class Campaign implements Comparable, Portable  {
 				Map<String, Object> r = new HashMap<String, Object>();
 				r.put("creative",p.impid);
 				List<String> reasons = new ArrayList<String>();
-				if (p.budgetExceeded(adId)) {
+				if (p.budgetExceeded(name)) {
 					reasons.add("nobudget");
 				}
 
@@ -1063,7 +1064,7 @@ public class Campaign implements Comparable, Portable  {
 			reason += DbTools.mapper.writeValueAsString(xreasons);
 		}
 		if (reason.length() > 0)
-			logger.info("Campaign {} not loaded: {}",adId, reason);
+			logger.info("Campaign {} not loaded: {}",name, reason);
 
 		if (reason.length() == 0)
 			reason = "Runnable";
@@ -1089,7 +1090,7 @@ public class Campaign implements Comparable, Portable  {
 		for (int i = 0; i < array.size(); i++) {
 			ObjectNode node = (ObjectNode) array.get(i);
 			Creative creative = new Creative(node, isBanner); 
-			if (!(creative.budgetExceeded(adId))) {
+			if (!(creative.budgetExceeded(name))) {
 				unpark(creative);
 			} else {
 				park(creative);
@@ -1135,8 +1136,12 @@ public class Campaign implements Comparable, Portable  {
 		 +"regions,"
 		 +"target_id,"
 		 +"rules,"
+		 +"banners,"
+		 +"videos,"
+		 +"audios,"
+		 +"natives,"
 		 +"spendrate) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -1190,10 +1195,29 @@ public class Campaign implements Comparable, Portable  {
 			p.setArray(15, rulesArray);
 		else
 			p.setNull(15, Types.ARRAY);
-		p.setInt(16,(int)c.assignedSpendRate);
+
+		if (c.banners != null) 
+			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
+		else
+			p.setNull(16,Types.ARRAY);
+		if (c.videos != null) 
+			p.setArray(17, conn.createArrayOf("int",c.videos.toArray()));
+		else
+			p.setNull(17,Types.ARRAY);
+		if (c.audios != null) 
+			p.setArray(18, conn.createArrayOf("int",c.audios.toArray()));
+		else
+			p.setNull(18,Types.ARRAY);
+		if (c.natives != null) 
+			p.setArray(19, conn.createArrayOf("int",c.natives.toArray()));
+		else
+			p.setNull(19,Types.ARRAY);
+		
+		p.setInt(20,(int)c.assignedSpendRate);
 		
 		return p;
 	}
+
 	
 	static PreparedStatement doUpdate(Campaign c,  Connection conn) throws Exception {
 		PreparedStatement p = null;
@@ -1218,6 +1242,10 @@ public class Campaign implements Comparable, Portable  {
 		 +"regions=?,"
 		 +"target_id=?,"
 		 +"rules=?,"
+		 +"banners=?,"
+		 +"videos=?,"
+		 +"audios=?,"
+		 +"natives=?,"
 		 +"spendrate=? WHERE id=?";
 
 		
@@ -1276,9 +1304,27 @@ public class Campaign implements Comparable, Portable  {
 			p.setArray(15, rulesArray);
 		else
 			p.setNull(15, Types.ARRAY);
-		p.setInt(16, (int)c.assignedSpendRate);
 		
-		p.setInt(17, c.id);
+		if (c.banners != null) 
+			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
+		else
+			p.setNull(16,Types.ARRAY);
+		if (c.videos != null) 
+			p.setArray(17, conn.createArrayOf("int",c.videos.toArray()));
+		else
+			p.setNull(17,Types.ARRAY);
+		if (c.audios != null) 
+			p.setArray(18, conn.createArrayOf("int",c.audios.toArray()));
+		else
+			p.setNull(18,Types.ARRAY);
+		if (c.natives != null) 
+			p.setArray(19, conn.createArrayOf("int",c.natives.toArray()));
+		else
+			p.setNull(19,Types.ARRAY);
+		
+		p.setInt(20, (int)c.assignedSpendRate);
+		
+		p.setInt(21, c.id);
 
 		
 		return p;

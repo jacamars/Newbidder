@@ -30,7 +30,7 @@ public class AppnexusBidResponse extends BidResponse {
 		this.dealId = dealId;
 
 		impid = imp.getImpid();
-		adid = camp.adId;
+		adid = camp.name;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
 

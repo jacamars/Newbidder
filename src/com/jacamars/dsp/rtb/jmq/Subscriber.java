@@ -53,7 +53,7 @@ public class Subscriber extends TailerListenerAdapter implements Runnable, Subsc
 
 	public static ObjectMapper mapper = new ObjectMapper();
 
-	Context context = JMQContext.getInstance();
+	Context context = JMQContext.getInstance(); 
 	EventIF handler;
 	Socket subscriber;
 	Thread me;
@@ -121,6 +121,7 @@ public class Subscriber extends TailerListenerAdapter implements Runnable, Subsc
 		this.inst = inst;
 		this.handler = handler;
 		this.address = address;
+		init();
 	}
 
 	public Subscriber(EventIF handler, String address) throws Exception {

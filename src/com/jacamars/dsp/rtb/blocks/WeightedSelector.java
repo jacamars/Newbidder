@@ -109,7 +109,7 @@ public class WeightedSelector extends LookingGlass {
                 return list.get(0);
             else {
                 // This is an error condition.
-                logger.error("Error obtaining algorithm {} for campaign {}, choosing the deault", c.algorithm, c.adId);
+                logger.error("Error obtaining algorithm {} for campaign {}, choosing the deault", c.algorithm, c.name);
                 return sc;
             }
         }
@@ -118,7 +118,7 @@ public class WeightedSelector extends LookingGlass {
         ProportionalRandomCollection rc = (ProportionalRandomCollection)ws;
         if (rc == null) {
             // This is an error condition.
-            logger.error("Error obtaining algorithm {} for campaign {}, choosing the deault", c.algorithm, c.adId);
+            logger.error("Error obtaining algorithm {} for campaign {}, choosing the deault", c.algorithm, c.name);
             return sc;
         }
 

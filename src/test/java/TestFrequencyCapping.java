@@ -75,7 +75,7 @@ public class TestFrequencyCapping {
 			assertTrue(x == 0);
 			
 			for (Campaign c : Configuration.getInstance().getCampaignsListReal()) {
-				if (c.adId.equals("block-test")) {
+				if (c.name.equals("block-test")) {
 					c.frequencyCap.capFrequency = 3;
 					break;
 				}
@@ -156,7 +156,7 @@ public class TestFrequencyCapping {
 
 		// Make sure cap is > 3
 		for (Campaign c : Configuration.getInstance().getCampaignsListReal()) {
-			if (c.adId.equals("block-test")) {
+			if (c.name.equals("block-test")) {
 				c.frequencyCap.capFrequency = 3;
 				break;
 			}
@@ -204,7 +204,7 @@ public class TestFrequencyCapping {
 			
 			
 			for (Campaign c : Configuration.getInstance().getCampaignsListReal()) {
-				if (c.adId.equals("block-test")) {
+				if (c.name.equals("block-test")) {
 					c.frequencyCap.capFrequency = 1;
 					break;
 				}

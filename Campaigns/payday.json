@@ -35,7 +35,7 @@
     "trace": "$TRACE",
     "stopped" : false,
     "ttl" : 300,
-    "demodb": "$DEMODB",
+    "NOdemodb": "$DEMODB",
     "pixel-tracking-url" : "$EXTERNAL/pixel",
     "clickurl" : "$EXTERNAL/click",
     "winurl" : "$EXTERNAL/rtb/win",
@@ -56,7 +56,7 @@
       "zipcodes" : ""
     },
 
-    "zeromq" : {
+    "pubsub" : {
       "bidchannel" : "kafka://[$BROKERLIST]&topic=bids",
       "winchannel" : "kafka://[$BROKERLIST]&topic=wins",
       "requests" : "kafka://[$BROKERLIST]&topic=requests",

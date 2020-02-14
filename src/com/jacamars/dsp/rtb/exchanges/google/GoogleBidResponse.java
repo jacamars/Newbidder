@@ -105,7 +105,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 			this.creat = x.getCreative();
 			this.price = Double.toString(x.price /* * 1000000 */);
 			this.dealId = x.dealId;
-			this.adid = camp.adId;
+			this.adid = camp.name;
 			this.imageUrl = substitute(creat.imageurl);
 			String billingId = getBillingId(camp,creat);
 			
@@ -124,7 +124,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 			bb.setW(this.width);
 			bb.setH(this.height);
 			bb.setCid(billingId);
-			bb.setAdid(camp.adId);
+			bb.setAdid(camp.name);
 
 			if (creat.w != null)
 				bb.setW(creat.w);
@@ -222,7 +222,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 		String billingId = getBillingId(camp,creat);
 
 		impid = imp.getImpid();
-		adid = camp.adId;
+		adid = camp.name;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
 
@@ -292,7 +292,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 		
 		Bid.Builder bb = Bid.newBuilder();
 		bb.addAdomain(camp.adomain);
-		bb.setAdid(camp.adId);
+		bb.setAdid(camp.name);
 
 		if (creat.w != null)
 			bb.setW(creat.w);
@@ -368,7 +368,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 		String billingId = creat.extensions.get("billing_id");
 		if (billingId == null) {
 			throw new Exception(
-					x.adId + "/" + c.impid + " is missing required billing_id for Google SSP");
+					x.name + "/" + c.impid + " is missing required billing_id for Google SSP");
 		}
 		return billingId;
 	}

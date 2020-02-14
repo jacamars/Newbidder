@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.common;
 
 import java.io.BufferedReader;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -40,6 +41,7 @@ import com.amazonaws.services.s3.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.google.common.collect.Sets;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.DeadmanSwitch;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
@@ -59,6 +61,8 @@ import com.jacamars.dsp.rtb.fraud.ForensiqClient;
 import com.jacamars.dsp.rtb.fraud.FraudIF;
 import com.jacamars.dsp.rtb.fraud.MMDBClient;
 import com.jacamars.dsp.rtb.geo.GeoTag;
+import com.jacamars.dsp.rtb.jmq.Subscriber;
+import com.jacamars.dsp.rtb.jmq.ZPublisher;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
@@ -202,7 +206,7 @@ public class Configuration {
 	public static volatile NavMap masterCidr = null;
 
 	/**
-	 * ZEROMQ LOGGING INFO
+	 * PUBSUB LOGGING INFO
 	 *
 	 */
 	/** The channel that handles video channels */
@@ -227,15 +231,12 @@ public class Configuration {
 	public volatile String PERF_CHANNEL = null;
 	/** The channel trasnmitting pixels */
 	public volatile String PIXELS_CHANNEL = null;
-	/** The channel the bidder sends command responses out on */
-	public volatile static String RESPONSES_SEND = null;
 	/** The channel the bidder receives responses for commands on */
 	public volatile static String RESPONSES_RECEIVE = null;
 
 	// Channel that reports reasons
 	public volatile static String REASONS_CHANNEL = null;
-	/** Zeromq command port */
-	public volatile static String commandsPort;
+
 	/** Whether to allow multiple bids per response */
 	public volatile static boolean multibid = false;
 
@@ -309,7 +310,7 @@ public class Configuration {
 	static volatile String myIpAddress = null;
 
 	/** 0MQ channel we receive commands from */
-	public static String COMMANDS = null;
+	//public static String COMMANDS = null;
 
 	/**
 	 * Private constructor, class has no public constructor.
@@ -691,9 +692,9 @@ public class Configuration {
 			logger.info("*** JEDISPOOL = {}/{}/{} {}", jedisPool, host, rport, rsize);
 		}
 
-		Map zeromq = (Map) m.get("zeromq");
-		if (zeromq == null) {
-			throw new Exception("Zeromq is mot configured!");
+		Map<String,String> pubsub = (Map) m.get("pubsub");
+		if (pubsub == null) {
+			throw new Exception("Pubsub is mot configured!");
 		}
 
 		String value = null;
@@ -701,48 +702,45 @@ public class Configuration {
 		bValue = false;
 
 		/**
-		 * Zeromq
+		 * Pubsub
 		 */
-		if ((value = (String) zeromq.get("videoevents")) != null)
+		if ((value = pubsub.get("videoevents")) != null)
 			VIDEOEVENTS_CHANNEL = value;
-		if ((value = (String) zeromq.get("postbackevents")) != null)
+		if ((value = pubsub.get("postbackevents")) != null)
 			POSTBACKEVENTS_CHANNEL = value;
-		if ((value = (String) zeromq.get("bidchannel")) != null)
+		if ((value = pubsub.get("bidchannel")) != null)
 			BIDS_CHANNEL = value;
-		if ((value = (String) zeromq.get("nobidchannel")) != null)
+		if ((value =  pubsub.get("nobidchannel")) != null)
 			NOBIDS_CHANNEL = value;
-		if ((value = (String) zeromq.get("winchannel")) != null)
+		if ((value = pubsub.get("winchannel")) != null)
 			WINS_CHANNEL = value;
-		if ((value = (String) zeromq.get("requests")) != null)
+		if ((value = pubsub.get("requests")) != null)
 			REQUEST_CHANNEL = value;
-		if ((value = (String) zeromq.get("unilogger")) != null)
+		if ((value = pubsub.get("unilogger")) != null)
 			UNILOGGER_CHANNEL = value;
-		if ((value = (String) zeromq.get("clicks")) != null)
+		if ((value =  pubsub.get("clicks")) != null)
 			CLICKS_CHANNEL = value;
-		if ((value = (String) zeromq.get("pixels")) != null)
+		if ((value = pubsub.get("pixels")) != null)
 			PIXELS_CHANNEL = value;
-		if ((value = (String) zeromq.get("fraud")) != null)
+		if ((value = pubsub.get("fraud")) != null)
 			FORENSIQ_CHANNEL = value;
-		COMMANDS = (String) zeromq.get("commands");
-		RESPONSES_SEND = (String) zeromq.get("responses");
 
-		String test = (String) zeromq.get("frequencygoverner");
+		String test = pubsub.get("frequencygoverner");
 		if (test != null && test.equals("true"))
 			FrequencyGoverner.silent = false;
 		else
 			FrequencyGoverner.silent = true;
 
-
-		if ((value = (String) zeromq.get("status")) != null)
+		if ((value = pubsub.get("status")) != null)
 			PERF_CHANNEL = value;
 
-		if ((value = (String) zeromq.get("reasons")) != null)
+		if ((value = pubsub.get("reasons")) != null)
 			REASONS_CHANNEL = value;
 
 		/////////////////////////////////////////////////////////////////////
 
-		if (zeromq.get("requeststrategy") != null) {
-			strategy = (String) zeromq.get("requeststrategy");
+		if (pubsub.get("requeststrategy") != null) {
+			strategy = pubsub.get("requeststrategy");
 			if (strategy.equalsIgnoreCase("all") || strategy.equalsIgnoreCase("requests"))
 				requstLogStrategy = REQUEST_STRATEGY_ALL;
 			else if (strategy.equalsIgnoreCase("bids"))
@@ -822,8 +820,7 @@ public class Configuration {
 	                e.printStackTrace();
 	                System.exit(1);
 	            }
-	        }, 0L, 30000, TimeUnit.MILLISECONDS);
-
+	        }, 0L, 30000, TimeUnit.MILLISECONDS); 
 		}
 	}
 
@@ -1469,7 +1466,7 @@ public class Configuration {
 		Iterator<Campaign> it = campaignsList.iterator();
 
 		for (Campaign c : campaignsList) {
-			if (c != null && c.adId.equals(name)) {
+			if (c != null && c.name.equals(name)) {
 				campaignsList.remove(c);
 				overrideList.remove(c);
 				recompile();
@@ -1491,8 +1488,8 @@ public class Configuration {
 	 */
 	public boolean setWeights(String name, String weights) throws Exception {
 		for (Campaign c : campaignsList) {
-			if (c != null && c.adId.equals(name)) {
-				c.setWeights(weights);
+			if (c != null && c.name.equals(name)) {
+				c.setWeights(weights); 
 				return true;
 			}
 		}
@@ -1509,7 +1506,7 @@ public class Configuration {
 	 */
 	public ProportionalEntry getWeights(String name) throws Exception {
 		for (Campaign c : campaignsList) {
-			if (c != null && c.adId.equals(name)) {
+			if (c != null && c.name.equals(name)) {
 				if (c.weights == null) {
 					return null;
 				}
@@ -1589,7 +1586,7 @@ public class Configuration {
 			campaignsLock.lock();
 			for (int i = 0; i < campaignsList.size(); i++) {
 				Campaign test = campaignsList.get(i);
-				if (test.adId.equals(c.adId)) {
+				if (test.name.equals(c.name)) {
 					return true;
 				}
 			}
@@ -1617,7 +1614,7 @@ public class Configuration {
 
 			for (int i = 0; i < campaignsList.size(); i++) {
 				Campaign test = campaignsList.get(i);
-				if (test.adId.equals(c.adId)) {
+				if (test.name.equals(c.name)) {
 					campaignsList.remove(i);
 					overrideList.remove(test);
 					break;
@@ -1691,7 +1688,7 @@ public class Configuration {
 	 */
 	public boolean isRunning(String owner, String name) {
 		for (Campaign c : campaignsList) {
-			if (c.adId.equals(name)) {
+			if (c.name.equals(name)) {
 				return true;
 			}
 		}
@@ -1706,7 +1703,7 @@ public class Configuration {
 	public List<String> getLoadedCampaignNames() {
 		List<String> list = new ArrayList<String>();
 		for (Campaign c : campaignsList) {
-			list.add(c.adId);
+			list.add(c.name);
 		}
 		return list;
 	}
@@ -1723,9 +1720,9 @@ public class Configuration {
 			campaignsLock.lock();
 			List<Campaign> list = CampaignCache.getInstance().getCampaigns();
 			for (Campaign c : list) {
-				if (name.length() == 0 || c.adId.matches(name)) {
+				if (name.length() == 0 || c.name.matches(name)) {
 					addCampaign(c);
-					logger.info("Loaded  {}", c.adId);
+					logger.info("Loaded  {}", c.name);
 				}
 			}
 		} finally {

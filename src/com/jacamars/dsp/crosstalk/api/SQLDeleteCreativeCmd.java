@@ -104,7 +104,7 @@ public class SQLDeleteCreativeCmd extends ApiCommand {
 				st.close();
 				 
 				return;
-			} catch (Exception err) {
+			} catch (Exception err) { 
 				err.printStackTrace();
 				error = true;
 				message = err.toString();

@@ -253,6 +253,14 @@ const  ViewContext = () => {
      return JSON.parse(data.campaign);
     }
 
+    const findCreativeByName = (name) => {
+      for (var i = 0; i < creatives.length; i++) {
+        var c = creatives[i];
+        if (c.name === name) {
+          return c;
+        }
+      } 
+    }
 
     const addNewCampaign = async(e) => {
       var cmd = {
@@ -469,7 +477,7 @@ const  ViewContext = () => {
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
-      creatives, listCreatives, addNewCreative, getCreative, deleteCreative
+      creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName
     };
 };
 

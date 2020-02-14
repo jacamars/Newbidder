@@ -1,7 +1,5 @@
 package com.jacamars.dsp.rtb.bidder;
 
-import java.net.InetAddress;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 
@@ -231,7 +229,7 @@ public enum Controller {
     static Configuration config;
 
     /**
-     * A factory object for making timnestamps
+     * A factory object for making timestamps
      */
     static final JsonNodeFactory factory = JsonNodeFactory.instance;
 
@@ -240,7 +238,7 @@ public enum Controller {
     static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
     /**
-     * Private construcotr with specified hosts
+     * Private constructor with specified hosts
      *
      * @throws Exception on REDIS errors.
      */
@@ -347,7 +345,7 @@ public enum Controller {
      * @throws Exception on redis errors.
      */
     public void addCampaign(Campaign c) throws Exception {
-        Configuration.getInstance().deleteCampaign(c.adId);
+        Configuration.getInstance().deleteCampaign(c.name);
         Configuration.getInstance().addCampaign(c);
     }
 
@@ -396,9 +394,9 @@ public enum Controller {
             responseQueue.add(m);
         } else {
 
-            Configuration.getInstance().deleteCampaign(camp.adId);
+            Configuration.getInstance().deleteCampaign(camp.name);
             Configuration.getInstance().addCampaign(camp);
-            m.msg = "Campaign " + camp.adId + " loaded ok";
+            m.msg = "Campaign " + camp.name + " loaded ok";
             m.name = "AddCampaign Response";
             responseQueue.add(m);
         }
@@ -432,7 +430,7 @@ public enum Controller {
         boolean handled = false;
         Double price = cmd.price;
         for (Campaign campaign : Configuration.getInstance().getCampaignsListReal()) {
-            if (campaign.adId.equals(campName)) {
+            if (campaign.name.equals(campName)) {
                 for (Creative creat : campaign.creatives) {
                     if (creat.impid.equals(creatName)) {
                         creat.price = price;
@@ -470,7 +468,7 @@ public enum Controller {
         m.logtype = c.logtype;
         boolean handled = false;
         for (Campaign campaign : Configuration.getInstance().getCampaignsListReal()) {
-            if (campaign.adId.equals(parts[0])) {
+            if (campaign.name.equals(parts[0])) {
                 for (Creative creat : campaign.creatives) {
                     if (creat.impid.equals(parts[1])) {
                         m.price = creat.price;
@@ -1205,7 +1203,7 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
      */
     Configuration config = Configuration.getInstance();
 
-    long time = 0;
+    long time = 0; 
 
     /**
      * How long since the last we saw a message on the control loop.
@@ -1382,7 +1380,7 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                         String list = "";
                         for (Campaign c : Configuration.getInstance().getCampaignsListReal()) {
                             if (c != null) 
-                            	list += c.adId + " ";
+                            	list += c.name + " ";
                         }
                         BasicCommand cmd = new ListCampaignsResponse(item.from, Configuration.instanceName, list);
                         cmd.from = Configuration.instanceName;

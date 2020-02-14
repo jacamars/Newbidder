@@ -184,7 +184,7 @@ public class BidRequest {
 					} else {
 						if (node.operator != Node.OR) {
 							startBidder();
-							throw new Exception("Malformed OR processing in campaign " + c.adId);
+							throw new Exception("Malformed OR processing in campaign " + c.name);
 						}
 						List<Node> nodes = (List<Node>) node.value;
 						for (int nc = 0; nc < nodes.size(); nc++) {

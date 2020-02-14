@@ -47,7 +47,7 @@
     "port": "$PORT",
     "adminSSL" : false,
     "password" : "startrekisbetterthanstarwars",
-    "zeromq" : {
+    "pubsub" : {
       "bidchannel" : "$BIDSCHANNEL",
       "winchannel" : "$WINSCHANNEL",
       "requests" : "$REQUESTSCHANNEL",

@@ -1,6 +1,7 @@
 package com.jacamars.dsp.crosstalk.budget;
 
 import java.io.IOException;
+
 import java.nio.charset.StandardCharsets;
 
 
@@ -38,6 +39,9 @@ import com.hazelcast.core.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.jmq.EventIF;
+import com.jacamars.dsp.rtb.jmq.Subscriber;
+import com.jacamars.dsp.rtb.jmq.ZPublisher;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
@@ -79,9 +83,6 @@ public enum Crosstalk {
 	static public boolean readBackup = true;
 	
 	public static Map<Integer, JsonNode> globalRtbSpecification;
-	public static ArrayNode campaignRtbStd;
-	public static ArrayNode bannerRtbStd;
-	public static ArrayNode videoRtbStd;
 	public static ArrayNode exchangeAttributes = JdbcTools.factory.arrayNode();
 	
 	/**
@@ -92,6 +93,9 @@ public enum Crosstalk {
 	public static final String BANNER_RTB_STD = "banners_rtb_standards";
 	public static final String VIDEO_RTB_STD = "banner_videos_rtb_standards";
 	
+	
+	public static ZPublisher commands;
+	public static Subscriber commandResponses;
 	
 	static ResultSet rs;
 	
@@ -134,6 +138,13 @@ public enum Crosstalk {
 			}
 		}, 0L, 1L, TimeUnit.MINUTES);
 		
+		
+		commands = new ZPublisher(RTBServer.getSharedInstance(),
+				"hazelcast://topic=rtbcommands");
+		commandResponses = new Subscriber(RTBServer.getSharedInstance(),
+				new Controller(),
+				"hazelcast://topic=rtbcommands");
+		
 		return INSTANCE;
 
 	}
@@ -166,28 +177,6 @@ public enum Crosstalk {
 			}
 		});
 		
-		/*String content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners_rtb_standards.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_videos_rtb_standards.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/banners.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns_rtb_standards.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/campaigns.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/rtb_standards.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/exchange_attributes.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/targets.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/banner_audios.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);
-		content = new String(Files.readAllBytes(Paths.get("data/postgres/targets.sql")), StandardCharsets.UTF_8);
-		stmt.execute(content);*/
 	}
 
 	static void updateBudgets() {
@@ -246,11 +235,11 @@ public enum Crosstalk {
 	 * @throws Exception if there was an error.
 	 */
 	boolean parkCampaign(Campaign camp) throws Exception {
-		if (camp == null || deletedCampaigns.get(camp.adId) != null)
+		if (camp == null || deletedCampaigns.get(camp.name) != null)
 			return false;
 
-		campaigns.delete(camp.adId);
-		deletedCampaigns.put(camp.adId, camp); // add to the deleted campaigns map
+		campaigns.delete(camp.name);
+		deletedCampaigns.put(camp.name, camp); // add to the deleted campaigns map
 
 		return true;
 	}
@@ -280,7 +269,7 @@ public enum Crosstalk {
 	public String update(Campaign campaign, boolean add) throws Exception {
 		String msg = null;
 		
-		Campaign c = getKnownCampaign(campaign.adId);
+		Campaign c = getKnownCampaign(campaign.name);
 
 		// New campaign
 		if (c == null) {
@@ -293,7 +282,7 @@ public enum Crosstalk {
 				msg = "NEW CAMPAIGN GOING ACTIVE: " + campaign;
 			} else {
 				logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
-				deleteCampaign(campaign.adId);
+				deleteCampaign(campaign.name);
 			}
 		} else {
 			// A previously known campaign is updated.
@@ -307,12 +296,12 @@ public enum Crosstalk {
 				try {
 					c.addToRTB(); // notifies the bidder
 				} catch (Exception err) {
-					logger.error("Failed to load campaign {} into bidders, reason: {}", c.adId,err.toString());
+					logger.error("Failed to load campaign {} into bidders, reason: {}", c.name,err.toString());
 				}
 			} else {
 				logger.info("New campaign going inactive:{}, reason: {}", campaign, c.report());
 				msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
-				deleteCampaign(campaign.adId);
+				deleteCampaign(campaign.name);
 			}
 		}
 
@@ -342,9 +331,9 @@ public enum Crosstalk {
 	public String update(String json) throws Exception {
 		Campaign x = new Campaign(json);
 		
-		Campaign c = getKnownCampaign(x.adId);
+		Campaign c = getKnownCampaign(x.name);
 		if (c == null) {
-			throw new Exception("No such campaign: " + x.adId);
+			throw new Exception("No such campaign: " + x.name);
 		}
 		return update(x,true);
 	}
@@ -402,9 +391,7 @@ public enum Crosstalk {
 		var stmt = conn.createStatement();
 		List<Integer> list = new ArrayList<Integer>();
 		globalRtbSpecification = new HashMap<Integer, JsonNode>();
-		bannerRtbStd = JdbcTools.factory.arrayNode();
-		campaignRtbStd = JdbcTools.factory.arrayNode();
-		videoRtbStd = JdbcTools.factory.arrayNode();
+
 
 		for (int i = 0; i < nodes.size(); i++) {
 			ObjectNode x = (ObjectNode) nodes.get(i);
@@ -443,31 +430,6 @@ public enum Crosstalk {
 			globalRtbSpecification.put(child.get("id").asInt(), child);
 		}
 
-		rs = stmt.executeQuery("select * from " + CAMP_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			campaignRtbStd.add(child);
-		}
-
-		rs = stmt.executeQuery("select * from " + BANNER_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			bannerRtbStd.add(child);
-		}
-
-		videoRtbStd = JdbcTools.factory.arrayNode();
-		rs = stmt.executeQuery("select * from " + VIDEO_RTB_STD);
-		std = JdbcTools.convertToJson(rs);
-		it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			videoRtbStd.add(child);
-		}
-
 		exchangeAttributes = JdbcTools.factory.arrayNode();
 		rs = stmt.executeQuery("select * from exchange_attributes");
 		std = JdbcTools.convertToJson(rs);
@@ -481,18 +443,35 @@ public enum Crosstalk {
 		for (int i = 0; i < nodes.size(); i++) {
 			ObjectNode x = (ObjectNode) nodes.get(i);
 			int campaignid = x.get("id").asInt();
-			rs = stmt.executeQuery("select * from banners where campaign_id = " + campaignid);
+			rs = stmt.executeQuery("select * from banners where id = " + campaignid);
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			x.set("banner", inner);
 		}
 
 		// Video
 		for (int i = 0; i < nodes.size(); i++) {
-			ObjectNode x = (ObjectNode) nodes.get(i);
+			ObjectNode x = (ObjectNode) nodes.get(i); 
 			int campaignid = x.get("id").asInt(); ///////// CHECK
-			rs = stmt.executeQuery("select * from banner_videos where campaign_id = " + campaignid);
+			rs = stmt.executeQuery("select * from banner_videos where id = " + campaignid);
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			x.set("banner_video", inner);
+		}
+		
+		// Audio
+		for (int i = 0; i < nodes.size(); i++) {
+			ObjectNode x = (ObjectNode) nodes.get(i); 
+			int campaignid = x.get("id").asInt(); ///////// CHECK
+			rs = stmt.executeQuery("select * from banner_audios where id = " + campaignid);
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			x.set("banner_audio", inner);
+		}
+		// native
+		for (int i = 0; i < nodes.size(); i++) {
+			ObjectNode x = (ObjectNode) nodes.get(i); 
+			int campaignid = x.get("id").asInt(); ///////// CHECK
+			rs = stmt.executeQuery("select * from banner_natives where id = " + campaignid);
+			ArrayNode inner = JdbcTools.convertToJson(rs);
+			x.set("banner_native", inner);
 		}
 	}
 	
@@ -501,21 +480,21 @@ public enum Crosstalk {
 			try {
 				refresh();
 				
-				var name = "accountingCampaigns";
+				var name = "accountingCampaigns"; 
 				campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
 				
 				campaigns.entrySet().forEach(e->{
 					Campaign camp = e.getValue();
 					camp.runUsingElk();
 					try {
-					if (!camp.isActive()) {
-						logger.info("Campaign has become inactive: {}", camp.adId);
+					if (!camp.isActive() || !camp.isRunnable()) {
+						logger.info("Campaign has become inactive: {}", camp.name);
 						removeFromRTB(camp);
 						camp.report();
 						parkCampaign(camp);
 					} 
 					} catch (Exception error) {
-						logger.error("Error scanning campaign: {}, error: {}", camp.adId,error.getMessage());
+						logger.error("Error scanning campaign: {}, error: {}", camp.name,error.getMessage());
 					}
 				});
 				
@@ -527,14 +506,14 @@ public enum Crosstalk {
 					if (camp.isRunnable()) {
 						camp.runUsingElk();
 						if (camp.isActive()) {
-							logger.info("Currently inactive campaign going active: {}", camp.adId);
+							logger.info("Currently inactive campaign going active: {}", camp.name);
 							addCampaignToRTB(camp);
 							additions.add(key);
 							try {
 								//camp.addToRTB();                                  // one at a time, not good. TBD
 								clist.add(key);
 							} catch (Exception error) {
-								logger.error("Error: Failed to load campaign {} into bidders, reason: {}", camp.adId,error.toString());
+								logger.error("Error: Failed to load campaign {} into bidders, reason: {}", camp.name,error.toString());
 							}
 						}
 					}
@@ -568,13 +547,13 @@ public enum Crosstalk {
 			Campaign c = deletedCampaigns.get(key);
 			if (c.canBePurged()) {
 				removeFromRTB(c);
-				list.append(c.adId + " ");
+				list.append(c.name + " ");
 				dc.add(c);
 			}
 		}
 
 		for (Campaign c : dc) {
-			deletedCampaigns.remove("" + c.adId);
+			deletedCampaigns.remove("" + c.name);
 		}
 
 		
@@ -583,10 +562,10 @@ public enum Crosstalk {
 			try {
 			if (c.canBePurged()) {
 				removeFromRTB(c);
-				list.append(c.adId + " ");
+				list.append(c.name + " ");
 			}
 			} catch (Exception error) {
-				logger.error("Error purging campaign: {}: error: {}" + c.adId,error.getMessage());
+				logger.error("Error purging campaign: {}: error: {}" + c.name,error.getMessage());
 			}
 		});
 
@@ -600,7 +579,7 @@ public enum Crosstalk {
 	 * @param camp Campaign. The campaign to add.
 	 */
 	void removeFromRTB(Campaign camp) {
-		campaigns.remove(camp.adId);
+		campaigns.remove(camp.name);
 	}
 	
 	/**
@@ -608,7 +587,7 @@ public enum Crosstalk {
 	 * @param camp Campaign. The campaign to add.
 	 */
 	void addCampaignToRTB(Campaign camp) {
-		campaigns.put(camp.adId,camp);
+		campaigns.put(camp.name,camp);
 	}
 	
 	/**
@@ -655,4 +634,19 @@ public enum Crosstalk {
 		
 	}
 
+}
+
+class Controller implements EventIF {
+
+	@Override
+	public void handleMessage(String id, String msg) {
+		System.out.println("GOT A CONTROL MESSAGE FROM: " + id + " Message is " + msg);
+	}
+
+	@Override
+	public void shutdown() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

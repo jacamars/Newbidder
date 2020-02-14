@@ -131,11 +131,11 @@ public class CampaignProcessor implements Runnable {
 				return;
 			}
 
-			if (!Configuration.getInstance().canBid(camp.adId)) {
-				probe.process(br.getExchange(), camp.adId, Probe.GLOBAL, Probe.SPEND_RATE_EXCEEDED);
+			if (!Configuration.getInstance().canBid(camp.name)) {
+				probe.process(br.getExchange(), camp.name, Probe.GLOBAL, Probe.SPEND_RATE_EXCEEDED);
 				done = true;
 				if (printNoBidReason)
-					logger.info("camp.adId {} spend rate is exceeded: {}", camp.adId, camp.assignedSpendRate);
+					logger.info("camp.adId {} spend rate is exceeded: {}", camp.name, camp.assignedSpendRate);
 				return;
 			}
 
@@ -146,13 +146,13 @@ public class CampaignProcessor implements Runnable {
 
 					if (n.test(br,null,null,null,null,null,null) == false) {
 						if (n.hierarchy == null || n.hierarchy.length()==0) {
-							probe.process(br.getExchange(), camp.adId, Probe.GLOBAL, Probe.SITE_OR_APP_DOMAIN);
+							probe.process(br.getExchange(), camp.name, Probe.GLOBAL, Probe.SITE_OR_APP_DOMAIN);
 						} else {
-							probe.process(br.getExchange(), camp.adId, Probe.GLOBAL, n.hierarchy);
+							probe.process(br.getExchange(), camp.name, Probe.GLOBAL, n.hierarchy);
 						}
 
 						if (printNoBidReason)
-							logger.info("camp.adId {} doesnt match the hierarchy: {}", camp.adId, n.hierarchy);
+							logger.info("camp.adId {} doesnt match the hierarchy: {}", camp.name, n.hierarchy);
 						done = true;
 						if (latch != null)
 							latch.countNull();
@@ -161,7 +161,7 @@ public class CampaignProcessor implements Runnable {
 					}
 				}
 			} catch (Exception error) {
-				logger.error("Campaign: {}, Node {} error, hierarchy: {}, error: {}",camp.adId, n.name,n.hierarchy,error.toString());
+				logger.error("Campaign: {}, Node {} error, hierarchy: {}, error: {}",camp.name, n.name,n.hierarchy,error.toString());
 				System.out.println(br.toString());
 				error.printStackTrace();
 
@@ -181,9 +181,9 @@ public class CampaignProcessor implements Runnable {
 			for (int i=0; i<creatives.size();i++) {
 			    Creative create = creatives.get(i);
 				SelectedCreative sc = null;
-				if ((sc = create.process(br, camp.adId, err, probe)) != null) {
+				if ((sc = create.process(br, camp.name, err, probe)) != null) {
 					sc.campaign = this.camp;
-					probe.process(br.getExchange(), camp.adId, sc.impid);
+					probe.process(br.getExchange(), camp.name, sc.impid);
 					selected.add(sc);
 
 					// Will select the first at random if campaign algorithm is null, otherwise it will
@@ -192,9 +192,9 @@ public class CampaignProcessor implements Runnable {
 						break;
 
 				} else {
-					probe.process(br.getExchange(),camp.adId,"Global",err.toString());
+					probe.process(br.getExchange(),camp.name,"Global",err.toString());
 					if (printNoBidReason) {
-						xerr.append(camp.adId);
+						xerr.append(camp.name);
 						xerr.append("/");
 						xerr.append(create.impid);
 						xerr.append(" ===> ");
@@ -205,7 +205,7 @@ public class CampaignProcessor implements Runnable {
 					    err.setLength(0);
 				}
 			}
-			probe.incrementTotal(br.getExchange(), camp.adId);
+			probe.incrementTotal(br.getExchange(), camp.name);
 			err = xerr;
 
 			if (selected.size() == 0) {
@@ -230,7 +230,7 @@ public class CampaignProcessor implements Runnable {
 					SelectedCreative cr = selected.get(i);
 					str += cr.impid + " ";
 					try {
-						logger.info("{} is candidate, creatives = {}", camp.adId, str);
+						logger.info("{} is candidate, creatives = {}", camp.name, str);
 					} catch (Exception error) {
 						error.printStackTrace();
 					}
@@ -245,7 +245,7 @@ public class CampaignProcessor implements Runnable {
 			if (latch != null)
 				latch.countDown();
 
-			probe.incrementBid(br.getExchange(), camp.adId);
+			probe.incrementBid(br.getExchange(), camp.name);
 			done = true;
 		} catch (Exception error) {
 			error.printStackTrace();

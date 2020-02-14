@@ -30,11 +30,19 @@ var undef;
       setCount(count+1);
   }
 
+  const setDates = (c) => {
+    var date = new Date();
+    c.interval_start = date.getTime();
+    c.interval_end = date.setDate(date.getDate() + 30);
+    return c;
+  }
+
   const makeNewBanner = async() => {
     if (creative !== null)
     return;
 
     var c = await vx.getNewCreative("My New Banner");
+    c = setDates(c);
     c.id = 0;
     c.isVideo = false;
     c.isAudio = false;
@@ -67,6 +75,7 @@ var undef;
       return;
 
     var c = await vx.getNewCreative("My New Video");
+    c = setDates(c);
     c.isVideo = true;
     c.isAudio = false;
     c.isNative = false;
@@ -80,6 +89,7 @@ var undef;
     return;
 
     var c = await vx.getNewCreative("My New Native");
+    c = setDates(c);
     c.isVideo = false;
     c.isAudio = false;
     c.isNative = true;
@@ -104,6 +114,7 @@ var undef;
       return;
 
     var c = await vx.getNewCreative("My New Audio");
+    c = setDates(c);
     c.isVideo = false;
     c.isAudio = true;
     c.isNative = false;

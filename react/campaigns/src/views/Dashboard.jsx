@@ -29,6 +29,7 @@ var undef;
     await vx.getDbCampaigns();
     await vx.listRules();
     await vx.listTargets();
+    await vx.listCampaigns();
     setCount(count+1);
   }
 
@@ -123,7 +124,7 @@ var undef;
                             <th className="text-right">Spend</th>
                           </tr>
                       </thead>
-                      <tbody>
+                      <tbody key={"div-"+count}>
                         { setCampaignsView(vx.runningCampaigns,vx.accounting) }
                       </tbody>
                     </Table>
