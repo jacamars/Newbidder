@@ -1599,8 +1599,7 @@ public class Configuration {
 
 	/**
 	 * Add a campaign to the list of campaigns we are running. Does not add to
-	 * Aerospike.
-	 * 
+
 	 * @param c Campaign. The campaign to add into the accounting.
 	 * @throws Exception if the encoding of the attributes fails.
 	 */
