@@ -86,7 +86,9 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
 				st.close();
-							
+						
+				Crosstalk.getInstance().scan();
+				
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

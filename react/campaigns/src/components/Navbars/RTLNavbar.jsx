@@ -36,6 +36,7 @@ import {
   Container,
   Modal
 } from "reactstrap";
+import { useViewContext } from "../../ViewContext";
 
 class AdminNavbar extends React.Component {
   constructor(props) {

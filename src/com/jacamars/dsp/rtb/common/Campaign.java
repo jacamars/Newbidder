@@ -887,10 +887,14 @@ public class Campaign implements Comparable, Portable  {
 	void processCreatives() throws Exception {
 		if (creatives == null) 
 			creatives = new ArrayList<>();
-		banners.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
-		videos.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
-		audios.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
-		natives.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
+		try {
+			banners.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
+			videos.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
+			audios.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
+			natives.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
+		} catch (Exception error) {
+			logger.error("Database error loading creatives for campaign id: " + id + ", error: " + error.getMessage());
+		}
 	}
 	
 	public boolean process() throws Exception {
@@ -932,7 +936,12 @@ public class Campaign implements Comparable, Portable  {
 			throw new Exception("No targeting record was found. for " + name);
 		}
  
-		targeting = Targeting.getInstance(target_id); 
+		try {
+			targeting = Targeting.getInstance(target_id); 
+		} catch (Exception err) {
+			logger.warn("Campaign id: " + id + " references unknown target id: " + target_id);
+			status = "offline";
+		}
 
 		instantiate("banner", true);
 		instantiate("banner_video", false);

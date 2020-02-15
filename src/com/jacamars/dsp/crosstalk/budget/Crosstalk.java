@@ -263,6 +263,11 @@ public enum Crosstalk {
 		return camp;
 	}
 	
+	public void setKnownCampaign(Campaign c) {
+		if (deletedCampaigns.get(c.id) != null)
+			deletedCampaigns.set(""+c.id, c);
+	}
+	
 	public String update(Campaign campaign, boolean add) throws Exception {
 		String msg = null;
 		
@@ -562,7 +567,7 @@ public enum Crosstalk {
 
 	
 	/**
-	 * Refresh the system. Load all bidders with all runnable campaigns.
+	 *  the system. Load all bidders with all runnable campaigns.
 	 * 
 	 * @return List. The bidder list.
 	 * @throws Exception
@@ -576,7 +581,6 @@ public enum Crosstalk {
 		long time = System.currentTimeMillis();
 	
 		if (array.size()==0) {
-			logger.info("No campaign updates scheduled to be being sent.");
 			return list;
 		}
 		

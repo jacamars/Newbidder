@@ -16,12 +16,20 @@ import {
   Col
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
+import DecisionModal from "../DecisionModal";
 import LoginModal from '../LoginModal'
 import CampaignEditor from './editors/CampaignEditor.jsx'
+import { GridLayer } from "leaflet";
 
 var undef;
 
  const Campaigns = (props) => {
+
+  // Called when page first loads
+  const loadDataOnce = async() => {
+    await vx.getDbCampaigns();
+    await vx.listCampaigns();
+  }
 
   const [count, setCount] = useState(0);
   const [campaign, setCampaign] = useState(null);
@@ -36,8 +44,7 @@ var undef;
   };
 
   const refresh = async() => {
-      await vx.getDbCampaigns();
-      await vx.listCampaigns();
+      loadDataOnce();
       redraw();
   }
 
@@ -55,6 +62,10 @@ var undef;
 
   const editCampaign = async (id) => {
     var x = await vx.getDbCampaign(id);
+    if (x === undef) {
+      alert("Database error on campaign id: " + id);
+      return;
+    }
     setCampaign(x);
   }
 
@@ -89,13 +100,40 @@ var undef;
 
   }
 
+  const RED = {
+    backgroundColor: 'red'
+  }
+  const GREEN = {
+    backgroundColor: 'green'
+  }
+  const GRAY = {
+    backgroundColor: 'gray'
+  }
+  const YELLOW = {
+    backgroundColor: 'goldenrod'
+  }
+
+  const getStyle = (status,name) => {
+    var running = checkRunning(name);
+    if (status !== 'runnable') {
+      if (running)
+        return YELLOW;
+      return GRAY
+    }
+    
+    if (checkRunning(name))
+      return GREEN;
+    return RED;
+  }
+
+
   const getCampaignsView = () => {
 
     console.log("GetCampaigsView, rows = " + vx.campaigns.length);
 
    return(
       vx.campaigns.map((row, index) => (
-        <tr key={'campaignsview-' + row}>
+        <tr key={'campaignsview-' + row} style={getStyle(row.status,row.name)}>
           <td>{index}</td>
           <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
@@ -106,24 +144,47 @@ var undef;
              &nbsp;
             <Button color="warning" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button>
             &nbsp;
-            <Button color="danger" size="sm" onClick={()=>deleteCampaign(row.id)}>Delete</Button></td>
+            <Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button></td>
         </tr>))
     ); 
   }
+
+  // deleteCampaign(row.id)
 
   const update = (e) => {
       setCampaign(null);
       if (e !== null) {
         //alert("NEW CAMPAIGN: " + JSON.stringify(e,null,2));
         vx.addNewCampaign(JSON.stringify(e));
-        vx.getDbCampaigns();
         setCampaign(null);
+
+        setTimeout(refresh,3000);
       }
-      redraw();
   }
+
+  ////////////////////////////// DELETE CAMPAIGN ///////////////////////////////////
+  const [modal, setModal] = useState(false);
+  const [id, setId] = useState(0);
+  const modalCallback = (doit) => {
+    if (doit) {
+      deleteCampaign(id)
+    }
+    setModal(!modal);
+
+  }
+  const showModal = (x) => {
+    setId(x);
+    setModal(true);
+  }
+  /////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <div className="content">
+    { modal &&
+      <DecisionModal title="Really delete campaign?" 
+                     message="Only the db admin can undo this if you delete it!!!" 
+                     name="DELETE"
+                     callback={modalCallback} />}
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
         <Row id={"running-"+count}>
             <Col xs="12">

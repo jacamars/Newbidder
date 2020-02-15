@@ -17,14 +17,24 @@ import {
 import { useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
 import TargetEditor from './editors/TargetEditor.jsx'
+import DecisionModal from "../DecisionModal";
 
 var undef;
 
  const Targets = (props) => {
 
+  // This should be called when the page first loads
+  const loadDataOnce = async() => {
+    await vx.listTargets();
+  }
+
   const vx = useViewContext();
   const [target, setTarget] = useState(null);
   const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (vx.loggedIn)
+      loadDataOnce();
+  }, []);
 
   const redraw = () => {
       setCount(count+1);
@@ -75,14 +85,35 @@ var undef;
            <td key={'targets-id-' + index} className="text-right">{row.id}</td>
            <td className="text-center"><Button color="success" size="sm" onClick={()=>editTarget(row.id)}>Edit</Button>
            &nbsp;
-           <Button color="danger" size="sm" onClick={()=>deleteTarget(row.id)}>Delete</Button></td>
+           <Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button></td>
          </tr>))
      ); 
   }
 
+    ////////////////////////////// DELETE CAMPAIGN ///////////////////////////////////
+    const [modal, setModal] = useState(false);
+    const [id, setId] = useState(0);
+    const modalCallback = (doit) => {
+      if (doit) {
+        deleteTarget(id)
+      }
+      setModal(!modal);
+  
+    }
+    const showModal = (x) => {
+      setId(x);
+      setModal(true);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////
+
   return (
     <div className="content">
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
+    { modal &&
+      <DecisionModal title="Really delete target?" 
+                     message="Only the db admin can undo this if you delete it!!!" 
+                     name="DELETE"
+                     callback={modalCallback} />}
         <Row>
             <Col xs="12">
             { target == null && <>

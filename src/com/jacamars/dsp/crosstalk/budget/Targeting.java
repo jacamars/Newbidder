@@ -91,6 +91,8 @@ public class Targeting {
 		
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		ObjectNode y = (ObjectNode) inner.get(0);
+		if (y == null)
+			throw new Exception("Missing target id: " + id + " in database");
 		return new Targeting(y);
 	}
 	public Targeting() {
@@ -99,6 +101,8 @@ public class Targeting {
 
 	public Targeting(ObjectNode myNode)
 			throws Exception {
+		if (myNode  == null)
+			throw new Exception("Missing target!");
 		this.myNode = myNode;
 		process();
 	}

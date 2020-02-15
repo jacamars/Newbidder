@@ -16,15 +16,25 @@ import {
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
-import CreativeEditor from './editors/CreativeEditor.jsx'
+import CreativeEditor from './editors/CreativeEditor'
+import DecisionModal from '../DecisionModal';
 
 var undef;
 
  const Creatives = (props) => {
 
+  // This should be called when the page first loads
+  const loadDataOnce = async() => {
+    await vx.listCreatives();
+  }
+
   const vx = useViewContext();
   const [creative, setCreative] = useState(null);
   const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (vx.loggedIn)
+      loadDataOnce();
+  }, []);
 
   const redraw = () => {
       setCount(count+1);
@@ -127,7 +137,7 @@ var undef;
       vx.addNewCreative(x);
     }
     setCreative(null)
-    redraw();
+    setTimeout(refresh,2000);
   }
 
   const getBannersView = () => {
@@ -142,7 +152,7 @@ var undef;
             &nbsp;
             <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'banner')}>Edit</Button>
             &nbsp;
-            <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'banner')}>Delete</Button>
+            <Button color="danger" size="sm" onClick={()=>showModal(row.id,'banner')}>Delete</Button>
           </td>
         </tr>))
     ); 
@@ -160,7 +170,7 @@ var undef;
             &nbsp;
             <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'video')}>Edit</Button>
             &nbsp;
-            <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'video')}>Delete</Button>
+            <Button color="danger" size="sm" onClick={()=>showModal(row.id,'video')}>Delete</Button>
           </td>
         </tr>))
     ); 
@@ -178,7 +188,7 @@ const getAudiosView = () => {
           &nbsp;
           <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'audio')}>Edit</Button>
           &nbsp;
-          <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'audio')}>Delete</Button>
+          <Button color="danger" size="sm" onClick={()=>showModal(row.id,'audio')}>Delete</Button>
         </td>
       </tr>))
   ); 
@@ -196,7 +206,7 @@ const getNativesView = () => {
           &nbsp;
           <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'native')}>Edit</Button>
           &nbsp;
-          <Button color="danger" size="sm" onClick={()=>deleteCreative(row.id,'native')}>Delete</Button>
+          <Button color="danger" size="sm" onClick={()=>showModal(row.id,'native')}>Delete</Button>
         </td>
       </tr>))
   );
@@ -206,9 +216,33 @@ const getNativesView = () => {
 
   };
 
+   ////////////////////////////// DELETE CREATIVE ///////////////////////////////////
+   const [modal, setModal] = useState(false);
+   const [id, setId] = useState(0);
+   const [type, setType] = useState('');
+
+   const modalCallback = (doit) => {
+     if (doit) {
+       deleteCreative(id,type)
+     }
+     setModal(!modal);
+ 
+   }
+   const showModal = (x,y) => {
+     setId(x);
+     setType(y);
+     setModal(true);
+   }
+   /////////////////////////////////////////////////////////////////////////////////////
+
   return (
     <div className="content">
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
+    { modal &&
+      <DecisionModal title="Really delete creative?" 
+                     message="Only the db admin can undo this if you delete it!!!" 
+                     name="DELETE"
+                     callback={modalCallback} />}
     { creative === null && <>
         <Row>
             <Col xs="12">

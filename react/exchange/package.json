@@ -17,7 +17,7 @@
     "react-native-elements": "^1.2.7",
     "react-player": "^1.15.2",
     "react-scripts": "2.1.8",
-    "yarn": "^1.21.1"
+    "yarn": "^1.22.0"
   },
   "scripts": {
     "start": "react-scripts start",

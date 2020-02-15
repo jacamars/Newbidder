@@ -448,6 +448,18 @@ const  ViewContext = () => {
       return result.target;
     }
 
+    const forceUpdate = async () => {
+      var cmd = {
+        token: jwt,
+        type: "Refresh#"
+      };
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("ForceUpdate returns: " + JSON.stringify(result.target,null,2));
+      return result.target;
+    }
 
 
     const  execute = async (cmd) =>  {
@@ -477,7 +489,8 @@ const  ViewContext = () => {
       getAccounting, accounting, getCount, getNewCampaign, getNewTarget, getNewRule, reset,
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
-      creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName
+      creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
+      forceUpdate
     };
 };
 

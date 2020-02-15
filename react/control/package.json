@@ -29,7 +29,7 @@
     "react-notification-alert": "0.0.8",
     "react-player": "^1.15.2",
     "react-router-dom": "4.3.1",
-    "react-scripts": "^3.2.0",
+    "react-scripts": "^3.4.0",
     "reactstrap": "6.5.0",
     "use-state-with-callback": "^1.0.18"
   },

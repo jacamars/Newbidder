@@ -21,8 +21,19 @@ var undef;
 
  const Dashboard = (props) => {
 
+  // This should be called when the page first loads
+  const loadDataOnce = async() => {
+    await vx.getAccounting();
+    await vx.listCampaigns();
+    await vx.getDbCampaigns();
+  }
+
   const vx = useViewContext();
   const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (vx.loggedIn)
+      loadDataOnce();
+  }, []);
 
   const refresh = async() => {
     await vx.getAccounting();

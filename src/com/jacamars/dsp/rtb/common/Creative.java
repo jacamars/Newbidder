@@ -282,7 +282,7 @@ public class Creative  {
 		c.id = id;
 		return c;
 		} catch (Exception error) {
-			throw (RuntimeException)error;
+			throw new RuntimeException("Error retreiving banner instance: " + id + ", error: " + error.getMessage());
 		}
 	
 	}
@@ -301,7 +301,7 @@ public class Creative  {
 			c.id = id;
 			return c;
 			} catch (Exception error) {
-				throw (RuntimeException)error;
+				throw new RuntimeException("Error retreiving video instance: " + id + ", error: " + error.getMessage());
 			}
 	}
 	
@@ -319,7 +319,7 @@ public class Creative  {
 			c.id = id;
 			return c;
 			} catch (Exception error) {
-				throw (RuntimeException)error;
+				throw new RuntimeException("Error retrieving audio instance: " + id + ", error: " + error.getMessage());
 			}
 	}
 	
@@ -337,7 +337,7 @@ public class Creative  {
 			c.id = id;
 			return c;
 			} catch (Exception error) {
-				throw (RuntimeException)error;
+				throw new RuntimeException("Error retrieving native instance: " + id + ", error: " + error.getMessage());
 			}
 	}
 	

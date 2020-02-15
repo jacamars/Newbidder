@@ -217,9 +217,14 @@ const AdminNavbar = (props) => {
                     {!vx.loggedIn && <NavLink tag="li">
                       <DropdownItem className="nav-item" onClick={e => vx.changeLoginState(true)} >Log in</DropdownItem>
                     </NavLink>}
-                    {vx.loggedIn &&<NavLink tag="li">
-                      <DropdownItem className="nav-item" onClick={e => vx.reset()} >Log out</DropdownItem>
-                    </NavLink>}
+                    {vx.loggedIn && <>
+                      <NavLink tag="li">
+                        <DropdownItem className="nav-item" onClick={e => vx.forceUpdate()} >Force Update</DropdownItem>
+                       </NavLink> 
+                       <NavLink tag="li">
+                          <DropdownItem className="nav-item" onClick={e => vx.reset()} >Log out</DropdownItem>
+                      </NavLink>
+                      </>}
 
                   </DropdownMenu>
                 </UncontrolledDropdown>

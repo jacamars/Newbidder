@@ -73,7 +73,7 @@ public class SQLDeleteTargetCmd extends ApiCommand {
 	}
 
 	/**
-	 * Execute the command, masrshall the results.
+	 * Execute the command, marshal the results.
 	 */
 	@Override
 		public void execute() {

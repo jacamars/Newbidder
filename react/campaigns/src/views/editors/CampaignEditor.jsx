@@ -54,7 +54,7 @@ const getAttachedCreatives = () => {
   for (var i=0;i<vx.creatives.length;i++) {
     var x = vx.creatives[i];
     var list = mt[x.type];
-    if (list.indexOf(x.id) != -1)
+    if (list != undef && list.indexOf(x.id) != -1)
       items.push(<option key={"creatives-"+i} selected>{x.name}</option>);
     else
       items.push(<option key={"creatives-"+i}>{x.name}</option>);
@@ -83,12 +83,18 @@ const  addNewCampaign = async () => {
     x.spendrate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
 
+
     var tid = document.getElementById("target").value;
     tid = getIdOf(tid);
     if (tid === "")
-      x.target_id = null;
+      x.target_id = 0;
     else
-      x.target_id = Number(tid);
+      x.target_id = tid;
+
+      if (x.target_id == 0) {
+        alert("No viable target, assigned, offline");
+        x.status = "offline";
+      }
 
   
     x.exchanges = [...document.getElementById("exchanges").options]
@@ -152,6 +158,7 @@ const  addNewCampaign = async () => {
     alert(JSON.stringify(x,null,2));
 
     props.callback(x);
+
     return false;
 }
 
@@ -198,14 +205,14 @@ const getSelectedRules = () => {
 
 const getSelectedTargets = () => {
   var items = []; 
-  items.push(<option key={"target-0"}></option>);
+  items.push(<option key={"target-none"}></option>);
   for (var i=0;i<vx.targets.length;i++) {
     var x = vx.targets[i];
     console.log("Check: " + x.id + " vs " + campaign.target_id);
     if (campaign.target_id === x.id)
-      items.push(<option key={"target-"+i} selected>{x.name}</option>);
+      items.push(<option key={"target-"+i} value={x.name} selected>{x.name}</option>);
     else
-      items.push(<option key={"target-"+i}>{x.name}</option>);
+      items.push(<option key={"target-"+i} value={x.name}>{x.name}</option>);
   }
   return(items);
 }

@@ -1,4 +1,4 @@
-.PHONY: clean local docker react react-control react-exchange react-camoaigns
+.PHONY: clean local docker react react-control react-exchange react-campaigns
 
 build: application
 
@@ -26,7 +26,7 @@ react-campaigns:
 	cp -a react/campaigns/build www
 	mv www/build www/campaigns
 	
-react: react-exchange react-control react-exchange
+react: react-exchange react-control react-campaigns
 
 	
 application: local react docker
@@ -35,7 +35,7 @@ local:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 
 docker:
-	docker build -t newbidder .
+	docker build -t jacamars/newbidder .
 
 
 clean:

@@ -61,8 +61,7 @@ public class CampaignBuilderWorker implements Runnable {
 				Crosstalk.getInstance().parkCampaign(c);
 			} else {                                               // both are known
 				boolean old = c.isActive();
-				boolean updated = checkUpdateTime(c);
-System.out.println("******** UPDATED: " + updated);				
+				boolean updated = checkUpdateTime(c);			
 				if (c.isActive()) {
 					if (old == false) {
 						logger.info("Previously inactive campaign going active: {}", campaign);
@@ -85,8 +84,10 @@ System.out.println("******** UPDATED: " + updated);
 						if (updated) {
 							logger.info("Active campaign was updated {}", campaign);
 							msg = "Active campaign was updated: " + campaign;
-							CampaignCache.getInstance().addCampaign(c);
-							Crosstalk.signaler.addString("load " + c.id);
+							Campaign newc = Campaign.getInstance(c.id);
+							CampaignCache.getInstance().addCampaign(newc);
+							Crosstalk.signaler.addString("load " + newc.id);
+							Crosstalk.getInstance().setKnownCampaign(newc);
 						}
 						if (old == true && !c.isActive()) {
 							logger.info("Campaign going inactive:{}, reason: {}", campaign, c.report());
@@ -115,7 +116,7 @@ System.out.println("******** UPDATED: " + updated);
 		var rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select updated_at from campaigns where id="+c.id);
 		if (rs.next()) {
 			var ts = rs.getTimestamp(1);
-			System.out.println("TS: " + ts.getTime() + ", updated_at: " + c.updated_at);
+System.out.println("NEW" + ts.getTime() + " OLD: " + c.updated_at);
 			if (ts.getTime() == c.updated_at)
 				return false;
 		}

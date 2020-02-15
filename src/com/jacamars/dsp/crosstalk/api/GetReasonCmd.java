@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+import com.jacamars.dsp.rtb.common.Campaign;
 
 /**
  * Web API to return the reason a campaign is not loaded.
@@ -70,6 +71,7 @@ public class GetReasonCmd extends ApiCommand {
 	@Override
 	public void execute() {
 			super.execute();
+			reasons = new ArrayList<>();
 			try {
 				if (campaign == null) {
 					reasons = new ArrayList();
@@ -94,15 +96,19 @@ public class GetReasonCmd extends ApiCommand {
 						}
 					});
 					
+					
+					
 					return;
 				}
 				
 				reason = "Unknown campaign";
+				var id = Integer.parseInt(campaign);
 				Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
 					if (e.getKey().equals("campaign")) {
 						var camp = e.getValue();
 						try {
 							reason = camp.report();
+							return;
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -111,11 +117,24 @@ public class GetReasonCmd extends ApiCommand {
 					}
 				});
 				
+				Crosstalk.getInstance().deletedCampaigns.entrySet().forEach(e->{
+					var camp = e.getValue();
+					if (camp.id == id)
+					try {
+						reasons.add(camp.name + ": " + camp.report());
+						return;
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				});
+				
+				Campaign c = Campaign.getInstance(id);
+				reasons.add(c.report());
 				return;
 			} catch (Exception err) {
 				error = true;
 				message = err.toString();
 			}
-			message = "Timed out";
 		}
 }
