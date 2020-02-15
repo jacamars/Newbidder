@@ -45,7 +45,7 @@ public enum CampaignCache  {
 	        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	 }
 
-    /** The cache to contain the general context info on runing campaigns*/
+    /** The cache to contain the general context info on running campaigns*/
     static private volatile IMap<String, Campaign> cache;
 
     /** The default backup count if you dont set it */
@@ -148,8 +148,12 @@ public enum CampaignCache  {
     	return list;
     }
     
-    public void deleteCampaign(String id) {
-    	cache.remove(id);
+    public void deleteCampaign(Campaign c ) {
+    	cache.remove(""+c.id);
+    }
+    
+    public void deleteCampaign(String c ) {
+    	cache.remove(c);;
     }
     
     public void loadDatabase(String fileName) {
@@ -167,15 +171,15 @@ public enum CampaignCache  {
         }
     }
     
-    public void addCampaign(String key, Campaign c) {
-    	cache.set(key,c);
+    public void addCampaign(Campaign c) {
+    	cache.set(c.id+"",c);
     }
     
     public void deleteCampaigns() throws Exception {
     	List<Campaign> camps = getCampaigns();
     	for (Campaign c : camps) {
     		System.out.println("=-->" + c.name);
-    		deleteCampaign(c.name);
+    		deleteCampaign(c);
     	}
     }
     

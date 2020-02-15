@@ -1461,14 +1461,11 @@ public class Configuration {
 	 * @param name String. The id of the campaign to delete
 	 * @return boolean. Returns true if the campaign was found, else returns false.
 	 */
-	public boolean deleteCampaign(String name) throws Exception {
-		List<Campaign> deletions = new ArrayList<Campaign>();
-		Iterator<Campaign> it = campaignsList.iterator();
-
+	public boolean deleteCampaign(String id) throws Exception {
 		for (Campaign c : campaignsList) {
-			if (c != null && c.name.equals(name)) {
+			String cid = ""+c.id;
+			if (c != null && cid.equals(id)) {
 				campaignsList.remove(c);
-				overrideList.remove(c);
 				recompile();
 				return true;
 			}
@@ -1711,17 +1708,18 @@ public class Configuration {
 	 * Add a campaign to the campaigns list using the shared map database of
 	 * campaigns
 	 * 
-	 * @param name String. The name of the campaign.
+	 * @param id String. The id of the campaign.
 	 * @throws Exception if the addition of this campaign fails.
 	 */
-	public void addCampaign(String name) throws Exception {
+	public void addCampaign(String id) throws Exception {
 		try {
 			campaignsLock.lock();
 			List<Campaign> list = CampaignCache.getInstance().getCampaigns();
 			for (Campaign c : list) {
-				if (name.length() == 0 || c.name.matches(name)) {
+				String cid = ""+c.id;
+				if (id.equals(cid)) {
 					addCampaign(c);
-					logger.info("Loaded  {}", c.name);
+					logger.info("Loaded  id: {}, name:{}", c.id, c.name);
 				}
 			}
 		} finally {

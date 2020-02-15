@@ -571,8 +571,10 @@ public class ZPublisher implements Runnable, Callback {
                 while ((msg = queue.poll()) != null) {
                     if (ping != null)
                         ping.cancelPing();
-                    String str = (String) msg;
-                    hazel.publish(str);
+                    if (msg instanceof Ping == false) {
+                    	String str = (String) msg;
+                    	hazel.publish(str);
+                    }
                 }
                 Thread.sleep(1);
             } catch (Exception e) {

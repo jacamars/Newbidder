@@ -349,6 +349,8 @@ public class ApiCommand {
         token = token.replaceAll("\"", "");
         
         ApiCommand cmd = null;
+        
+        boolean requireLeader = false;
 
         logger.info("From IP: {}, command: {}", ip, data);
         switch (token) {
@@ -360,21 +362,22 @@ public class ApiCommand {
                 break;
             case SetPrice:
                 cmd = mapper.readValue(data, SetPriceCmd.class);
+                requireLeader = true;
                 break;
             case GetBudget:
                 cmd = mapper.readValue(data, GetBudgetCmd.class);
                 break;
             case SetBudget:
                 cmd = mapper.readValue(data, SetBudgetCmd.class);
+                requireLeader = true;
                 break;
             case GetValues:
                 cmd = mapper.readValue(data, GetValuesCmd.class);
                 break;
-            case Update:
-                cmd = mapper.readValue(data, UpdateCmd.class);
-                break;
+        
             case Delete:
                 cmd = mapper.readValue(data, DeleteCmd.class);
+                requireLeader = true;
                 break;
             case GetCampaign:
                 cmd = mapper.readValue(data, GetCampaignCmd.class);
@@ -390,10 +393,12 @@ public class ApiCommand {
 
             case Add:
                 cmd = mapper.readValue(data, AddCampaignCmd.class);
+                requireLeader = true;
                 break;
 
             case ConfigureAws:
                 cmd = mapper.readValue(data, ConfigureAwsObjectCmd.class);
+                requireLeader = true;
                 break;
 
             case Future:
@@ -410,6 +415,7 @@ public class ApiCommand {
 
             case SetWeights:
                 cmd = mapper.readValue(data, SetWeightsCmd.class);
+                requireLeader = true;
                 break;
             case GetWeights:
                 cmd = mapper.readValue(data, GetWeightsCmd.class);
@@ -417,6 +423,7 @@ public class ApiCommand {
                 
             case Refresh:
             	cmd = mapper.readValue(data, RefreshCmd.class);
+            	requireLeader = true;
             	break;
             	
             case GetAccounting:
@@ -453,6 +460,7 @@ public class ApiCommand {
             	
             case SQLDELETE_CAMPAIGN:
             	cmd = mapper.readValue(data, SQLDeleteCampaignCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLGET_CAMPAIGN:
@@ -461,6 +469,7 @@ public class ApiCommand {
             	
             case SQLADD_NEW_RULE:
             	cmd = mapper.readValue(data, SQLAddNewRuleCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLLIST_RULES:
@@ -473,14 +482,17 @@ public class ApiCommand {
             	
             case SQLDELETE_RULE:
             	cmd = mapper.readValue(data, SQLDeleteRuleCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLADD_NEW_TARGET:
             	cmd = mapper.readValue(data, SQLAddNewTargetCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLDELETE_TARGET:
             	cmd = mapper.readValue(data, SQLDeleteTargetCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLLIST_TARGETS:
@@ -493,6 +505,7 @@ public class ApiCommand {
             	
             case SQLADD_NEW_CREATIVE:
             	cmd = mapper.readValue(data, SQLAddNewCreativeCmd.class);
+            	requireLeader = true;
             	break;
             	
             case SQLGET_CREATIVE:
@@ -501,6 +514,7 @@ public class ApiCommand {
             	
             case SQLDELETE_CREATIVE:
             	cmd = mapper.readValue(data, SQLDeleteCreativeCmd.class);
+            	requireLeader = true;
             	break;
             	
             case MACROSUB:
@@ -512,12 +526,16 @@ public class ApiCommand {
                 return cmd;
         }
         
-        if (!RTBServer.isLeader()) {
-        	cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
+        ///////////// If this is not the leader, but leadership is required, then send it to the leader ///////////
+        if (requireLeader) {
+        	if (!RTBServer.isLeader()) 
+        		cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
+        	else 
+        		cmd.execute();
         } else {
         	cmd.execute();
         }
-        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (cmd instanceof FutureCmd) {
         	cmd = ((FutureCmd) cmd).cmd;
         }

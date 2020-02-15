@@ -251,7 +251,7 @@ public class Commands implements WatchInterface {
 				String fileName = sub.get(0);
 				String contents = new String(Files.readAllBytes(Paths.get(fileName)), StandardCharsets.UTF_8);
 		    	c = mapper.readValue(contents, Campaign.class);
-				CampaignCache.getClientInstance(client).addCampaign(c.name,c);
+				CampaignCache.getClientInstance(client).addCampaign(c);
 				break;
 
 			case "add-campaigns":

@@ -42,6 +42,7 @@ import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.jmq.EventIF;
 import com.jacamars.dsp.rtb.jmq.Subscriber;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
+import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
@@ -89,13 +90,9 @@ public enum Crosstalk {
 	 * The list of RTB rules not specified in campaigns, creatives and targets.
 	 */
 	public static final String RTB_STD = "rtb_standards";
-	public static final String CAMP_RTB_STD = "campaigns_rtb_standards";
-	public static final String BANNER_RTB_STD = "banners_rtb_standards";
-	public static final String VIDEO_RTB_STD = "banner_videos_rtb_standards";
 	
-	
-	public static ZPublisher commands;
-	public static Subscriber commandResponses;
+	protected static ZPublisher signaler;
+	protected static Subscriber signals;
 	
 	static ResultSet rs;
 	
@@ -139,9 +136,9 @@ public enum Crosstalk {
 		}, 0L, 1L, TimeUnit.MINUTES);
 		
 		
-		commands = new ZPublisher(RTBServer.getSharedInstance(),
+		signaler = new ZPublisher(RTBServer.getSharedInstance(),
 				"hazelcast://topic=rtbcommands");
-		commandResponses = new Subscriber(RTBServer.getSharedInstance(),
+		signals = new Subscriber(RTBServer.getSharedInstance(),
 				new Controller(),
 				"hazelcast://topic=rtbcommands");
 		
@@ -235,11 +232,11 @@ public enum Crosstalk {
 	 * @throws Exception if there was an error.
 	 */
 	boolean parkCampaign(Campaign camp) throws Exception {
-		if (camp == null || deletedCampaigns.get(camp.name) != null)
+		if (camp == null || deletedCampaigns.get(""+camp.id) != null)
 			return false;
 
-		campaigns.delete(camp.name);
-		deletedCampaigns.put(camp.name, camp); // add to the deleted campaigns map
+		campaigns.delete(""+camp.id);
+		deletedCampaigns.put(""+camp.id, camp); // add to the deleted campaigns map
 
 		return true;
 	}
@@ -269,28 +266,29 @@ public enum Crosstalk {
 	public String update(Campaign campaign, boolean add) throws Exception {
 		String msg = null;
 		
-		Campaign c = getKnownCampaign(campaign.name);
+		Campaign c = getKnownCampaign(""+campaign.id);
 
 		// New campaign
 		if (c == null) {
 			c = makeNewCampaign(campaign);
 			if (c.isActive()) {
-				addCampaignToRTB(c);
-				Configuration.getInstance().addCampaign(campaign);
+				CampaignCache.getInstance().addCampaign(c);
+				deletedCampaigns.remove(""+c.id);
 				c.runUsingElk();
 				logger.info("New campaign {} going active",campaign);
 				msg = "NEW CAMPAIGN GOING ACTIVE: " + campaign;
+				Crosstalk.signaler.addString("load " + c.id);
 			} else {
 				logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
-				deleteCampaign(campaign.name);
+				deleteCampaign(""+campaign.id);
 			}
 		} else {
 			// A previously known campaign is updated.
 			c.update(campaign);
 			if (c.isActive()) {
 				logger.info("Previously inactive campaign going active: {}",campaign);
-				if (deletedCampaigns.get(campaign) != null) {
-					deletedCampaigns.remove(campaign);
+				if (deletedCampaigns.get(""+campaign.id) != null) {
+					deletedCampaigns.remove(""+campaign.id);
 				}
 				msg = "CAMPAIGN GOING ACTIVE: " + campaign;
 				try {
@@ -301,7 +299,7 @@ public enum Crosstalk {
 			} else {
 				logger.info("New campaign going inactive:{}, reason: {}", campaign, c.report());
 				msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
-				deleteCampaign(campaign.name);
+				deleteCampaign(""+campaign.id);
 			}
 		}
 
@@ -313,10 +311,6 @@ public enum Crosstalk {
 		Campaign ac = new Campaign(str);
 		return ac;
 		
-	}
-	
-	public Campaign makeNewCampaign(ObjectNode node) throws Exception {
-		return new Campaign(node);
 	}
 	
 	/**
@@ -331,7 +325,7 @@ public enum Crosstalk {
 	public String update(String json) throws Exception {
 		Campaign x = new Campaign(json);
 		
-		Campaign c = getKnownCampaign(x.name);
+		Campaign c = getKnownCampaign(""+x.id);
 		if (c == null) {
 			throw new Exception("No such campaign: " + x.name);
 		}
@@ -438,41 +432,6 @@ public enum Crosstalk {
 			JsonNode child = it.next();
 			exchangeAttributes.add(child);
 		}
-		// ////////////////////////////////////////////////////////////////////////////
-		// Banner
-		for (int i = 0; i < nodes.size(); i++) {
-			ObjectNode x = (ObjectNode) nodes.get(i);
-			int campaignid = x.get("id").asInt();
-			rs = stmt.executeQuery("select * from banners where id = " + campaignid);
-			ArrayNode inner = JdbcTools.convertToJson(rs);
-			x.set("banner", inner);
-		}
-
-		// Video
-		for (int i = 0; i < nodes.size(); i++) {
-			ObjectNode x = (ObjectNode) nodes.get(i); 
-			int campaignid = x.get("id").asInt(); ///////// CHECK
-			rs = stmt.executeQuery("select * from banner_videos where id = " + campaignid);
-			ArrayNode inner = JdbcTools.convertToJson(rs);
-			x.set("banner_video", inner);
-		}
-		
-		// Audio
-		for (int i = 0; i < nodes.size(); i++) {
-			ObjectNode x = (ObjectNode) nodes.get(i); 
-			int campaignid = x.get("id").asInt(); ///////// CHECK
-			rs = stmt.executeQuery("select * from banner_audios where id = " + campaignid);
-			ArrayNode inner = JdbcTools.convertToJson(rs);
-			x.set("banner_audio", inner);
-		}
-		// native
-		for (int i = 0; i < nodes.size(); i++) {
-			ObjectNode x = (ObjectNode) nodes.get(i); 
-			int campaignid = x.get("id").asInt(); ///////// CHECK
-			rs = stmt.executeQuery("select * from banner_natives where id = " + campaignid);
-			ArrayNode inner = JdbcTools.convertToJson(rs);
-			x.set("banner_native", inner);
-		}
 	}
 	
 	public void scan() {
@@ -480,22 +439,33 @@ public enum Crosstalk {
 			try {
 				refresh();
 				
-				var name = "accountingCampaigns"; 
 				campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
 				
+				List<Campaign> deletions = new ArrayList<>();
+			
 				campaigns.entrySet().forEach(e->{
 					Campaign camp = e.getValue();
 					camp.runUsingElk();
 					try {
-					if (!camp.isActive() || !camp.isRunnable()) {
+					if (!camp.isActive()) {
 						logger.info("Campaign has become inactive: {}", camp.name);
-						removeFromRTB(camp);
+						deletions.add(camp);
 						camp.report();
 						parkCampaign(camp);
 					} 
+					if (!stillRunnable(camp)) {
+						logger.info("Campaign is taken offline: {}", camp.name);
+						deletions.add(camp);
+						camp.report();
+						parkCampaign(camp);
+					}
 					} catch (Exception error) {
 						logger.error("Error scanning campaign: {}, error: {}", camp.name,error.getMessage());
 					}
+				});
+				deletions.stream().forEach(c->{
+					CampaignCache.getInstance().deleteCampaign(c);
+					Crosstalk.signaler.addString("unload " + c.id);
 				});
 				
 				
@@ -503,11 +473,12 @@ public enum Crosstalk {
 				List<String> clist = new ArrayList<String>();
 				for (String key : deletedCampaigns.keySet()) {
 					Campaign camp = deletedCampaigns.get(key);
-					if (camp.isRunnable()) {
+					if (stillRunnable(camp)) {
 						camp.runUsingElk();
-						if (camp.isActive()) {
+						if (camp.isActive() && camp.isRunnable()) {
 							logger.info("Currently inactive campaign going active: {}", camp.name);
-							addCampaignToRTB(camp);
+							CampaignCache.getInstance().addCampaign(camp);
+							Crosstalk.signaler.addString("load " + camp.id);
 							additions.add(key);
 							try {
 								//camp.addToRTB();                                  // one at a time, not good. TBD
@@ -518,7 +489,7 @@ public enum Crosstalk {
 						}
 					}
 
-				}
+				} 
 				
 				for (String key : additions) {
 					deletedCampaigns.remove(key);
@@ -540,6 +511,13 @@ public enum Crosstalk {
 			}
 		}
 	
+	boolean stillRunnable(Campaign c) throws Exception {
+		var rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from campaigns where status='runnable' and id="+c.id);
+		if (rs.next())
+			return true;
+		return false;
+	}
+	
 	void purge() throws Exception {
 		StringBuilder list = new StringBuilder("");  
 		List<Campaign> dc = new ArrayList<Campaign>();
@@ -547,13 +525,13 @@ public enum Crosstalk {
 			Campaign c = deletedCampaigns.get(key);
 			if (c.canBePurged()) {
 				removeFromRTB(c);
-				list.append(c.name + " ");
+				list.append(c.id + " ");
 				dc.add(c);
 			}
 		}
 
 		for (Campaign c : dc) {
-			deletedCampaigns.remove("" + c.name);
+			deletedCampaigns.remove("" + c.id);
 		}
 
 		
@@ -562,7 +540,7 @@ public enum Crosstalk {
 			try {
 			if (c.canBePurged()) {
 				removeFromRTB(c);
-				list.append(c.name + " ");
+				list.append(c.id + " ");
 			}
 			} catch (Exception error) {
 				logger.error("Error purging campaign: {}: error: {}" + c.name,error.getMessage());
@@ -579,16 +557,9 @@ public enum Crosstalk {
 	 * @param camp Campaign. The campaign to add.
 	 */
 	void removeFromRTB(Campaign camp) {
-		campaigns.remove(camp.name);
+		campaigns.remove(camp.id);
 	}
-	
-	/**
-	 * Add a campaign from the hazelcast IMap.
-	 * @param camp Campaign. The campaign to add.
-	 */
-	void addCampaignToRTB(Campaign camp) {
-		campaigns.put(camp.name,camp);
-	}
+
 	
 	/**
 	 * Refresh the system. Load all bidders with all runnable campaigns.
@@ -640,7 +611,20 @@ class Controller implements EventIF {
 
 	@Override
 	public void handleMessage(String id, String msg) {
-		System.out.println("GOT A CONTROL MESSAGE FROM: " + id + " Message is " + msg);
+		try {
+			System.out.println("====> GOT A SIGNAL MESSAGE FROM: " + id + " Message is " + msg);
+			String [] parts = msg.split(" ");
+			switch(parts[0]) {
+			case "load":
+				Configuration.getInstance().addCampaign(parts[1]);
+				break;
+			case "unload":
+				Configuration.getInstance().deleteCampaign(parts[1]);
+				break;
+			}
+		} catch (Exception e) {
+			throw (RuntimeException)e;
+		}
 	}
 
 	@Override

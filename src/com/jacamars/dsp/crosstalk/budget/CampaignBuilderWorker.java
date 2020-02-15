@@ -3,6 +3,7 @@ package com.jacamars.dsp.crosstalk.budget;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +42,13 @@ public class CampaignBuilderWorker implements Runnable {
 
 			// New campaign
 			if (c == null && node != null) {
-				c = Crosstalk.getInstance().makeNewCampaign(node);
+				c = new Campaign(node);
 				c.runUsingElk();
 				if (c.isActive()) {
 					logger.info("New campaign {} going active", campaign);
 					msg = "New campaign going active: " + campaign;
-					Crosstalk.getInstance().addCampaignToRTB(c);
-					Crosstalk.commands.addString(msg);
+					CampaignCache.getInstance().addCampaign(c);
+					Crosstalk.signaler.addString("load " + c.id);
 				} else {
 					logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
 					Crosstalk.getInstance().parkCampaign(c); 
@@ -60,12 +61,8 @@ public class CampaignBuilderWorker implements Runnable {
 				Crosstalk.getInstance().parkCampaign(c);
 			} else {                                               // both are known
 				boolean old = c.isActive();
-				boolean updated = false;
-				if (c.updated_at != node.get("updated_at").asLong()) {
-					c.update(node);
-					updated = true;
-				}
-
+				boolean updated = checkUpdateTime(c);
+System.out.println("******** UPDATED: " + updated);				
 				if (c.isActive()) {
 					if (old == false) {
 						logger.info("Previously inactive campaign going active: {}", campaign);
@@ -76,7 +73,8 @@ public class CampaignBuilderWorker implements Runnable {
 						if (updated) {
 							logger.info("Active campaign was updated {}", campaign);
 							try {
-								Crosstalk.getInstance().addCampaignToRTB(c);
+								CampaignCache.getInstance().addCampaign(c);
+								Crosstalk.signaler.addString("load " + c.id);
 							} catch (Exception err) {
 								logger.error("Failed to load campaign {} into bidders, reason: {}", c.name,
 										err.toString());
@@ -87,7 +85,8 @@ public class CampaignBuilderWorker implements Runnable {
 						if (updated) {
 							logger.info("Active campaign was updated {}", campaign);
 							msg = "Active campaign was updated: " + campaign;
-							Crosstalk.getInstance().addCampaignToRTB(c);
+							CampaignCache.getInstance().addCampaign(c);
+							Crosstalk.signaler.addString("load " + c.id);
 						}
 						if (old == true && !c.isActive()) {
 							logger.info("Campaign going inactive:{}, reason: {}", campaign, c.report());
@@ -110,6 +109,18 @@ public class CampaignBuilderWorker implements Runnable {
 			logger.error("Error creating campaign: {}", error.toString());
 		}
 
+	}
+	
+	boolean checkUpdateTime(Campaign c) throws Exception {
+		var rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select updated_at from campaigns where id="+c.id);
+		if (rs.next()) {
+			var ts = rs.getTimestamp(1);
+			System.out.println("TS: " + ts.getTime() + ", updated_at: " + c.updated_at);
+			if (ts.getTime() == c.updated_at)
+				return false;
+		}
+
+		return true;
 	}
 
 	@Override

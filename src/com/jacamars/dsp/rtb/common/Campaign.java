@@ -233,6 +233,7 @@ public class Campaign implements Comparable, Portable  {
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Campaign c = new Campaign(y);
+		c.id = id;
 		return c;
 	}
 	
@@ -293,7 +294,10 @@ public class Campaign implements Comparable, Portable  {
 	 * @throws Exception
 	 */
 	private void init(Campaign camp) throws Exception {
+		this.id = camp.id;
 		this.isAdx = camp.isAdx;
+		this.activate_time = camp.activate_time;
+		this.expire_time = camp.expire_time;
 		this.adomain = camp.adomain;
 		this.attributes = camp.attributes;
 		this.creatives = camp.creatives;

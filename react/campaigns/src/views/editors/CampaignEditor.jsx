@@ -113,7 +113,6 @@ const  addNewCampaign = async () => {
         alert("DB problem, creative: " + name + " is missing");
         return;
       }
-      alert(cr.type);
       switch(cr.type) {
         case "banner":
           x.banners.push(cr.id);
@@ -132,7 +131,6 @@ const  addNewCampaign = async () => {
           return;
       }
     }
-    alert("CNAMES = " + JSON.stringify(cnames,null,2));
    
     if (x.name === "") { alert("Name cannot be blank"); return; }
 
