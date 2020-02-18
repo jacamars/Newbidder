@@ -429,7 +429,7 @@ public enum Crosstalk {
 
 		try {
 
-			refresh();
+			//refresh();
 
 			campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
 

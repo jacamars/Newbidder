@@ -29,6 +29,7 @@ var undef;
   const loadDataOnce = async() => {
     await vx.getDbCampaigns();
     await vx.listCampaigns();
+    redraw();
   }
 
   const [count, setCount] = useState(0);

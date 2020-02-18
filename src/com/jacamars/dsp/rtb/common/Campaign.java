@@ -1148,7 +1148,7 @@ public class Campaign implements Comparable, Portable  {
 			int cid = rs.getInt("id");
 			Campaign c = Campaign.getInstance(id);
 			c.target_id = 0;
-			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).executeQuery();
+			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 			w.run();
 		}
@@ -1168,8 +1168,10 @@ public class Campaign implements Comparable, Portable  {
 			Campaign c = Campaign.getInstance(id);
 			int index = c.banners.indexOf(id);
 			c.banners.remove(index);
-			System.out.println("NUMBER: " + c.banners.size());
-			System.out.println(c.banners);
+			c.creatives.clear();
+			c.processCreatives();
+			System.out.println(c.isActive());
+				
 			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 			w.run();

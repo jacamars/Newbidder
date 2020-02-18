@@ -39,10 +39,59 @@ public class CampaignBuilderWorker implements Runnable {
 		msg = "No change required for campaign: " + campaign;
 		try {
 			ObjectNode node = (ObjectNode) jnode;
-
-			Campaign check = Crosstalk.getInstance().getKnownCampaign(campaign);
-
-			if (check == null && (c == null && jnode == null)) {
+			Campaign check = Crosstalk.getInstance().getKnownCampaign(campaign);   // check is the old one.
+			if (c == null) {                                                         // c is the new one.
+				c = new Campaign(node);
+				c.runUsingElk();
+			}
+			
+			// Is this a known campaign? Null is not known
+			if (check == null) {
+				// Ok, it's not known, is the new one ready to run.
+				if (c.isRunnable() && c.isActive()) {
+					logger.info("New campaign {} going active", campaign);
+					msg = "New campaign going active: " + campaign;
+					CampaignCache.getInstance().addCampaign(c);
+					Crosstalk.signaler.addString("load " + c.id);
+					return;
+				} else {
+					logger.info("New campaign {} is not going active, reason: {}", campaign, c.report());
+				}
+			} else {
+				if (c.isRunnable() && c.isActive()) {
+					if (check.isRunnable() && check.isActive()) {
+						logger.info("Previous running campaign {}, changed but is active", campaign);
+						msg = "New campaign going active: " + campaign;
+						CampaignCache.getInstance().addCampaign(c);
+						Crosstalk.signaler.addString("load " + c.id);
+						return;
+					} else {
+						logger.info("Previous paused campaign {}, is now active", campaign);
+						msg = "New campaign going active: " + campaign;
+						CampaignCache.getInstance().addCampaign(c);
+						Crosstalk.signaler.addString("load " + c.id);
+						return;
+					}
+				} else {
+					if (check.isRunnable() && check.isActive()) {
+						logger.info("Previous running campaign {}, is now inactive, reason: {}", campaign,c.report());
+						msg = "Campaign going inactive: " + campaign;
+						Crosstalk.getInstance().parkCampaign(c);
+						Crosstalk.getInstance().deletedCampaigns.remove(campaign);
+						Crosstalk.signaler.addString("unload " + c.id);
+						return;
+					} else {
+						logger.info("Previous paused campaign {}, changed, but is still inactive, reason: {}", campaign,c.report());
+						msg = "New campaign going inactive: " + campaign;
+						Crosstalk.getInstance().parkCampaign(c);
+						Crosstalk.signaler.addString("unload " + c.id);
+						return;
+					}
+				}
+			}
+			
+		
+/*			if (check == null && (c == null && jnode == null)) {
 				msg = "Campaign is unknown; " + campaign;
 				throw new Exception("Campaign is unknown: " + campaign);
 			}
@@ -134,7 +183,7 @@ public class CampaignBuilderWorker implements Runnable {
 						Crosstalk.signaler.addString("unload " + c.id);
 					}
 				}
-			}
+			} */
 		} catch (Exception error) {
 			error.printStackTrace();
 			msg = "Error creating campaign: " + campaign + ", error: "+ error.toString();
