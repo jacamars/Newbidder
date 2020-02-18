@@ -950,8 +950,10 @@ public class Campaign implements Comparable, Portable  {
 			status = "offline";
 		}
 
-		instantiate("banner", true);
-		instantiate("banner_video", false);
+		instantiate(Creative.SQL_BANNERS);
+		instantiate(Creative.SQL_VIDEOS);
+		instantiate(Creative.SQL_AUDIOS);
+		instantiate(Creative.SQL_NATIVES);
 		compile();
 	}
 	
@@ -1108,7 +1110,7 @@ public class Campaign implements Comparable, Portable  {
 	 * @throws Exception on SQL or JSON errors.
 	 * 
 	 */
-	protected void instantiate(String type, boolean isBanner) throws Exception {
+	protected void instantiate(String type) throws Exception {
 
 		ArrayNode array = (ArrayNode) getMyNode().get(type);
 		if (array == null)
@@ -1116,14 +1118,14 @@ public class Campaign implements Comparable, Portable  {
 
 		for (int i = 0; i < array.size(); i++) {
 			ObjectNode node = (ObjectNode) array.get(i);
-			Creative creative = new Creative(node, isBanner); 
+			Creative creative = new Creative(node); 
 			if (!(creative.budgetExceeded(name))) {
 				unpark(creative);
 			} else {
 				park(creative);
 			}
 		}
-	}
+	} 
 
 	
 	public boolean isRunnable() throws Exception {
@@ -1132,6 +1134,29 @@ public class Campaign implements Comparable, Portable  {
 		if (!status.equals("runnable"))
 			return false;
 		return true;
+	}
+	
+	public static void touchCampaignsWithCreative(int id) throws Exception {
+		touchCampaignsWithCreative(Creative.SQL_BANNERS,id);
+		touchCampaignsWithCreative(Creative.SQL_VIDEOS,id);
+		touchCampaignsWithCreative(Creative.SQL_AUDIOS,id);
+		touchCampaignsWithCreative(Creative.SQL_NATIVES,id);
+	}
+	
+	public static void touchCampaignsWithCreative(String table, int id) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
+		st.setInt(1, id);
+		ResultSet rs = st.executeQuery();
+		while(rs.next()) {
+			int cid = rs.getInt("id");
+			Campaign c = Campaign.getInstance(id);	
+			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
+			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+			w.run();
+		}
+		
+		st.close();
 	}
 	
 	/**
@@ -1156,22 +1181,64 @@ public class Campaign implements Comparable, Portable  {
 		st.close();
 	}
 	
+	
 	public static void removeCreativeFromCampaigns(int id) throws Exception {
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_BANNERS,id);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_VIDEOS,id);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_AUDIOS,id);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_NATIVES,id);	
+	}
+	
+	public static void removeSpecificTypeCreativeFromCampaigns(String table, int id) throws Exception {
 		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-		//		prepareStatement("select * from campaigns where banners @> " + id);
+				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
+		st.setInt(1, id);
+		ResultSet rs = st.executeQuery();
+		while(rs.next()) {
+			int cid = rs.getInt("id");
+			Campaign c = Campaign.getInstance(id);
+			int index = -1; 
+			switch(table) {
+			case "banners":
+				index = c.banners.indexOf(id);
+				c.banners.remove(index); break;
+			case "banner_videos":
+				index = c.videos.indexOf(id);
+				c.videos.remove(index); break;
+			case "banner_audios":
+				index = c.audios.indexOf(id);
+				c.audios.remove(index); break;
+			case "banner_natives":
+				index = c.natives.indexOf(id);
+				c.natives.remove(index); break;
+				default:
+					throw new Exception("Cant update cratives type " + table + " for campaign " + cid);
+			}
+			c.creatives.clear();
+			c.processCreatives();
+				
+			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
+			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+			w.run();
+		}
 		
-				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(banners) FROM campaigns)");
+		st.close();
+	}
+	
+	
+	public static void removeRuleFromCampaigns(int id) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(rules) FROM campaigns)");
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
 		while(rs.next()) {
 			int cid = rs.getInt("id");
 			Campaign c = Campaign.getInstance(id);
 			int index = c.banners.indexOf(id);
-			c.banners.remove(index);
-			c.creatives.clear();
-			c.processCreatives();
-			System.out.println(c.isActive());
-				
+			c.rules.remove(index);
+			
+			c.process();
+
 			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 			w.run();

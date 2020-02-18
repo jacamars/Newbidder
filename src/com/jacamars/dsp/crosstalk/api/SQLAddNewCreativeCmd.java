@@ -73,18 +73,21 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 	}
 
 	/**
-	 * Execute the command, masrshall the results.
+	 * Execute the command, marshal the results.
 	 */
 	@Override
 		public void execute() {
 			super.execute();
 			try {
-				System.out.println("NEW CAMPAIGN: " + creative);
+				System.out.println("NEW Creative: " + creative);
 				ObjectNode node = mapper.readValue(creative,ObjectNode.class);
-				String stype = node.get("react_type").asText();
-				Creative c = new Creative(node,stype);
+				String stype = node.get("type").asText();
+				Creative c = new Creative(node);
 				c.compile();
 				c.saveToDatabase();
+				if (c.id != 0) {
+					Campaign.touchCampaignsWithCreative(c.getTable(),c.id);
+				}
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.crosstalk.budget.CampaignBuilderWorker;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.RtbStandard;
@@ -56,6 +57,12 @@ import com.jacamars.dsp.rtb.tools.MacroProcessing;
  *
  */
 public class Creative  {
+	
+	public static final String SQL_BANNERS = "banners";
+	public static final String SQL_VIDEOS = "banner_videos";
+	public static final String SQL_AUDIOS = "banner_audios";
+	public static final String SQL_NATIVES = "banner_natives";
+	
 	/** The forward URL used with this creative */
 	public String forwardurl;
 	/** The encoded version of the forward url used by this creative */
@@ -278,7 +285,7 @@ public class Creative  {
 		
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		ObjectNode y = (ObjectNode) inner.get(0);
-		Creative c = new Creative(y,"banner");
+		Creative c = new Creative(y);
 		c.id = id;
 		return c;
 		} catch (Exception error) {
@@ -297,7 +304,7 @@ public class Creative  {
 			
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
-			Creative c = new Creative(y,"video");
+			Creative c = new Creative(y);
 			c.id = id;
 			return c;
 			} catch (Exception error) {
@@ -315,7 +322,7 @@ public class Creative  {
 			
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
-			Creative c = new Creative(y,"audio");
+			Creative c = new Creative(y);
 			c.id = id;
 			return c;
 			} catch (Exception error) {
@@ -333,7 +340,7 @@ public class Creative  {
 			
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
-			Creative c = new Creative(y,"native");
+			Creative c = new Creative(y);
 			c.id = id;
 			return c;
 			} catch (Exception error) {
@@ -589,16 +596,16 @@ public class Creative  {
 	static String getTable(Creative c) throws Exception {
 		String table = null;
 	if (c.isAudio)
-		table = "banner_audios";
+		table = SQL_AUDIOS;
 	else
 	if (c.isNative)
-		table = "banner_natives";
+		table = SQL_NATIVES;
 	else
 	if (c.isVideo)
-		table = "banner_videos";
+		table = SQL_VIDEOS;
 	else
 	if (c.isBanner)
-		table = "banners";
+		table = SQL_BANNERS;
 	else
 		throw new Exception("Can't tell what kind of creative id: " + c.id + " is.");
 	return table;
@@ -853,6 +860,32 @@ public class Creative  {
 		
 		return p;
 	}
+	
+	public static void removeRuleFromCreatives(int id) throws Exception {
+		updateRules(Creative.SQL_BANNERS,id);
+		updateRules(Creative.SQL_VIDEOS,id);
+		updateRules(Creative.SQL_AUDIOS,id);
+		updateRules(Creative.SQL_NATIVES,id);
+	}
+	
+	static void updateRules(String table, int id) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+				prepareStatement("SELECT * FROM " + table + " WHERE ? IN (SELECT unnest(rules) FROM " + table + ")");
+		st.setInt(1, id);
+		ResultSet rs = st.executeQuery();
+		List<Integer> creative_ids = new ArrayList<>();
+		while(rs.next()) {
+			int cid = rs.getInt("id");
+			Creative c = Creative.getInstance(id,table);
+			int index = c.rules.indexOf(id);
+			c.rules.remove(index);
+			c.process();
+			Creative.toSql(c,CrosstalkConfig.getInstance().getConnection());
+			Campaign.touchCampaignsWithCreative(table, c.id);
+		}
+		
+		st.close();
+	}
 
 	/**
 	 * Empty constructor for creation using json.
@@ -861,37 +894,39 @@ public class Creative  {
 
 	}
 	
-	public Creative(JsonNode node, boolean isBanner) throws Exception {
-		this.isBanner = isBanner;
-		if (isBanner)
-			tableName = "banners";
-		else
-			tableName = "banner_videos";
-		update(node);
-	}
-	
-	public Creative(JsonNode node, String type) throws Exception {
+	public Creative(JsonNode node) throws Exception {
+		type = node.get("type").asText();
 		switch(type.toLowerCase()) {
 		case "banner":
 			isBanner = true;
-			tableName = "banners";
+			tableName = SQL_BANNERS;
 			break;
 		case "video":
 			isVideo = true;
-			tableName = "banner_videos";
+			tableName = SQL_VIDEOS;
 			break;
 		case "audio":
 			isAudio = true;
-			tableName = "banner_audios";
+			tableName = SQL_AUDIOS;
 			break;
 		case "native":
 			isNative = true;
-			tableName = "banner_natives";
+			tableName = SQL_NATIVES;
+			break;
+		default:
+			throw new Exception("Don't know type: " + type);
 		}
 		update(node);
 	}
 	
 
+	/**
+	 * Return the sql table this creative belongs to.
+	 * @return
+	 */
+	public String getTable() {
+		return tableName;
+	}
 	/**
 	 * A shallow copy. This is used to create a 'rotating creative'. The rotating creative will inherit all the
 	 * attributes of the proxy, but, the adm will be changed. as needed.
@@ -917,6 +952,10 @@ public class Creative  {
 		c.imageurl = imageurl;
 		c.dimensions = dimensions;
 		c.categories = categories;
+		c.type = type;
+		c.tableName = tableName;
+		c.rules = rules;
+		c.deals = deals;
 
 		c.encodeUrl();
 		return c;

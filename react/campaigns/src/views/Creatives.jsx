@@ -58,7 +58,7 @@ var undef;
     c.isAudio = false;
     c.isNative = false;
     c.isBanner = true;
-    c.react_type = "BANNER";
+    c.type = "banner";
     setCreative(c);
   }
 

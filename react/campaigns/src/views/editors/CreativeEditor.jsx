@@ -88,16 +88,16 @@ const getSelectedRules = () => {
   const addNewCreative = () => {
     var x = creative;
     if (x.isBanner)
-      x.react_type = "BANNER";
+      x.type = "banner";
     else
     if (x.isVideo)
-      x.react_type = "VIDEO";
+      x.type = "video";
     else
     if (x.isAudio)
-      x.react_type = "AUDIO";
+      x.type = "audio";
     else
     if (x.isNative)
-      x.react_type = "NATIVE";
+      x.type = "native";
     else {
       alert("Type can't be set for " + JSON.stringify(x,null,2))
       return;

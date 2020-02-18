@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
@@ -85,6 +86,8 @@ public class SQLDeleteRuleCmd extends ApiCommand {
 				st.executeUpdate();
 				st.close();
 				 
+				Campaign.removeRuleFromCampaigns(id);
+				Creative.removeRuleFromCreatives(id);
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();
