@@ -18,7 +18,7 @@ public enum CrosstalkConfig {
 	
 	static Statement statement;
 	static Connection connect;
-	static String region;
+	public static String region;
 	static Elk elk;
 	
 	public static CrosstalkConfig getInstance(Map crosstalk) throws Exception {

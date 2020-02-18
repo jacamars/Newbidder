@@ -124,20 +124,20 @@ const getWBList = (s) => {
     var lat = document.getElementById("lat").value;
     var lon = document.getElementById("lon").value;
     var range = document.getElementById("range").value;
-    if (country == "")
-      target.country = null;
+    if (country === "" || country === "null")
+      target.country = undef;
     else
       target.country = country;
     if (lat === "" || lat === "0")
-      target.geo_latitude = null;
+      target.geo_latitude = undef;
     else
       target.geo_latitude = Number(lat);
     if (lon === "" || lon === "0")
-      target.geo_longitude = null;
+      target.geo_longitude = undef;
     else
       target.geo_longitude = Number(lon);
     if (range === "" || range === "0")
-      target.geo_range = null;
+      target.geo_range = undef;
     else
       target.geo_range = Number(range);
      
@@ -149,20 +149,20 @@ const getWBList = (s) => {
       .filter((x) => x.selected)
       .map((x)=>x.value)).join();
   
-    if (car === "")
-      target.carrier = null;
+    if (car === "" || car === "null")
+      target.carrier = undef;
     else
       target.carrier = car;
-    if (os === "")
-      target.os = null;
+    if (os === "" || os === "null")
+      target.os = undef;
     else
       target.os = os;     
-    if (make === "")
-      target.make = null;
+    if (make === "" || make === "null")
+      target.make = undef;
     else
       target.make = make.split("\n").join(",");
-    if (model === "")
-      target.model = null;
+    if (model === "" || make === "null")
+      target.model = undef;
     else
       target.model = model.split("\n").join(",");
  

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
+import com.jacamars.dsp.crosstalk.budget.CampaignBuilderWorker;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
@@ -86,8 +87,12 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
 				st.close();
+				
+			//	Crosstalk.getInstance().scan(); 
 						
-				Crosstalk.getInstance().scan();
+				CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+				w.run();
+				
 				
 				return;
 			} catch (Exception err) {

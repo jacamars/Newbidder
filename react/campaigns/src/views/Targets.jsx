@@ -65,6 +65,7 @@ var undef;
     if (x !== null) {
       await vx.addNewTarget(x);
     }
+
     setTarget(null)
     await vx.listTargets();
     redraw();

@@ -85,6 +85,7 @@ public class SQLDeleteTargetCmd extends ApiCommand {
 				st.executeUpdate();
 				st.close();
 				 
+				Campaign.removeTargetFromCampaigns(id);
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

@@ -97,12 +97,13 @@ public class SQLDeleteCreativeCmd extends ApiCommand {
 				default:
 					throw new Exception("Can't delete unknown type: " + key);
 				}
-				PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+			/*	PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
 						prepareStatement(sql);
 				st.setInt(1, id);
 				st.executeUpdate();
-				st.close();
+				st.close(); */
 				 
+				Campaign.removeCreativeFromCampaigns(id);
 				return;
 			} catch (Exception err) { 
 				err.printStackTrace();

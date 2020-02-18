@@ -2,6 +2,7 @@ package com.jacamars.dsp.crosstalk.budget;
 
 import java.sql.Connection;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.common.Node;
+import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
 
@@ -499,6 +501,22 @@ public class Targeting {
 		return countries;
 	}
 	
+	public void updateAttachedCampaigns() throws Exception {
+		String sql = "SELECT id FROM campaigns where target_id=" + this.id;
+		var conn = CrosstalkConfig.getInstance().getConnection();
+		var stmt = conn.createStatement();
+		var prep = conn.prepareStatement(sql);
+		ResultSet rs = prep.executeQuery();
+		while(rs.next()) {
+			int id = rs.getInt("id");
+			Campaign c = Campaign.getInstance(id);
+			c.updated_at = System.currentTimeMillis();
+			Campaign.toSql(c, conn);
+			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+			w.run();
+		}
+	}
+	
 	public static PreparedStatement toSql(Targeting c, Connection conn) throws Exception {
 		if (c.id == 0) 
 			return doNew(c, conn);
@@ -536,15 +554,15 @@ public class Targeting {
 			p.setNull(2,Types.VARCHAR);
 		p.setString(2, c.domain_targetting);
 		if (c.geo_latitude == 0)
-			p.setDouble(3,Types.DOUBLE);
+			p.setNull(3,Types.DOUBLE);
 		else
 			p.setDouble(3,c.geo_latitude);
 		if (c.geo_longitude == 0)
-			p.setDouble(4,Types.DOUBLE);
+			p.setNull(4,Types.DOUBLE);
 		else
 			p.setDouble(4,c.geo_longitude);
 		if (c.geo_range == 0)
-			p.setDouble(5,Types.DOUBLE);
+			p.setNull(5,Types.DOUBLE);
 		else
 		p.setDouble(5,c.geo_range);
 		
@@ -616,15 +634,15 @@ public class Targeting {
 			p.setNull(2,Types.VARCHAR);
 		p.setString(2, c.domain_targetting);
 		if (c.geo_latitude == 0)
-			p.setDouble(3,Types.DOUBLE);
+			p.setNull(3,Types.DOUBLE);
 		else
 			p.setDouble(3,c.geo_latitude);
 		if (c.geo_longitude == 0)
-			p.setDouble(4,Types.DOUBLE);
+			p.setNull(4,Types.DOUBLE);
 		else
 			p.setDouble(4,c.geo_longitude);
 		if (c.geo_range == 0)
-			p.setDouble(5,Types.DOUBLE);
+			p.setNull(5,Types.DOUBLE);
 		else
 		p.setDouble(5,c.geo_range);
 		

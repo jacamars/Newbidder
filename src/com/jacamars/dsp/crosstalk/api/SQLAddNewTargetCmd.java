@@ -90,7 +90,7 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 				st.executeUpdate();
 				st.close();
 				
-				
+				n.updateAttachedCampaigns();
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

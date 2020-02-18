@@ -37,6 +37,7 @@ import com.hazelcast.nio.serialization.PortableWriter;
 
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.crosstalk.budget.CampaignBuilderWorker;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.DayPart;
@@ -706,6 +707,12 @@ public class Campaign implements Comparable, Portable  {
 		if (creatives.size() == 0) {
 			return false;
 		}
+		
+		if (regions != null) {
+			if (regions.toLowerCase().contains(CrosstalkConfig.getInstance().region.toLowerCase()) == false) {
+				return false;
+			}
+		}
 
 		if (budgetExceeded()) {
 			logger.debug("BUDGET EXCEEDED: {}", name);
@@ -1072,6 +1079,13 @@ public class Campaign implements Comparable, Portable  {
 				r.put("reasons",reasons);
 			}
 		}
+		
+		if (regions != null) {
+			if (regions.toLowerCase().contains(CrosstalkConfig.getInstance().region.toLowerCase()) == false) {
+				reason += "Campaign in wrong bidding region, campaign in: " + regions + ", this region: " 
+							+ CrosstalkConfig.getInstance().region + ". " ;
+			}
+		}
 
 		if (xreasons.size() != 0) {
 			reason += DbTools.mapper.writeValueAsString(xreasons);
@@ -1118,6 +1132,50 @@ public class Campaign implements Comparable, Portable  {
 		if (!status.equals("runnable"))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * Remove the target id from all campaigns pinned to it.
+	 * @param id int. The target id.
+	 * @throws Exception on SQL errors;
+	 */
+	public static void removeTargetFromCampaigns(int id) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+				prepareStatement("select * from campaigns where target_id=?");
+		st.setInt(1, id);
+		ResultSet rs = st.executeQuery();
+		while(rs.next()) {
+			int cid = rs.getInt("id");
+			Campaign c = Campaign.getInstance(id);
+			c.target_id = 0;
+			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).executeQuery();
+			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+			w.run();
+		}
+		
+		st.close();
+	}
+	
+	public static void removeCreativeFromCampaigns(int id) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+		//		prepareStatement("select * from campaigns where banners @> " + id);
+		
+				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(banners) FROM campaigns)");
+		st.setInt(1, id);
+		ResultSet rs = st.executeQuery();
+		while(rs.next()) {
+			int cid = rs.getInt("id");
+			Campaign c = Campaign.getInstance(id);
+			int index = c.banners.indexOf(id);
+			c.banners.remove(index);
+			System.out.println("NUMBER: " + c.banners.size());
+			System.out.println(c.banners);
+			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
+			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+			w.run();
+		}
+		
+		st.close();
 	}
 
 	public static PreparedStatement toSql(Campaign c, Connection conn) throws Exception {
@@ -1209,8 +1267,10 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(15, Types.ARRAY);
 
-		if (c.banners != null) 
+		if (c.banners != null)  {
+			System.out.println("BANNERS: " + c.banners);
 			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
+		}
 		else
 			p.setNull(16,Types.ARRAY);
 		if (c.videos != null) 
@@ -1235,6 +1295,7 @@ public class Campaign implements Comparable, Portable  {
 	static PreparedStatement doUpdate(Campaign c,  Connection conn) throws Exception {
 		PreparedStatement p = null;
 		Array rulesArray  = null;
+		c.updated_at = System.currentTimeMillis();
 		if (c.rules != null) {
 			rulesArray = conn.createArrayOf("int",c.rules.toArray());
 		}
@@ -1318,8 +1379,10 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(15, Types.ARRAY);
 		
-		if (c.banners != null) 
+		if (c.banners != null)  {
+			System.out.println("======> BANNERS: " + c.banners);
 			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
+		}
 		else
 			p.setNull(16,Types.ARRAY);
 		if (c.videos != null) 
