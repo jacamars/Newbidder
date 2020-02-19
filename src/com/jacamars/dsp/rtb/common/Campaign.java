@@ -860,20 +860,15 @@ public class Campaign implements Comparable, Portable  {
 			audios = getList(myNode.get("audios"));
 		if (myNode.get("natives") != null)
 			natives = getList(myNode.get("natives"));
+			
+		processCreatives();
 		/**
 		 * Do this last
 		 */
 
 		x = myNode.get("target_id");
-		if (x == null || x instanceof NullNode || ((JsonNode)x).asInt() == 0) {
-			if (!isActive())
-				return;
-			throw new Exception("Can't have null targetting for campaign " + name);
-		}
 		if (x != null)
 			target_id = ((JsonNode)x).asInt();
-		
-		processCreatives();
 	}
 	
 	List<Integer> getList(JsonNode n) {
@@ -937,23 +932,19 @@ public class Campaign implements Comparable, Portable  {
 	}
 	
 	protected void doTargets() throws Exception {
-		if (target_id == 0) {
-			if (!isActive())
-				return;
-			throw new Exception("No targeting record was found. for " + name);
-		}
- 
-		try {
-			targeting = Targeting.getInstance(target_id); 
-		} catch (Exception err) {
-			logger.warn("Campaign id: " + id + " references unknown target id: " + target_id);
-			status = "offline";
+		if (target_id != 0) {
+			try {
+				targeting = Targeting.getInstance(target_id); 
+			} catch (Exception err) {
+				logger.warn("Campaign id: " + id + " references unknown target id: " + target_id);
+				status = "offline";
+			}
 		}
 
-		instantiate(Creative.SQL_BANNERS);
-		instantiate(Creative.SQL_VIDEOS);
-		instantiate(Creative.SQL_AUDIOS);
-		instantiate(Creative.SQL_NATIVES);
+		//instantiate(Creative.SQL_BANNERS);
+		//instantiate(Creative.SQL_VIDEOS);
+		//instantiate(Creative.SQL_AUDIOS);
+		//instantiate(Creative.SQL_NATIVES);
 		compile();
 	}
 	
@@ -1088,6 +1079,10 @@ public class Campaign implements Comparable, Portable  {
 							+ CrosstalkConfig.getInstance().region + ". " ;
 			}
 		}
+		
+		if (status.equals("runnable")==false) {
+			reason += "Marked offline. ";
+		}
 
 		if (xreasons.size() != 0) {
 			reason += DbTools.mapper.writeValueAsString(xreasons);
@@ -1109,7 +1104,7 @@ public class Campaign implements Comparable, Portable  {
 	 *            boolean. Is this a banner
 	 * @throws Exception on SQL or JSON errors.
 	 * 
-	 */
+	 *
 	protected void instantiate(String type) throws Exception {
 
 		ArrayNode array = (ArrayNode) getMyNode().get(type);
@@ -1125,8 +1120,7 @@ public class Campaign implements Comparable, Portable  {
 				park(creative);
 			}
 		}
-	} 
-
+	} */
 	
 	public boolean isRunnable() throws Exception {
 		if (status == null)

@@ -1,13 +1,17 @@
 import React, { useState} from 'react';
 import ReactPlayer from 'react-player'
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
-
 import useScript from '../../useScript';
+import { useViewContext } from "../../ViewContext";
 
 const DemoTag = (props) => {
+
+    const vx = useViewContext();
+
     const myStyle = {
         fontSize: 12
     };
+
 
     const pausedNotice = (e) =>{
         console.log("PAUSED: " + e);
@@ -26,7 +30,7 @@ const DemoTag = (props) => {
             onPause={pausedNotice}
         url={props.adm} playing />);
     else 
-        return( <div>{ ReactHtmlParser( output) }</div> );
+        return( <div>{ ReactHtmlParser( vx.macroSub(props.adm) ) }</div> );
 }
 
 export default DemoTag;

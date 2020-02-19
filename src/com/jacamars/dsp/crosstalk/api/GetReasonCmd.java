@@ -95,9 +95,7 @@ public class GetReasonCmd extends ApiCommand {
 							e1.printStackTrace();
 						}
 					});
-					
-					
-					
+													
 					return;
 				}
 				

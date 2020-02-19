@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS banners (
   id SERIAL,
+  type text NOT null,
   interval_start timestamp NOT NULL,
   interval_end timestamp DEFAULT NULL,
   total_budget decimal DEFAULT NULL,

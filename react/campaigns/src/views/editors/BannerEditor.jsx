@@ -26,11 +26,13 @@ import {
 } from "reactstrap";
 import DemoTag from "./DemoTag.jsx";
 import {mimeTypes} from "../../Utils";
+import { useViewContext } from "../../ViewContext";
 
 var undef;
 
 const BannerEditor = (props) => {
 
+  const vx = useViewContext();
   const [rSelected, setRSelected] = useState(props.creative.dealType);
 
   const setDealSelection = (r) => {
@@ -53,7 +55,7 @@ const BannerEditor = (props) => {
         </Input>
       </FormGroup>
     </Col>
-    <Col className="px-md-1" md="2">
+    <Col className="px-md-1" md="6">
       <FormGroup>
         <label>Image Url</label>
         <Input
@@ -74,6 +76,7 @@ const BannerEditor = (props) => {
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}
           spellCheck={false}
+          size="6"
           type="textarea"
         />
       </FormGroup>

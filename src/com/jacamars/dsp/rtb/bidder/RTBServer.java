@@ -848,6 +848,12 @@ public class RTBServer implements Runnable {
 							+ ", fraud=" + fraud + ", cidrblocked=" + cidrblocked + ", wins=" + win + ", pixels="
 							+ pixels + ", clicks=" + clicks + ", exchanges= " + exchangeCounts + ", stopped=" + stopped
 							+ ", campaigns=" + Configuration.getInstance().getCampaignsList().size();
+					
+					// Add crosstalk info if this is the leader
+					if (RTBServer.isLeader()) {
+						msg = Crosstalk.getInstance().info + msg;
+					}
+					
 					Map m = new HashMap();
 					m.put("timestamp", System.currentTimeMillis());
 					m.put("hostname", Configuration.getInstance().instanceName);

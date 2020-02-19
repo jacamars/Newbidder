@@ -85,6 +85,8 @@ public enum Crosstalk {
 
 	public static Map<Integer, JsonNode> globalRtbSpecification;
 	public static ArrayNode exchangeAttributes = JdbcTools.factory.arrayNode();
+	
+	
 
 	/**
 	 * The list of RTB rules not specified in campaigns, creatives and targets.
@@ -96,6 +98,8 @@ public enum Crosstalk {
 
 	static ResultSet rs;
 
+	public static String info = "";
+	
 	public static final String CAMPAIGNS_KEY = "CONTEXT"; // "accountingCampaigns";
 	public static final String DELETED_CAMPAIGNS_KEY = "deletedCampaigns";
 	/**
@@ -121,6 +125,9 @@ public enum Crosstalk {
 
 		campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
 		config.getMapConfig(CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		
+		signaler = new ZPublisher(RTBServer.getSharedInstance(), "hazelcast://topic=rtbcommands");
+		signals = new Subscriber(RTBServer.getSharedInstance(), new Controller(), "hazelcast://topic=rtbcommands");
 
 		ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
@@ -135,8 +142,8 @@ public enum Crosstalk {
 			}
 		}, 0L, 1L, TimeUnit.MINUTES);
 
-		signaler = new ZPublisher(RTBServer.getSharedInstance(), "hazelcast://topic=rtbcommands");
-		signals = new Subscriber(RTBServer.getSharedInstance(), new Controller(), "hazelcast://topic=rtbcommands");
+	
+		INSTANCE.refresh();
 
 		return INSTANCE;
 
@@ -168,14 +175,9 @@ public enum Crosstalk {
 	static void updateBudgets() {
 		if (!RTBServer.isLeader())
 			return;
-
-		logger.info("CROSSTALK budgeting has started");
-
 		campaigns.entrySet().forEach(e -> {
 			e.getValue().runUsingElk();
 		});
-
-		logger.info("CROSSTALK budgeting has completed");
 	}
 
 	static void initialize() throws Exception {
@@ -489,10 +491,11 @@ public enum Crosstalk {
 			}
 
 			var canrun = Configuration.getInstance().deadmanSwitch.canRun();
-			logger.info("Heartbeat, canbid: {}, runnable campaigns: {}, parked: {}, dailyspend: {} avg-spend-min: {}",
+			info = String.format("[canbid=%b, runnable campaigns=%d, parked=%d, dailyspend=%f avg-spend-min=%f] ",
 					canrun, campaigns.size(), deletedCampaigns.size(),
 					BudgetController.getInstance().getCampaignDailySpend(null),
 					BudgetController.getInstance().getCampaignSpendAverage(null));
+			//logger.info(info);
 		} catch (Exception error) {
 			error.printStackTrace();
 			if (error.toString().toLowerCase().contains("sql")) {

@@ -88,6 +88,11 @@ var undef;
     }
   }
 
+  const report = async (id) => {
+    var reasons = await vx.getReasons(id);
+    alert(reasons);
+  }
+
   const checkRunning = (name) => {
     for (var i=0;i<vx.runningCampaigns.length;i++) {
       var x = vx.runningCampaigns[i];
@@ -134,18 +139,20 @@ var undef;
 
    return(
       vx.campaigns.map((row, index) => (
-        <tr key={'campaignsview-' + row} style={getStyle(row.status,row.name)}>
+        <tr key={'campaignsview-' + index} style={getStyle(row.status,row.name)}>
           <td>{index}</td>
           <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
           <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
           <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
           <td key={'campaignsview-edit-'+ index} className="text-center">
-            <Button color="success" size="sm" onClick={()=>viewCampaign(row.id)}>View</Button>
-             &nbsp;
-            <Button color="warning" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button>
-            &nbsp;
-            <Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button></td>
+            <Button color="success" size="sm" onClick={()=>viewCampaign(row.id)}>View</Button>{' '}
+            <Button color="warning" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button>{' '}
+            {!checkRunning(row.name)
+            ? <Button color="info" size='sm' onClick={()=>report(row.id)}>Report</Button>
+            : <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</>}
+            &nbsp; &nbsp; &nbsp;<Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button>
+            </td>
         </tr>))
     ); 
   }

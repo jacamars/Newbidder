@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS banner_videos (
   id SERIAL,
+  type text NOT NULL,
   campaign_id  int DEFAULT NULL,
   interval_start timestamp DEFAULT NULL,
   interval_end timestamp DEFAULT NULL,

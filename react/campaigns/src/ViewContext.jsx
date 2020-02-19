@@ -2,13 +2,9 @@ import {useState} from 'react';
 import createUseContext from "constate"; // State Context Object Creator
 import http from 'http';
 import axios from 'axios';
-import { SampleBanner} from './views/simulator/Utils';
-import { resetWarningCache } from 'prop-types';
 
 var undef;
-var mapXhr;
-var xhrLog;
-var interval = 0;
+
 
 const httpAgent = new http.Agent({ keepAlive: true });
 const axiosInstance = axios.create({
@@ -448,6 +444,12 @@ const  ViewContext = () => {
       return result.target;
     }
 
+    const macroSub = (data) => {
+      var rc = data.replace(/{external}/g,"http://localhost:8080");
+      console.log("DATA: " + rc);
+      return rc;
+    }
+
     const forceUpdate = async () => {
       var cmd = {
         token: jwt,
@@ -459,6 +461,20 @@ const  ViewContext = () => {
 
       console.log("ForceUpdate returns: " + JSON.stringify(result.target,null,2));
       return result.target;
+    }
+
+    const getReasons = async (id) => {
+      var cmd = {
+        token: jwt,
+        campaign: id,
+        type: "GetReason#"
+      };
+      var result = await execute(cmd);
+      if (!result)
+        return;
+
+      console.log("GetReason returns: " + JSON.stringify(result.reasons,null,2));
+      return result.reasons;
     }
 
 
@@ -490,7 +506,7 @@ const  ViewContext = () => {
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
       creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
-      forceUpdate
+      forceUpdate, getReasons, macroSub
     };
 };
 
