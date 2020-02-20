@@ -89,7 +89,7 @@ public class BidCacheStore implements MapStore<String, RecordedBid> {
     }
 
     public synchronized void delete(String key) {
-        System.out.println("Delete:" + key);
+        //System.out.println("Delete:" + key);
         try {
             con.createStatement().executeUpdate(
                     format("delete from recordedbids where id = '%s'", key));

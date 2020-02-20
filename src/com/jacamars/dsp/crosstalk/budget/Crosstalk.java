@@ -604,7 +604,7 @@ class Controller implements EventIF {
 	@Override
 	public void handleMessage(String id, String msg) {
 		try {
-			System.out.println("====> GOT A SIGNAL MESSAGE FROM: " + id + " Message is " + msg);
+			// System.out.println("====> GOT A SIGNAL MESSAGE FROM: " + id + " Message is " + msg);
 			String[] parts = msg.split(" ");
 			switch (parts[0]) {
 			case "load":

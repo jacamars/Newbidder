@@ -17,6 +17,7 @@
     "jsoneditor-react": "^1.0.1",
     "leaflet": "^1.6.0",
     "node-sass": "4.9.3",
+    "pepjs": "^0.5.0",
     "perfect-scrollbar": "1.4.0",
     "prop-types": "^15.6.2",
     "react": "16.10.2",
@@ -32,9 +33,11 @@
     "react-player": "^1.15.2",
     "react-router-dom": "4.3.1",
     "react-scripts": "^3.4.0",
+    "react-week-scheduler": "^0.1.13",
     "react-widgets": "^4.4.11",
     "react-widgets-globalize": "^5.0.20",
     "reactstrap": "8.4.1",
+    "resize-observer-polyfill": "^1.5.1",
     "use-state-with-callback": "^1.0.18"
   },
   "scripts": {

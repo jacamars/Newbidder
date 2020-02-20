@@ -18,6 +18,7 @@ import { useViewContext } from "../../ViewContext";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import DayPartEditor from "./DayPartEditor";
 import {getTrueFalseOptions, ssp} from "../../Utils.js"
 
 var regions = ["US","APAC","EUROPE","Russia"];
@@ -406,6 +407,9 @@ const getSelectedRegions = () => {
                               </FormGroup>
                             </Col>
                           </Row>
+
+                        <DayPartEditor />
+
                         </Form>
                       </CardBody>
                       <CardFooter>

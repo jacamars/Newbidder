@@ -121,7 +121,7 @@ public enum CampaignCache  {
 
             @Override
             public void entryEvicted(EntryEvent<String, Campaign> event) {
-            	System.out.println("**** EVICTED: " + event.getKey());
+//            	System.out.println("**** EVICTED: " + event.getKey());
             }
         }, true);
         

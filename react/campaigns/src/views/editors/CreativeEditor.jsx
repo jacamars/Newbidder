@@ -40,11 +40,12 @@ var undef;
 
 const CreativeEditor = (props) => {
 
-  const [count, setCount] = useState(0);
-  const [creative, setCreative] = useState(props.creative);
-  const [startDate, setStartDate] = useState(new Date(props.creative.interval_start));
-  const [endDate, setEndDate] = useState(new Date(props.creative.interval_end));
-  const vx = useViewContext();
+const [count, setCount] = useState(0);
+const [creative, setCreative] = useState(props.creative);
+const [startDate, setStartDate] = useState(new Date(props.creative.interval_start));
+const [endDate, setEndDate] = useState(new Date(props.creative.interval_end));
+const [privateDeals, setPrivateDeals] = useState(props.creative.dealType == 2);
+const vx = useViewContext();
 
 const getAttachedCampaign = () => {
     return(
@@ -86,6 +87,8 @@ const getSelectedRules = () => {
   }
 
   const addNewCreative = () => {
+
+    // Form up the creative, except deals, the callback update in Creatives.jsx will rewrite the deals.
     var x = creative;
     if (x.isBanner)
       x.type = "banner";
@@ -108,7 +111,7 @@ const getSelectedRules = () => {
     }
 
     x.name = document.getElementById("name").value;
-    x.bid_ecpm = Number(document.getElementById("price").value);
+    x.price = Number(document.getElementById("price").value);
     x.cur = document.getElementById("currency").value;
     x.total_budget = Number(document.getElementById("total_budget").value);
     x.hourly_budget = Number(document.getElementById("hourly_budget").value);
@@ -182,6 +185,18 @@ const getSelectedRules = () => {
       x.audio_bitrate = Number(x.audio_bitrate);
     }
 
+    if (privateDeals) {
+      if (x.deals === undef || x.deals.length === 0) {
+        alert("Sorry, you can't have private deals with no deals specified");
+        return;
+      }
+    }
+
+    if (x.price === 0 && (x.deals === undef || x.deals.length == 0)) {
+      alert("You can't have a 0 price AND no deals defined");
+      return;
+    }
+
     alert(JSON.stringify(x,null,2));
     props.callback(x);
   }
@@ -205,6 +220,30 @@ const getSelectedRules = () => {
   // Set the deal
   const setDealType = (t) => {
     creative.dealType = t;
+    if (t === 2) {
+      setPrivateDeals(true);
+      creative.price = 0;
+      document.getElementById("price").value = 0.0;
+    } else {
+      creative.deals = undef;
+      setPrivateDeals(false);
+    }
+    setCreative(creative);
+    setCount(count+1);
+  }
+
+  const setDealsArray = (deals) => {
+    creative.deals = deals;
+    setCreative(creative);
+    setCount(count+1);
+  }
+
+  const changeDeal = (index) => {
+    var price = document.getElementById("deal-price-"+index).value;
+    var id = document.getElementById("deal-id-"+index).value;
+    creative.deals[index].price = Number(price);
+    creative.deals[index].id = id;
+    setCreative(creative);
   }
 
   const setHtml = (e,type) => {
@@ -263,6 +302,7 @@ const getSelectedRules = () => {
                                   defaultValue={creative.price}
                                   placeholder="Creative Price (Required)"
                                   type="text"
+                                  disabled={privateDeals}
                                 />
                               </FormGroup>
                             </Col>
@@ -285,7 +325,7 @@ const getSelectedRules = () => {
                               callback={setSize} 
                               selector={setSizeType}/>}
 
-                          <DealEditor creative={creative} selector={setDealType}/>
+                          <DealEditor creative={creative} changeDeal={changeDeal} selector={setDealType} setdeals={setDealsArray}/>
 
                           { creative.isBanner &&
                             <BannerEditor key={"banner-creative-"-count} 

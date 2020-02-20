@@ -890,10 +890,10 @@ public class Campaign implements Comparable, Portable  {
 		if (creatives == null) 
 			creatives = new ArrayList<>();
 		try {
-			banners.stream().forEach(id->creatives.add(Creative.getBannerInstance(id)));
-			videos.stream().forEach(id->creatives.add(Creative.getVideoInstance(id)));
-			audios.stream().forEach(id->creatives.add(Creative.getAudioInstance(id)));
-			natives.stream().forEach(id->creatives.add(Creative.getNativeInstance(id)));
+			banners.stream().forEach(id->creatives.add(Creative.getInstance(id,"banner")));
+			videos.stream().forEach(id->creatives.add(Creative.getInstance(id,"video")));
+			audios.stream().forEach(id->creatives.add(Creative.getInstance(id,"audio")));
+			natives.stream().forEach(id->creatives.add(Creative.getInstance(id,"native")));
 		} catch (Exception error) {
 			logger.error("Database error loading creatives for campaign id: " + id + ", error: " + error.getMessage());
 		}

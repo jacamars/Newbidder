@@ -67,6 +67,9 @@ var undef;
       alert("Database error on campaign id: " + id);
       return;
     }
+
+
+
     setCampaign(x);
   }
 

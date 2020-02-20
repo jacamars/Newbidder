@@ -528,14 +528,12 @@ public class RTBServer implements Runnable {
 		synchronized (stopFlag) {
 			stopped = true;
 		}
-		System.out.println("**** STOPPED");
 	}
 	
 	public static void startBidder() {
 		synchronized (stopFlag) {
 			stopped = false;
 		}
-		System.out.println("**** STARTED");
 	}
 	
 	public static boolean isStopped() {

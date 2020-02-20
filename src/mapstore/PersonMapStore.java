@@ -30,7 +30,7 @@ public class PersonMapStore implements MapStore<Long, Person> {
     }
 
     public synchronized void delete(Long key) {
-        System.out.println("Delete:" + key);
+        // System.out.println("Delete:" + key);
         try {
             con.createStatement().executeUpdate(
                     format("delete from person where id = %s", key));

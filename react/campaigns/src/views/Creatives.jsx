@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
-  Badge,
   Button,
-  ButtonGroup,
-  ButtonToolbar,
   Card,
   CardHeader,
   CardBody,
@@ -59,6 +56,7 @@ var undef;
     c.isNative = false;
     c.isBanner = true;
     c.type = "banner";
+    c.price = c.bid_ecpm;
     setCreative(c);
   }
 
@@ -70,6 +68,28 @@ var undef;
     }
     if (mode === 'VIEW')
       c.readOnly = true;
+
+    // Rewrite the deals so we cn deal with them. Also, set the dealType which is used by the
+    // DealEditor, 1 is no deal, 2 is private (price is 0) and 3 is preferred.
+    if (c.dealSpec !== undef) {
+      var rc = c.dealSpec.split(",");
+      var array = [];
+      for (var i = 0; i < rc.length;i++) {
+        var d = rc[i];
+        array.push({id:d.split(":")[0],price:d.split(":")[1]})
+      }
+      if (c.price === 0)
+        c.dealType = 2;
+      else
+        c.dealType = 3;
+      c.deals = array;
+    } else {
+      c.dealType = 1;
+      c.deals = undef;
+    }
+
+    c.bid_ecpm = c.price;
+
     setCreative(c);
   }
 
@@ -90,6 +110,7 @@ var undef;
     c.isAudio = false;
     c.isNative = false;
     c.isBanner = false;
+    c.price = c.bid_ecpm;
 
     setCreative(c);
   }
@@ -110,6 +131,7 @@ var undef;
     c.native_js_tracker = "";
     c.native_context = [1];
     c.native_contextsubtype = [10];
+    c.price = c.bid_ecpm;
 
     setCreative(c);
   }
@@ -129,11 +151,26 @@ var undef;
     c.isAudio = true;
     c.isNative = false;
     c.isBanner = false;
+    c.price = c.bid_ecpm;
     setCreative(c);
   }
 
   const update = (x) => {
     if (x !== null) {
+      // rewrite the deals if they are present
+      if (x.deals !== undef && x.deals.length > 0) {
+        var deals = x.deals;
+        var str = "";
+        for (var i=0; i<deals.length;i++) {
+          str += deals[i].id + ":" + deals[i].price;
+          if (i+1 < deals.length)
+            str += ","
+        }
+        x.deals = str;
+      }
+      
+      x.bid_ecpm = x.price;
+      alert("SET PRICE TO: " + x.bid_ecpm);
       vx.addNewCreative(x);
     }
     setCreative(null)

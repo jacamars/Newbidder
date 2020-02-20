@@ -80,7 +80,7 @@ public class Deals extends ArrayList<Deal> {
 	/**
 	 * Return the highest price deal in the list of ids that match. If duplicates are found, then choose one of those at random.
 	 * @param ids List. A list of ids to match.
-	 * @return Deal. The hoghest price deal that matches.
+	 * @return Deal. The highest price deal that matches.
 	 */
 	public Deal findDealHighest(List<String> ids) {
 		Set<String> intersection = new HashSet<String>(ids); // use the copy constructor

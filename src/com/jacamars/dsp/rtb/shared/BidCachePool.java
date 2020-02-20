@@ -162,7 +162,7 @@ public enum BidCachePool {
 	}
 	
 	static void handleWatch(String category, String key) {
-		System.out.println("**** EVICTED: " + category + "/" + key );
+		// System.out.println("**** EVICTED: " + category + "/" + key );
 		List<WatchInterface> ifcs = watchMap.get(category).get(key);
 		if (ifcs != null)
 			ifcs.stream().forEach(ifc -> ifc.callback(category, key));
