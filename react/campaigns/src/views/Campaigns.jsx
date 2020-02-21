@@ -58,24 +58,26 @@ var undef;
     camp.activate_time = date.getTime();
     date.setDate(date.getDate() + 30);
     camp.expire_time = date.getTime();
+    camp.daypartSchedule = undef;
     setCampaign(camp);
   }
 
-  const editCampaign = async (id) => {
+  const editCampaign = async (id, ro) => {
     var x = await vx.getDbCampaign(id);
     if (x === undef) {
       alert("Database error on campaign id: " + id);
       return;
     }
 
+    if (ro) {
+      x.readOnly = true;
+    }
 
+    if (x.day_parting_utc === undef)
+      x.daypartSchedule = undef;
+    else
+      x.daypartSchedule = JSON.parse(x.day_parting_utc);
 
-    setCampaign(x);
-  }
-
-  const viewCampaign = async (id) => {
-    var x = await vx.getDbCampaign(id);
-    x.readOnly = true;
     setCampaign(x);
   }
 
@@ -149,8 +151,8 @@ var undef;
           <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
           <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
           <td key={'campaignsview-edit-'+ index} className="text-center">
-            <Button color="success" size="sm" onClick={()=>viewCampaign(row.id)}>View</Button>{' '}
-            <Button color="warning" size="sm" onClick={()=>editCampaign(row.id)}>Edit</Button>{' '}
+            <Button color="success" size="sm" onClick={()=>editCampaign(row.id,true)}>View</Button>{' '}
+            <Button color="warning" size="sm" onClick={()=>editCampaign(row.id,false)}>Edit</Button>{' '}
             {!checkRunning(row.name)
             ? <Button color="info" size='sm' onClick={()=>report(row.id)}>Report</Button>
             : <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</>}

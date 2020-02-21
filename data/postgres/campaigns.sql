@@ -31,5 +31,6 @@ CREATE TABLE IF NOT EXISTS campaigns (
   videos integer[] DEFAULT NULL,
   audios integer[] DEFAULT NULL,
   natives integer[] DEFAULT NULL,
+  day_parting_utc text DEFAULT NULL,
   PRIMARY KEY (id)
 );

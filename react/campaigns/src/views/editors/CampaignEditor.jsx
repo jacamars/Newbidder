@@ -31,6 +31,7 @@ const CampaignEditor = (props) => {
   const [campaign, setCampaign] = useState(props.campaign);
   const [startDate, setStartDate] = useState(new Date(props.campaign.activate_time));
   const [endDate, setEndDate] = useState(new Date(props.campaign.expire_time));
+  const [daypartSchedule, setDaypartSchedule] = useState(props.campaign.daypartSchedule);
   const vx = useViewContext();
 
 const getAttachedCreatives = () => {
@@ -146,9 +147,22 @@ const  addNewCampaign = async () => {
     x.expire_time = endDate.getTime();
     if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
 
+    if (daypartSchedule.length === 0) {
+      x.day_parting_utc = undef;
+    } else {
+      x.day_parting_utc = JSON.stringify(daypartSchedule);
+      if (x.day_parting_utc.indexOf("1") < 0) {
+          alert("Empty daypart, undef'ing it");
+          x.day_parting_utc = undef;
+      }
+    }
+
     alert(JSON.stringify(x,null,2));
 
     props.callback(x);
+
+    setCampaign(null);
+    setDaypartSchedule(null);
 
     return false;
 }
@@ -225,7 +239,9 @@ const getSelectedRegions = () => {
   }
 
   const discard = () => {
-      props.callback(false);
+    setCampaign(null);
+    setDaypartSchedule(null);
+    props.callback(false);
   }
 
   const getLabel = () => {
@@ -408,7 +424,9 @@ const getSelectedRegions = () => {
                             </Col>
                           </Row>
 
-                        <DayPartEditor />
+                        <DayPartEditor 
+                            daypart={daypartSchedule}
+                            callback={setDaypartSchedule}/>
 
                         </Form>
                       </CardBody>

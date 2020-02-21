@@ -41,6 +41,13 @@ public class DayPart {
     Map<String,List<Integer>> map;
 
     /**
+     * Empty constructor for serialization purposes
+     */
+    public DayPart() {
+    	
+    }
+    
+    /**
      * Create a daypart structure
      * @param data String. The JSON format as a string.
      * @throws Exception on JSON errors.

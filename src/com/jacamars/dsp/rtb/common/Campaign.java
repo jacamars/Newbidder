@@ -38,10 +38,10 @@ import com.hazelcast.nio.serialization.PortableWriter;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.CampaignBuilderWorker;
-import com.jacamars.dsp.crosstalk.budget.Crosstalk;
+
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.DayPart;
-import com.jacamars.dsp.crosstalk.budget.RtbStandard;
+
 import com.jacamars.dsp.crosstalk.budget.Targeting;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
@@ -166,6 +166,7 @@ public class Campaign implements Comparable, Portable  {
     public transient long adspend = 0L;
     //////////////////////////////////////////////////////
     
+    public String day_parting_utc;
     
     /**
      * Resources used to create campaign from JSON based SQL
@@ -798,11 +799,11 @@ public class Campaign implements Comparable, Portable  {
 		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
 
 		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
-				String parts = myNode.get(DAYPART).asText();
-				if (parts.equals("null") || parts.length()==0)
+			day_parting_utc = myNode.get(DAYPART).asText();
+				if (day_parting_utc.equals("null") || day_parting_utc.length()==0)
 					budget.daypart = null;
 			else
-				budget.daypart = new DayPart(parts);
+				budget.daypart = new DayPart(day_parting_utc);
 		} else
 			budget.daypart = null;
 
@@ -1274,8 +1275,9 @@ public class Campaign implements Comparable, Portable  {
 		 +"videos,"
 		 +"audios,"
 		 +"natives,"
+		 +"day_parting_utc,"
 		 +"spendrate) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -1349,7 +1351,11 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(19,Types.ARRAY);
 		
-		p.setInt(20,(int)c.assignedSpendRate);
+		if (c.day_parting_utc != null) 
+			p.setString(20, c.day_parting_utc);
+		else
+			p.setNull(20, Types.VARCHAR);
+		p.setInt(21,(int)c.assignedSpendRate);
 		
 		return p;
 	}
@@ -1383,6 +1389,7 @@ public class Campaign implements Comparable, Portable  {
 		 +"videos=?,"
 		 +"audios=?,"
 		 +"natives=?,"
+		 +"day_parting_utc=?,"
 		 +"spendrate=? WHERE id=?";
 
 		
@@ -1461,9 +1468,14 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(19,Types.ARRAY);
 		
-		p.setInt(20, (int)c.assignedSpendRate);
+		if (c.day_parting_utc == null)
+			p.setNull(20, Types.VARCHAR);
+		else
+			p.setString(20,  c.day_parting_utc);
 		
-		p.setInt(21, c.id);
+		p.setInt(21, (int)c.assignedSpendRate);
+		
+		p.setInt(22, c.id);
 
 		
 		return p;
