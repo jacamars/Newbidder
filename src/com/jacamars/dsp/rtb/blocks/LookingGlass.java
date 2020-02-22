@@ -1,13 +1,10 @@
 package com.jacamars.dsp.rtb.blocks;
 
 import java.io.BufferedReader;
+
 import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.jacamars.dsp.rtb.bidder.Controller;
-import com.jacamars.dsp.rtb.common.Configuration;
-import com.jacamars.dsp.rtb.pojo.WinObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +101,14 @@ public class LookingGlass {
 		return line.split(regex, -1);
 	}
 	
+	/**
+	 * Return the size
+	 * @return
+	 */
+	public long getMembers() {
+		return myMap.size();
+	}
+	
 	public static Object get(String name) {
 		Object x = symbols.get(name);
 		return x;
@@ -112,4 +117,5 @@ public class LookingGlass {
 	public static List<String> getAllSymbolNames() {
 		return new ArrayList<>(symbols.keySet());
 	}
+	
 }

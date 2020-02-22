@@ -30,6 +30,11 @@ public class AdxGeoCodes extends LookingGlass {
 	public AdxGeoCode query(Integer code) {
 		return geocodes.get(code);
 	}
+	
+	@Override
+	public long getMembers() {
+		return geocodes.size();
+	}
 }
 
 

@@ -28,6 +28,7 @@ import Campaigns from "views/Campaigns.jsx"
 import Targets from "views/Targets.jsx"
 import Creatives from "views/Creatives.jsx"
 import Rules from "views/Rules.jsx"
+import Sets from "views/Sets.jsx"
 
 
 var routes = [
@@ -64,6 +65,13 @@ var routes = [
     name: "Rules",
     icon: "tim-icons icon-bank",
     component: Rules,
+    layout: "/admin"
+  },
+  {
+    path: "/sets",
+    name: "Sets",
+    icon: "tim-icons icon-basket-simple",
+    component: Sets,
     layout: "/admin"
   }
 ];

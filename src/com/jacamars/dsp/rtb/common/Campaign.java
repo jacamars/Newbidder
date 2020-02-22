@@ -176,13 +176,15 @@ public class Campaign implements Comparable, Portable  {
 	/** The exchanges this campaign can be used with */
 	public List<String> exchanges = new ArrayList<String>(); 
 	transient List<String> bcat = new ArrayList<String>();
-	transient String capSpec;	
+	
+	/** rtb attribute being capped */
+	public String capSpec;	
 	/** Number of seconds before the frequency cap expires */
-	transient int capExpire;	
+	public Integer capExpire;	
 	/** The count limit of the frequency cap */
-	transient int capCount;
+	public Integer capCount;
 	/** cap time unit **/
-	transient String capTimeUnit;
+	public String capUnit;;
 	//////////////////////////////////////////////////////////////////////
     
 	/**
@@ -307,6 +309,9 @@ public class Campaign implements Comparable, Portable  {
 		this.forensiq = camp.forensiq;
 		this.status = camp.status;
 		this.frequencyCap = camp.frequencyCap;
+		this.capCount = camp.capCount;
+		this.capExpire = camp.capExpire;
+		this.capSpec = camp.capSpec;
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
 		this.assignedSpendRate = camp.assignedSpendRate;
@@ -861,6 +866,19 @@ public class Campaign implements Comparable, Portable  {
 			audios = getList(myNode.get("audios"));
 		if (myNode.get("natives") != null)
 			natives = getList(myNode.get("natives"));
+		
+		if (myNode.get("capspec") != null) {
+			capSpec = myNode.get("capspec").asText();
+		}
+		if (myNode.get("capexpire") != null) {
+			capExpire = myNode.get("capexpire").asInt();
+		}
+		if (myNode.get("capcount") != null) {
+			capCount = myNode.get("capcount").asInt();
+		}
+		if (myNode.get("capunit") != null) {
+			capUnit = myNode.get("capunit").asText();
+		}
 			
 		processCreatives();
 		/**
@@ -995,12 +1013,9 @@ public class Campaign implements Comparable, Portable  {
 			isAdx = false;
 
 		if (capSpec != null && capSpec.length() > 0 && capCount > 0 && capExpire > 0) {
-			frequencyCap = new FrequencyCap();
-			frequencyCap.capSpecification = new ArrayList<String>();
-			Targeting.getList(frequencyCap.capSpecification, capSpec);
-			frequencyCap.capTimeout = capExpire; // in seconds
-			frequencyCap.capFrequency = capCount;
-			frequencyCap.capTimeUnit = capTimeUnit;
+			List<String> spec = new ArrayList<>();
+			Targeting.getList(spec, capSpec);
+			frequencyCap = new FrequencyCap(spec,capCount,capExpire,capUnit);
 		}
 		doStandardRtb();
 	}
@@ -1276,8 +1291,12 @@ public class Campaign implements Comparable, Portable  {
 		 +"audios,"
 		 +"natives,"
 		 +"day_parting_utc,"
+		 +"capspec,"
+		 +"capcount,"
+		 +"capexpire,"
+		 +"capunit,"
 		 +"spendrate) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -1355,7 +1374,25 @@ public class Campaign implements Comparable, Portable  {
 			p.setString(20, c.day_parting_utc);
 		else
 			p.setNull(20, Types.VARCHAR);
-		p.setInt(21,(int)c.assignedSpendRate);
+		
+		if (c.capSpec != null) 
+			p.setString(21, c.capSpec);
+		else
+			p.setNull(21, Types.VARCHAR);
+		if (c.capCount == null)
+			p.setNull(22, Types.INTEGER);
+		else
+			p.setInt(22,  c.capCount);
+		if (c.capExpire == null)
+			p.setNull(23, Types.INTEGER);
+		else
+			p.setInt(23,  c.capExpire);
+		if (c.capUnit != null) 
+			p.setString(24, c.capUnit);
+		else
+			p.setNull(24, Types.VARCHAR);
+		
+		p.setInt(25,(int)c.assignedSpendRate);
 		
 		return p;
 	}
@@ -1390,6 +1427,10 @@ public class Campaign implements Comparable, Portable  {
 		 +"audios=?,"
 		 +"natives=?,"
 		 +"day_parting_utc=?,"
+		 +"capspec=?,"
+		 +"capcount=?,"
+		 +"capexpire=?,"
+		 +"capunit=?,"
 		 +"spendrate=? WHERE id=?";
 
 		
@@ -1473,9 +1514,26 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setString(20,  c.day_parting_utc);
 		
-		p.setInt(21, (int)c.assignedSpendRate);
+		if (c.capSpec != null) 
+			p.setString(21, c.capSpec);
+		else
+			p.setNull(21, Types.VARCHAR);
+		if (c.capCount == null)
+			p.setNull(22, Types.INTEGER);
+		else
+			p.setInt(22,  c.capCount);
+		if (c.capExpire == null)
+			p.setNull(23, Types.INTEGER);
+		else
+			p.setInt(23,  c.capExpire);
+		if (c.capUnit != null) 
+			p.setString(24, c.capUnit);
+		else
+			p.setNull(24, Types.VARCHAR);
 		
-		p.setInt(22, c.id);
+		p.setInt(25, (int)c.assignedSpendRate);
+		
+		p.setInt(26, c.id);
 
 		
 		return p;

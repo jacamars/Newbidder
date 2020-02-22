@@ -97,6 +97,7 @@ public class Cuckoo extends LookingGlass {
 	 * Returns the number of elements.
 	 * @return int. The number of elements in the filter.
 	 */
+	@Override
 	public long getMembers() {
 		return cuckooFilter.getCount();
 	}

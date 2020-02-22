@@ -51,6 +51,11 @@ public class IsoTwo2Iso3 extends LookingGlass {
 		if (code.length() == 3) return code;
 		return iso.get(code);
 	}
+	
+	@Override
+	public long getMembers() {
+		return iso.size();
+	}
 }
 
 

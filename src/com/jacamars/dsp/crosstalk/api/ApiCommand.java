@@ -168,9 +168,13 @@ public class ApiCommand {
     public static final String SQLDELETE_CREATIVE = "SQLDeleteCreative#";
     
     public static final String MACROSUB = "MacroSub#";
+    
+    public static final String LIST_BIGDATA = "ListBigData#";
+    
+    public static final String DELETE_SYMBOL = "DeleteSymbol#";
+    
+    public static final String QUERY_SYMBOL = "QuerySymbol#";
    
-
-
     /**
      * This class'es sl4j log object
      */
@@ -520,6 +524,21 @@ public class ApiCommand {
             case MACROSUB:
             	cmd = mapper.readValue(data, MacroSubCmd.class);
             	break;
+            	
+            case LIST_BIGDATA:
+            	cmd = mapper.readValue(data, ListBigDataCmd.class);
+            	break;
+            	
+            case DELETE_SYMBOL:
+            	cmd = mapper.readValue(data, DeleteSymbolCmd.class);
+            	requireLeader = true;
+            	break;
+            	
+            case QUERY_SYMBOL:
+            	cmd = mapper.readValue(data, QuerySymbolCmd.class);
+            	requireLeader = true;
+            	break;
+            	
             	
             default:
                 cmd = new UnknownCmd(token);

@@ -33,7 +33,7 @@ def GetAccounting():
     
 def ListSymbols():
     try:
-        r = requests.post(globalHost, data='{"type":"ListSymbols#"}')
+        r = requests.post(globalHost, data='{"type":"ListBigData#"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -203,6 +203,24 @@ def SQLGetRule(id):
 def SQLDeleteRule(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLDeleteRule#","id":"' + id + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def DeleteSymbol(name):
+    try:
+        r = requests.post(globalHost, data='{"type":"DeleteSymbol#","symbol":"' + name + '"}')
+      	print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def QuerySymbol(name,value):
+    try:
+        r = requests.post(globalHost, data='{"type":"QuerySymbol#","symbol":"' + name + '", "value":"' + value + '"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

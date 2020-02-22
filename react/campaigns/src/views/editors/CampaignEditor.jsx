@@ -75,20 +75,23 @@ const  addNewCampaign = async () => {
     x.spendrate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
 
+    var capspec = document.getElementById("capspec").value;
+    var capexpire = document.getElementById("capexpire").value;
+    var capcount = document.getElementById("capcount").value;
+    x.capunit = document.getElementById("capunit").value;
+    x.capspec = capspec === "" ? undef : capspec;
+    x.capexpire = capexpire === "" ? undef : Number(capexpire);
+    x.capcount = capcount === "" ? undef : Number(capcount);
+    
 
     var tid = document.getElementById("target").value;
     tid = getIdOf(tid);
-    if (tid === "")
-      x.target_id = 0;
-    else
-      x.target_id = tid;
+    x.target_id = tid === "" ? 0 : tid;
+    if (x.target_id == 0) {
+      alert("No viable target, assigned, offline");
+      x.status = "offline";
+    }
 
-      if (x.target_id == 0) {
-        alert("No viable target, assigned, offline");
-        x.status = "offline";
-      }
-
-  
     x.exchanges = [...document.getElementById("exchanges").options]
                      .filter((x) => x.selected)
                      .map((x)=>x.value);
@@ -147,7 +150,7 @@ const  addNewCampaign = async () => {
     x.expire_time = endDate.getTime();
     if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
 
-    if (daypartSchedule.length === 0) {
+    if (daypartSchedule === undef || daypartSchedule === null ||  daypartSchedule.length === 0) {
       x.day_parting_utc = undef;
     } else {
       x.day_parting_utc = JSON.stringify(daypartSchedule);
@@ -422,7 +425,39 @@ const getSelectedRegions = () => {
                                 <Input placeholder="0" type="number" id="hourlyBudget" defaultValue={campaign.budget.hourlyBudget}/>
                               </FormGroup>
                             </Col>
-                          </Row>
+                        </Row>
+
+                        <Row>
+                        <Col className="pr-md-1" md="4">
+                              <FormGroup>
+                              <label>Frequency Specification</label>
+                                <Input type="text" name="capspec" id="capspec" defaultValue={campaign.capSpec}/>
+                              </FormGroup>
+                            </Col>
+                            <Col className="pl-md-1" md="1">
+                              <FormGroup>
+                                <label>Count</label>
+                                <Input placeholder="0" type="number" id="capcount" defaultValue={campaign.capCount}/>
+                              </FormGroup>
+                            </Col>
+                            <Col className="px-md-1" md="1">
+                              <FormGroup>
+                                <label>Expiration</label>
+                                <Input placeholder="0" type="number" id="capexpire" defaultValue={campaign.capExpire}/>
+                              </FormGroup>
+                            </Col>
+                            <Col lassName="px-md-1" md="2">
+                              <FormGroup>
+                                <label>Timebase</label>
+                                <Input type="select" name="select" id="capunit">
+                                  <option selected={campaign.capUnit === undef || campaign.capUnit === "seconds"}>seconds</option>
+                                  <option selected={campaign.capUnit === "minutes"}>minutes</option>
+                                  <option selected={campaign.capUnit === "hours"}>hours</option>
+                                  <option selected={campaign.capUnit === "days"}>days</option>
+                                </Input>
+                              </FormGroup>
+                            </Col>
+                        </Row>
 
                         <DayPartEditor 
                             daypart={daypartSchedule}

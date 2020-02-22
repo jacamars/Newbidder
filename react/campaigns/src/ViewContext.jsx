@@ -235,6 +235,48 @@ const  ViewContext = () => {
      return data.creatives;
     }
 
+    const listSymbols = async () => {
+      var cmd = {
+        token: jwt,
+        type: "ListBigData#"
+      };
+      var data = await execute(cmd);
+      if (!data)
+        return;
+
+     console.log("=====> listSymbols returns: " + JSON.stringify(data,null,2));
+     return data.catalog;
+    }
+
+    const deleteSymbol = async (name) => {
+      var cmd = {
+        token: jwt,
+        type: "DeleteSymbol#",
+        symbol: name
+      };
+      var data = await execute(cmd);
+      if (!data)
+        return;
+
+     console.log("=====> deleteSymbols returns: " + JSON.stringify(data,null,2));
+     return data;
+    }
+
+    const querySymbol = async (name,value) => {
+      var cmd = {
+        token: jwt,
+        type: "QuerySymbol#",
+        symbol: name
+      };
+      var data = await execute(cmd);
+      if (!data)
+        return;
+
+     console.log("=====> querySymbols returns: " + JSON.stringify(data,null,2));
+     return data.reply;
+    }
+
+
     const getDbCampaign = async (id) => {
       var cmd = {
         token: jwt,
@@ -506,7 +548,7 @@ const  ViewContext = () => {
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
       creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
-      forceUpdate, getReasons, macroSub
+      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol
     };
 };
 

@@ -86,6 +86,31 @@ public class FrequencyCap implements Serializable, com.hazelcast.nio.serializati
     public FrequencyCap() {
 
     }
+    
+    public FrequencyCap(List<String> spec, int count, int expire, String unit) {
+    	 if (unit == null)
+    		 unit = "seconds";
+    	 
+    	 capSpecification = spec;        
+         capFrequency = count;
+         capTimeout = expire;
+         capTimeUnit = unit;
+         switch(unit.toLowerCase()) {
+         case "seconds":
+        	 break; // do nothing.
+         case "minutes":
+        	 capTimeout *= 60;
+        	 break;
+         case "hours":
+        	 capTimeout *= 60 * 60;
+        	 break;
+         case "days": 
+        	 capTimeout *= 60 * 60 * 24;
+        	 break;
+         default:
+        	 throw new RuntimeException("FrequencyCap does not handle timeunit of " + unit);
+         }
+    }
 
     /**
      * Return a copy of this frequency acap.
@@ -200,6 +225,9 @@ public class FrequencyCap implements Serializable, com.hazelcast.nio.serializati
         Controller.bidCachePool.increment(capSpec, capTimeout, capTimeUnit);
     }
     
+    /**
+     * Serializer for hazelcast
+     */
     @Override
 	public void readData(ObjectDataInput arg) throws IOException {
 		String buf = arg.readUTF();
@@ -212,6 +240,9 @@ public class FrequencyCap implements Serializable, com.hazelcast.nio.serializati
 		
 	}
 
+    /**
+     * Serializer for hazelcast.
+     */
 	@Override
 	public void writeData(ObjectDataOutput arg) throws IOException {
 		String buf = DbTools.mapper.writeValueAsString(this);

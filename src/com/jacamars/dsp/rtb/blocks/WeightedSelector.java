@@ -216,6 +216,11 @@ public class WeightedSelector extends LookingGlass {
         return picked;
 
     }
+    
+    @Override
+    public long getMembers() {
+    	return wMap.size();
+    }
 }
 
 

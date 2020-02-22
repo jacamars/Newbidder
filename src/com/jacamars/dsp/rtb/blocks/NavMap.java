@@ -325,4 +325,9 @@ public class NavMap extends LookingGlass implements Set {
 		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public long getMembers() {
+		return tree.size();
+	}
 }

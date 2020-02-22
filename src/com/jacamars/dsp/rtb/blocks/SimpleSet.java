@@ -81,4 +81,9 @@ public class SimpleSet extends LookingGlass {
 	public Set<String> getSet() {
 		return set;
 	}
+	
+	@Override
+	public long getMembers() {
+		return set.size();
+	}
 }

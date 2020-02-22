@@ -62,5 +62,10 @@ public class Membership extends LookingGlass {
 		symbols.put(name, this);
 		// System.out.format("[%s] - %d - %s - %s - %s\n",Controller.sdf.format(new Date()), 1, Configuration.instanceName, this.getClass().getName(),message);
 	}
+	
+	@Override
+	public long getMembers() {
+		return tree.size();
+	}
 
 }

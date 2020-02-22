@@ -84,7 +84,7 @@ public class SimpleMultiset extends LookingGlass {
 	 * Returns the number of elements.
 	 * @return int. The number of elements in the filter.
 	 */
-	public int getMembers() {
+	public long getMembers() {
 		return size;
 	}
 }

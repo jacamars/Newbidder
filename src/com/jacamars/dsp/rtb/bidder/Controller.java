@@ -1083,7 +1083,7 @@ public enum Controller {
     }
 
     /**
-     * Record a vast vdeo tag in aerospike, it will be retrieved later when the video loads.
+     * Record a vast vdeo tag in hazelcast, it will be retrieved later when the video loads.
      *
      * @param vast String. The video vast tag.
      * @param key  String. The key used to recover the vast tag

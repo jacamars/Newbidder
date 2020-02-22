@@ -32,5 +32,9 @@ CREATE TABLE IF NOT EXISTS campaigns (
   audios integer[] DEFAULT NULL,
   natives integer[] DEFAULT NULL,
   day_parting_utc text DEFAULT NULL,
+  capspec text DEFAULT NULL,
+  capcount integer DEFAULT NULL,
+  capexpire integer DEFAULT NULL,
+  capunit text DEFAULT NULL,
   PRIMARY KEY (id)
 );
