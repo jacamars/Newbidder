@@ -77,7 +77,10 @@ public class QuerySymbolCmd extends ApiCommand {
 				nano = System.nanoTime();
 				Object x = q.query(value);
 				nano = System.nanoTime() -nano;
-				reply = mapper.writeValueAsString(x);
+				if (x instanceof String)
+					reply = (String)x;
+				else
+					reply = mapper.writeValueAsString(x);
 				return;
 			} catch (Exception err) {
 				error = true;

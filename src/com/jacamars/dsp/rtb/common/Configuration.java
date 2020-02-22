@@ -254,16 +254,6 @@ public class Configuration {
 	public static final int STRATEGY_HEURISTIC = 0;
 	public static final int STRATEGY_MAX_CONNECTIONS = 1;
 
-	/** The host name where the aerospike lives */
-	public volatile String cacheHost = null;
-	/** The aerospike TCP port */
-	public volatile int cachePort = 3000;
-	/** Max number of aerospike connections */
-	public volatile int maxconns = 300;
-
-	public volatile String udfModule = null;
-	public volatile boolean forceRegisterUdfModule = false;
-
 	/** Pause on Startup */
 	public volatile boolean pauseOnStart = false;
 	/** a copy of the config verbosity object */

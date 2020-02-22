@@ -204,7 +204,7 @@ public class ProportionalRandomCollection extends LookingGlass implements Serial
      * @return String. The next heayy creative.
      */
     @Override
-    public String query(Object key) {
+    public String query(String key) {
         return next((String)key);
     }
 }

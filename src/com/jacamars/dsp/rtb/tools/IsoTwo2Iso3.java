@@ -47,6 +47,8 @@ public class IsoTwo2Iso3 extends LookingGlass {
 	 * @param code String. The 2 char ISO country code.
 	 * @return String. The 3 char ISO country code.
 	 */
+	
+	@Override
 	public String query(String code) {
 		if (code.length() == 3) return code;
 		return iso.get(code);

@@ -61,7 +61,7 @@ public class LookingGlass {
 	 * @param key Object. The key to use in the lookup.
 	 * @return Object. Returns the value at key, or null if not in the list.
 	 */
-	public Object query(Object key) {
+	public Object query(String key) {
 		if (key == null)
 			return null;
 		return myMap.get(key);
