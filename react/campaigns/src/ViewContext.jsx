@@ -27,6 +27,7 @@ const  ViewContext = () => {
     const [bidders, setBidders] = useState([]);
     const [targets, setTargets] = useState([]);
     const [creatives, setCreatives] = useState([]);
+    const [macros,setMacros] = useState({});
 
     const reset = () => {
       setLoggedIn(false);
@@ -86,9 +87,24 @@ const  ViewContext = () => {
       if (data === undef)
         return;
       
-      console.log("ListRules returns: " + JSON.stringify(data,null,2));
       setRules(data.rules);
-      return data.campaigns;
+      return data.rules;
+    }
+
+    const listMacros = async() => {
+
+      var cmd = {
+        token: jwt,
+        type: "ListMacros#"
+      };
+      var data = await execute(cmd);
+
+      if (data === undef)
+        return;
+      
+      console.log("ListMacros returns: " + JSON.stringify(data,null,2));
+      setMacros(data.macros);
+      return data.macros;
     }
 
     const listTargets = async() => {
@@ -487,9 +503,16 @@ const  ViewContext = () => {
     }
 
     const macroSub = (data) => {
-      var rc = data.replace(/{external}/g,"http://localhost:8080");
-      console.log("DATA: " + rc);
-      return rc;
+      var keys = Object.keys(macros);
+      for (var i=0;i<keys.length;i++) {
+        var key = keys[i];
+        var sub = macros[key];
+        var re = new RegExp(key);
+        //console.log("SUB " + sub + " for " + key);
+        data = data.replace(re,sub);
+      }
+      //console.log("DATA: " + data);
+      return data;
     }
 
     const forceUpdate = async () => {
@@ -548,7 +571,7 @@ const  ViewContext = () => {
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
       creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
-      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol
+      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol, listMacros
     };
 };
 

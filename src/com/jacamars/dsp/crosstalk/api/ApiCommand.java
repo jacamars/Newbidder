@@ -174,6 +174,8 @@ public class ApiCommand {
     public static final String DELETE_SYMBOL = "DeleteSymbol#";
     
     public static final String QUERY_SYMBOL = "QuerySymbol#";
+    
+    public static final String LIST_MACROS = "ListMacros#";
    
     /**
      * This class'es sl4j log object
@@ -539,6 +541,10 @@ public class ApiCommand {
             	requireLeader = true;
             	break;
             	
+            case LIST_MACROS:
+            	cmd = mapper.readValue(data, ListMacrosCmd.class);
+            	requireLeader = true;
+            	break;
             	
             default:
                 cmd = new UnknownCmd(token);

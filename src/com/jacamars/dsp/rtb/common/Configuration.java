@@ -850,6 +850,30 @@ public class Configuration {
 		logger.info("GDPR Mode = " + RTBServer.GDPR_MODE);
 
 	}
+	
+	public  Map<String,String> getEnvironment() throws Exception {
+		Map<String,String> m = new HashMap<>();
+		String[] args = new String[] { "$EXTERNAL" };
+		
+		for (String s : args) {
+			String address = Env.substitute(s);
+			m.put(s, address);
+		}
+		
+		if (redirectUrl != null)
+			m.put("{redirect_url}", redirectUrl);
+		if (eventUrl != null)
+			m.put("{event_url}", eventUrl);
+		if(vastUrl != null)
+			m.put("{vast_url}",vastUrl);
+		if (postbackUrl != null)
+			m.put("{postback_url}",postbackUrl);
+		if (winUrl != null)
+			m.put("{win_url}",winUrl);
+		m.put("{external}",Env.substitute("$EXTERNAL"));
+		
+		return m;
+	}
 
 	public static String getHostFrom(String address) {
 		String s = address.replaceAll("tcp://", "");

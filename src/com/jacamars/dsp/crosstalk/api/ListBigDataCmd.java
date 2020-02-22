@@ -54,7 +54,7 @@ public class ListBigDataCmd extends ApiCommand {
 	}
 
 	/**
-	 * Execute the command, msrshal the results.
+	 * Execute the command, marshal the results.
 	 */
 	@Override
 		public void execute() {

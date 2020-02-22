@@ -68,7 +68,7 @@ const BannerEditor = (props) => {
    </Col>
    </Row>
    <Row>
-    <Col className="px-md-1" md="6">
+    <Col className="px-md-1" sm={6}>
       <FormGroup>
         <label>HTML Template</label>
         <Input
@@ -76,7 +76,7 @@ const BannerEditor = (props) => {
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}
           spellCheck={false}
-          size="6"
+          rows={8}
           type="textarea"
         />
       </FormGroup>

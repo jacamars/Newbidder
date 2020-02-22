@@ -28,7 +28,7 @@ const DemoTag = (props) => {
             width='100%'
             height='265px'
             onPause={pausedNotice}
-        url={props.adm} playing />);
+        url={vx.macroSub(props.adm)} playing />);
     else 
         return( <div>{ ReactHtmlParser( vx.macroSub(props.adm) ) }</div> );
 }

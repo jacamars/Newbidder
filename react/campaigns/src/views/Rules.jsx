@@ -21,6 +21,9 @@ import RuleEditor from './editors/RuleEditor.jsx'
 var undef;
 
 const Rules = (props) => {
+  useEffect(() => {
+  }, []);
+
 
     const [count, setCount] = useState(0);
     const [rule, setRule] = useState(null);
@@ -48,6 +51,9 @@ const Rules = (props) => {
   }
 
   const getRulesView = () => {
+    if (vx.rules === undef)
+      return(null);
+      
     console.log("GetRulesView, rows = " + vx.rules.length);
 
     return(

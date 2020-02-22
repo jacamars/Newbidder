@@ -39,6 +39,15 @@ def ListSymbols():
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
+        
+def ListMacros():
+    try:
+        r = requests.post(globalHost, data='{"type":"ListMacros#"}')
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
 
 #
 # Ping the system
