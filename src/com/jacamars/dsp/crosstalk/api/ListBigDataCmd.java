@@ -12,6 +12,7 @@ import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 /**
@@ -23,6 +24,7 @@ public class ListBigDataCmd extends ApiCommand {
 
 	/** The list of campaigns */
 	public List<Map<String,String>> catalog;
+	public Map<String,Integer> hazelcast;
 
 	/**
 	 * Default constructor
@@ -66,6 +68,7 @@ public class ListBigDataCmd extends ApiCommand {
 					m.put("type",type);
 					m.put("size", "" + ((LookingGlass)value).getMembers());
 					catalog.add(m);
+					hazelcast = BidCachePool.getStats();
 				});
 				
 				return;

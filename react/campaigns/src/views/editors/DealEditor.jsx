@@ -72,13 +72,15 @@ const DealEditor = (props) => {
     if (rSelected == 1)
       return (null);
 
-    console.log("GetDealView, rows = " + props.creative.deals.length);
+    if (props.creative.deals === undef)
+      makeNewDeal();
+    //console.log("GetDealView, rows = " + props.creative.deals.length);
 
    return(
       props.creative.deals.map((deal, index) => (
         <Row>
           <Col className="px-md-1" md="1">
-          
+
           </Col>
           <Col className="px-md-1" md="2">
             <FormGroup>
@@ -86,19 +88,19 @@ const DealEditor = (props) => {
               <Input
                 id={"deal-id-"+index}
                 onChange={ (e) => props.changeDeal(index)}
-                placeholder="Requires a unique deal-id"
+                placeholder={"Deal#" + index + " id"}
                 defaultValue={deal.id}
                 type="text"
               />
             </FormGroup>
           </Col>
-          <Col className="px-md-1" md="1">
+          <Col className="px-md-1" md="2">
             <FormGroup>
               <label>Price ECPM</label>
               <Input
                 id={"deal-price-"+index}
                 onChange={ (e) => props.changeDeal(index)}
-                placeholder="Price in ecpm"
+                placeholder={"Deal#" + index + " price"}
                 defaultValue={deal.price}
                 type="number"
               />

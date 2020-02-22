@@ -197,7 +197,17 @@ const getSelectedRules = () => {
       return;
     }
 
-    alert(JSON.stringify(x,null,2));
+    if (x.deals !== undef) {
+      for (var i=0;i<x.deals.length;i++) {
+        var d = x.deals[i];
+        if (d.id === "") {
+          alert("Deal #" + i + " has no id, not allowed");
+          return;
+        }
+      }
+    }
+
+    // alert(JSON.stringify(x,null,2));
     props.callback(x);
   }
 

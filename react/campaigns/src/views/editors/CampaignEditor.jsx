@@ -160,7 +160,7 @@ const  addNewCampaign = async () => {
       }
     }
 
-    alert(JSON.stringify(x,null,2));
+    //alert(JSON.stringify(x,null,2));
 
     props.callback(x);
 
@@ -446,7 +446,7 @@ const getSelectedRegions = () => {
                                 <Input placeholder="0" type="number" id="capexpire" defaultValue={campaign.capExpire}/>
                               </FormGroup>
                             </Col>
-                            <Col lassName="px-md-1" md="2">
+                            <Col className="px-md-1" md="2">
                               <FormGroup>
                                 <label>Timebase</label>
                                 <Input type="select" name="select" id="capunit">

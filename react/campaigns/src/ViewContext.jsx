@@ -245,7 +245,7 @@ const  ViewContext = () => {
         return;
 
      console.log("=====> listSymbols returns: " + JSON.stringify(data,null,2));
-     return data.catalog;
+     return data;
     }
 
     const deleteSymbol = async (name) => {
@@ -312,7 +312,7 @@ const  ViewContext = () => {
       if (!result)
         return;
 
-      console.log("SQLAddNewCampaign returns: " + JSON.stringify(result,null,2));
+     // console.log("SQLAddNewCampaign returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
       return result.data;

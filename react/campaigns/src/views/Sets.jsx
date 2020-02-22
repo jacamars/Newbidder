@@ -27,6 +27,7 @@ const Sets = (props) => {
     }, []);
 
     const [bigdata, setBigdata] = useState([]);
+    const [hazel, setHazel] = useState({});
     const [count, setCount] = useState(0);
     const [modal, setModal] = useState(false);
     const [name, setName] = useState('');
@@ -38,7 +39,8 @@ const Sets = (props) => {
 
     const refresh = async () => {
         var d = await vx.listSymbols();
-        setBigdata(d);
+        setBigdata(d.catalog);
+        setHazel(d.hazelcast);
         redraw();
         return d;
       }
@@ -52,14 +54,20 @@ const Sets = (props) => {
     setModal(true);
   }
 
+  const makeNew = () => {
+
+  }
+
   const query = (name) => {
+
+  }
+
+  const queryHazel = (key) => {
 
   }
 
 
   const getSetsView = () => {
-    console.log("GetSetsView, Sets = " + bigdata.length);
-
     return(
        bigdata.map((row, index) => (
          <tr key={'setsview-' + index}>
@@ -74,16 +82,25 @@ const Sets = (props) => {
      ); 
    }
 
+   const getHazelView = () => {
+    return(
+       Object.keys(hazel).map((key,index) => (
+         <tr key={'hazelview-' + index}>
+           <td>{index}</td>
+           <td key={'hazel-name-' + index} className="text-left">{key}</td>
+           <td key={'hazel-count-' + index} className="text-left">{hazel[key]}</td>
+           <td key={'hazel-actions-' + index} className="text-center">
+            <Button color="info" size='sm' onClick={()=>queryHazel(key)}>Query</Button></td>
+         </tr>))
+     ); 
+   }
+
    const modalCallback = (doit) => {
     if (doit) {
       vx.deleteSymbol(name);
     }
     setModal(!modal);
     refresh();
-  }
-
-  const update = async(e) => {
-    
   }
 
   return (
@@ -97,6 +114,7 @@ const Sets = (props) => {
         <Row>
             <Col xs="12">
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>Load</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
@@ -116,6 +134,34 @@ const Sets = (props) => {
                       </thead>
                       <tbody>
                         { getSetsView() }
+                      </tbody>
+                    </Table>
+                  </CardBody>
+                </Card>
+            </Col>
+        </Row>
+
+        <Row>
+            <Col xs="12">
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+                <Card className="card-chart">
+                    <CardHeader>
+                        <Row>
+                            <CardTitle tag="h2">In Memory Data  Grid</CardTitle>
+                        </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <Table key={"sets-table-"+count} size="sm">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th className="text-center">Name</th>
+                            <th className="text-center">Records</th>
+                            <th className="text-center">Actions</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        { getHazelView() }
                       </tbody>
                     </Table>
                   </CardBody>

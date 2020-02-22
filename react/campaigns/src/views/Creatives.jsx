@@ -170,7 +170,6 @@ var undef;
       }
       
       x.bid_ecpm = x.price;
-      alert("SET PRICE TO: " + x.bid_ecpm);
       vx.addNewCreative(x);
     }
     setCreative(null)

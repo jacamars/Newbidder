@@ -223,6 +223,17 @@ public enum BidCachePool {
 		return INSTANCE;
 	}
 	
+	public static Map<String,Integer> getStats() {
+		Map<String,Integer> map = new HashMap<>();
+		
+		map.put("bidcache",bidCache.size());
+		map.put("videocache", videoCache.size());
+		map.put("miscCache", miscCache.size());
+		map.put("watch", watchMap.size());
+		
+		return map;
+	}
+	
 	/**
 	 * A hook for watching evictions
 	 * @param category String. Which shared interface.
