@@ -840,12 +840,18 @@ public class Configuration {
 
 		logger.info("******************* MACRO TESTS **************************");
 
-		logger.info("{redirect_url} = " + redirectUrl);
-		logger.info("{event_url} = " + eventUrl);
-		logger.info("{vast_url} = " + vastUrl);
-		logger.info("{postback_url} = " + postbackUrl);
-		logger.info("{win_url} = " + winUrl);
-
+		logger.info("{redirect_url} = {}", redirectUrl);
+		logger.info("{event_url} = {}", eventUrl);
+		logger.info("{vast_url} = {}", vastUrl);
+		logger.info("{postback_url} = {}", postbackUrl);
+		logger.info("{win_url} = {}", winUrl);
+	
+		logger.info("**************** SYSTEM MACROS ***************************");
+		
+		systemMacros.forEach((k,v)->{
+			logger.info("{} = {}",k, v);
+		});
+		
 		logger.info("**********************************************************");
 		logger.info("GDPR Mode = " + RTBServer.GDPR_MODE);
 
@@ -871,6 +877,10 @@ public class Configuration {
 		if (winUrl != null)
 			m.put("{win_url}",winUrl);
 		m.put("{external}",Env.substitute("$EXTERNAL"));
+		
+		systemMacros.forEach((k,v)->{
+			m.put(k, v);
+		});
 		
 		return m;
 	}
