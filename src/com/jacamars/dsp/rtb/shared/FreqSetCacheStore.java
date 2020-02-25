@@ -37,7 +37,7 @@ public class FreqSetCacheStore implements MapStore<Long, String> {
     }
 
     public synchronized void delete(Long key) {
-        System.out.println("Delete:" + key);
+        //System.out.println("Delete:" + key);
         try {
             con.createStatement().executeUpdate(
                     format("delete from frequencycap where id = %s", key));

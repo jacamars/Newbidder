@@ -83,7 +83,7 @@ public class AdxBidResponse extends BidResponse {
 		slotBuilder = RealtimeBidding.BidResponse.Ad.AdSlot.newBuilder();
 		adBuilder = RealtimeBidding.BidResponse.Ad.newBuilder();
 		exchange = AdxBidRequest.ADX;
-		adomain = camp.adomain;
+		adomain = camp.ad_domain;
 	}
 	
 	public AdxBidResponse build(int n) {

@@ -132,7 +132,7 @@ public class BidResponse {
 		this.timestamp = System.currentTimeMillis();
 
 		impid = imp.getImpid();
-		adid = camp.name;
+		adid = camp.stringId;;
 		crid = creat.impid;
 		this.domain = br.siteDomain;
 
@@ -204,7 +204,7 @@ public class BidResponse {
 			this.creat = x.getCreative();
 			this.price = Double.toString(x.price);
 			this.dealId = x.dealId;
-			this.adid = camp.name;
+			this.adid = camp.stringId;
 			this.imageUrl = substitute(creat.imageurl);
 			this.crid = creat.impid;
 			this.domain = br.siteDomain;
@@ -279,7 +279,7 @@ public class BidResponse {
 		response.append("\",\"iurl\":\"");
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
-		response.append(camp.adomain);
+		response.append(camp.ad_domain);
 
 		response.append("\"],\"adm\":\"");
 		
@@ -698,7 +698,7 @@ public class BidResponse {
 		response.append("\",\"iurl\":\"");
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
-		response.append(camp.adomain);
+		response.append(camp.ad_domain);
 	
 		response.append("\"],\"adm\":\"");
 		if (this.creat.isVideo()) {

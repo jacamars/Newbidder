@@ -49,6 +49,7 @@ var undef;
   };
 
   const setBiddersView = (rows) => {
+    console.log("ROWS: " + JSON.stringify(rows,null,2));
         if (rows === undef)
           return null;
         return(
@@ -58,7 +59,7 @@ var undef;
               <td key={'bidders-address-' + index} className="text-left">{row.from}</td>
               <td key={'bidders-leader-' + index} className="text-right">{row.leader.toString()}</td>
               <td key={'bidders-stopped-' + index} className="text-right">{row.stopped.toString()}</td>
-              <td key={'bidders-error-' + index} className="text-right">{row.error.toString()}</td>
+              <td key={'bidders-error-' + index} className="text-right">{row.request.toString()}</td>
               <td key={'bidders-bid-' + index} className="text-right">{row.bid.toString()}</td>
               <td key={'bidders-nobid-' + index} className="text-right">{row.nobid.toString()}</td>
               <td key={'bidders-qps-' + index} className="text-right">{row.qps.toString()}</td>
@@ -68,17 +69,18 @@ var undef;
       }
 
     const setCampaignsView = (rows,acc) => {
-        console.log("ACC: " + JSON.stringify(acc,null,2));
+        //console.log("ACC: " + JSON.stringify(acc,null,2));
+        //console.log("ROWS: " + JSON.stringify(rows,null,2));
         return(
           rows.map((row, index) => (
             <tr key={'camps-' + index}>
               <td key={'camps-index-' + index}>{index+1}</td>
               <td key={'camps-name-' + index} className="text-left">{row}</td> 
-              <td key={'camps-bids-' + index} className="text-right">{vx.getCount(acc,row+".bids")}</td>
-              <td key={'camps-wins-' + index} className="text-right">{vx.getCount(acc,row+".wins")}</td>
-              <td key={'bidders-pixels-' + index} className="text-right">{vx.getCount(acc,row+".pixels")}</td>
-              <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row+".clicks")}</td>
-              <td key={'bidders-adspend-' + index} className="text-right">{vx.getCount(acc,row+".adspend")/100000}</td>
+              <td key={'camps-bids-' + index} className="text-right">{vx.getCount(acc,row,".bids")}</td>
+              <td key={'camps-wins-' + index} className="text-right">{vx.getCount(acc,row,".wins")}</td>
+              <td key={'bidders-pixels-' + index} className="text-right">{vx.getCount(acc,row,".pixels")}</td>
+              <td key={'bidders-clicks-' + index} className="text-right">{vx.getCount(acc,row,".clicks")}</td>
+              <td key={'bidders-adspend-' + index} className="text-right">{vx.getCount(acc,row,".adspend")/100000}</td>
             </tr>))
         );
       }
@@ -103,7 +105,7 @@ var undef;
                             <th className="text-center">Instance</th>
                             <th className="text-right">Leader</th>
                             <th className="text-right">Stopped</th>
-                            <th className="text-right">Error</th>
+                            <th className="text-right">Requests</th>
                             <th className="text-right">Bid</th>
                             <th className="text-right">Nobid</th>
                             <th className="text-right">QPS</th>

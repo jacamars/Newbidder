@@ -71,14 +71,13 @@ const Simulator = (props) =>  {
     json: vx.bidobject, //SampleBanner,
     uri: vx.uri,
     url: vx.url,
-    bid: vx.bidvalue, // JSON.stringify(SampleBanner, null, 2),
+    bid: vx.bidvalue, 
     response: vx.bidresponse,
     adm: vx.adm,
     nurl: vx.nurl,
     winSent: vx.winsent,
     selectedBidType: vx.bidtype,
     xtime: vx.xtime,
-    isVideo: vx.nurl.indexOf("Video") > -1,
     jsonError: false
   });
 
@@ -108,6 +107,13 @@ const Simulator = (props) =>  {
 
   const bidTypeChangedHandler = (event, id) => {
     const name = event.target.value;
+
+    if (name === "Video") {
+      vars.isVideo = true;
+    } else {
+      vars.isVideo = false;
+    }
+
     var file = '?';
     for (var i in vars.bidTypes) {
       var bt = vars.bidTypes[i]
@@ -179,7 +185,6 @@ const Simulator = (props) =>  {
     vars.nurl = '';
     vars.adm = '';
     vars.creative = '';
-    vars.isVideo=false;
     vars.winSent = false;
     vx.setWinSent = false;
     setVars(vars);
@@ -233,7 +238,6 @@ const Simulator = (props) =>  {
     try {
       const response = await axiosInstance.get(nurl);
       console.log("RESPONSE: " + response.data);
-      vars.isVideo = nurl.indexOf("Video") > -1;
       vars.winSent = true;
       vx.changeWinsent(true);
       setVars(vars);

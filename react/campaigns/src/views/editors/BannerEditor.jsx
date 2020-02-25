@@ -24,7 +24,7 @@ import {
   Row,
   Col
 } from "reactstrap";
-import DemoTag from "./DemoTag.jsx";
+import DemoTag from "../simulator/DemoTag.jsx";
 import {mimeTypes} from "../../Utils";
 import { useViewContext } from "../../ViewContext";
 

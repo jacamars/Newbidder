@@ -67,12 +67,14 @@ public class Campaign implements Comparable, Portable  {
 	
 	/** SQL id */
 	public int id; 
+	public transient String stringId;
+	
 	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
 	public boolean isAdx;
 	/** points back to the name of the owner of the campaign */
 	public String name;
 	/** The default ad domain */
-	public String adomain = "default-domain";
+	public String ad_domain = "default-domain";
 	/** The list of constraint nodes for this campaign */
 	public List<Node> attributes = new ArrayList<Node>();
 	/** The list of creatives for this campaign */
@@ -85,7 +87,7 @@ public class Campaign implements Comparable, Portable  {
 	public Boolean forensiq = false;
 
 	/** The spend rate of the campaign, default is $1/minute/second in micros. */
-	public long assignedSpendRate = 16667;
+	public long spendrate = 16667;
 
 	public FrequencyCap frequencyCap = null;
 
@@ -299,10 +301,11 @@ public class Campaign implements Comparable, Portable  {
 	 */
 	private void init(Campaign camp) throws Exception {
 		this.id = camp.id;
+		this.stringId = "" + camp.id;
 		this.isAdx = camp.isAdx;
 		this.activate_time = camp.activate_time;
 		this.expire_time = camp.expire_time;
-		this.adomain = camp.adomain;
+		this.ad_domain = camp.ad_domain;
 		this.attributes = camp.attributes;
 		this.creatives = camp.creatives;
 		this.name = camp.name;
@@ -314,7 +317,7 @@ public class Campaign implements Comparable, Portable  {
 		this.capSpec = camp.capSpec;
 		this.budget = camp.budget;
 		this.updated_at = camp.updated_at;
-		this.assignedSpendRate = camp.assignedSpendRate;
+		this.spendrate = camp.spendrate;
 		this.banners = banners;
 		this.videos = videos;
 		this.natives = natives;
@@ -547,7 +550,7 @@ public class Campaign implements Comparable, Portable  {
 		int k = RTBServer.biddersCount;
 		if (k == 0)
 			k = 1;
-		effectiveSpendRate = assignedSpendRate / k;
+		effectiveSpendRate = spendrate / k;
 		Limiter.getInstance().setSpendRate(name, effectiveSpendRate);
 	}
 
@@ -640,13 +643,26 @@ public class Campaign implements Comparable, Portable  {
 	@Override
 	public void readPortable(PortableReader reader) throws IOException {
 		String json = reader.readUTF("json");
-		Campaign c = DbTools.mapper.readValue(json, Campaign.class);
+		JsonNode node = DbTools.mapper.readValue(json, JsonNode.class);
 		try {
-			init(c);
+			init(node);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Node version of init
+	 * @param node
+	 * @throws Exception
+	 */
+	public void init (JsonNode node) throws Exception {
+		myNode = node;
+		updated_at = node.get("updated_at").asLong();
+		setup();
+		process();
+		doTargets();
 	}
 	
 	////////////////////////////
@@ -792,6 +808,8 @@ public class Campaign implements Comparable, Portable  {
 		// process
 		name = myNode.get("name").asText();
 		id = myNode.get(CAMPAIGN_ID).asInt();
+		stringId = "" + id;
+		
 		budget = new Budget();
 		
 		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
@@ -854,9 +872,9 @@ public class Campaign implements Comparable, Portable  {
 			budget.hourlyBudget = null;
 		
 		status = myNode.get("status").asText();
-		adomain = myNode.get("ad_domain").asText(); 
+		ad_domain = myNode.get("ad_domain").asText(); 
 		forensiq = myNode.get("forensiq").asBoolean();
-		assignedSpendRate = myNode.get("spendrate").asInt();
+		spendrate = myNode.get("spendrate").asInt();
 		regions = myNode.get("regions").asText();
 		if (myNode.get("banners") != null)
 			banners = getList(myNode.get("banners"));
@@ -1308,7 +1326,7 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(2, Types.TIMESTAMP);
 		}
 		p.setDouble(3, c.costAsDouble());
-		p.setString(4, c.adomain);
+		p.setString(4, c.ad_domain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
 		
@@ -1392,7 +1410,7 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(24, Types.VARCHAR);
 		
-		p.setInt(25,(int)c.assignedSpendRate);
+		p.setInt(25,(int)c.spendrate);
 		
 		return p;
 	}
@@ -1445,7 +1463,7 @@ public class Campaign implements Comparable, Portable  {
 		}
 		
 		p.setDouble(3, c.costAsDouble());
-		p.setString(4, c.adomain);
+		p.setString(4, c.ad_domain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
 		if (c.budget==null || c.budget.dailyBudget == null) {
@@ -1472,7 +1490,7 @@ public class Campaign implements Comparable, Portable  {
 				if (i+1 < c.exchanges.size())
 					s += ",";
 			}
-			System.out.println("=======>" + c.exchanges);
+			// System.out.println("=======>" + c.exchanges);
 			p.setString(12, s);
 		}
 		
@@ -1491,7 +1509,7 @@ public class Campaign implements Comparable, Portable  {
 			p.setNull(15, Types.ARRAY);
 		
 		if (c.banners != null)  {
-			System.out.println("======> BANNERS: " + c.banners);
+			// System.out.println("======> BANNERS: " + c.banners);
 			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
 		}
 		else
@@ -1531,7 +1549,7 @@ public class Campaign implements Comparable, Portable  {
 		else
 			p.setNull(24, Types.VARCHAR);
 		
-		p.setInt(25, (int)c.assignedSpendRate);
+		p.setInt(25, (int)c.spendrate);
 		
 		p.setInt(26, c.id);
 

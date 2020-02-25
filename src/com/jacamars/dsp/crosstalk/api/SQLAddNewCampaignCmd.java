@@ -79,7 +79,6 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				System.out.println("NEW CAMPAIGN: " + campaign);
 				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
 				
 				Campaign c =  new Campaign(node); 

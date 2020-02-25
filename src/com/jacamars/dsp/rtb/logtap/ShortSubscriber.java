@@ -24,7 +24,7 @@ public class ShortSubscriber extends WebMQSubscriber {
 	        chan.addListener(new MessageListener<Object>() {
 	            @Override
 	            public void onMessage(String channel, Object data) {
-	            	System.out.println("====>" + data);
+	            	//System.out.println("====>" + data);
 	            	Map m = null;
 	                try {
 	                	switch(topic) {

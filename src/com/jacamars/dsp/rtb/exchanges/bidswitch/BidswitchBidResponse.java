@@ -137,7 +137,7 @@ public class BidswitchBidResponse extends BidResponse {
 			
 			response.append("\"crid\":\"").append(creat.impid).append("\",");
 			
-			response.append("\"adomain\":[\"").append(camp.adomain).append("\"],");
+			response.append("\"adomain\":[\"").append(camp.ad_domain).append("\"],");
 			
 			response.append("\"price\":").append(price).append(",");
 			

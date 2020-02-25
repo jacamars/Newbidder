@@ -73,7 +73,7 @@ public class MiscCacheStore implements MapStore<String, RecordedMisc> {
     }
 
     public synchronized void delete(String key) {
-        System.out.println("Delete:" + key);
+        //System.out.println("Delete:" + key);
         try {
             con.createStatement().executeUpdate(
                     format("delete from misc where id = '%s'", key));

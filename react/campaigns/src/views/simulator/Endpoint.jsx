@@ -56,7 +56,7 @@ const Endpoint = (props) => {
                     {optionItems}
                 </select>
             </Col>
-            <Col xs="auto">
+            <Col xs="5">
                 <InputGroup>
                     <InputGroupAddon addonType="prepend">
                         <InputGroupText>Endpoint</InputGroupText>

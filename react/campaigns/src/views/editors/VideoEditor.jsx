@@ -24,7 +24,7 @@ import {
   Row,
   Col
 } from "reactstrap";
-import DemoTag from "./DemoTag.jsx"
+import DemoTag from "../simulator/DemoTag.jsx"
 import {mimeTypes, protocolOptions} from "../../Utils"
 
 var undef;
@@ -45,7 +45,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>Mime Type</label>
         <Input
-          id="fixed-width"
+          id="mime_type"
           spellCheck={false}
           onChange={ (e) => props.callback(e,"mime_type")}
           type="select">
@@ -57,7 +57,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>Linearity</label>
         <Input
-          id="height"
+          id="vast_video_linearity"
           onChange={ (e) => props.callback(e,"vast_video_linearity")}
           defaultValue={props.creative.vast_video_linearity}
           type="text"
@@ -68,7 +68,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>Duration</label>
         <Input
-          id="height"
+          id="vast_video_duration"
           onChange={ (e) => props.callback(e,"vast_video_duration")}
           defaultValue={props.creative.vast_video_duration}
           type="text"
@@ -79,7 +79,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>VAST Video Protocol</label>
         <Input
-          id="protocol"
+          id="vast_video_protocol"
           type="select"
           onChange={ (e) => props.callback(e,"vast_video_protocol")}>
               {protocolOptions(props.creative.vast_video_protocol)}
@@ -90,7 +90,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>Bit Rate</label>
         <Input
-          id="height"
+          id="vast_video_bitrate"
           onChange={ (e) => props.callback(e,"vast_video_bitrate")}
           defaultValue={props.creative.vast_video_bitrate}
           type="text"
@@ -103,7 +103,7 @@ const VideoEditor = (props) => {
       <FormGroup>
         <label>Outgoing File</label>
         <Input
-          id="height"
+          id="outgoingfile"
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}
           type="textarea"

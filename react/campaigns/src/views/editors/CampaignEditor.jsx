@@ -148,7 +148,7 @@ const  addNewCampaign = async () => {
 
     x.activate_time = startDate.getTime();
     x.expire_time = endDate.getTime();
-    if (!x.adomain) { alert("Ad Domain cannot be blank"); return; }
+    if (!x.ad_domain) { alert("Ad Domain cannot be blank"); return; }
 
     if (daypartSchedule === undef || daypartSchedule === null ||  daypartSchedule.length === 0) {
       x.day_parting_utc = undef;
@@ -294,7 +294,7 @@ const getSelectedRegions = () => {
                                 <Input 
                                   id="adomain"
                                   placeholder="Ad domain (required)"
-                                  defaultValue={campaign.adomain}
+                                  defaultValue={campaign.ad_domain}
                                   type="text" />
                               </FormGroup>
                             </Col>

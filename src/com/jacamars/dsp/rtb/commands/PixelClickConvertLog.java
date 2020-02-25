@@ -99,7 +99,7 @@ public class PixelClickConvertLog {
             str = str.substring(0,i);
         }
         
-        System.out.println("============>PARSE: " + str);
+        //System.out.println("============>PARSE: " + str);
         String[] parts = str.split("/");
 
         for (i = 0; i < parts.length; i++) {
@@ -164,7 +164,7 @@ public class PixelClickConvertLog {
 								price = AdxWinObject.decrypt(items[1], System.currentTimeMillis());
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
-								System.out.println("Error decrypt: =====>'" + items[1] + "'");
+								//System.out.println("Error decrypt: =====>'" + items[1] + "'");
 								e.printStackTrace();
 							}
                              price /= 1000;

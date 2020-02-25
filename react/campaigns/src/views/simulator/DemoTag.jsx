@@ -1,6 +1,10 @@
+// React video.js, see here: https://docs.videojs.com/tutorial-react.html
+
 import React, { useState} from 'react';
 import ReactPlayer from 'react-player'
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
+import VideoPlayer from './VideoPlayer';
+import "video.js/dist/video-js.css";
 
 import useScript from '../../useScript';
 
@@ -19,13 +23,25 @@ const DemoTag = (props) => {
 
     let output = props.adm;
 
-    if (props.isVideo)
-        return (<ReactPlayer 
-            width='100%'
-            height='265px'
-            onPause={pausedNotice}
-        url={props.adm} playing />);
-    else 
+    if (props.isVideo) {
+        if (props.adm.indexOf("youtube")>-1) {
+            return (<ReactPlayer 
+                width='100%'
+                height='265px'
+                onPause={pausedNotice}
+                url={props.adm} playing />);
+            } else {
+              var video = JSON.parse(props.adm);
+              const videoJsOptions = {
+                autoplay: true,
+                controls: false,
+                sources: [{
+                src: video[0]
+                }]}
+                return <VideoPlayer { ...videoJsOptions } />
+            }
+    }
+    else
         return( <div>{ ReactHtmlParser( output) }</div> );
 }
 

@@ -73,7 +73,14 @@ var routes = [
     icon: "tim-icons icon-basket-simple",
     component: Sets,
     layout: "/admin"
-  }
+  },
+  {
+    path: "/simulator",
+    name: "Simulator",
+    icon: "tim-icons icon-light-3",
+    component: Simulator,
+    layout: "/admin"
+  },
 ];
 
 export default routes;

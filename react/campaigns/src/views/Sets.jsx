@@ -28,6 +28,7 @@ const Sets = (props) => {
 
     const [bigdata, setBigdata] = useState([]);
     const [hazel, setHazel] = useState({});
+    const [macros, setMacros] = useState({});
     const [count, setCount] = useState(0);
     const [modal, setModal] = useState(false);
     const [name, setName] = useState('');
@@ -41,6 +42,8 @@ const Sets = (props) => {
         var d = await vx.listSymbols();
         setBigdata(d.catalog);
         setHazel(d.hazelcast);
+        var m = await vx.listMacros();
+        setMacros(m);
         redraw();
         return d;
       }
@@ -91,6 +94,17 @@ const Sets = (props) => {
            <td key={'hazel-count-' + index} className="text-left">{hazel[key]}</td>
            <td key={'hazel-actions-' + index} className="text-center">
             <Button color="info" size='sm' onClick={()=>queryHazel(key)}>Query</Button></td>
+         </tr>))
+     ); 
+   }
+
+   const getMacroView = () => {
+    return(
+       Object.keys(macros).map((key,index) => (
+         <tr key={'macroview-' + index}>
+           <td>{index}</td>
+           <td key={'macro-name-' + index} className="text-left">{key}</td>
+           <td key={'macro-value-' + index} className="text-left">{macros[key]}</td>
          </tr>))
      ); 
    }
@@ -162,6 +176,33 @@ const Sets = (props) => {
                       </thead>
                       <tbody>
                         { getHazelView() }
+                      </tbody>
+                    </Table>
+                  </CardBody>
+                </Card>
+            </Col>
+        </Row>
+
+        <Row>
+            <Col xs="12">
+            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+                <Card className="card-chart">
+                    <CardHeader>
+                        <Row>
+                            <CardTitle tag="h2">Macros</CardTitle>
+                        </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <Table key={"sets-table-"+count} size="sm">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th className="text-center">Name</th>
+                            <th className="text-center">Value</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        { getMacroView() }
                       </tbody>
                     </Table>
                   </CardBody>

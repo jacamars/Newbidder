@@ -27,7 +27,6 @@ import {
   Row,
   Col
 } from "reactstrap";
-import DemoTag from "./DemoTag.jsx"
 import {mimeTypes, protocolOptions} from "../../Utils"
 
 var undef;

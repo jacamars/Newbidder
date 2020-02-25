@@ -126,7 +126,7 @@ public class OpenXBidResponse extends BidResponse {
         response.append("\",\"iurl\":\"");
         response.append(imageUrl);
         response.append("\",\"adomain\": [\"");
-        response.append(camp.adomain);
+        response.append(camp.ad_domain);
 
         response.append("\"],\"adm\":\"");
         if (this.creat.isVideo()) {

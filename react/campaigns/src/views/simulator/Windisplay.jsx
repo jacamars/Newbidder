@@ -18,7 +18,6 @@ const windisplay = (props) => {
 
     console.log("WIN NURL: " + props.vars.nurl);
     console.log("ADM: " + props.vars.adm);
-    console.log("VIDEO: " + props.vars.isVideo);
     const show = !(props.vars.nurl === '');
     console.log("SHOW: " + show);
 

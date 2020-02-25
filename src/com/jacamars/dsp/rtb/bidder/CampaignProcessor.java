@@ -135,7 +135,7 @@ public class CampaignProcessor implements Runnable {
 				probe.process(br.getExchange(), camp.name, Probe.GLOBAL, Probe.SPEND_RATE_EXCEEDED);
 				done = true;
 				if (printNoBidReason)
-					logger.info("camp.adId {} spend rate is exceeded: {}", camp.name, camp.assignedSpendRate);
+					logger.info("camp.adId {} spend rate is exceeded: {}", camp.name, camp.spendrate);
 				return;
 			}
 

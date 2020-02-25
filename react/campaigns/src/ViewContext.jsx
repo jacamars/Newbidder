@@ -2,6 +2,7 @@ import {useState} from 'react';
 import createUseContext from "constate"; // State Context Object Creator
 import http from 'http';
 import axios from 'axios';
+import { SampleBanner} from './views/simulator/Utils';
 
 var undef;
 
@@ -13,6 +14,50 @@ const axiosInstance = axios.create({
 
 
 const  ViewContext = () => {
+
+    const [ssp, setSsp] = useState('Nexage')
+    const [uri, setUri] = useState('/rtb/bids/nexage');
+    const [url, setUrl] = useState('http://localhost:8080');
+    const [bidtype, setBidtype] = useState('Banner');
+    const [bidvalue, setBidvalue] = useState(JSON.stringify(SampleBanner,null,2));
+    const [bidobject, setBidobject] = useState(SampleBanner);
+    const [bidresponse, setBidresponse] = useState({"response": "will go here"})
+    const [nurl, setNurl] = useState('');
+    const [xtime, setXtime] = useState('xtime: 0, rtt: 0');
+    const [adm, setAdm] = useState('');
+    const [winsent, setWinsent] = useState(false);
+    const changeSsp = (name) => {
+        setSsp(name);
+    }
+    const changeUri = (name) => {
+        setUri(name);
+    }
+    const changeUrl = (name) => {
+        setUrl(name);
+    }
+    const changeBidtype = (name) => {
+        setBidtype(name);
+    }
+    const changeBidvalue = (value) => {
+        setBidvalue(value);
+        var x = eval('(' + value + ')');
+        setBidobject(x);
+    }
+    const changeBidresponse = (value) => {
+        setBidresponse(value)
+    }
+    const changeNurl = (value) => {
+        setNurl(value);
+    }
+    const changeXtime = (value) => {
+        setXtime(value)
+    }
+    const changeAdm = (value) => {
+        setAdm(value);
+    }
+    const changeWinsent = (value) => {
+        setWinsent(value);
+    }
 
     const [loggedIn, setLoggedIn] = useState(false);
     const [name,setName] = useState('');
@@ -557,10 +602,19 @@ const  ViewContext = () => {
       }
     }
 
-    const getCount = (acc,id) => {
-      if (acc[id] === undef)
-        return 0;
-      return acc[id];
+    // Acc is the accounting array, name is the name in question, and tail is what we are looking for.
+    const getCount = (acc,name,tail) => {
+      // Convert name to id.
+      for (var i=0;i<campaigns.length;i++) {
+        var c = campaigns[i];
+        if (c.name === name) {
+          var id = "" + c.id + tail;
+          if (acc[id] === undef)
+            return 0;
+          return acc[id];
+        }
+      }
+      return 0;
     }
 
       ///////////////////////////
@@ -571,7 +625,11 @@ const  ViewContext = () => {
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
       creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
-      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol, listMacros
+      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol, listMacros,
+
+      ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
+      bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
+      changeWinsent
     };
 };
 

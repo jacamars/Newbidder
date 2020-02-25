@@ -2,29 +2,12 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
-  Badge,
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  CardText,
-
-  CardTitle,
-  Form,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Table,
-  Label,
   Row,
   Col
 } from "reactstrap";
-import DemoTag from "./DemoTag.jsx"
+import DemoTag from "../simulator/DemoTag.jsx"
 import {mimeTypes, protocolOptions} from "../../Utils"
 
 var undef;

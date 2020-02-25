@@ -160,15 +160,38 @@ const getSelectedRules = () => {
     }
 
     if (x.isVideo) {
+      var linearity = document.getElementById("vast_video_linearity").value;
+      var duration = document.getElementById("vast_video_duration").value;
+      var bitrate = document.getElementById("vast_video_bitrate").value;
+      var protocol = document.getElementById("vast_video_protocol").value;
+
+      if (linearity === "") {
+        alert("Please fill in video linearity");
+        return;
+      }
+      if (duration === "") {
+        alert("Please fill in video duration");
+        return;
+      }
+      if (bitrate === "") {
+        alert("Please fill in bitrate");
+        return;
+      }
+      if (protocol === "") {
+        alert("Please fill in protocol");
+        return;
+      }
+
+      x.htmltemplate = document.getElementById("outgoingfile").value;
+      x.mime_type = document.getElementById("mime_type").value;
       x.vast_video_width = x.width;
       x.vast_video_height = x.height;
       x.width = undef;
       x.height = undef;
-      x.vast_video_linearity = Number(x.vast_video_linearity);
-      x.vast_video_duration = Number(x.vast_video_duration);
-      x.vast_video_bitrate = Number(x.vast_video_bitrate);
-      x.vast_video_protocol = Number(x.vast_video_protocol);
-      x.vast_video_inearity = Number(x.vast_video_linearity);
+      x.vast_video_linearity = Number(linearity);
+      x.vast_video_duration = Number(duration);
+      x.vast_video_bitrate = Number(bitrate);
+      x.vast_video_protocol = Number(protocol);
     }
 
     if (x.isAudio) {

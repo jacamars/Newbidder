@@ -75,7 +75,7 @@ public class VideoCacheStore implements MapStore<String, RecordedVideo> {
     }
 
     public synchronized void delete(String key) {
-        System.out.println("Delete:" + key);
+        // System.out.println("Delete:" + key);
         try {
             con.createStatement().executeUpdate(
                     format("delete from video where id = %s", key));

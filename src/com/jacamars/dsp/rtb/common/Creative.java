@@ -172,10 +172,10 @@ public class Creative {
 	public transient String alternateAdId;
 
 	/* creative's status */
-	public String status;
+	public String status = ALLOWED_STATUS;
 
-	/* Only Active creative is allowed to bid */
-	public static String ALLOWED_STATUS = "Active";
+	/* Only runnable creative is allowed to bid */
+	public static String ALLOWED_STATUS = "runnable";
 
 	public List<Integer> rules = new ArrayList<>();
 
@@ -299,6 +299,7 @@ public class Creative {
 			ObjectNode y = (ObjectNode) inner.get(0);
 			Creative c = new Creative(y);
 			c.id = id;
+			c.impid = "" + id;
 			c.process();
 			c.compile();
 			return c;
@@ -920,6 +921,13 @@ public class Creative {
 	 * the encoded form.
 	 */
 	void encodeUrl() {
+		/** 
+		 * Do system macros first, because they will be comprised of other macros.
+		 */
+		forwardurl = Configuration.getInstance().replaceAllSystemMacros(forwardurl);
+		if (imageurl != null) // only used on banners
+			imageurl = Configuration.getInstance().replaceAllSystemMacros(imageurl);
+		
 		MacroProcessing.findMacros(macros, forwardurl);
 		MacroProcessing.findMacros(macros, imageurl);
 
@@ -1466,8 +1474,10 @@ public class Creative {
 		attributes.clear();
 
 		price = bid_ecpm.doubleValue();
-		impid = "" + bannerid;
+		impid = "" + id;
 
+		forwardurl = htmltemplate;
+		
 		if (isBanner) {
 			if (contenttype != null && (contenttype.equalsIgnoreCase("OVERRIDE"))) {
 				adm_override = true;
@@ -1488,8 +1498,6 @@ public class Creative {
 				w = width;
 				h = height;
 			}
-
-			forwardurl = htmltemplate;
 
 			if (position != null && position.length() > 0) {
 				String[] data = position.split(",");
@@ -1665,6 +1673,7 @@ public class Creative {
 		}
 
 		// Is this WxH, ... list
+		
 		if (node.get("width_height_list") != null) {
 			if (width_height_list != null && width_height_list.length() > 0) {
 				dimensions = new Dimensions();
@@ -1766,6 +1775,7 @@ public class Creative {
 			width_height_list = null;
 
 		id = node.get("id").asInt();
+		impid = "" + id;
 		if (node.get("bid_ecpm") != null)
 			price = node.get("bid_ecpm").asDouble();
 		else

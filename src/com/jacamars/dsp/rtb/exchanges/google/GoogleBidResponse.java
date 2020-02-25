@@ -120,7 +120,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 			
 			
 			Bid.Builder bb = Bid.newBuilder();
-			bb.addAdomain(camp.adomain);
+			bb.addAdomain(camp.ad_domain);
 			bb.setW(this.width);
 			bb.setH(this.height);
 			bb.setCid(billingId);
@@ -291,7 +291,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 		this.forwardUrl = adm;
 		
 		Bid.Builder bb = Bid.newBuilder();
-		bb.addAdomain(camp.adomain);
+		bb.addAdomain(camp.ad_domain);
 		bb.setAdid(camp.name);
 
 		if (creat.w != null)

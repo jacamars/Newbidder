@@ -866,6 +866,8 @@ public class Configuration {
 			m.put(s, address);
 		}
 		
+		if (pixelTrackingUrl != null) 
+			m.put("{pixel_url}",pixelTrackingUrl);
 		if (redirectUrl != null)
 			m.put("{redirect_url}", redirectUrl);
 		if (eventUrl != null)
@@ -944,6 +946,21 @@ public class Configuration {
 	 */
 	public String getMacroDefinition(String macro) {
 		return systemMacros.get(macro);
+	}
+	
+	/**
+	 * Take a string, and apply all the system macros to it.
+	 * @param input String. The input string.
+	 * @return String. The resultant string.
+	 */
+	public String replaceAllSystemMacros(String input) {
+		StringBuilder sb = new StringBuilder(input);
+		
+		systemMacros.forEach((k,v)->{
+			MacroProcessing.replaceAll(sb, k, v);
+		});
+		
+		return sb.toString();
 	}
 
 	/**
@@ -1743,7 +1760,7 @@ public class Configuration {
 				String cid = ""+c.id;
 				if (id.equals(cid)) {
 					addCampaign(c);
-					logger.info("Loaded  id: {}, name:{}", c.id, c.name);
+				logger.info("Loaded  id: {}, name:{}", c.id, c.name);
 				}
 			}
 		} finally {

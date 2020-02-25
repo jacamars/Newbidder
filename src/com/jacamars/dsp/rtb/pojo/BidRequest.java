@@ -172,11 +172,11 @@ public class BidRequest {
 				}
 			}
 
-			logger.debug("Compiling for domain: {} ", c.adomain);
+			logger.debug("Compiling for domain: {} ", c.ad_domain);
 			for (int j = 0; j < c.attributes.size(); j++) {
 				Node node = c.attributes.get(j);
 				if (mapp.containsKey(keys) == false) {
-					logger.debug("Compile unit: {}: {} values: {}", c.adomain, node.hierarchy, node.bidRequestValues);
+					logger.debug("Compile unit: {}: {} values: {}", c.ad_domain, node.hierarchy, node.bidRequestValues);
 
 					if (node.hierarchy.equals("") == false) {
 						keys.add(node.hierarchy);
@@ -208,13 +208,13 @@ public class BidRequest {
 			}
 			for (Creative creative : c.creatives) { // Handle creative specific
 													// attributes
-				logger.debug("Compiling creatives for: {}: {}", c.adomain, creative.impid);
+				logger.debug("Compiling creatives for: {}: {}", c.ad_domain, creative.impid);
 
 				for (Node node : creative.attributes) {
 
 					if (mapp.containsKey(keys) == false) {
 
-						logger.debug("Compile unit: {}/{}/{}: {}", c.adomain, creative.impid, node.hierarchy,
+						logger.debug("Compile unit: {}/{}/{}: {}", c.ad_domain, creative.impid, node.hierarchy,
 								node.bidRequestValues);
 
 						if (mapp.get(node.hierarchy) == null) {

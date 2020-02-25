@@ -162,7 +162,7 @@ public class AppnexusBidResponse extends BidResponse {
 		response.append("\",\"iurl\":\"");
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
-		response.append(camp.adomain);
+		response.append(camp.ad_domain);
 		response.append("\"]");
 		// Does not use the ADM field.
 
