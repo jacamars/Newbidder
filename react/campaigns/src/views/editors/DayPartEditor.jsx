@@ -42,6 +42,11 @@ const DayPartEditor = (props) => {
   const [eventTime, setEventTime] = useState(0);
   const [timeTrack, setTimeTrack] = useState({});
 
+  const clear = () => {
+    setDays(initSchedule(undef))
+    props.callback(days);
+    props.redraw();
+  }
 
   const drawTable = () => {
     //console.log(JSON.stringify(days,null,2));
@@ -144,7 +149,7 @@ const DayPartEditor = (props) => {
     </Row>
     <Row>
     <Col className="px-md-1" md="1">
-      <Button className="btn-fill" color="danger" size="sm" onClick={()=>setDays(initSchedule(null))}>Clear</Button>
+      <Button className="btn-fill" color="danger" size="sm" onClick={()=>clear()}>Clear</Button>
     </Col>
     <Col className="px-md-1" md="8">
     <div 

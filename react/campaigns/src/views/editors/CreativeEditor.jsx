@@ -45,6 +45,11 @@ const [creative, setCreative] = useState(props.creative);
 const [startDate, setStartDate] = useState(new Date(props.creative.interval_start));
 const [endDate, setEndDate] = useState(new Date(props.creative.interval_end));
 const [privateDeals, setPrivateDeals] = useState(props.creative.dealType == 2);
+const [appnexusSSP, setAppnexus] = useState(false);
+const [bidswitchSSP, setBidswitch] = useState(false);
+const [googleSSP, setGoogle] = useState(false);
+const [stroerSSP, setStroer] = useState(false);
+
 const vx = useViewContext();
 
 const getAttachedCampaign = () => {
@@ -393,6 +398,88 @@ const getSelectedRules = () => {
                               </FormGroup>
                             </Col>
                           </Row>
+
+                          <Row>
+                            <Col className="pr-md-1" md="4">
+                            <h4>Specialty Exchange Attributes</h4>
+                            </Col>
+                          </Row>
+
+                          <Row>
+                            <Col className="pr-md-1" md="1"></Col>
+                            <Col className="pr-md-1" md="2">
+                              <ButtonGroup>
+                                <Button size="sm" className="btn-fill" color="success" onClick={()=>setAppnexus(!appnexusSSP)}>Appnexus</Button>
+                              </ButtonGroup>
+                              <FormGroup>
+                                { appnexusSSP && <>
+                                   <label>Assigned Creative ID:</label>
+                                   <Input
+                                    id="appnexus_crid"
+                                    type="text">
+                                </Input>
+                                </>}
+                                </FormGroup>
+                                </Col>
+
+                              <Col className="pr-md-1" md="2">
+                              <ButtonGroup>
+                                <Button size="sm" className="btn-fill" color="success" onClick={()=>setBidswitch(!bidswitchSSP)}>Bidswitch</Button>
+                               </ButtonGroup>
+                                { bidswitchSSP && <>
+                                  <FormGroup>
+                                  <label>Agency Name:</label>
+                                   <Input
+                                    id="agency_name"
+                                    type="text">
+                                    </Input>
+                                <label>Advertiser Name:</label>
+                                   <Input
+                                    id="advertiser_name"
+                                    type="text">
+                                    </Input>
+                                    </FormGroup>
+                                </>}
+                                </Col>
+                            </Row>
+                            <Row>
+                            <Col className="pr-md-1" md="1"></Col>
+                            <Col className="pr-md-1" md="2">
+                              <ButtonGroup>
+                                <Button size="sm" className="btn-fill" color="success" onClick={()=>setGoogle(!googleSSP)}>Google</Button>
+                              </ButtonGroup>
+                              <FormGroup>
+                                { googleSSP && <>
+                                  <label>Assigned Billing Id:</label>
+                                   <Input
+                                    id="billing_id"
+                                    type="text">
+                                </Input>
+                                </>}
+                                </FormGroup>
+                                </Col>
+
+                              <Col className="pr-md-1" md="2">
+                              <ButtonGroup>
+                                <Button size="sm" className="btn-fill" color="success" onClick={()=>setStroer(!stroerSSP)}>Stroer</Button>
+                               </ButtonGroup>
+                                { stroerSSP && <>
+                                  <FormGroup>
+                                  <label>AVR:</label>
+                                   <Input
+                                    id="avr"
+                                    type="text">
+                                    </Input>
+                                <label>AVN:</label>
+                                   <Input
+                                    id="avn"
+                                    type="text">
+                                    </Input>
+                                    </FormGroup>
+                                </>}
+                                </Col>
+                          </Row>
+
                           <Row>
                             <Col className="pr-md-1" md="4">
                               <FormGroup>

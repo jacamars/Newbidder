@@ -2,25 +2,8 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
-  Badge,
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  CardText,
-
-  CardTitle,
-  Form,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Table,
-  Label,
   Row,
   Col
 } from "reactstrap";
@@ -84,7 +67,7 @@ const BannerEditor = (props) => {
       <Col className="px-md-1" md="6">
         <FormGroup>
           <label>Visualization</label>
-          <DemoTag isVideo={false} adm={props.creative.htmltemplate} />
+          <DemoTag isVideo={false} adm={vx.macroSub(props.creative.htmltemplate)} />
         </FormGroup>
       </Col>
    </Row>

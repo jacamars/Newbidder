@@ -103,7 +103,7 @@ public class Creative {
 	public transient String encodedAdm;
 	// unencoded adm of the
 	public transient String unencodedAdm;
-	/** Extensions needed by SSPs */
+	/** Extensions needed by certain SSPs */
 	public Map<String, String> extensions = null;
 	// Currency
 	public String cur = "USD";

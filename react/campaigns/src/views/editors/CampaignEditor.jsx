@@ -460,7 +460,9 @@ const getSelectedRegions = () => {
                         </Row>
 
                         <DayPartEditor 
+                            key={"day-part-"+count}
                             daypart={daypartSchedule}
+                            redraw={redraw}
                             callback={setDaypartSchedule}/>
 
                         </Form>
