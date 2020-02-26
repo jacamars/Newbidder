@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.File;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,15 +26,11 @@ import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.NullNode;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
 import com.jacamars.dsp.crosstalk.budget.BudgetController;
-import com.jacamars.dsp.crosstalk.budget.CampaignBuilderWorker;
-import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
-import com.jacamars.dsp.crosstalk.budget.RtbStandard;
-import com.jacamars.dsp.crosstalk.budget.Targeting;
 import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.exchanges.Nexage;
@@ -104,7 +101,9 @@ public class Creative {
 	// unencoded adm of the
 	public transient String unencodedAdm;
 	/** Extensions needed by certain SSPs */
-	public Map<String, String> extensions = null;
+	public transient Map<String, String> extensions;
+	/** Extension spec for certain ssps in the database */
+	public List<String> ext_spec;
 	// Currency
 	public String cur = "USD";
 	/** Width range specification */
@@ -305,6 +304,7 @@ public class Creative {
 			return c;
 
 		} catch (Exception error) {
+			error.printStackTrace();
 			throw new RuntimeException("Error retreiving banner instance: " + id + ", error: " + error.getMessage());
 		}
 	}
@@ -320,206 +320,218 @@ public class Creative {
 		PreparedStatement p = null;
 		String table = getTable(c);
 		Array rulesArray = null;
-		if (c.rules != null) {
+		Array extArray = null;
+		if (c.rules != null) 
 			rulesArray = conn.createArrayOf("int", c.rules.toArray());
-		}
+		if (c.ext_spec != null)
+			extArray = conn.createArrayOf("varchar", c.ext_spec.toArray());
+		
+		var i = 22;
 
 		String sql = "INSERT INTO " + table + " (" + "interval_start," + "interval_end," + "total_budget,"
 				+ "daily_budget," + "hourly_budget," + "bid_ecpm," + "total_cost," + "daily_cost," + "hourly_cost,"
 				+ "created_at," + "updated_at," + "rules," + "deals," + "interstitial," + "width_range,"
-				+ "height_range," + "width_height_list," + "name," + "cur," + "type,";
+				+ "height_range," + "width_height_list," + "name," + "cur," + "type," + "ext_spec,";
 
 		if (c.isBanner) {
 			sql += "imageurl," + "width," + "height," + "contenttype," + "htmltemplate," + "position) VALUES ("
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
-			p.setString(21, c.imageurl);
-			p.setInt(22, c.width);
-			p.setInt(23, c.height);
-			p.setString(24, c.contenttype);
-			p.setString(25, c.htmltemplate);
+			
+			p.setString(i++, c.imageurl);
+			p.setInt(i++, c.width);
+			p.setInt(i++, c.height);
+			p.setString(i++, c.contenttype);
+			p.setString(i++, c.htmltemplate);
 			if (c.position != null)
-				p.setString(26, c.position);
+				p.setString(i++, c.position);
 			else
-				p.setNull(26, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 		} else if (c.isVideo) {
 			sql += "mime_type," + "vast_video_bitrate," + "vast_video_duration," + "vast_video_height,"
 					+ "vast_video_width," + "vast_video_protocol," + "vast_video_linearity," + "htmltemplate) VALUES ("
 
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?   ?,?,?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
-				p.setString(21, c.mime_type);
+				p.setString(i++, c.mime_type);
 			else
-				p.setNull(21, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.vast_video_bitrate != null)
-				p.setInt(22, c.vast_video_bitrate);
+				p.setInt(i++, c.vast_video_bitrate);
 			else
-				p.setNull(22, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_duration != null)
-				p.setInt(23, c.vast_video_duration);
+				p.setInt(i++, c.vast_video_duration);
 			else
-				p.setNull(23, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_height != null)
-				p.setInt(24, c.vast_video_height);
+				p.setInt(i++, c.vast_video_height);
 			else
-				p.setNull(24, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_width != null)
-				p.setInt(25, c.vast_video_width);
+				p.setInt(i++, c.vast_video_width);
 			else
-				p.setNull(25, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_protocol != null)
-				p.setInt(26, c.vast_video_protocol);
+				p.setInt(i++, c.vast_video_protocol);
 			else
-				p.setNull(26, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_linearity != null)
-				p.setInt(27, c.vast_video_linearity);
+				p.setInt(i++, c.vast_video_linearity);
 			else
-				p.setNull(27, Types.INTEGER);
-			p.setString(28, c.htmltemplate);
+				p.setNull(i++, Types.INTEGER);
+			p.setString(i++, c.htmltemplate);
 
 		} else if (c.isAudio) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
-				p.setString(21, c.mime_type);
+				p.setString(i++, c.mime_type);
 			else
-				p.setNull(21, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.audio_bitrate != null)
-				p.setInt(22, c.audio_bitrate);
+				p.setInt(i++, c.audio_bitrate);
 			else
-				p.setNull(22, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.audio_duration != null)
-				p.setInt(23, c.audio_duration);
+				p.setInt(i++, c.audio_duration);
 			else
-				p.setNull(23, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.audio_start_delay != null)
-				p.setInt(24, c.audio_start_delay);
+				p.setInt(i++, c.audio_start_delay);
 			else
-				p.setNull(24, Types.INTEGER);
-			p.setString(25, c.htmltemplate);
+				p.setNull(i++, Types.INTEGER);
+			p.setString(i++, c.htmltemplate);
 			if (c.audio_protocol != null)
-				p.setInt(26, c.audio_protocol);
+				p.setInt(i++, c.audio_protocol);
 			else
-				p.setNull(26, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 
 		} else if (c.isNative) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.nativead.native_assets != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_assets.toArray());
-				p.setArray(21, arr);
+				p.setArray(i++, arr);
 			} else {
-				p.setNull(21, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			}
 			if (c.nativead.native_link != null)
-				p.setString(22, c.nativead.native_link);
+				p.setString(i++, c.nativead.native_link);
 			else
-				p.setNull(22, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.nativead.native_js_tracker != null)
-				p.setString(23, c.nativead.native_js_tracker);
+				p.setString(i++, c.nativead.native_js_tracker);
 			else
-				p.setNull(23, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.nativead.native_trk_urls != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_trk_urls.toArray());
-				p.setArray(24, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(24, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_context != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_context.toArray());
-				p.setArray(25, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(25, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_contextsubtype != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_contextsubtype.toArray());
-				p.setArray(26, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(26, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_plcmttype != null)
-				p.setInt(27, c.nativead.native_plcmttype);
+				p.setInt(i++, c.nativead.native_plcmttype);
 			else
-				p.setNull(27, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_plcmttype != null)
-				p.setInt(28, c.nativead.native_plcmtct);
+				p.setInt(i++, c.nativead.native_plcmtct);
 			else
-				p.setNull(28, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 
 		} else
 			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
 
+		i = 1;
+		
 		if (c.budget != null) {
-			p.setTimestamp(1, new Timestamp(c.budget.activate_time));
-			p.setTimestamp(2, new Timestamp(c.budget.expire_time));
+			p.setTimestamp(i++, new Timestamp(c.budget.activate_time));
+			p.setTimestamp(i++, new Timestamp(c.budget.expire_time));
 		} else {
-			p.setNull(1, Types.TIMESTAMP);
-			p.setNull(2, Types.TIMESTAMP);
+			p.setNull(i++, Types.TIMESTAMP);
+			p.setNull(i++, Types.TIMESTAMP);
 		}
 
 		if (c.budget != null && c.budget.totalBudget != null)
-			p.setDouble(3, c.budget.totalBudget.doubleValue());
+			p.setDouble(i++, c.budget.totalBudget.doubleValue());
 		else
-			p.setNull(3, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
 		if (c.budget != null && c.budget.dailyBudget != null)
-			p.setDouble(4, c.budget.dailyBudget.doubleValue());
+			p.setDouble(i++, c.budget.dailyBudget.doubleValue());
 		else
-			p.setNull(4, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
 		if (c.budget != null && c.budget.hourlyBudget != null)
-			p.setDouble(5, c.budget.hourlyBudget.doubleValue());
+			p.setDouble(i++, c.budget.hourlyBudget.doubleValue());
 		else
-			p.setNull(5, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
-		p.setDouble(6, c.price);
+		p.setDouble(i++, c.price);
 
 		if (c.budget != null) {
 			if (c.budget.totalCost != null)
-				p.setDouble(7, c.budget.totalCost.doubleValue());
+				p.setDouble(i++, c.budget.totalCost.doubleValue());
 			else
-				p.setNull(7, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 			if (c.budget.dailyCost != null)
-				p.setDouble(8, c.budget.dailyCost.doubleValue());
+				p.setDouble(i++, c.budget.dailyCost.doubleValue());
 			else
-				p.setNull(8, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 			if (c.budget.hourlyCost != null)
-				p.setDouble(9, c.budget.hourlyCost.doubleValue());
+				p.setDouble(i++, c.budget.hourlyCost.doubleValue());
 			else
-				p.setNull(9, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 		} else {
-			p.setNull(7, Types.DOUBLE);
-			p.setNull(8, Types.DOUBLE);
-			p.setNull(9, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 		}
 
-		p.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
-		p.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
+		p.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
+		p.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
 		if (rulesArray != null)
-			p.setArray(12, rulesArray);
+			p.setArray(i++, rulesArray);
 		else
-			p.setNull(12, Types.ARRAY);
-		p.setString(13, c.dealSpec);
+			p.setNull(i++, Types.ARRAY);
+		p.setString(i++, c.dealSpec);
 		if (c.interstitialOnly)
-			p.setInt(14, 1);
+			p.setInt(i++, 1);
 		else
-			p.setInt(14, 0);
+			p.setInt(i++, 0);
 		if (c.width_range != null)
-			p.setString(15, c.width_range);
+			p.setString(i++, c.width_range);
 		else
-			p.setNull(15, Types.VARCHAR);
+			p.setNull(i++, Types.VARCHAR);
 		if (c.height_range != null)
-			p.setString(16, c.width_range);
+			p.setString(i++, c.width_range);
 		else
-			p.setNull(16, Types.VARCHAR);
+			p.setNull(i++, Types.VARCHAR);
 		if (c.width_height_list != null)
-			p.setString(17, c.width_range);
+			p.setString(i++, c.width_range);
 		else
-			p.setNull(17, Types.VARCHAR);
-		p.setString(18, c.name);
-		p.setString(19, c.cur);
-		p.setString(20, c.type);
+			p.setNull(i++, Types.VARCHAR);
+		p.setString(i++, c.name);
+		p.setString(i++, c.cur);
+		p.setString(i++, c.type);
+		
+		if (c.ext_spec == null)
+			p.setNull(i++, Types.ARRAY);
+		else
+			p.setArray(i++, extArray);
 
 		return p;
 	}
@@ -543,31 +555,37 @@ public class Creative {
 		PreparedStatement p = null;
 		String table = getTable(c);
 		Array rulesArray = null;
+		Array extArray = null;
+		var i = 0;
 		if (c.rules != null) {
 			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		}
+		if (c.ext_spec != null)
+			extArray = conn.createArrayOf("varchar",c.ext_spec.toArray());
 
 		String sql = "UPDATE " + table + " SET " + "interval_start=?," + "interval_end=?," + "total_budget=?,"
 				+ "daily_budget=?," + "hourly_budget=?," + "bid_ecpm=?," + "total_cost=?," + "daily_cost=?,"
 				+ "hourly_cost=?," + "updated_at=?," + "rules=?," + "deals=?," + "interstitial=?," + "width_range=?,"
-				+ "height_range=?," + "width_height_list=?," + "name=?," + "cur=?," + "type=?,";
+				+ "height_range=?," + "width_height_list=?," + "name=?," + "cur=?," + "type=?," + "ext_spec=?,";
 
+		i = 21;
+		
 		if (c.isBanner) {
 			sql += "imageurl=?," + "width=?," + "height=?," + "contenttype=?," + "htmltemplate=?,"
 					+ "position=? WHERE id=?";
 			p = conn.prepareStatement(sql);
 
-			p.setString(20, c.imageurl);
-			p.setInt(21, c.width);
-			p.setInt(22, c.height);
-			p.setString(23, c.contenttype);
-			p.setString(24, c.htmltemplate);
+			p.setString(i++, c.imageurl);
+			p.setInt(i++, c.width);
+			p.setInt(i++, c.height);
+			p.setString(i++, c.contenttype);
+			p.setString(i++, c.htmltemplate);
 			if (c.position != null)
-				p.setString(25, c.position);
+				p.setString(i++, c.position);
 			else
-				p.setNull(25, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 
-			p.setInt(26, c.id);
+			p.setInt(i++, c.id);
 		} else if (c.isVideo) {
 			sql += "mime_type=?," + "vast_video_bitrate=?," + "vast_video_duration=?," + "vast_video_height=?,"
 					+ "vast_video_width=?," + "vast_video_protocol=?," + "vast_video_linearity=?,"
@@ -575,63 +593,63 @@ public class Creative {
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
-				p.setString(20, c.mime_type);
+				p.setString(i++, c.mime_type);
 			else
-				p.setNull(20, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.vast_video_bitrate != null)
-				p.setInt(21, c.vast_video_bitrate);
+				p.setInt(i++, c.vast_video_bitrate);
 			else
-				p.setNull(21, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_duration != null)
-				p.setInt(22, c.vast_video_duration);
+				p.setInt(i++, c.vast_video_duration);
 			else
-				p.setNull(22, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_height != null)
-				p.setInt(23, c.vast_video_height);
+				p.setInt(i++, c.vast_video_height);
 			else
-				p.setNull(23, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_width != null)
-				p.setInt(24, c.vast_video_width);
+				p.setInt(i++, c.vast_video_width);
 			else
-				p.setNull(24, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_protocol != null)
-				p.setInt(25, c.vast_video_protocol);
+				p.setInt(i++, c.vast_video_protocol);
 			else
-				p.setNull(25, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.vast_video_linearity != null)
-				p.setInt(26, c.vast_video_linearity);
+				p.setInt(i++, c.vast_video_linearity);
 			else
-				p.setNull(26, Types.INTEGER);
-			p.setString(27, c.htmltemplate);
+				p.setNull(i++, Types.INTEGER);
+			p.setString(i++, c.htmltemplate);
 
-			p.setInt(28, c.id);
+			p.setInt(i++, c.id);
 		} else if (c.isAudio) {
 			sql += "mime_type=?," + "audio_bitrate=?," + "audio_duration=?," + "audio_start_delay=?,"
 					+ "htmltemplate=?," + "audio_protocol=? WHERE id=?";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
-				p.setString(20, c.mime_type);
+				p.setString(i++, c.mime_type);
 			else
-				p.setNull(20, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.audio_bitrate != null)
-				p.setInt(21, c.audio_bitrate);
+				p.setInt(i++, c.audio_bitrate);
 			else
-				p.setNull(21, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.audio_duration != null)
-				p.setInt(22, c.audio_duration);
+				p.setInt(i++, c.audio_duration);
 			else
-				p.setNull(22, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.audio_start_delay != null)
-				p.setInt(23, c.audio_start_delay);
+				p.setInt(i++, c.audio_start_delay);
 			else
-				p.setNull(23, Types.INTEGER);
-			p.setString(24, c.htmltemplate);
+				p.setNull(i++, Types.INTEGER);
+			p.setString(i++, c.htmltemplate);
 			if (c.audio_protocol != null)
-				p.setInt(25, c.audio_protocol);
+				p.setInt(i++, c.audio_protocol);
 			else
-				p.setNull(25, Types.INTEGER);
-			p.setInt(26, c.id);
+				p.setNull(i++, Types.INTEGER);
+			p.setInt(i++, c.id);
 		} else if (c.isNative) {
 			sql += "native_assets=?," + "native_link=?," + "native_js_tracker=?," + "native_trk_urls=?,"
 					+ "native_context=?," + "native_contextsubtype=?," + "native_plcmttype=?,"
@@ -641,114 +659,122 @@ public class Creative {
 
 			if (c.nativead.native_assets != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_assets.toArray());
-				p.setArray(20, arr);
+				p.setArray(i++, arr);
 			} else {
-				p.setNull(20, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			}
 			if (c.nativead.native_link != null)
-				p.setString(21, c.nativead.native_link);
+				p.setString(i++, c.nativead.native_link);
 			else
-				p.setNull(21, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.nativead.native_js_tracker != null)
-				p.setString(22, c.nativead.native_js_tracker);
+				p.setString(i++, c.nativead.native_js_tracker);
 			else
-				p.setNull(22, Types.VARCHAR);
+				p.setNull(i++, Types.VARCHAR);
 			if (c.nativead.native_trk_urls != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_trk_urls.toArray());
-				p.setArray(23, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(23, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_context != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_context.toArray());
-				p.setArray(24, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(24, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_contextsubtype != null) {
 				Array arr = conn.createArrayOf("varchar", c.nativead.native_contextsubtype.toArray());
-				p.setArray(25, arr);
+				p.setArray(i++, arr);
 			} else
-				p.setNull(25, Types.ARRAY);
+				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_plcmttype != null)
-				p.setInt(26, c.nativead.native_plcmttype);
+				p.setInt(i++, c.nativead.native_plcmttype);
 			else
-				p.setNull(26, Types.INTEGER);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_plcmttype != null)
-				p.setInt(27, c.nativead.native_plcmtct);
+				p.setInt(i++, c.nativead.native_plcmtct);
 			else
-				p.setNull(27, Types.INTEGER);
-			p.setInt(28, c.id);
+				p.setNull(i++, Types.INTEGER);
+			p.setInt(i++, c.id);
 		} else
 			throw new Exception("Can't tell what kind of creative " + c.name + " is.");
 
+		i = 1;
+		
 		if (c.budget != null) {
-			p.setTimestamp(1, new Timestamp(c.budget.activate_time));
-			p.setTimestamp(2, new Timestamp(c.budget.expire_time));
+			p.setTimestamp(i++, new Timestamp(c.budget.activate_time));
+			p.setTimestamp(i++, new Timestamp(c.budget.expire_time));
 		} else {
-			p.setNull(1, Types.TIMESTAMP);
-			p.setNull(2, Types.TIMESTAMP);
+			p.setNull(i++, Types.TIMESTAMP);
+			p.setNull(i++, Types.TIMESTAMP);
 		}
 
 		if (c.budget != null && c.budget.totalBudget != null)
-			p.setDouble(3, c.budget.totalBudget.doubleValue());
+			p.setDouble(i++, c.budget.totalBudget.doubleValue());
 		else
-			p.setNull(3, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
 		if (c.budget != null && c.budget.dailyBudget != null)
-			p.setDouble(4, c.budget.dailyBudget.doubleValue());
+			p.setDouble(i++, c.budget.dailyBudget.doubleValue());
 		else
-			p.setNull(4, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
 		if (c.budget != null && c.budget.hourlyBudget != null)
-			p.setDouble(5, c.budget.hourlyBudget.doubleValue());
+			p.setDouble(i++, c.budget.hourlyBudget.doubleValue());
 		else
-			p.setNull(5, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 
-		p.setDouble(6, c.price);
+		p.setDouble(i++, c.price);
 
 		if (c.budget != null) {
 			if (c.budget.totalCost != null)
-				p.setDouble(7, c.budget.totalCost.doubleValue());
+				p.setDouble(i++, c.budget.totalCost.doubleValue());
 			else
-				p.setNull(7, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 			if (c.budget.dailyCost != null)
-				p.setDouble(8, c.budget.dailyCost.doubleValue());
+				p.setDouble(i++, c.budget.dailyCost.doubleValue());
 			else
-				p.setNull(8, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 			if (c.budget.hourlyCost != null)
-				p.setDouble(9, c.budget.hourlyCost.doubleValue());
+				p.setDouble(i++, c.budget.hourlyCost.doubleValue());
 			else
-				p.setNull(9, Types.DOUBLE);
+				p.setNull(i++, Types.DOUBLE);
 		} else {
-			p.setNull(7, Types.DOUBLE);
-			p.setNull(8, Types.DOUBLE);
-			p.setNull(9, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
+			p.setNull(i++, Types.DOUBLE);
 		}
 
-		p.setTimestamp(10, new Timestamp(System.currentTimeMillis()));
+		p.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
 		if (rulesArray != null)
-			p.setArray(11, rulesArray);
+			p.setArray(i++, rulesArray);
 		else
-			p.setNull(11, Types.ARRAY);
-		p.setString(12, c.dealSpec);
+			p.setNull(i++, Types.ARRAY);
+		p.setString(i++, c.dealSpec);
 		if (c.interstitialOnly)
-			p.setInt(13, 1);
+			p.setInt(i++, 1);
 		else
-			p.setInt(13, 0);
+			p.setInt(i++, 0);
 		if (c.width_range != null)
-			p.setString(14, c.width_range);
+			p.setString(i++, c.width_range);
 		else
-			p.setNull(14, Types.VARCHAR);
+			p.setNull(i++, Types.VARCHAR);
 		if (c.height_range != null)
-			p.setString(15, c.width_range);
+			p.setString(i++, c.width_range);
 		else
-			p.setNull(15, Types.VARCHAR);
+			p.setNull(i++, Types.VARCHAR);
 		if (c.width_height_list != null)
-			p.setString(16, c.width_height_list);
+			p.setString(i++, c.width_height_list);
 		else
-			p.setNull(16, Types.VARCHAR);
-		p.setString(17, c.name);
-		p.setString(18, c.cur);
-		p.setString(19, c.type);
+			p.setNull(i++, Types.VARCHAR);
+		p.setString(i++, c.name);
+		p.setString(i++, c.cur);
+		p.setString(i++, c.type);
+		
+		if (c.ext_spec == null)
+			p.setNull(i++, Types.ARRAY);
+		else
+			p.setArray(i++, extArray);
+
 
 		return p;
 	}
@@ -851,6 +877,7 @@ public class Creative {
 		c.tableName = tableName;
 		c.rules = rules;
 		c.deals = deals;
+		c.ext_spec = ext_spec;
 
 		c.encodeUrl();
 		return c;
@@ -976,6 +1003,18 @@ public class Creative {
 		}
 
 		strPrice = Double.toString(price);
+		
+		/**
+		 * Create extensions, if required
+		 */
+		if (ext_spec != null) {
+			extensions = new HashMap<>();
+			ext_spec.forEach((val)->{
+				String[] parts = val.split(":");
+				extensions.put(parts[0], parts[1]);
+			});
+		}
+		
 
 		if (extensions != null) {
 			String cat = extensions.get("categories");
@@ -1525,24 +1564,26 @@ public class Creative {
 			attributes.add(n);
 		}
 
-		compileExchangeAttributes();
+		// compileExchangeAttributes();
 		handleDeals();
 		doStandardRtb();
 	}
 
 	/**
-	 * 1584205833725 Compiles the exchange specific attributes, like for Stroer and
+	 * Compiles the exchange specific attributes, like for Stroer and
 	 * Adx.
 	 * 
 	 * @param creative Creative. The creative we are attaching the extensions for.
 	 */
-	public void compileExchangeAttributes() throws Exception {
-		String theKey = "banner_id";
+	/* public void compileExchangeAttributes() throws Exception {
+		String theKey = null;
 
 		extensions = new HashMap();
 		AdxCreativeExtensions x = null;
 
-		if (!isBanner)
+		if (isBanner)
+			theKey = "banner_id";
+		if (isVideo)
 			theKey = "banner_video_id";
 
 		for (JsonNode node : Crosstalk.getInstance().exchangeAttributes) {
@@ -1593,7 +1634,7 @@ public class Creative {
 				}
 			}
 		}
-	}
+	} */
 
 	/**
 	 * Compile the video specific components of a creative.
@@ -1810,8 +1851,18 @@ public class Creative {
 				rules.add(n.get(i).asInt());
 			}
 		}
+		
+		if (myNode.get("ext_spec") != null) {
+			ArrayNode n = (ArrayNode) myNode.get("ext_spec");
+			ext_spec = new ArrayList<String>();
+			for (int i = 0; i < n.size(); i++) {
+				ext_spec.add(n.get(i).asText());
+			}
+		}
 
 		process();
+		compile();
+		encodeUrl();
 	}
 
 	public void process() throws Exception {

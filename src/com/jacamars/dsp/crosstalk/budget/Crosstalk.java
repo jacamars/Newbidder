@@ -181,13 +181,7 @@ public enum Crosstalk {
 	}
 
 	static void initialize() throws Exception {
-		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from exchange_attributes");
-		ArrayNode std = JdbcTools.convertToJson(rs);
-		Iterator<JsonNode> it = std.iterator();
-		while (it.hasNext()) {
-			JsonNode child = it.next();
-			exchangeAttributes.add(child);
-		}
+		rs = CrosstalkConfig.getInstance().getStatement().executeQuery("select * from banners");
 	}
 
 	////////////////////////////////////

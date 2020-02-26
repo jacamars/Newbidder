@@ -88,6 +88,16 @@ var undef;
       c.deals = undef;
     }
 
+    if (c.ext_spec != undef) {
+      var map = {};
+      for (var i=0;i<c.ext_spec.length;i++) {
+        var str = c.ext_spec[i];
+        var n = str.split(":");
+        map[n[0]] = n[1];
+      }
+      c.extensions = map;
+    }
+
     c.bid_ecpm = c.price;
 
     setCreative(c);

@@ -1,4 +1,4 @@
-.PHONY: clean local docker react react-control react-exchange react-campaigns
+.PHONY: clean local docker react react-control react-exchange react-campaigns backup-db restore-db
 
 build: application
 
@@ -37,6 +37,11 @@ local:
 docker:
 	docker build -t jacamars/newbidder .
 
+backup-db:
+	pg_dump -F c -b -v --dbname=postgresql://postgres:postgres@localhost:5432 > database.backup
+
+restore-db:
+	pg_restore --dbname=postgresql://postgres:postgres@localhost:5432 --clean --verbose database.backup
 
 clean:
 	mvn clean

@@ -235,8 +235,41 @@ const getSelectedRules = () => {
       }
     }
 
+    // handle extensions
+    var ext = [];
+    var appnexus_crid = getValue(document.getElementById("appnexus_crid"));
+    var agency_name = getValue(document.getElementById("agency_name"));
+    var advertiser_name = getValue(document.getElementById("advertiser_name"));
+    var billing_id = getValue(document.getElementById("billing_id"));
+    var avr = getValue(document.getElementById("avr"));
+    var avn = getValue(document.getElementById("avn"));
+    var cnames = [...document.getElementById("categories").options]
+        .filter((x) => x.selected)
+        .map((x)=>x.value);
+
+    if (appnexus_crid !== "") ext.push("appnexus_crid"+":"+appnexus_crid);
+    if (agency_name !== "") ext.push("agency_name"+":"+agency_name);
+    if (advertiser_name !== "") ext.push("advertiser_name"+":"+advertiser_name);
+    if (billing_id !== "") ext.push("billing_id"+":"+billing_id);
+    if (avr !== "") ext.push("avr"+":"+avr);
+    if (avn !== "") ext.push("avn"+":"+avn);
+    if (cnames.length !== 0) {
+      ext.push("categories"+":"+cnames.join());
+    }
+    if (ext.length !== 0) 
+      x.ext_spec = ext;
+    else
+      x.ext_spec = undef;
+
+
     // alert(JSON.stringify(x,null,2));
     props.callback(x);
+  }
+
+  const getValue = (x) => {
+    if (x === undef || x === null)
+      return "";
+    return x.value;
   }
 
   // Callback for w/h in CreativeSizeEditor
@@ -297,6 +330,22 @@ const getSelectedRules = () => {
       .map((x)=>Number(x.value));
     creative[key] = s;
     setCreative(creative);
+  }
+
+  const getCategoryList = () => {
+    var checks = [];
+    if (creative.categories !== undef)
+      checks = creative.categories;
+
+    var items = []; 
+    for (var i=1;i<26;i++) {
+      var iab = "IAB"+i;
+      if (checks.indexOf(iab)>-1)
+        items.push(<option key={"iab-"+i} selected>{iab}</option>);
+      else
+        items.push(<option key={"iab-"+i}>{iab}</option>)
+    }
+    return(items);  
   }
 
         return (
@@ -400,6 +449,17 @@ const getSelectedRules = () => {
                           </Row>
 
                           <Row>
+                            <Col>
+                                <FormGroup>
+                                    <label>Creative's Categories</label>
+                                    <Input type="select" id="categories" multiple>
+                                        {getCategoryList()}
+                                    </Input>     
+                                </FormGroup>    
+                            </Col>
+                          </Row>
+
+                          <Row>
                             <Col className="pr-md-1" md="4">
                             <h4>Specialty Exchange Attributes</h4>
                             </Col>
@@ -416,6 +476,7 @@ const getSelectedRules = () => {
                                    <label>Assigned Creative ID:</label>
                                    <Input
                                     id="appnexus_crid"
+                                    defaultValue={creative.extensions["appnexus_crid"]}
                                     type="text">
                                 </Input>
                                 </>}
@@ -431,13 +492,14 @@ const getSelectedRules = () => {
                                   <label>Agency Name:</label>
                                    <Input
                                     id="agency_name"
+                                    defaultValue={creative.extensions["agency_name"]}
                                     type="text">
                                     </Input>
                                 <label>Advertiser Name:</label>
                                    <Input
                                     id="advertiser_name"
-                                    type="text">
-                                    </Input>
+                                    type="text"
+                                    defaultValue={creative.extensions["advertiser_name"]}/>
                                     </FormGroup>
                                 </>}
                                 </Col>
@@ -453,6 +515,7 @@ const getSelectedRules = () => {
                                   <label>Assigned Billing Id:</label>
                                    <Input
                                     id="billing_id"
+                                    defaultValue={creative.extensions["billing_id"]}
                                     type="text">
                                 </Input>
                                 </>}
@@ -468,11 +531,13 @@ const getSelectedRules = () => {
                                   <label>AVR:</label>
                                    <Input
                                     id="avr"
+                                    defaultValue={creative.extensions["avr"]}
                                     type="text">
                                     </Input>
                                 <label>AVN:</label>
                                    <Input
                                     id="avn"
+                                    defaultValue={creative.extensions["avn"]}
                                     type="text">
                                     </Input>
                                     </FormGroup>

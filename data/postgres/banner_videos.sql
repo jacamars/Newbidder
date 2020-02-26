@@ -40,5 +40,6 @@ CREATE TABLE IF NOT EXISTS banner_videos (
   rules integer[] DEFAULT NULL,
   interstitial int DEFAULT NULL,
   htmltemplate text,
+  ext_spec text [ ] DEFAULT NULL,
   PRIMARY KEY (id)
 );

@@ -34,5 +34,6 @@ CREATE TABLE IF NOT EXISTS banners (
   rules integer[] DEFAULT NULL,
   position text DEFAULT NULL,
   interstitial int DEFAULT NULL,
+  ext_spec text [ ] DEFAULT NULL,
   PRIMARY KEY (id)
 );

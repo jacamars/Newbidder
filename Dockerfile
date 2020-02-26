@@ -97,6 +97,7 @@ COPY target/*with-dependencies.jar /target
 COPY wait-for-it.sh /
 RUN chmod +x wait-for-it.sh
 
+COPY database.backup /
 COPY tools/* /
 COPY data/* data/
 COPY data/postgres/* data/postgres/
