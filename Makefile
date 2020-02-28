@@ -41,7 +41,7 @@ backup-db:
 	pg_dump -F c -b -v --dbname=postgresql://postgres:postgres@localhost:5432 > database.backup
 
 restore-db:
-	pg_restore --dbname=postgresql://postgres:postgres@localhost:5432 --clean --verbose database.backup
+	pg_restore --dbname=postgresql://postgres:postgres@localhost:5432 --verbose database.backup
 
 clean:
 	mvn clean

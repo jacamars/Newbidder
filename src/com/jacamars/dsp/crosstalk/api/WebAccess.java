@@ -239,7 +239,7 @@ class Handler extends AbstractHandler {
 	///////////////////////////
 	
 	String executeCommand(String ip, InputStream body) throws Exception {
-		byte [] bytes = new byte[4096];
+		byte [] bytes = new byte[64000];
 		int rc = body.read(bytes);
 		if (rc <= 0) {
 			return "{\"error\":true, \"message\": \"empty command\"}";

@@ -5,8 +5,9 @@ import ReactPlayer from 'react-player'
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 import VideoPlayer from './VideoPlayer';
 import "video.js/dist/video-js.css";
-
 import useScript from '../../useScript';
+
+var undef;
 
 const DemoTag = (props) => {
     const myStyle = {
@@ -24,6 +25,12 @@ const DemoTag = (props) => {
     let output = props.adm;
 
     if (props.isVideo) {
+        try {
+            JSON.parse(props.adm);
+        } catch  {
+            return null
+        }
+
         if (props.adm.indexOf("youtube")>-1) {
             return (<ReactPlayer 
                 width='100%'

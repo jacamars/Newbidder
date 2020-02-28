@@ -94,6 +94,8 @@ public class Creative {
 	transient public String strPrice;
 	/** Attributes applied to all impressions */
 	public List<Node> attributes = new ArrayList<Node>();
+	/** The attributes of this creative */
+	public List<Integer> attr;
 	/** Input ADM field */
 	public List<String> adm;
 	/** The encoded version of the adm as a single string */
@@ -321,21 +323,24 @@ public class Creative {
 		String table = getTable(c);
 		Array rulesArray = null;
 		Array extArray = null;
+		Array attrArray = null;
 		if (c.rules != null) 
 			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		if (c.ext_spec != null)
 			extArray = conn.createArrayOf("varchar", c.ext_spec.toArray());
+		if (c.attr  != null)
+			attrArray = conn.createArrayOf("int", c.attr.toArray());
 		
-		var i = 22;
+		var i = 23;
 
 		String sql = "INSERT INTO " + table + " (" + "interval_start," + "interval_end," + "total_budget,"
 				+ "daily_budget," + "hourly_budget," + "bid_ecpm," + "total_cost," + "daily_cost," + "hourly_cost,"
 				+ "created_at," + "updated_at," + "rules," + "deals," + "interstitial," + "width_range,"
-				+ "height_range," + "width_height_list," + "name," + "cur," + "type," + "ext_spec,";
+				+ "height_range," + "width_height_list," + "name," + "cur," + "type," + "ext_spec," + "attr,";
 
 		if (c.isBanner) {
 			sql += "imageurl," + "width," + "height," + "contenttype," + "htmltemplate," + "position) VALUES ("
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 			
 			p.setString(i++, c.imageurl);
@@ -351,7 +356,7 @@ public class Creative {
 			sql += "mime_type," + "vast_video_bitrate," + "vast_video_duration," + "vast_video_height,"
 					+ "vast_video_width," + "vast_video_protocol," + "vast_video_linearity," + "htmltemplate) VALUES ("
 
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?   ?,?,?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
@@ -385,7 +390,7 @@ public class Creative {
 			p.setString(i++, c.htmltemplate);
 
 		} else if (c.isAudio) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
@@ -411,7 +416,7 @@ public class Creative {
 				p.setNull(i++, Types.INTEGER);
 
 		} else if (c.isNative) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.nativead.native_assets != null) {
@@ -528,10 +533,15 @@ public class Creative {
 		p.setString(i++, c.cur);
 		p.setString(i++, c.type);
 		
-		if (c.ext_spec == null)
+		if (extArray == null)
 			p.setNull(i++, Types.ARRAY);
 		else
 			p.setArray(i++, extArray);
+		
+		if (attrArray == null)
+			p.setNull(i++, Types.ARRAY);
+		else
+			p.setArray(i++, attrArray);
 
 		return p;
 	}
@@ -556,19 +566,22 @@ public class Creative {
 		String table = getTable(c);
 		Array rulesArray = null;
 		Array extArray = null;
+		Array attrArray = null;
 		var i = 0;
 		if (c.rules != null) {
 			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		}
 		if (c.ext_spec != null)
 			extArray = conn.createArrayOf("varchar",c.ext_spec.toArray());
+		if (c.attr  != null)
+			attrArray = conn.createArrayOf("int", c.attr.toArray());
 
 		String sql = "UPDATE " + table + " SET " + "interval_start=?," + "interval_end=?," + "total_budget=?,"
 				+ "daily_budget=?," + "hourly_budget=?," + "bid_ecpm=?," + "total_cost=?," + "daily_cost=?,"
 				+ "hourly_cost=?," + "updated_at=?," + "rules=?," + "deals=?," + "interstitial=?," + "width_range=?,"
-				+ "height_range=?," + "width_height_list=?," + "name=?," + "cur=?," + "type=?," + "ext_spec=?,";
+				+ "height_range=?," + "width_height_list=?," + "name=?," + "cur=?," + "type=?," + "ext_spec=?," + "attr=?,";
 
-		i = 21;
+		i = 22;
 		
 		if (c.isBanner) {
 			sql += "imageurl=?," + "width=?," + "height=?," + "contenttype=?," + "htmltemplate=?,"
@@ -775,7 +788,10 @@ public class Creative {
 		else
 			p.setArray(i++, extArray);
 
-
+		if (attrArray == null)
+			p.setNull(i++, Types.ARRAY);
+		else
+			p.setArray(i++, attrArray);
 		return p;
 	}
 
@@ -1556,7 +1572,12 @@ public class Creative {
 			}
 
 		} else
+		if (isVideo)
 			compileVideo();
+		else
+		if (isAudio) {
+			compileAudio();
+		}
 
 		if (interstitialOnly) {
 			Node n = new Node(INTERSTITIAL, "imp.0.instl", Node.EQUALS, 1);
@@ -1566,9 +1587,29 @@ public class Creative {
 
 		// compileExchangeAttributes();
 		handleDeals();
-		doStandardRtb();
+		doRules();
+		doBATTR();
 	}
 
+	/**
+	 * If attr (creative attribute types) is defined, make sure the impression isn't blocking this
+	 * @throws Exception if the creation of the parse node fails.
+	 */
+	void doBATTR() throws Exception {
+		var name = "imp.0.banner.battr";
+		if (isVideo)
+			name = "imp.0.video.battr";
+		if (isAudio)
+			name = "imp.0.audio.battr";
+		if (isNative)
+			name = "imp.0.banner.battr";
+		
+		if (attr != null) {
+			Node n = new Node("battr", name, Node.NOT_INTERSECTS, attr);
+			n.notPresentOk = true;
+			attributes.add(n);
+		}
+	}
 	/**
 	 * Compiles the exchange specific attributes, like for Stroer and
 	 * Adx.
@@ -1684,6 +1725,10 @@ public class Creative {
 		adm = new ArrayList<String>();
 		adm.add(theVideo);
 	}
+	
+	void compileAudio() throws Exception {
+		
+	}
 
 	void addDimensions() {
 		String[] parts = null;
@@ -1785,7 +1830,7 @@ public class Creative {
 	 * @param creative Creative. The RTB4FREE campaign to send out to the bidders.
 	 * @throws Exception on JSON errors
 	 */
-	void doStandardRtb() throws Exception {
+	void doRules() throws Exception {
 		rules.forEach(id -> {
 			try {
 				attributes.add(Node.getInstance(id));
@@ -1795,12 +1840,21 @@ public class Creative {
 			}
 		});
 
+		
 	}
 
 	public void update(JsonNode myNode) throws Exception {
 		node = myNode;
 
 		type = node.get("type").asText();
+		if (node.get("attr") != null) {
+			ArrayNode n = (ArrayNode) myNode.get("attr");
+			attr = new ArrayList<Integer>();
+			for (int i = 0; i < n.size(); i++) {
+				attr.add(n.get(i).asInt());
+			}
+		}
+		
 		if (node.get("width_range") != null)
 			width_range = node.get("width_range").asText();
 		if (node.get("height_range") != null)

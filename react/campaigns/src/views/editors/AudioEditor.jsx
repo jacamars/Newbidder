@@ -8,7 +8,7 @@ import {
   Col
 } from "reactstrap";
 import DemoTag from "../simulator/DemoTag.jsx"
-import {mimeTypes, protocolOptions} from "../../Utils"
+import {mimeTypes, protocolOptions, apiOptions} from "../../Utils"
 
 var undef;
 
@@ -68,7 +68,7 @@ const AudioEditor = (props) => {
         />
       </FormGroup>
    </Col>
-    <Col className="px-md-1" md="2">
+    <Col className="px-md-1" md="1">
       <FormGroup>
         <label>Supported Protocols</label>
         <Input
@@ -76,6 +76,17 @@ const AudioEditor = (props) => {
           onChange={ (e) => props.callback(e,"audio_protocols")}
           type="select">
                 {protocolOptions(props.creative.audio_protocols)}
+        </Input>
+      </FormGroup>
+    </Col>
+    <Col className="px-md-1" md="1">
+      <FormGroup>
+        <label>Supported API</label>
+        <Input
+          id="height"
+          onChange={ (e) => props.callback(e,"audio_api")}
+          type="select">
+                {apiOptions(props.creative.audio_api)}
         </Input>
       </FormGroup>
     </Col>

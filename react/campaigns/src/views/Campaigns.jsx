@@ -19,7 +19,6 @@ import { useViewContext } from "../ViewContext";
 import DecisionModal from "../DecisionModal";
 import LoginModal from '../LoginModal'
 import CampaignEditor from './editors/CampaignEditor.jsx'
-import { GridLayer } from "leaflet";
 
 var undef;
 

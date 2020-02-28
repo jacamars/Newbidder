@@ -97,6 +97,9 @@ public class JdbcTools {
 					break;
 				case java.sql.Types.ARRAY:
 					Array arr = rs.getArray(column_name);
+					if (arr == null)
+						break;
+					
 					Object[] o1 = (Object[])arr.getArray();
 					var an = mapper.createArrayNode();
 					for (Object x : o1) {

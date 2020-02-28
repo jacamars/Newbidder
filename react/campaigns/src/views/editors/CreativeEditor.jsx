@@ -5,22 +5,13 @@ import {
   Badge,
   Button,
   ButtonGroup,
-  ButtonToolbar,
   Card,
   CardHeader,
   CardBody,
   CardFooter,
-  CardText,
-
-  CardTitle,
   Form,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Table,
-  Label,
   Row,
   Col
 } from "reactstrap";
@@ -31,6 +22,7 @@ import DealEditor from "./DealEditor";
 import NativeEditor from "./NativeEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
+import {attrOptions} from "../../Utils"
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -129,6 +121,10 @@ const getSelectedRules = () => {
       .filter((x) => x.selected)
       .map((x)=>Number(x.value));
 
+    x.attr = [...document.getElementById("attributes").options]
+      .filter((x) => x.selected)
+      .map((x)=>Number(x.value));
+
     switch(x.sizeType) {
       case 1: // width and height are 0
         x.width = 0;
@@ -153,8 +149,10 @@ const getSelectedRules = () => {
         x.height_range = undef;
         break;
       default:
-        alert("Don't know what size type this creative is");
-        return;
+        if (!x.isAudio) {
+          alert("Don't know what size type this creative is");
+          return;
+        }
     }
 
     if (x.isBanner) {
@@ -348,6 +346,13 @@ const getSelectedRules = () => {
     return(items);  
   }
 
+  const getAttrList = () => {
+    var checks = [];
+    if (creative.attr !== undef)
+      checks = creative.attr;
+    return attrOptions(checks);
+  }
+
         return (
             <>
               <div className="content">
@@ -449,11 +454,20 @@ const getSelectedRules = () => {
                           </Row>
 
                           <Row>
-                            <Col>
+                            <Col className="pr-md-1" md="4">
                                 <FormGroup>
                                     <label>Creative's Categories</label>
                                     <Input type="select" id="categories" multiple>
                                         {getCategoryList()}
+                                    </Input>     
+                                </FormGroup>    
+                            </Col>
+
+                            <Col className="pr-md-1" md="4">
+                                <FormGroup>
+                                    <label>Creative's Attributes</label>
+                                    <Input type="select" id="attributes" multiple>
+                                        {getAttrList()}
                                     </Input>     
                                 </FormGroup>    
                             </Col>

@@ -35,5 +35,6 @@ CREATE TABLE IF NOT EXISTS banners (
   position text DEFAULT NULL,
   interstitial int DEFAULT NULL,
   ext_spec text [ ] DEFAULT NULL,
+  attr int [ ] DEFAULT NULL,
   PRIMARY KEY (id)
 );

@@ -249,6 +249,17 @@ public class BidResponse {
 			response.append(creat.cur);
 			response.append("\"");
 		}
+		
+		
+		if (creat.attr != null) {
+			response.append(",\"attr\": [");
+			for (int i=0;i<creat.attr.size();i++) {
+				response.append(creat.attr.get(i));
+				if (i+1 < creat.attr.size())
+					response.append(",");
+			}
+			response.append("]");
+		}
 
 		response.append(",\"price\":");
 		response.append(price);
@@ -279,6 +290,8 @@ public class BidResponse {
 		response.append("\",\"iurl\":\"");
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
+		
+		
 		response.append(camp.ad_domain);
 
 		response.append("\"],\"adm\":\"");
@@ -650,6 +663,16 @@ public class BidResponse {
 		response.append("\",\"id\":\"");
 		response.append(br.id);						// the request bid id
 		response.append("\"");
+		
+		if (creat.attr != null) {
+			response.append(",\"attr\": [");
+			for (int i=0;i<creat.attr.size();i++) {
+				response.append(creat.attr.get(i));
+				if (i+1 < creat.attr.size())
+					response.append(",");
+			}
+			response.append("]");
+		}
 
 		/*
 		 * if (camp.encodedIab != null) { response.append(",");
@@ -691,6 +714,8 @@ public class BidResponse {
 		response.append(adid);
 		response.append("\",\"crid\":\"");
 		response.append(creat.impid);
+		
+
 		if (dealId != null) {
 			response.append("\",\"dealid\":\"");
 			response.append(dealId);

@@ -357,8 +357,11 @@ public class ApiCommand {
         ApiCommand cmd = null;
         
         boolean requireLeader = false;
+        
+        
+        
 
-        logger.info("From IP: {}, command: {}", ip, data);
+        logger.info("From IP: {}, size: {}, command: {}", ip, data.length(), data);
         switch (token) {
             case Ping:
                 cmd = mapper.readValue(data, PingCmd.class);

@@ -46,7 +46,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 	}
 	
 	/**
-	 * Reconstitute a response using a proobud
+	 * Reconstitute a response using a proobuf
 	 * @param bytes byte[]. The protobuf bytes.
 	 * @throws InvalidProtocolBufferException on bad expression of a a bid request.
 	 */
@@ -180,7 +180,7 @@ public class GoogleBidResponse extends com.jacamars.dsp.rtb.pojo.BidResponse {
 	}
 
 	/**
-	 * Convert the VAST tag to a URL that can be retrieved from aerospike
+	 * Convert the VAST tag to a URL that can be retrieved from hazelcast
 	 * @param adm String. The adm with the vast tag
 	 * @return String. The URL that can be used to retrieve this vast tag.
 	 */

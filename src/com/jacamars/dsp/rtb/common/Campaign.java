@@ -237,6 +237,9 @@ public class Campaign implements Comparable, Portable  {
 		ResultSet rs = prep.executeQuery();
 		
 		ArrayNode inner = JdbcTools.convertToJson(rs);
+		if (inner == null || inner.size() == 0)
+			return null;
+		
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Campaign c = new Campaign(y);
 		c.id = id;
@@ -257,7 +260,10 @@ public class Campaign implements Comparable, Portable  {
 	 */
 	public Campaign(JsonNode node) throws Exception {
 		myNode = node;
-		updated_at = node.get("updated_at").asLong();
+		if (node.get("updated_at") != null)
+			updated_at = node.get("updated_at").asLong();
+		else
+			updated_at = System.currentTimeMillis();
 		setup();
 		process();
 		doTargets();

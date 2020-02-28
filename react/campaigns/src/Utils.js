@@ -81,6 +81,7 @@ export const contextSubType = (e) => {
 export const protocolOptions = (e) => {
     return(
         <>
+        <option value="0" selected={0 === e}>None Specified</option>
         <option value="1" selected={1 === e}>VAST 1.0</option>
         <option value="2" selected={2 === e}>VAST 2.0</option>
         <option value="3" selected={3 === e}>VAST 3.0</option>
@@ -90,8 +91,54 @@ export const protocolOptions = (e) => {
         <option value="7" selected={7 === e}>VAST 4.0</option>
         <option value="8" selected={8 === e}>VAST 4.0 Wrapper</option>
         <option value="9" selected={9 === e}>DAAST 1.0</option>
-        <option value="9" selected={10 === e}>DAAST 1.0 Wrapper</option>
+        <option value="10" selected={10 === e}>DAAST 1.0 Wrapper</option>
+        <option value="11" selected={11 === e}>VAST 4.1</option>
+        <option value="12" selected={12 === e}>VAST 4.1 Wrapper</option>
         </>
+    );
+}
+
+export const apiOptions = (e) => {
+    return(
+        <>
+
+        <option value="0" selected={0 === e}>None Specified</option>
+        <option value="1" selected={1 === e}>VPAID 1.0</option>
+        <option value="2" selected={2 === e}>VPAID 2.0</option>
+        <option value="3" selected={3 === e}>MRAID 1.0</option>
+        <option value="4" selected={4 === e}>ORMMA</option>
+        <option value="5" selected={5 === e}>MRAID 2.0</option>
+        <option value="6" selected={6 === e}>MRAID 3.0</option>
+        <option value="7" selected={7 === e}>OMID</option>
+
+        </>
+    );
+}
+
+export const attrOptions = (e) => {
+    return (
+        <>
+        <option value="1" selected={e.indexOf(1) > -1}>Audio Ad (autoplay)</option>
+        <option value="2" selected={e.indexOf(2) > -1}>Audio Ad (user-initiated)</option>
+        <option value="3" selected={e.indexOf(3) > -1}>Expandable (automatic)</option>
+        <option value="4" selected={e.indexOf(4) > -1}>Expandable (user initiated: Click)</option>
+        <option value="5" selected={e.indexOf(5) > -1}>Expandable (rollver)</option>
+        <option value="6" selected={e.indexOf(6) > -1}>In banner video ad (autoplay)</option>
+        <option value="7" selected={e.indexOf(7) > -1}>In banner video ad (user-initiated)</option>
+        <option value="8" selected={e.indexOf(8) > -1}>Pop (over, under, or on-exit)</option>
+        <option value="9" selected={e.indexOf(9) > -1}>Provocative or suggestive imagery</option>
+        <option value="10" selected={e.indexOf(10) > -1}>Shaky, Flashing, Flickering, Extreme Animation, Smileys</option>
+        <option value="11" selected={e.indexOf(11) > -1}>Surveys</option>
+        <option value="12" selected={e.indexOf(12) > -1}>Text only</option>
+        <option value="13" selected={e.indexOf(13) > -1}>User interactive (e.g. embedded game)</option>
+        <option value="14" selected={e.indexOf(14) > -1}>Windows dialog or alert style</option>
+        <option value="15" selected={e.indexOf(15) > -1}>Has audio on/off button</option>
+        <option value="16" selected={e.indexOf(16) > -1}>Ad provides a skip button</option>
+        <option value="17" selected={e.indexOf(17) > -1}>Adobe Flash</option>
+
+
+        </>
+
     );
 }
 

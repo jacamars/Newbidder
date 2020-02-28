@@ -41,5 +41,6 @@ CREATE TABLE IF NOT EXISTS banner_videos (
   interstitial int DEFAULT NULL,
   htmltemplate text,
   ext_spec text [ ] DEFAULT NULL,
+  attr int [ ] DEFAULT NULL,
   PRIMARY KEY (id)
 );
