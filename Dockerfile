@@ -100,7 +100,7 @@ RUN chmod +x wait-for-it.sh
 COPY database.backup /
 COPY tools/* /
 COPY data/* data/
-COPY data/postgres/* data/postgres/
+COPY sql/create/* data/postgres/
 COPY shell/ /shell
 
 COPY www/control/ /www/control/

@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/campaigns/static/css/main.da44e5e9.chunk.css",
-    "main.js": "/campaigns/static/js/main.242079d6.chunk.js",
-    "main.js.map": "/campaigns/static/js/main.242079d6.chunk.js.map",
+    "main.js": "/campaigns/static/js/main.bc4c956e.chunk.js",
+    "main.js.map": "/campaigns/static/js/main.bc4c956e.chunk.js.map",
     "runtime-main.js": "/campaigns/static/js/runtime-main.d1c1e605.js",
     "runtime-main.js.map": "/campaigns/static/js/runtime-main.d1c1e605.js.map",
     "static/css/2.1f401f94.chunk.css": "/campaigns/static/css/2.1f401f94.chunk.css",
-    "static/js/2.ed4bb212.chunk.js": "/campaigns/static/js/2.ed4bb212.chunk.js",
-    "static/js/2.ed4bb212.chunk.js.map": "/campaigns/static/js/2.ed4bb212.chunk.js.map",
+    "static/js/2.de91d17a.chunk.js": "/campaigns/static/js/2.de91d17a.chunk.js",
+    "static/js/2.de91d17a.chunk.js.map": "/campaigns/static/js/2.de91d17a.chunk.js.map",
     "index.html": "/campaigns/index.html",
-    "precache-manifest.b7f938031af8bd86780e8b4fda88cbf6.js": "/campaigns/precache-manifest.b7f938031af8bd86780e8b4fda88cbf6.js",
+    "precache-manifest.9045db3b01c382dc6ead03570d9ae984.js": "/campaigns/precache-manifest.9045db3b01c382dc6ead03570d9ae984.js",
     "service-worker.js": "/campaigns/service-worker.js",
     "static/css/2.1f401f94.chunk.css.map": "/campaigns/static/css/2.1f401f94.chunk.css.map",
     "static/css/main.da44e5e9.chunk.css.map": "/campaigns/static/css/main.da44e5e9.chunk.css.map",
-    "static/js/2.ed4bb212.chunk.js.LICENSE.txt": "/campaigns/static/js/2.ed4bb212.chunk.js.LICENSE.txt",
-    "static/js/main.242079d6.chunk.js.LICENSE.txt": "/campaigns/static/js/main.242079d6.chunk.js.LICENSE.txt",
+    "static/js/2.de91d17a.chunk.js.LICENSE.txt": "/campaigns/static/js/2.de91d17a.chunk.js.LICENSE.txt",
+    "static/js/main.bc4c956e.chunk.js.LICENSE.txt": "/campaigns/static/js/main.bc4c956e.chunk.js.LICENSE.txt",
     "static/media/anime3.png": "/campaigns/static/media/anime3.bd6820f1.png",
     "static/media/emilyz.jpg": "/campaigns/static/media/emilyz.9fcf69e5.jpg",
     "static/media/nucleo-icons.css": "/campaigns/static/media/nucleo.f0b489a5.woff",
@@ -23,8 +23,8 @@
   "entrypoints": [
     "static/js/runtime-main.d1c1e605.js",
     "static/css/2.1f401f94.chunk.css",
-    "static/js/2.ed4bb212.chunk.js",
+    "static/js/2.de91d17a.chunk.js",
     "static/css/main.da44e5e9.chunk.css",
-    "static/js/main.242079d6.chunk.js"
+    "static/js/main.bc4c956e.chunk.js"
   ]
 }
