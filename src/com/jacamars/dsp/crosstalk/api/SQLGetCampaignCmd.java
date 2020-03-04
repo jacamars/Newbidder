@@ -32,35 +32,6 @@ public class SQLGetCampaignCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLGetCampaignCmd(String username, String password) {
-		super(username, password);
-		type = SQLGET_CAMPAIGN;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLGetCampaignCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLGET_CAMPAIGN;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -74,7 +45,7 @@ public class SQLGetCampaignCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				campaign = Campaign.getInstance(id).toJson();		
+				campaign = Campaign.getInstance(id, tokenData).toJson();		
 				return;
 			} catch (Exception err) {
 				error = true;

@@ -24,35 +24,6 @@ public class GetCampaignCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command..
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public GetCampaignCmd(String username, String password) {
-		super(username, password);
-		type = GetCampaign;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorization.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public GetCampaignCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = GetCampaign;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -71,6 +42,13 @@ public class GetCampaignCmd extends ApiCommand {
 				for (Campaign c : clist) {
 					if (c.name.equals(campaign)) {
 						node = c;
+						
+						if (tokenData.isAuthorized(c.customer_id) == false) {
+							error = true;
+							message = "No such campaign";
+							return;
+						}
+						
 						return;
 					}
 				}

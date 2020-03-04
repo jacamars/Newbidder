@@ -2,6 +2,7 @@ package com.jacamars.dsp.crosstalk.budget;
 
 import java.io.IOException;
 
+
 import java.nio.charset.StandardCharsets;
 
 import java.nio.file.Files;
@@ -33,8 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hazelcast.config.Config;
-import com.hazelcast.core.IMap;
-
+import com.hazelcast.map.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
@@ -42,6 +42,7 @@ import com.jacamars.dsp.rtb.jmq.EventIF;
 import com.jacamars.dsp.rtb.jmq.Subscriber;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
@@ -154,11 +155,11 @@ public enum Crosstalk {
 		if (conn == null)
 			throw new Exception("Crosstalk database connection was not established");
 
-		List<String> specs = Arrays.asList("data/postgres/banner_videos.sql", "data/postgres/banners_rtb_standards.sql",
-				"data/postgres/banner_videos_rtb_standards.sql", "data/postgres/banners.sql",
-				"data/postgres/campaigns_rtb_standards.sql", "data/postgres/campaigns.sql",
-				"data/postgres/rtb_standards.sql", "data/postgres/exchange_attributes.sql", "data/postgres/targets.sql",
-				"data/postgres/banner_audios.sql", "data/postgres/banner_natives.sql");
+		List<String> specs = Arrays.asList("sql/create/banner_videos.sql", "sql/create/banners_rtb_standards.sql",
+				"sql/create/banner_videos_rtb_standards.sql", "sql/create/banners.sql",
+				"sql/create/campaigns_rtb_standards.sql", "sql/create/campaigns.sql",
+				"sql/create/rtb_standards.sql", "sql/create/exchange_attributes.sql", "sql/create/targets.sql",
+				"sql/create/banner_audios.sql", "sql/create/banner_natives.sql","sql/create/users.sql","sql/create/cande.sql");
 
 		final var stmt = conn.createStatement();
 		specs.stream().forEach(e -> {
@@ -199,8 +200,11 @@ public enum Crosstalk {
 
 	}
 
-	public List<String> deleteCampaign(String campaign) throws Exception {
+	public List<String> deleteCampaign(String campaign, TokenData td) throws Exception {
 		Campaign c = getKnownCampaign(campaign);
+		if (td != null && td.isAuthorized(c.customer_id)==false)
+			return null;
+		
 		c.setStatus("offline");
 		parkCampaign(c);
 		return null;
@@ -267,7 +271,7 @@ public enum Crosstalk {
 				Crosstalk.signaler.addString("load " + c.id);
 			} else {
 				logger.info("New campaign is inactive {}, reason: {}", campaign, c.report());
-				deleteCampaign("" + campaign.id);
+				deleteCampaign("" + campaign.id, null);
 			}
 		} else {
 			// A previously known campaign is updated.
@@ -286,7 +290,7 @@ public enum Crosstalk {
 			} else {
 				logger.info("New campaign going inactive:{}, reason: {}", campaign, c.report());
 				msg = "CAMPAIGN GOING INACTIVE: " + campaign + ", reason: " + c.report();
-				deleteCampaign("" + campaign.id);
+				deleteCampaign("" + campaign.id, null);
 			}
 		}
 

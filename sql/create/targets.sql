@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS targets (
   id serial,
+  customer_id text NOT NULL,
+  sub_id text DEFAULT NULL,
   activate_time timestamp DEFAULT NULL,
   expire_time timestamp DEFAULT NULL,
   list_of_domains TEXT DEFAULT NULL,

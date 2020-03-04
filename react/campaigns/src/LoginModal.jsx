@@ -7,10 +7,12 @@ var undef;
 const LoginModal = (props) => {
 
   useEffect(() => {
+    var c = localStorage.getItem('rtb4free_cm:customer');
     var u = localStorage.getItem('rtb4free_cm:username');
     var p = localStorage.getItem('rtb4free_cm:password');
     var s = localStorage.getItem('rtb4free_cm:server');
-    if (! (u == null || p == null || s == null)) {
+    if (! (c == null || u == null || p == null || s == null)) {
+      setCustomer(c);
       setName(u);
       setPassword(p);
       setServer(s);
@@ -22,10 +24,15 @@ const LoginModal = (props) => {
 
   const vx = useViewContext();
 
+  const [customer, setCustomer] = useState('');
   const [name, setName] = useState('rtb4free');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('localhost:7379');
   const [remembered, setRemembered] = useState(false);
+
+  const changeCustomer = (event) => {
+    setCustomer(event.target.value);
+  }
 
   const changeName = (event) => {
     setName(event.target.value);
@@ -40,29 +47,48 @@ const LoginModal = (props) => {
   }
 
   const login = async () => {
-    var x = document.getElementById("remember-me").checked;
-
     if (remembered) {
+      localStorage.setItem('rtb4free_cm:customer',customer);
       localStorage.setItem('rtb4free_cm:username',name);
       localStorage.setItem('rtb4free_cm:password',password);
       localStorage.setItem('rtb4free_cm:server',server);
     } else {
+      localStorage.removeItem('rtb4free_cm:customer');
       localStorage.removeItem('rtb4free_cm:username');
       localStorage.removeItem('rtb4free_cm:password');
       localStorage.removeItem('rtb4free_cm:server');
     }
 
-    var mx = await vx.listCampaigns(name,password,server);
-    if (mx === undef)
+    if (customer === undef || customer === '') {
+      alert("Please provide an Org value");
       return;
-    console.log("Campaigns = " + mx.length);
+    }
+    if (name === undef || name === '') {
+      alert("Please provide a User value");
+      return;
+    }
+    if (password === undef || password === '') {
+      alert("Please provide a Password value");
+      return;
+    }
+    if (server === undef || server === '') {
+      alert("Please provide a Server value");
+      return;
+    }
+
+    var jwt = await vx.getToken(customer,name,password,server);
+    if (jwt === undef) {
+      alert("Could not login...");
+      return;
+    }
+
     await vx.getAccounting();
     await vx.getDbCampaigns();
     await vx.listRules();
     await vx.listTargets();
     await vx.listCreatives();
     await vx.listMacros();
-    mx = await vx.getBidders();
+    var mx = await vx.getBidders();
     if (mx === undef)
       return;
     console.log("Bidders = " + mx.length);
@@ -81,7 +107,16 @@ const LoginModal = (props) => {
       <Modal isOpen={!vx.loggedIn}>
         <ModalBody>
         <FormGroup row>
-            <Label for="username" sm={2}>User</Label>
+            <Label for="customer" sm={2}>Org:</Label>
+            <Col sm={10}>
+                <Input style={estyle} 
+                  type="text" id="customer" 
+                  defaultValue={customer}
+                  placeholder={customer} onChange={changeCustomer}/>
+            </Col>
+        </FormGroup>
+        <FormGroup row>
+            <Label for="username" sm={2}>User:</Label>
             <Col sm={10}>
                 <Input style={estyle} 
                   type="text" id="username" 
@@ -104,7 +139,7 @@ const LoginModal = (props) => {
              <Input style={estyle} 
               type="text" id="server"  
               placeholder={server}  
-              defultValue={server}
+              defaultValue={server}
               onChange={changeServer} />
             </Col>
         </FormGroup>

@@ -1,12 +1,13 @@
 package com.jacamars.dsp.rtb.shared;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.MapStore;
+import com.hazelcast.map.IMap;
+import com.hazelcast.map.MapStore;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.FrequencyCap;
 import com.jacamars.dsp.rtb.common.RecordedBid;

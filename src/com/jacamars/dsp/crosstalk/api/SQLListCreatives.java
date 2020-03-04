@@ -34,35 +34,6 @@ public class SQLListCreatives extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLListCreatives(String username, String password) {
-		super(username, password);
-		type = SQLLIST_CREATIVES;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLListCreatives(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLLIST_CREATIVES;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -77,20 +48,30 @@ public class SQLListCreatives extends ApiCommand {
 			super.execute();
 			creatives = new ArrayList<>();
 			try {
-				String select = "select * from banners";
+				String select, selectbv, selectn, selecta;
+				if (tokenData.isRtb4FreeSuperUser()) {
+					select = "select * from banners";
+					selectbv = "select * from banner_videos";
+					selectn = "select * from banner_natives";
+					selecta = "select * from banner_audios";
+				} else {
+					select = "select * from banners where customer_id='"+tokenData.customer + "'";
+					selectbv = "select * from banner_videos where customer_id='"+tokenData.customer + "'";
+					selectn = "select * from banner_natives where customer_id='"+tokenData.customer + "'";
+					selecta = "select * from banner_audios where customer_id='"+tokenData.customer + "'";
+				}
 				var conn = CrosstalkConfig.getInstance().getConnection();
-				var stmt = conn.createStatement();
 				var prep = conn.prepareStatement(select);
 				ResultSet rs = prep.executeQuery();	
 				banners = convertToJson(rs,"banner");	
 				
-				rs = conn.prepareStatement("select * from banner_videos").executeQuery();
+				rs = conn.prepareStatement(selectbv).executeQuery();
 				videos = convertToJson(rs,"video"); 
 			
-				rs = conn.prepareStatement("select * from banner_natives").executeQuery();
+				rs = conn.prepareStatement(selectn).executeQuery();
 				natives = convertToJson(rs,"native"); 
 				
-				rs = conn.prepareStatement("select * from banner_audios").executeQuery();
+				rs = conn.prepareStatement(selecta).executeQuery();
 				audios =  convertToJson(rs,"audio");
 				
 				creatives.addAll(banners);
@@ -100,6 +81,7 @@ public class SQLListCreatives extends ApiCommand {
 				
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}

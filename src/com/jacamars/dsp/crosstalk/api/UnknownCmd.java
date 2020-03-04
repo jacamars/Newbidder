@@ -18,16 +18,9 @@ public class UnknownCmd extends ApiCommand {
 	public UnknownCmd() {
 
 	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * @param target
-	 *            String. The command that was unknwon/
-	 */
-	public UnknownCmd(String target) {
-		super(null, null);
-		command = target;
-		type = Unknown;
+	
+	public UnknownCmd(String s) {
+		command = s;
 	}
 
 	/**

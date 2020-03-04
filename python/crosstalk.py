@@ -6,7 +6,7 @@ import pprint
 
 def ConfigureAwsObject(symbolName):
     try:
-        r = requests.post(globalHost, data='{"type":"ConfigureAws#","symbol":"'+symbolName+'"}')
+        r = requests.post(globalHost, data='{"type":"ConfigureAws#","symbol":"'+symbolName+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -15,7 +15,7 @@ def ConfigureAwsObject(symbolName):
 
 def RemoveSymbol(symbolName):
     try:
-        r = requests.post(globalHost, data='{"type":"RemoveSymbol#","symbol":"'+symbolName+'"}')
+        r = requests.post(globalHost, data='{"type":"RemoveSymbol#","symbol":"'+symbolName+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -24,7 +24,7 @@ def RemoveSymbol(symbolName):
 
 def GetAccounting():
     try:
-        r = requests.post(globalHost, data='{"type":"GetAccounting#"}')
+        r = requests.post(globalHost, data='{"type":"GetAccounting#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -33,7 +33,19 @@ def GetAccounting():
     
 def ListSymbols():
     try:
-        r = requests.post(globalHost, data='{"type":"ListBigData#"}')
+        r = requests.post(globalHost, data='{"type":"ListBigData#","token":"'+token+'"}')
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+        
+def GetToken(c,u,p):
+    try:
+        r = requests.post(globalHost, data='{"type":"GetToken#","customer":"'+c+'","username":"'+u+'", "password":"'+p+'"}')
+        data = json.loads(r.text)
+        global token
+        token = data['token']
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -42,7 +54,7 @@ def ListSymbols():
         
 def ListMacros():
     try:
-        r = requests.post(globalHost, data='{"type":"ListMacros#"}')
+        r = requests.post(globalHost, data='{"type":"ListMacros#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -63,7 +75,7 @@ def Ping():
     
 def Refresh():
     try:
-        r = requests.post(globalHost, data='{"type":"Refresh#"}')
+        r = requests.post(globalHost, data='{"type":"Refresh#","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -75,7 +87,7 @@ def Refresh():
 
 def GetPrice(camp,creat):
     try:
-        r = requests.post(globalHost, data='{"type":"GetPrice#","campaign":"' + camp + '","creative":"'+creat+'"}')
+        r = requests.post(globalHost, data='{"type":"GetPrice#","campaign":"' + camp + '","creative":"'+creat+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -90,12 +102,12 @@ def SetPrice(*arg):
         if len(arg)==2:
             campaign=arg[0];
             creative=arg[1];
-            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'"}')
+            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'","token":"'+token+'"}')
         if len(arg)==3:
             campaign=arg[0];
             creative=arg[1];
             deal=arg[2];
-            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'", "deal":"'+deal+'"}')
+            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'", "deal":"'+deal+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -108,7 +120,7 @@ def SetPrice(*arg):
 
 def SetWeights(camp,weights):
     try:
-        r = requests.post(globalHost, data='{"type":"SetWeights#","campaign":"' + camp + '","weights":"'+weights+'"}')
+        r = requests.post(globalHost, data='{"type":"SetWeights#","campaign":"' + camp + '","weights":"'+weights+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -120,7 +132,7 @@ def SetWeights(camp,weights):
 
 def SQLListCampaigns():
     try:
-        r = requests.post(globalHost, data='{"type":"SQLListCampaigns#"}')
+        r = requests.post(globalHost, data='{"type":"SQLListCampaigns#","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -129,7 +141,7 @@ def SQLListCampaigns():
         
 def SQLListCreatives():
     try:
-        r = requests.post(globalHost, data='{"type":"SQLListCreatives#"}')
+        r = requests.post(globalHost, data='{"type":"SQLListCreatives#","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -138,7 +150,7 @@ def SQLListCreatives():
 
 def SQLGetNewCampaign(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetNewCampaign#","campaign":"' + camp + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetNewCampaign#","campaign":"' + camp + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -147,7 +159,7 @@ def SQLGetNewCampaign(camp):
     
 def SQLGetCampaign(id):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -156,7 +168,7 @@ def SQLGetCampaign(id):
         
 def SQLGetCreative(id,x):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetCreative#","id":' + id + ', "key":"' + x  +'"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetCreative#","id":' + id + ', "key":"' + x  +'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -165,7 +177,7 @@ def SQLGetCreative(id,x):
  
 def SQLGetTarget(id):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetTarget#","id":"' + id + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetTarget#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -174,7 +186,7 @@ def SQLGetTarget(id):
                
 def SQLGetNewCreative(name):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetNewCreative#","name":"' + name + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetNewCreative#","name":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -183,7 +195,7 @@ def SQLGetNewCreative(name):
 
 def SQLGetNewTarget(name):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetNewTarget#","name":"' + name + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetNewTarget#","name":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -193,7 +205,7 @@ def SQLGetNewTarget(name):
 
 def SQLGetNewRule(name):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetNewRule#","name":"' + name + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetNewRule#","name":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -202,7 +214,7 @@ def SQLGetNewRule(name):
         
 def SQLGetRule(id):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetRule#","id":"' + id + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetRule#","id":"' + id + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -211,7 +223,7 @@ def SQLGetRule(id):
         
 def SQLDeleteRule(id):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLDeleteRule#","id":"' + id + '"}')
+        r = requests.post(globalHost, data='{"type":"SQLDeleteRule#","id":"' + id + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -220,7 +232,7 @@ def SQLDeleteRule(id):
         
 def DeleteSymbol(name):
     try:
-        r = requests.post(globalHost, data='{"type":"DeleteSymbol#","symbol":"' + name + '"}')
+        r = requests.post(globalHost, data='{"type":"DeleteSymbol#","symbol":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -229,7 +241,7 @@ def DeleteSymbol(name):
         
 def QuerySymbol(name,value):
     try:
-        r = requests.post(globalHost, data='{"type":"QuerySymbol#","symbol":"' + name + '", "value":"' + value + '"}')
+        r = requests.post(globalHost, data='{"type":"QuerySymbol#","symbol":"' + name + '", "value":"' + value + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -238,7 +250,7 @@ def QuerySymbol(name,value):
 
 def GetWeights(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"GetWeights#","campaign":"' + camp + '"}')
+        r = requests.post(globalHost, data='{"type":"GetWeights#","campaign":"' + camp + '","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -250,7 +262,7 @@ def GetWeights(camp):
 
 def MacroSub(data):
     try:
-        r = requests.post(globalHost, data='{"type":"MacroSub#","data":"' + data + '"}')
+        r = requests.post(globalHost, data='{"type":"MacroSub#","data":"' + data + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -260,9 +272,9 @@ def MacroSub(data):
 def GetBudget(*arg):
     try:
         if len(arg)==1:
-            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '"}')
+            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","token":"'+token+'"}')
         if len(arg)==2:
-            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","creative":"' + arg[1] + '"}')
+            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","creative":"' + arg[1] + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -275,7 +287,7 @@ def SetBudget(camp,total,daily,hourly):
         db = "%f" % daily
         hb = "%f" % hourly
         r = requests.post(globalHost, data='{"type":"SetBudget#","campaign":"' + camp  +
-            '","total":' + tb + ',"daily":' + db + ',"hourly":' + hb + '}')
+            '","total":' + tb + ',"daily":' + db + ',"hourly":' + hb + ',"token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -285,9 +297,9 @@ def SetBudget(camp,total,daily,hourly):
 def GetValues(*arg):
     try:
         if len(arg)==1:
-            r = requests.post(globalHost, data='{"type":"GetValues#","campaign":"' + arg[0] + '"}')
+            r = requests.post(globalHost, data='{"type":"GetValues#","campaign":"' + arg[0] + '","token":"'+token+'"}')
         if len(arg)==2:
-            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","creative":"' + arg[1] + '"}')
+            r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","creative":"' + arg[1] + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -296,7 +308,7 @@ def GetValues(*arg):
     
 def GetStatus(*arg):
     try:
-        r = requests.post(globalHost, data='{"type":"GetStatus#"}')
+        r = requests.post(globalHost, data='{"type":"GetStatus#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -305,7 +317,7 @@ def GetStatus(*arg):
     
 def GetStatusA(*arg):
     try:
-        r = requests.post(globalHost, data='{"type":"GetStatus#","async":true}')
+        r = requests.post(globalHost, data='{"type":"GetStatus#","async":true+,"token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -314,7 +326,7 @@ def GetStatusA(*arg):
 
 def ListCreatives(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'"}')
+        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -332,7 +344,7 @@ def ListCreatives(camp):
 
 def GetCreative(camp, crid):
     try:
-        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'"}')
+        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -349,7 +361,7 @@ def GetCreative(camp, crid):
 
 def GetCampaign(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'"}')
+        r = requests.post(globalHost, data='{"type":"GetCampaign#","campaign":"'+camp+'","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -361,7 +373,7 @@ def GetCampaign(camp):
 
 def DeleteCampaign(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"Delete#","campaign":"'+camp+'"}')
+        r = requests.post(globalHost, data='{"type":"Delete#","campaign":"'+camp+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -372,7 +384,7 @@ def DeleteCampaign(camp):
 def GetReason(*arg):
     try:
         if len(arg)==0:
-            r = requests.post(globalHost, data='{"type":"GetReason#"}')
+            r = requests.post(globalHost, data='{"type":"GetReason#","token":"'+token+'"}')
         else:
             r = requests.post(globalHost, data='{"type":"GetReason#","campaign":"'+arg[0]+'"}')
         print (r.status_code, r.reason)
@@ -384,9 +396,9 @@ def GetReason(*arg):
 def GetReasonA(*arg):
     try:
         if len(arg)==0:
-            r = requests.post(globalHost, data='{"async":true, "type":"GetReason#"}')
+            r = requests.post(globalHost, data='{"async":true, "type":"GetReason#","token":"'+token+'"}')
         else:
-            r = requests.post(globalHost, data='{"async": true,"type":"GetReason#","campaign":"'+arg[0]+'"}')
+            r = requests.post(globalHost, data='{"async": true,"type":"GetReason#","campaign":"'+arg[0]+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -396,12 +408,12 @@ def GetReasonA(*arg):
 def GetSpendRate(*arg):
     try:
         if len(arg)==0:
-            r = requests.post(globalHost, data='{"type":"GetSpendRate#"}')
+            r = requests.post(globalHost, data='{"type":"GetSpendRate#","token":"'+token+'"}')
         else:
             if len(arg)==1:
-                r = requests.post(globalHost, data='{"type":"GetSpendRate#","campaign":"'+arg[0]+'"}')
+                r = requests.post(globalHost, data='{"type":"GetSpendRate#","campaign":"'+arg[0]+'","token":"'+token+'"}')
             else:
-                r = requests.post(globalHost, data='{"type":"GetSpendRate#","campaign":"'+arg[0]+'","creative":"'+arg[1]+'", "type":"'+arg[2]+'"}')
+                r = requests.post(globalHost, data='{"type":"GetSpendRate#","campaign":"'+arg[0]+'","creative":"'+arg[1]+'", "type":"'+arg[2]+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -410,7 +422,7 @@ def GetSpendRate(*arg):
     
 def ListCampaigns():
     try:
-        r = requests.post(globalHost, data='{"type":"ListCampaigns#"}')
+        r = requests.post(globalHost, data='{"type":"ListCampaigns#","token":"'+token+'"}')
         data = json.loads(r.text)
         return r.status_code, data['timestamp'], data['campaigns']
     except requests.exceptions.RequestException as e:
@@ -419,7 +431,7 @@ def ListCampaigns():
 
 def StartBidder(bidder):
     try:
-        r = requests.post(globalHost, data='{"type":"StartBidder#","biddder":"'+bidder+'"}')
+        r = requests.post(globalHost, data='{"type":"StartBidder#","biddder":"'+bidder+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -428,7 +440,7 @@ def StartBidder(bidder):
     
 def StopBidder(bidder):
     try:
-        r = requests.post(globalHost, data='{"type":"StopBidder#","biddder":"'+bidder+'"}')
+        r = requests.post(globalHost, data='{"type":"StopBidder#","biddder":"'+bidder+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -437,7 +449,7 @@ def StopBidder(bidder):
     
 def Update(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"Update#","campaign":"'+camp+'"}')
+        r = requests.post(globalHost, data='{"type":"Update#","campaign":"'+camp+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -446,7 +458,7 @@ def Update(camp):
     
 def RefreshA():
     try:
-        r = requests.post(globalHost, data='{"type":"Refresh#","async":true}')
+        r = requests.post(globalHost, data='{"type":"Refresh#","async":true,"token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -455,7 +467,7 @@ def RefreshA():
     
 def Future(id):
     try:
-        r = requests.post(globalHost, data='{"type":"Future#","asyncid":"' + id + '"}')
+        r = requests.post(globalHost, data='{"type":"Future#","asyncid":"' + id + '","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -467,7 +479,7 @@ def Future(id):
     
 def Dump():
     try:
-        r = requests.post(globalHost, data='{"type":"Dump#"}')
+        r = requests.post(globalHost, data='{"type":"Dump#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -476,7 +488,7 @@ def Dump():
     
 def GetBiddersStatus():
     try:
-        r = requests.post(globalHost, data='{"type":"GetBiddersStatus#"}')
+        r = requests.post(globalHost, data='{"type":"GetBiddersStatus#","token":"'+token+'"}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -499,6 +511,7 @@ def SetHostPort(hostPort):
 def PP(x):
     pp.pprint(x)
     
+token = '';
 globalHost = "http://localhost:7379/api"
 pp = pprint.PrettyPrinter(indent=4)
 

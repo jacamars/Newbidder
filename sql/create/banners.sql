@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS banners (
   id SERIAL,
+  customer_id text NOT NULL,
+  sub_id text DEFAULT NULL,
   type text NOT null,
   interval_start timestamp NOT NULL,
   interval_end timestamp DEFAULT NULL,

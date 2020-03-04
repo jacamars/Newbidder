@@ -41,35 +41,6 @@ public class SQLGetNewCreativeCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLGetNewCreativeCmd(String username, String password) {
-		super(username, password);
-		type = SQLGET_NEW_CREATIVE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLGetNewCreativeCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLGET_NEW_CREATIVE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {

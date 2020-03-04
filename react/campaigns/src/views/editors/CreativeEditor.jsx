@@ -20,6 +20,7 @@ import VideoEditor from "./VideoEditor";
 import AudioEditor from "./AudioEditor";
 import DealEditor from "./DealEditor";
 import NativeEditor from "./NativeEditor";
+import SiteOrAppEditor from "./SiteOrAppEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
 import {attrOptions} from "../../Utils"
@@ -41,6 +42,7 @@ const [appnexusSSP, setAppnexus] = useState(false);
 const [bidswitchSSP, setBidswitch] = useState(false);
 const [googleSSP, setGoogle] = useState(false);
 const [stroerSSP, setStroer] = useState(false);
+const [siteorapp, setSiteorapp] = useState(props.creative.siteorapp);
 
 const vx = useViewContext();
 
@@ -254,6 +256,8 @@ const getSelectedRules = () => {
     if (cnames.length !== 0) {
       ext.push("categories"+":"+cnames.join());
     }
+    if (siteorapp !== "")
+      ext.push("site_or_app:"+siteorapp);
     if (ext.length !== 0) 
       x.ext_spec = ext;
     else
@@ -313,6 +317,10 @@ const getSelectedRules = () => {
     creative.deals[index].price = Number(price);
     creative.deals[index].id = id;
     setCreative(creative);
+  }
+
+  const changeSiteOrApp = (value) => {
+    setSiteorapp(value);
   }
 
   const setHtml = (e,type) => {
@@ -411,6 +419,7 @@ const getSelectedRules = () => {
                             </Col>
                           </Row>
 
+                          <SiteOrAppEditor creative={creative} value={siteorapp} change={changeSiteOrApp} />
                           {! (creative.isAudio || creative.isNative) && 
                             <CreativeSizeEditor 
                               creative={creative} 

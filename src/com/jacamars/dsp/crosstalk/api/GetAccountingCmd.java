@@ -30,19 +30,6 @@ public class GetAccountingCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public GetAccountingCmd(String username, String password) {
-		super(username, password);
-		type = GetAccounting;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -56,6 +43,9 @@ public class GetAccountingCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
+				
+				// TBD rewrite for multi tenant
+				
 				accounting = MemoryAccounting.getInstance().getValues();
 				return;
 			} catch (Exception err) {

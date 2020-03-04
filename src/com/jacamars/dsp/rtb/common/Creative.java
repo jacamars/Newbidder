@@ -39,6 +39,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
 import com.jacamars.dsp.rtb.nativeads.creative.NativeCreative;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.probe.Probe;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.Env;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 import com.jacamars.dsp.rtb.tools.MacroProcessing;
@@ -59,6 +60,8 @@ public class Creative {
 	public static final String SQL_VIDEOS = "banner_videos";
 	public static final String SQL_AUDIOS = "banner_audios";
 	public static final String SQL_NATIVES = "banner_natives";
+	
+	public String customer_id;
 
 	/** The forward URL used with this creative */
 	public String forwardurl;
@@ -271,21 +274,21 @@ public class Creative {
 
 	/** SQL name for the vast data attribute */
 
-	public static Creative getInstance(int id, String key) {
+	public static Creative getInstance(int id, String key, String customer_id) {
 		String select = "";
 		try {
 			switch (key.toLowerCase()) {
 			case "banner":
-				select = "select * from banners where id=" + id;
+				select = "select * from banners where id=" + id + " AND customer_id='"+customer_id+"'";
 				break;
 			case "video":
-				select = "select * from banner_videos where id=" + id;
+				select = "select * from banner_videos where id=" + id  + " AND customer_id='"+customer_id+"'";
 				break;
 			case "audio":
-				select = "select * from banner_audios where id=" + id;
+				select = "select * from banner_audios where id=" + id  + " AND customer_id='"+customer_id+"'";
 				break;
 			case "native":
-				select = "select * from banner_natives where id=" + id;
+				select = "select * from banner_natives where id=" + id  + " AND customer_id='"+customer_id+"'";
 				break;
 			default:
 				throw new RuntimeException("Can't instantiate unknown type: " + key);
@@ -299,6 +302,7 @@ public class Creative {
 			ArrayNode inner = JdbcTools.convertToJson(rs);
 			ObjectNode y = (ObjectNode) inner.get(0);
 			Creative c = new Creative(y);
+			
 			c.id = id;
 			c.impid = "" + id;
 			c.process();
@@ -331,16 +335,16 @@ public class Creative {
 		if (c.attr  != null)
 			attrArray = conn.createArrayOf("int", c.attr.toArray());
 		
-		var i = 23;
+		var i = 24;
 
 		String sql = "INSERT INTO " + table + " (" + "interval_start," + "interval_end," + "total_budget,"
 				+ "daily_budget," + "hourly_budget," + "bid_ecpm," + "total_cost," + "daily_cost," + "hourly_cost,"
 				+ "created_at," + "updated_at," + "rules," + "deals," + "interstitial," + "width_range,"
-				+ "height_range," + "width_height_list," + "name," + "cur," + "type," + "ext_spec," + "attr,";
+				+ "height_range," + "width_height_list," + "name," + "cur," + "type," + "ext_spec," + "attr," + "customer_id,";
 
 		if (c.isBanner) {
 			sql += "imageurl," + "width," + "height," + "contenttype," + "htmltemplate," + "position) VALUES ("
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 			
 			p.setString(i++, c.imageurl);
@@ -356,7 +360,7 @@ public class Creative {
 			sql += "mime_type," + "vast_video_bitrate," + "vast_video_duration," + "vast_video_height,"
 					+ "vast_video_width," + "vast_video_protocol," + "vast_video_linearity," + "htmltemplate) VALUES ("
 
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
@@ -542,6 +546,8 @@ public class Creative {
 			p.setNull(i++, Types.ARRAY);
 		else
 			p.setArray(i++, attrArray);
+		
+		p.setString(i++, c.customer_id);
 
 		return p;
 	}
@@ -795,14 +801,14 @@ public class Creative {
 		return p;
 	}
 
-	public static void removeRuleFromCreatives(int id) throws Exception {
-		updateRules(Creative.SQL_BANNERS, id);
-		updateRules(Creative.SQL_VIDEOS, id);
-		updateRules(Creative.SQL_AUDIOS, id);
-		updateRules(Creative.SQL_NATIVES, id);
+	public static void removeRuleFromCreatives(int id, TokenData td) throws Exception {
+		updateRules(Creative.SQL_BANNERS, id,td);
+		updateRules(Creative.SQL_VIDEOS, id,td);
+		updateRules(Creative.SQL_AUDIOS, id,td);
+		updateRules(Creative.SQL_NATIVES, id,td);
 	}
 
-	static void updateRules(String table, int id) throws Exception {
+	static void updateRules(String table, int id, TokenData td) throws Exception {
 		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
 				.prepareStatement("SELECT * FROM " + table + " WHERE ? IN (SELECT unnest(rules) FROM " + table + ")");
 		st.setInt(1, id);
@@ -810,7 +816,7 @@ public class Creative {
 		List<Integer> creative_ids = new ArrayList<>();
 		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Creative c = Creative.getInstance(id, table);
+			Creative c = Creative.getInstance(id, table,td.customer);
 			int index = c.rules.indexOf(id);
 			c.rules.remove(index);
 			c.process();
@@ -871,6 +877,7 @@ public class Creative {
 	 */
 	public Creative copy() {
 		Creative c = new Creative();
+		c.customer_id = customer_id;
 		c.alternateAdId = alternateAdId;
 		c.adm_override = adm_override;
 		c.cur = cur;
@@ -1032,6 +1039,7 @@ public class Creative {
 		}
 		
 
+		// Handle the assorted extensions
 		if (extensions != null) {
 			String cat = extensions.get("categories");
 			if (cat != null) {
@@ -1183,6 +1191,9 @@ public class Creative {
 		fixedNodes.add(new FixedNodeStatus());
 		fixedNodes.add(new FixedNodeNonStandard());
 		attributes.add(new FixedNodeDoSize());
+		
+		if (extensions != null && extensions.get("site_or_app") != null)
+			attributes.add(new FixedNodeAppOrSite(extensions.get("site_or_app")));
 
 		// These are impression related
 		attributes.add(new FixedNodeRequiresDeal());
@@ -1204,14 +1215,9 @@ public class Creative {
 	public void sortNodes() {
 		Collections.sort(fixedNodes, nodeSorter);
 		Collections.sort(attributes, nodeSorter);
-
-		for (int i = 0; i < fixedNodes.size(); i++) {
-			fixedNodes.get(i).clearFalseCount();
-		}
-
-		for (int i = 0; i < attributes.size(); i++) {
-			attributes.get(i).clearFalseCount();
-		}
+		
+		fixedNodes.forEach(node->node.clearFalseCount());
+		attributes.forEach(node->node.clearFalseCount());
 	}
 
 	/**
@@ -1846,6 +1852,7 @@ public class Creative {
 	public void update(JsonNode myNode) throws Exception {
 		node = myNode;
 
+		customer_id = node.get("customer_id").asText();
 		type = node.get("type").asText();
 		if (node.get("attr") != null) {
 			ArrayNode n = (ArrayNode) myNode.get("attr");

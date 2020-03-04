@@ -32,35 +32,6 @@ public class ConfigureAwsObjectCmd extends ApiCommand {
 	}
 
 	/**
-	 * Configures an S3 object.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public ConfigureAwsObjectCmd(String username, String password) {
-		super(username, password);
-		type = ConfigureAws;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public ConfigureAwsObjectCmd(String username, String password, String target) {
-		super(username, password);
-		command = target;
-		type = ConfigureAws;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -74,6 +45,13 @@ public class ConfigureAwsObjectCmd extends ApiCommand {
 	public void execute() {
 			super.execute();	
 			try {
+				
+				if (tokenData.isRtb4FreeSuperUser()) {
+					error = true;
+					message = "Not rtb4free super user";
+					return;
+				}
+				
 				logger.debug("EXECUTING THE CONFIGURATION COMMAND: " + command);
 				ConfigureAwsObject sp = new ConfigureAwsObject("","",command);
 				sp.from = WebAccess.uuid + "-" + new Random().nextLong();

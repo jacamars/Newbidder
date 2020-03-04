@@ -34,19 +34,6 @@ public class ListBigDataCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public ListBigDataCmd(String username, String password) {
-		super(username, password);
-		type = LIST_BIGDATA;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -59,6 +46,9 @@ public class ListBigDataCmd extends ApiCommand {
 	@Override
 		public void execute() {
 			super.execute();
+			
+			// TBD: Needs rewrite for multi tenant
+			
 			try {
 				catalog = new ArrayList<>(); 
 				LookingGlass.symbols.forEach((key,value)-> {

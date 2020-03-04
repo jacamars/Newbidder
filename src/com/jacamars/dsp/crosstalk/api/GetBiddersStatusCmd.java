@@ -30,20 +30,6 @@ public class GetBiddersStatusCmd extends ApiCommand {
 	}
 
 	/**
-	 * Dumps a heap to disk file.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public GetBiddersStatusCmd(String username, String password) {
-		super(username, password);
-		type = GetBiddersStatus;
-	}
-
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {

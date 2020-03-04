@@ -30,35 +30,6 @@ public class MacroSubCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command..
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public MacroSubCmd(String username, String password) {
-		super(username, password);
-		type = MACROSUB;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorization.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public MacroSubCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = MACROSUB;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -72,6 +43,9 @@ public class MacroSubCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
+				
+				// TBD Needs rewrite for multi tenant
+				
 				List<String> macros = new ArrayList<>();
 				MacroProcessing.findMacros(macros,data);
 				StringBuilder sb = new StringBuilder(data);

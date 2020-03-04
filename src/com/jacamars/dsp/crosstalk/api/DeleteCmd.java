@@ -23,35 +23,6 @@ public class DeleteCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public DeleteCmd(String username, String password) {
-		super(username, password);
-		type = Delete;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public DeleteCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = Delete;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -65,7 +36,7 @@ public class DeleteCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				updated = Crosstalk.getInstance().deleteCampaign(campaign);
+				updated = Crosstalk.getInstance().deleteCampaign(campaign, tokenData);
 				return;
 			} catch (Exception err) {
 				error = true;

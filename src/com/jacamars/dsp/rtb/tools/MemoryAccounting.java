@@ -1,9 +1,10 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 
 public enum MemoryAccounting {

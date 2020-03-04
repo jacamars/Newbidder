@@ -31,42 +31,6 @@ public class GetSpendRateCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username
-	 *            String. The username to use for authorization.
-	 * @param password
-	 *            String. The password to use for authorization.
-	 */
-	public GetSpendRateCmd(String username, String password) {
-		super(username, password);
-		type = SpendRate;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username
-	 *            String. The user authorization.
-	 * @param password
-	 *            String. THe password authorization.
-	 * @param campaign
-	 *            String. The target campaign.
-	 * @param creative
-	 *            String. The target creative.
-	 * @param type
-	 *            String. The type of the creative, eg 'banner'
-	 */
-	public GetSpendRateCmd(String username, String password, String campaign, String creative, String type) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		this.type = type;
-		type = SpendRate;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -79,6 +43,8 @@ public class GetSpendRateCmd extends ApiCommand {
 	@Override
 	public void execute() {
 		super.execute();
+		
+		// TBD: Needs rewrite for multi tenant
 
 		try {
 			if (campaign == null) {

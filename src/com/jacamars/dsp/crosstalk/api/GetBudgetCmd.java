@@ -27,44 +27,6 @@ public class GetBudgetCmd extends ApiCommand {
 
 	}
 
-	/** 
-	 * Basic form of the command.
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public GetBudgetCmd(String username, String password) {
-		super(username, password);
-		type = GetBudget;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 */
-	public GetBudgetCmd(String username, String password, String campaign) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		type = GetBudget;
-	}
-	
-	/**
-	 * Targeted form of the command.
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 * @param creative String. The target creative.
-	 */
-	public GetBudgetCmd(String username, String password, String campaign, String creative) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		type = GetBudget;
-	}
-
 	/**
 	 * Convert to JSON
 	 */
@@ -101,6 +63,12 @@ public class GetBudgetCmd extends ApiCommand {
 		} } catch (Exception e) {
 			error = true;
 			message = e.getMessage();
+		}
+		
+		if (tokenData.isAuthorized(c.customer_id)==false) {
+			error = true;
+			message = "No campaign defined: " + campaign;
+			return;
 		}
 		
 		budget_limit_daily = c.budget.dailyBudget.getDoubleValue(); 

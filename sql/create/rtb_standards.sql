@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS rtb_standards (
   id SERIAL,
+  customer_id text NOT NULL,
+  sub_id text DEFAULT NULL,
   rtbspecification varchar(1024) DEFAULT NULL,
   operator varchar(1024) DEFAULT NULL,
   operand varchar(1024) DEFAULT NULL,

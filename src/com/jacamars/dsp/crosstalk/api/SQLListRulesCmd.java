@@ -28,34 +28,6 @@ public class SQLListRulesCmd extends ApiCommand {
 
 	}
 
-	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLListRulesCmd(String username, String password) {
-		super(username, password);
-		type = SQLLIST_RULES;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLListRulesCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLLIST_RULES;
-	}
 
 	/**
 	 * Convert to JSON
@@ -71,7 +43,11 @@ public class SQLListRulesCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				String select = "select * from rtb_standards";
+				String select;
+				if (tokenData.isRtb4FreeSuperUser()) 
+					select = "select * from rtb_standards";
+				else
+					select = "select * from rtb_standards where customer_id='"+tokenData.customer+"'";
 				var conn = CrosstalkConfig.getInstance().getConnection();
 				var stmt = conn.createStatement();
 				var prep = conn.prepareStatement(select);
@@ -81,6 +57,7 @@ public class SQLListRulesCmd extends ApiCommand {
 							
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}

@@ -68,6 +68,7 @@ import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.*;
 
 import org.slf4j.Logger;
@@ -1542,9 +1543,9 @@ public class Configuration {
 	 * @return ProportionalEntry. The PE weights.
 	 * @throws Exception if campaign is not found.
 	 */
-	public ProportionalEntry getWeights(String name) throws Exception {
+	public ProportionalEntry getWeights(String name, TokenData td) throws Exception {
 		for (Campaign c : campaignsList) {
-			if (c != null && c.name.equals(name)) {
+			if (c != null && td.isAuthorized(c.customer_id) && c.name.equals(name)) {
 				if (c.weights == null) {
 					return null;
 				}

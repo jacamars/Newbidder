@@ -1,6 +1,5 @@
 package com.jacamars.dsp.rtb.common;
 
-import com.jacamars.dsp.rtb.bidder.SelectedCreative;
 import com.jacamars.dsp.rtb.nativeads.assets.Entity;
 import com.jacamars.dsp.rtb.nativeads.creative.Data;
 import com.jacamars.dsp.rtb.pojo.BidRequest;

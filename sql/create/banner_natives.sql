@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS banner_natives (
    id SERIAL,
+  customer_id text NOT NULL,
+  sub_id text DEFAULT NULL,
   type text NOT NULL,
   campaign_id int DEFAULT NULL,
   interval_start timestamp NOT NULL,

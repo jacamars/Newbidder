@@ -39,34 +39,6 @@ public class SQLDeleteRuleCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLDeleteRuleCmd(String username, String password) {
-		super(username, password);
-		type = SQLDELETE_RULE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLDeleteRuleCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLDELETE_RULE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -80,14 +52,23 @@ public class SQLDeleteRuleCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-						prepareStatement("delete from rtb_standards where id=?");
-				st.setInt(1, id);
-				st.executeUpdate();
+				PreparedStatement st;
+				if (tokenData.isRtb4FreeSuperUser()) {
+					st = CrosstalkConfig.getInstance().getConnection().
+					prepareStatement("delete from rtb_standards where id=?");
+					st.setInt(1, id);
+					st.executeUpdate();
+				} else {
+					st = CrosstalkConfig.getInstance().getConnection().
+							prepareStatement("delete from rtb_standards where id=? and customer_id=?");
+					st.setInt(1, id);
+					st.setString(2, tokenData.customer);
+					st.executeUpdate();
+				}
 				st.close();
 				 
-				Campaign.removeRuleFromCampaigns(id);
-				Creative.removeRuleFromCreatives(id);
+				Campaign.removeRuleFromCampaigns(id,tokenData);
+				Creative.removeRuleFromCreatives(id,tokenData);
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

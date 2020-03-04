@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS campaigns (
   id SERIAL,
+  customer_id text NOT NULL,
+  sub_id text DEFAULT NULL,
   activate_time timestamp DEFAULT NULL,
   expire_time timestamp DEFAULT NULL,
   cost decimal(15,6) DEFAULT NULL,

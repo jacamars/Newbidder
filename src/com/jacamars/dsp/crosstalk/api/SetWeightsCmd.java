@@ -24,33 +24,6 @@ public class SetWeightsCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public SetWeightsCmd(String username, String password) {
-		super(username, password);
-		type = GetPrice;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 * @param weights  String. The target creative.
-	 */
-	public SetWeightsCmd(String username, String password, String campaign, String weights) {
-		super(username, password);
-		this.campaign = campaign;
-		this.weights = weights;
-		type = SetWeights;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -66,7 +39,7 @@ public class SetWeightsCmd extends ApiCommand {
 		Campaign c = null;
 		try {
 			c = Crosstalk.getInstance().getKnownCampaign(campaign);
-			if (c == null) {
+			if (c == null || tokenData.isAuthorized(c.customer_id)) {
 				error = true;
 				message = "No campaign defined: " + campaign;
 				return;

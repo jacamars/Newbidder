@@ -38,34 +38,6 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLAddNewCampaignCmd(String username, String password) {
-		super(username, password);
-		type = SQLADD_NEW_CAMPAIGN;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLAddNewCampaignCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLADD_NEW_CAMPAIGN;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -80,6 +52,7 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 			super.execute();
 			try {
 				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
+				node.put("customer_id", tokenData.customer);
 				
 				Campaign c =  new Campaign(node); 
 	

@@ -41,19 +41,6 @@ public class RefreshCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the refresh command.
-	 * 
-	 * @param username
-	 *            String. The username authorization.
-	 * @param password
-	 *            String. The password authorization.
-	 */
-	public RefreshCmd(String username, String password) {
-		super(username, password);
-		type = Refresh;
-	}
-
-	/**
 	 * Default constructor
 	 */
 	public RefreshCmd() {
@@ -75,6 +62,7 @@ public class RefreshCmd extends ApiCommand {
 	public void execute() {
 		super.execute();
 
+		// TBD Needs rewrite for multi tenant
 		try {	
 			if (async == null || !async)
 				updated = Crosstalk.getInstance().refresh();

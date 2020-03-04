@@ -20,20 +20,6 @@ public class FutureCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command, starts all bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public FutureCmd(String username, String password) {
-		super(username, password);
-		type = Future;
-	}
-
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {

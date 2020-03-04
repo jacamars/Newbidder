@@ -38,34 +38,6 @@ public class SQLDeleteTargetCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLDeleteTargetCmd(String username, String password) {
-		super(username, password);
-		type = SQLDELETE_TARGET;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLDeleteTargetCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLDELETE_TARGET;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -79,13 +51,21 @@ public class SQLDeleteTargetCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
+				PreparedStatement st;
+				if (tokenData.isRtb4FreeSuperUser()) {
+					st= CrosstalkConfig.getInstance().getConnection().
 						prepareStatement("delete from targets where id=?");
-				st.setInt(1, id);
-				st.executeUpdate();
+					st.setInt(1, id);
+					st.executeUpdate();
+				} else {
+					st = CrosstalkConfig.getInstance().getConnection().
+							prepareStatement("delete from targets where id=?");
+					st.setInt(1, id);
+					st.setString(2,  tokenData.customer);
+					st.executeUpdate();
+				}
 				st.close();
-				 
-				Campaign.removeTargetFromCampaigns(id);
+				Campaign.removeTargetFromCampaigns(id, tokenData);
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

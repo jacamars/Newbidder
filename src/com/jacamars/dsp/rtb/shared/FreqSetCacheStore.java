@@ -1,7 +1,5 @@
 package com.jacamars.dsp.rtb.shared;
 
-import com.hazelcast.core.MapStore;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -10,6 +8,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.hazelcast.map.MapStore;
 
 import static java.lang.String.format;
 

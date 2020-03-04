@@ -567,37 +567,7 @@ public enum Controller {
         logger.info("SetWeights: Campaign: {}, message {}", cmd.name,cmd.msg);
     }
 
-    /**
-     *
-     * Get the weights assigned to a campaign.
-     *
-     * @param cmd BasicCommand. GetWeights.
-     */
-    public void getWeights(BasicCommand cmd) throws Exception {
-        ProportionalEntry e;
-        BasicCommand m = new BasicCommand();
-        try {
-            m.msg = "OK";
-            e = Configuration.getInstance().getWeights(cmd.name);
-            if (e == null)
-                m.target = "No weights assigned for " + cmd.name;
-            else
-                m.target = "Weights for " + cmd.name + " set to: " + e.toString();
-        } catch (Exception error) {
-            m.status = "error";
-            m.msg = error.toString();
-        }
-
-        m.to = cmd.from;
-        m.from = Configuration.instanceName;
-        m.id = cmd.id;
-        m.logtype = cmd.logtype;
-        m.name = "GetWeights Response";
-        responseQueue.add(m);
-
-        logger.info("GetWeights: Status: {},  Campaign: {},  {}, {}",m.status, m.name,m.target,m.msg);
-    }
-
+   
     /**
      * Stop the bidder from REDIS
      *
@@ -1458,9 +1428,6 @@ class CommandLoop implements com.jacamars.dsp.rtb.jmq.MessageListener<Object> {
                     break;
                 case Controller.SET_WEIGHTS:
                     Controller.getInstance().setWeights(item);
-                    break;
-                case Controller.GET_WEIGHTS:
-                    Controller.getInstance().getWeights(item);
                     break;
                 default:
                     Controller.getInstance().notHandled(item);

@@ -38,35 +38,6 @@ public class SQLGetCreativeCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLGetCreativeCmd(String username, String password) {
-		super(username, password);
-		type = SQLGET_CREATIVE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLGetCreativeCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLGET_CREATIVE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -80,7 +51,7 @@ public class SQLGetCreativeCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				data = Creative.getInstance(id,key);
+				data = Creative.getInstance(id,key,tokenData.customer);
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

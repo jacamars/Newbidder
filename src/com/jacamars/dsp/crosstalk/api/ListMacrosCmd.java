@@ -32,35 +32,6 @@ public class ListMacrosCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command..
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public ListMacrosCmd(String username, String password) {
-		super(username, password);
-		type = LIST_MACROS;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorization.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public ListMacrosCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = LIST_MACROS;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -74,9 +45,12 @@ public class ListMacrosCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
+				
+				// TBD Needs rewrite for multi tenant
 				macros = Configuration.getInstance().getEnvironment();			
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}

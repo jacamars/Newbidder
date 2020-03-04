@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.crosstalk.budget.CommandController;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.BasicCommand;
+import com.jacamars.dsp.rtb.shared.BidCachePool;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.XORShiftRandom;
 
 /**
@@ -176,6 +178,8 @@ public class ApiCommand {
     public static final String QUERY_SYMBOL = "QuerySymbol#";
     
     public static final String LIST_MACROS = "ListMacros#";
+    
+    public static final String GET_TOKEN = "GetToken#";
    
     /**
      * This class'es sl4j log object
@@ -240,42 +244,6 @@ public class ApiCommand {
      */
     static volatile XORShiftRandom random = new XORShiftRandom();
 
-    /**
-     * Get the username.
-     *
-     * @return String. The user name.
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Set the user name
-     *
-     * @param username String.The name to set.
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Get the passeord.
-     *
-     * @return String. The password used.
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Set the password.
-     *
-     * @param password String. The password to use.
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getBidder() {
         return bidder;
     }
@@ -307,11 +275,6 @@ public class ApiCommand {
     public String getCreative() {
         return creative;
     }
-
-    // The command user name
-    protected String username;
-    // The command password
-    protected String password;
     // The command bidder we targer, or null for all bidders
     protected String bidder;
     // The type of the command.
@@ -320,23 +283,14 @@ public class ApiCommand {
     protected String campaign;
     // The creative target
     protected String creative;
+    
+    protected TokenData tokenData;
 
     /**
      * Empty constructor for JSON
      */
     public ApiCommand() {
 
-    }
-
-    /**
-     * Command form using username and password.
-     *
-     * @param username String. The username to use.
-     * @param password String. The password to use.
-     */
-    public ApiCommand(String username, String password) {
-        this.username = username;
-        this.password = password;
     }
 
     /**
@@ -358,9 +312,6 @@ public class ApiCommand {
         
         boolean requireLeader = false;
         
-        
-        
-
         logger.info("From IP: {}, size: {}, command: {}", ip, data.length(), data);
         switch (token) {
             case Ping:
@@ -549,9 +500,30 @@ public class ApiCommand {
             	requireLeader = true;
             	break;
             	
+            case GET_TOKEN:
+            	cmd = mapper.readValue(data, GetTokenCmd.class);
+            	break;
+            	
             default:
                 cmd = new UnknownCmd(token);
                 return cmd;
+        }
+        
+        /**
+         * Retrieve the token
+         */
+        if (token.equals(GET_TOKEN) == false) {
+        	if (cmd.token == null) {
+        		cmd.error = true;
+        		cmd.message = "You did not supply a token (" + token + ")";
+        		return cmd;
+        	}
+        	cmd.tokenData = BidCachePool.getInstance().getToken(cmd.token);
+        	if (cmd.tokenData == null) {
+        		cmd.error = true;
+        		cmd.message = "Token expired";
+        		return cmd;
+        	}
         }
         
         ///////////// If this is not the leader, but leadership is required, then send it to the leader ///////////
@@ -586,8 +558,6 @@ public class ApiCommand {
      */
     public void execute() {
         this.timestamp = System.currentTimeMillis();
-        username = null;
-        password = null;
     }
 
     /**

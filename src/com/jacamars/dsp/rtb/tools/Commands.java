@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.io.BufferedReader;
+
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -153,7 +154,8 @@ public class Commands implements WatchInterface {
 		Campaign.registerWithHazelCast(clientConfig);
 		// clientConfig.setProperty("hazelcast.logging.type", "slf4j");
 
-		clientConfig.addAddress(cluster);
+		clientConfig.getNetworkConfig().addAddress(cluster);
+		//clientConfig.addAddress(cluster);
 
 		client = HazelcastClient.newHazelcastClient(clientConfig);
 

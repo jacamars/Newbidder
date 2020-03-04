@@ -825,7 +825,7 @@ public class BidRequest {
 	 * @return Object. The object found at 'x.y.z'
 	 */
 
-	Object walkTree(List<String> list) {
+	public Object walkTree(List<String> list) {
 		try {
 			JsonNode node = rootNode.get(list.get(0));
 			if (node == null)

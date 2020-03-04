@@ -30,35 +30,6 @@ public class GetReasonCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command, starts all bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public GetReasonCmd(String username, String password) {
-		super(username, password);
-		type = GetReason;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public GetReasonCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = GetReason;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -79,7 +50,8 @@ public class GetReasonCmd extends ApiCommand {
 					Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
 						var camp = e.getValue();
 						try {
-							reasons.add(camp.name + ": " + camp.report());
+							if (tokenData.isAuthorized(camp.customer_id)) 
+								reasons.add(camp.name + ": " + camp.report());
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -127,7 +99,7 @@ public class GetReasonCmd extends ApiCommand {
 					}
 				});
 				
-				Campaign c = Campaign.getInstance(id);
+				Campaign c = Campaign.getInstance(id,tokenData);
 				reasons.add(c.report());
 				return;
 			} catch (Exception err) {

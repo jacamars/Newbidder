@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.shared;
 
 import java.io.Serializable;
 
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,9 +22,11 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.ITopic;
+import com.hazelcast.map.IMap;
+//import com.hazelcast.core.IMap;
+//import com.hazelcast.core.ITopic;
 import com.hazelcast.map.listener.EntryEvictedListener;
+import com.hazelcast.topic.ITopic;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.Echo;
 
@@ -35,6 +38,7 @@ public enum BidCachePool {
 
 	INSTANCE;
 	
+	public static final String TOKENCACHE = "TOKENCACHE";
 	public static final String BIDCACHE = "BIDCACHE";
 	public static final String VIDEO = "VIDEO";
 	public static final String MISC = "MISC";
@@ -51,8 +55,11 @@ public enum BidCachePool {
 		watchMap.put(MISC, new HashMap());
 		watchMap.put(VIDEO, new HashMap());
 		watchMap.put(BIDCACHE,  new HashMap());
+		watchMap.put(TOKENCACHE, new HashMap());
 	}
 
+	/** API Tokens (encrypted) */
+	static private volatile IMap<String, TokenData> tokenCache;
 	/** The cache to contain the general context */
 	static private volatile IMap<String, RecordedBid> bidCache;
 	/** The cache that contains the membership records of all the bidders */
@@ -102,6 +109,17 @@ public enum BidCachePool {
 				config.getMapConfig(name).setMapStoreConfig(mapStoreCfg);
 			}
 			//////////////////////////////////////////////////
+			
+			name = "TOKENCACHE";
+			tokenCache = RTBServer.getSharedInstance().getMap(name);
+			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			tokenCache.addEntryListener(new EntryEvictedListener<String, TokenData>() {
+				@Override
+				public void entryEvicted(EntryEvent<String, TokenData> event) {
+					System.out.println("Token deleted: " + event.getKey());
+					handleWatch(TOKENCACHE, event.getKey());
+				}
+			}, true);
 			
 			name = "MEMBER";
 			memberCache = RTBServer.getSharedInstance().getMap(name);
@@ -319,6 +337,14 @@ public enum BidCachePool {
 			return null;
 		bidCache.remove(key);
 		return rb;
+	}
+	
+	public void setToken(String key, TokenData t) {
+		tokenCache.set(key, t, 1, TimeUnit.MINUTES);     
+	}
+	
+	public TokenData getToken(String key) {
+		return tokenCache.get(key);
 	}
 
 	public void setVideo(String key, String vast, long timeout) {

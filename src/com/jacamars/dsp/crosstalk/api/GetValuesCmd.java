@@ -30,56 +30,6 @@ public class GetValuesCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username
-	 *            String. The username to use for authorization.
-	 * @param password
-	 *            String. The password to use for authorization.
-	 */
-	public GetValuesCmd(String username, String password) {
-		super(username, password);
-		type = GetValues;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username
-	 *            String. The user authorization.
-	 * @param password
-	 *            String. THe password authorization.
-	 * @param campaign
-	 *            String. The target campaign.
-	 */
-	public GetValuesCmd(String username, String password, String campaign) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		type = GetValues;
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username
-	 *            String. The user authorization.
-	 * @param password
-	 *            String. THe password authorization.
-	 * @param campaign
-	 *            String. The target campaign.
-	 * @param creative
-	 *            String. The target creative.
-	 */
-	public GetValuesCmd(String username, String password, String campaign, String creative) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		type = GetValues;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -94,6 +44,9 @@ public class GetValuesCmd extends ApiCommand {
 		super.execute();
 		refreshList = null;
 		String type = null;
+		
+		// TBD Needs rewrite for multi tenant
+		
 		try {
 			if (creative == null) {
 				total_value = BudgetController.getInstance().getCampaignTotalSpend(campaign);

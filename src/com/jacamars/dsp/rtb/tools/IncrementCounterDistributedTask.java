@@ -1,13 +1,14 @@
 package com.jacamars.dsp.rtb.tools;
 
 import java.io.Serializable;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.PartitionAware;
+import com.hazelcast.map.IMap;
+import com.hazelcast.partition.PartitionAware;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 
 public final class IncrementCounterDistributedTask<K> implements Runnable, PartitionAware, Serializable {

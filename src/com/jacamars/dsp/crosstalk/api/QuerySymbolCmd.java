@@ -27,35 +27,6 @@ public class QuerySymbolCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public QuerySymbolCmd(String username, String password) {
-		super(username, password);
-		type = QUERY_SYMBOL;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public QuerySymbolCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = QUERY_SYMBOL;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -69,6 +40,8 @@ public class QuerySymbolCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
+				
+				// TBD needs rewrite for multi tenant
 				LookingGlass q = (LookingGlass)LookingGlass.symbols.get(symbol);
 				if (q == null) {
 					error = true;

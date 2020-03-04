@@ -24,35 +24,6 @@ public class DeleteSymbolCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public DeleteSymbolCmd(String username, String password) {
-		super(username, password);
-		type = DELETE_SYMBOL;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public DeleteSymbolCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = DELETE_SYMBOL;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -66,7 +37,7 @@ public class DeleteSymbolCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				LookingGlass.symbols.remove(symbol);
+				LookingGlass.symbols.remove(symbol, tokenData);
 				return;
 			} catch (Exception err) {
 				error = true;

@@ -30,57 +30,6 @@ public class SetBudgetCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public SetBudgetCmd(String username, String password) {
-		super(username, password);
-		type = SetBudget;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 * @param creative String. The target creative.
-	 * @param hourly   double. The hourly limit to set.
-	 * @param daily    double. The daily limit to set.
-	 * @param total    double. The total limit to set.
-	 */
-	public SetBudgetCmd(String username, String password, String campaign, String creative, double hourly, double daily,
-			double total) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		this.daily = daily;
-		this.hourly = hourly;
-		this.total = total;
-		type = SetBudget;
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 */
-	public SetBudgetCmd(String username, String password, String campaign, double hourly, double daily, double total) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		this.daily = daily;
-		this.hourly = hourly;
-		this.total = total;
-		type = SetBudget;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -98,6 +47,11 @@ public class SetBudgetCmd extends ApiCommand {
 			Campaign c = Crosstalk.getInstance().getKnownCampaign(campaign);
 			if (c == null) {
 				error = true;
+				message = "No campaign defined: " + campaign;
+				return;
+			}
+			
+			if (tokenData.isAuthorized(c.customer_id) == false) {
 				message = "No campaign defined: " + campaign;
 				return;
 			}

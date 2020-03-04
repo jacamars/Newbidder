@@ -39,34 +39,6 @@ public class SQLAddNewRuleCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLAddNewRuleCmd(String username, String password) {
-		super(username, password);
-		type = SQLADD_NEW_RULE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLAddNewRuleCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLADD_NEW_RULE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -82,8 +54,9 @@ public class SQLAddNewRuleCmd extends ApiCommand {
 			try {
 				System.out.println("NEW RULE: " + rule);
 				ObjectNode x = mapper.readValue(rule,ObjectNode.class);
+				x.put("customer_id", tokenData.customer);
+				
 				Node n = new Node(x);
-	
 				PreparedStatement st = Node.toSql(n, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
 				st.close();

@@ -42,35 +42,6 @@ public class SQLGetNewRuleCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLGetNewRuleCmd(String username, String password) {
-		super(username, password);
-		type = SQLGET_NEW_TARGET;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLGetNewRuleCmd(String username, String password, String target) {
-		super(username, password);
-		this.name = target;
-		type = SQLGET_NEW_TARGET;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {

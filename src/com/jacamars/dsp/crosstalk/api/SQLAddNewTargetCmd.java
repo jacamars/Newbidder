@@ -41,34 +41,6 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLAddNewTargetCmd(String username, String password) {
-		super(username, password);
-		type = SQLADD_NEW_TARGET;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLAddNewTargetCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLADD_NEW_TARGET;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -84,6 +56,7 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 			try {
 				System.out.println("NEW TARGET: " + target);
 				ObjectNode x = mapper.readValue(target,ObjectNode.class);
+				x.put("customer_id",tokenData.customer);
 				Targeting n = new Targeting(x);
 	
 				PreparedStatement st = Targeting.toSql(n, CrosstalkConfig.getInstance().getConnection());

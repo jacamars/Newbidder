@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.jmq;
 
 import org.zeromq.ZMQ;
+
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 

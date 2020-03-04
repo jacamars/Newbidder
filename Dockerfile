@@ -86,7 +86,7 @@ RUN mkdir web
 RUN mkdir js
 RUN mkdir target
 RUN mkdir data
-RUN mkdir data/postgres
+RUN mkdir -p sql/create
 RUN mkdir logs
 RUN mkdir SampleBids
 RUN mkdir Campaigns
@@ -100,7 +100,7 @@ RUN chmod +x wait-for-it.sh
 COPY database.backup /
 COPY tools/* /
 COPY data/* data/
-COPY sql/create/* data/postgres/
+COPY sql/create/* sql/create/
 COPY shell/ /shell
 
 COPY www/control/ /www/control/

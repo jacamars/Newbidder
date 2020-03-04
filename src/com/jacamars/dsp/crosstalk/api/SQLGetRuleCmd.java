@@ -36,35 +36,6 @@ public class SQLGetRuleCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLGetRuleCmd(String username, String password) {
-		super(username, password);
-		type = SQLGET_RULE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 * 
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLGetRuleCmd(String username, String password, String target) {
-		super(username, password);
-		campaign = target;
-		type = SQLGET_RULE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -79,6 +50,11 @@ public class SQLGetRuleCmd extends ApiCommand {
 			super.execute();
 			try {
 				rule = Node.getInstance(id);
+				if (tokenData.isAuthorized(rule.customer_id) == false) {
+					error = true;
+					rule = null;
+					message = "No such rule";
+				}
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

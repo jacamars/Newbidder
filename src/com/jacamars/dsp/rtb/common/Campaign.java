@@ -50,6 +50,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.shared.PortableJsonFactory;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.ChattyErrors;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
@@ -58,18 +59,23 @@ import com.jacamars.dsp.rtb.tools.JdbcTools;
  * A class that implements a campaign. Provide the campaign with evaluation
  * Nodes (a stack) and a bid request, and this campaign will determine if the
  * bid request in question matches this campaign.
+ * 
  * @author Ben M. Faul
  *
  */
 
-public class Campaign implements Comparable, Portable  {
+public class Campaign implements Comparable, Portable {
 	public static final int CLASS_ID = 3;
-	
+
 	/** SQL id */
-	public int id; 
+	public int id;
 	public transient String stringId;
-	
-	/** Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns */
+
+	public String customer_id;
+
+	/**
+	 * Set to true if this is an Adx campaign. Can't mix Adx and regular campaigns
+	 */
 	public boolean isAdx;
 	/** points back to the name of the owner of the campaign */
 	public String name;
@@ -82,7 +88,7 @@ public class Campaign implements Comparable, Portable  {
 	/** IAB Categories */
 	public List<String> category;
 	/** encoded IAB category */
-	public transient StringBuilder encodedIab;	
+	public transient StringBuilder encodedIab;
 	/** Should you do forensiq fingerprinting for this campaign? */
 	public Boolean forensiq = false;
 
@@ -91,7 +97,10 @@ public class Campaign implements Comparable, Portable  {
 
 	public FrequencyCap frequencyCap = null;
 
-	/** The actual spend rate of the campaign, affected by the number of bidders in the system */
+	/**
+	 * The actual spend rate of the campaign, affected by the number of bidders in
+	 * the system
+	 */
 	public transient long effectiveSpendRate;
 
 	/** The selection algorithm name */
@@ -100,162 +109,177 @@ public class Campaign implements Comparable, Portable  {
 	public List<String> algorithmKeys;
 
 	public String weightAssignment;
-	
+
 	/** Set to runnable to make it actually loadable in the bidder. */
 	public String status = "offline";
-	
+
 	public transient volatile ProportionalEntry weights;
-	
+
 	public Long activate_time;
 	public Long expire_time;
 	public Budget budget;
-	
+
 	/** Database keys for the creatives */
 	public List<Integer> banners;
 	public List<Integer> videos;
 	public List<Integer> audios;
 	public List<Integer> natives;
 	/////////////////////////////////////
-	
+
 	/** The SQL name for this campaign id */
 	protected final String CAMPAIGN_ID = "id";
-	
+
 	/** Thew SQL name for the updated flag */
 	protected final String UPDATED = "updated_at";
-	
+
 	/** The SQL name for the total budget */
 	protected final String TOTAL_BUDGET = "total_budget";
-	
+
 	/** SQL name for the descriptive name */
 	protected final String CAMPAIGN_NAME = "name";
-	
+
 	/** SQL name of Datetime of expiration */
 	protected final String EXPIRE_TIME = "expire_time";
-	
+
 	/** SQL name for the date time to activate */
 	protected final String ACTIVATE_TIME = "activate_time";
-	
+
 	/** The SQL name for the budget limit daily */
 	protected final String DAILY_BUDGET = "budget_limit_daily";
-	
+
 	/** The SQL name for the hourly budget */
 	protected final String HOURLY_BUDGET = "budget_limit_hourly";
 
 	protected final String DAYPART = "day_parting_utc";
-	
+
 	transient Set<Creative> parkedCreatives = new HashSet<Creative>();
-	
+
 	/** This class's logger */
 	static final Logger logger = LoggerFactory.getLogger(Campaign.class);
 
-    private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
-    
-    // when it was last updated if by sql
-    public long updated_at;
-    /** points to the regions in the sql database */
-    public String regions;
-    /** points to the target id for this guy (used to make rules from the campaign manager) */
-    public int target_id = 0;
-    
-    /** Identifies standard rules associated with this campaign */
-    public List<Integer>rules = new ArrayList<>();
-    
-    // ///////////// Crude accounting /////////////////////
-    public transient long bids = 0L;
-    public transient long wins = 0L;
-    public transient long pixels = 0L;
-    public transient long clicks = 0L;
-    public transient long adspend = 0L;
-    //////////////////////////////////////////////////////
-    
-    public String day_parting_utc;
-    
-    /**
-     * Resources used to create campaign from JSON based SQL
-     */
-    transient JsonNode myNode;
-    transient Targeting targeting;
+	private SortNodesFalseCount nodeSorter = new SortNodesFalseCount();
+
+	// when it was last updated if by sql
+	public long updated_at;
+	/** points to the regions in the sql database */
+	public String regions;
+	/**
+	 * points to the target id for this guy (used to make rules from the campaign
+	 * manager)
+	 */
+	public int target_id = 0;
+
+	/** Identifies standard rules associated with this campaign */
+	public List<Integer> rules = new ArrayList<>();
+
+	// ///////////// Crude accounting /////////////////////
+	public transient long bids = 0L;
+	public transient long wins = 0L;
+	public transient long pixels = 0L;
+	public transient long clicks = 0L;
+	public transient long adspend = 0L;
+	//////////////////////////////////////////////////////
+
+	public String day_parting_utc;
+
+	/**
+	 * Resources used to create campaign from JSON based SQL
+	 */
+	transient JsonNode myNode;
+	transient Targeting targeting;
 	/** The exchanges this campaign can be used with */
-	public List<String> exchanges = new ArrayList<String>(); 
+	public List<String> exchanges = new ArrayList<String>();
 	transient List<String> bcat = new ArrayList<String>();
-	
+
 	/** rtb attribute being capped */
-	public String capSpec;	
+	public String capSpec;
 	/** Number of seconds before the frequency cap expires */
-	public Integer capExpire;	
+	public Integer capExpire;
 	/** The count limit of the frequency cap */
 	public Integer capCount;
 	/** cap time unit **/
 	public String capUnit;;
 	//////////////////////////////////////////////////////////////////////
-    
+
 	/**
 	 * Return the in-memory accounting
+	 * 
 	 * @return
 	 */
-	public Map<String,Long> getCrudeAccounting() {
-		Map<String,Long> map = new HashMap<>();
-		map.put("bids",bids);
+	public Map<String, Long> getCrudeAccounting() {
+		Map<String, Long> map = new HashMap<>();
+		map.put("bids", bids);
 		map.put("wins", wins);
 		map.put("pixels", pixels);
 		map.put("clicks", clicks);
 		map.put("adspend", adspend);
-		return map; 
+		return map;
 	}
-    
-    /**
-	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+
+	/**
+	 * Register the portable hazelcast serializeable object. Call this before
+	 * hazelcast is initialized!
+	 * 
 	 * @param config ClientConfig. The configuration for the user.
 	 */
 	public static void registerWithHazelCast(ClientConfig config) {
-        config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
-        ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, Campaign.CLASS_ID);
+		config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
+		ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID,
+				Campaign.CLASS_ID);
 		portableCampaignClassBuilder.addUTFField("json");
 
 		ClassDefinition portablCampaignClassDefinition = portableCampaignClassBuilder.build();
-	    config.getSerializationConfig().addClassDefinition(portablCampaignClassDefinition);
+		config.getSerializationConfig().addClassDefinition(portablCampaignClassDefinition);
 	}
-	
+
 	/**
-	 * Register the portable hazelcast serializeable object. Call this before hazelcast is initialized!
+	 * Register the portable hazelcast serializeable object. Call this before
+	 * hazelcast is initialized!
+	 * 
 	 * @param config ClientConfig. The configuration for the member.
 	 */
 	public static void registerWithHazelCast(Config config) {
 		config.getSerializationConfig().addPortableFactory(PortableJsonFactory.FACTORY_ID, new PortableJsonFactory());
-	    ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID, Campaign.CLASS_ID);
-	    portableCampaignClassBuilder.addUTFField("json");
+		ClassDefinitionBuilder portableCampaignClassBuilder = new ClassDefinitionBuilder(PortableJsonFactory.FACTORY_ID,
+				Campaign.CLASS_ID);
+		portableCampaignClassBuilder.addUTFField("json");
 
 		ClassDefinition portableCampaignClassDefinition = portableCampaignClassBuilder.build();
 		config.getSerializationConfig().addClassDefinition(portableCampaignClassDefinition);
 	}
-	
-	public static Campaign getInstance(int id) throws Exception {
-		String select = "select * from campaigns where id="+id;
+
+	public static Campaign getInstance(int id, TokenData td) throws Exception {
+		String select = "select * from campaigns where id=" + id;
 		var conn = CrosstalkConfig.getInstance().getConnection();
 		var stmt = conn.createStatement();
 		var prep = conn.prepareStatement(select);
 		ResultSet rs = prep.executeQuery();
-		
+
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		if (inner == null || inner.size() == 0)
 			return null;
-		
+
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Campaign c = new Campaign(y);
+
+		if (td != null && td.isAuthorized(c.customer_id) == false)
+			return null;
+
 		c.id = id;
 		return c;
 	}
-	
+
 	/**
 	 * Empty constructor, simply takes all defaults, useful for testing.
 	 */
 	public Campaign() {
 
 	}
-	
-	
+
 	/**
-	 * Constructor using a JSON Node. Crosstalk uses this to create this object from SQL
+	 * Constructor using a JSON Node. Crosstalk uses this to create this object from
+	 * SQL
+	 * 
 	 * @param node JsonNode. The object as defined by SQL, and interpreted as JSON.
 	 */
 	public Campaign(JsonNode node) throws Exception {
@@ -268,27 +292,28 @@ public class Campaign implements Comparable, Portable  {
 		process();
 		doTargets();
 	}
-	
+
 	/**
 	 * Constructor using a string JSON. This is used by file readers.
+	 * 
 	 * @param data
 	 * @throws Exception
 	 */
 	public Campaign(String data) throws Exception {
-		
+
 		Campaign camp = DbTools.mapper.readValue(data, Campaign.class);
 		init(camp);
 	}
-	
-	
+
 	/**
 	 * Crosstalk updates a campaign using this.
+	 * 
 	 * @param camp Campaign.
 	 */
 	public void update(Campaign camp) throws Exception {
 		init(camp);
 	}
-	
+
 	public void update(ObjectNode myNode) throws Exception {
 		this.myNode = myNode;
 		this.creatives.clear();
@@ -299,13 +324,15 @@ public class Campaign implements Comparable, Portable  {
 		process();
 		doTargets();
 	}
-	
-	/** 
+
+	/**
 	 * An iniitializer from a copy.
+	 * 
 	 * @param camp
 	 * @throws Exception
 	 */
 	private void init(Campaign camp) throws Exception {
+		this.customer_id = customer_id;
 		this.id = camp.id;
 		this.stringId = "" + camp.id;
 		this.isAdx = camp.isAdx;
@@ -330,34 +357,35 @@ public class Campaign implements Comparable, Portable  {
 		this.audios = audios;
 		if (camp.category != null)
 			this.category = camp.category;
-		
+
 		encodeCreatives();
-		encodeAttributes();	
+		encodeAttributes();
 	}
 
-    /**
-     * Sort the selection criteria in descending order of number of times false was selected.
-     * Then, after doing that, zero the counters.
-     */
-    public void sortNodes() {
-        Collections.sort(attributes, nodeSorter);
+	/**
+	 * Sort the selection criteria in descending order of number of times false was
+	 * selected. Then, after doing that, zero the counters.
+	 */
+	public void sortNodes() {
+		Collections.sort(attributes, nodeSorter);
 
-        for (int i = 0; i<attributes.size();i++) {
-            attributes.get(i).clearFalseCount();
-        }
+		for (int i = 0; i < attributes.size(); i++) {
+			attributes.get(i).clearFalseCount();
+		}
 
-        for (int i=0;i<creatives.size();i++) {
-            creatives.get(i).sortNodes();
-        }
-    }
-	
+		for (int i = 0; i < creatives.size(); i++) {
+			creatives.get(i).sortNodes();
+		}
+	}
+
 	/**
 	 * Find the node with the specified hierarchy string.
+	 * 
 	 * @param str String. The hierarchy we are looking for.
 	 * @return Node. The node with this hierarchy, might be null if not exists.
 	 */
 	public Node getAttribute(String str) {
-		
+
 		for (Node n : attributes) {
 			if (n.equals(str))
 				return n;
@@ -367,60 +395,66 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Is this campaign capped on the item in this bid request?
-	 * @param br BidRequest. The bid request to query.
+	 * 
+	 * @param br       BidRequest. The bid request to query.
 	 * @param capSpecs Map. The current cap spec.
 	 * @return boolean. Returns true if the IP address is capped, else false.
 	 */
 	public boolean isCapped(BidRequest br, Map<String, String> capSpecs) {
 		if (frequencyCap == null)
 			return false;
-		return frequencyCap.isCapped(br,capSpecs,name);
+		return frequencyCap.isCapped(br, capSpecs, name);
 	}
 
 	/**
 	 * Determine if this bid request + campaign is frequency Governed.
+	 * 
 	 * @param br BidReuestcount . The bid request to check for governance.
-	 * @return boolean. Returns true if this campaign has bid on the same user/synthkey in the last 1000 ms.
+	 * @return boolean. Returns true if this campaign has bid on the same
+	 *         user/synthkey in the last 1000 ms.
 	 */
 	public boolean isGoverned(BidRequest br) {
 		if (RTBServer.frequencyGoverner == null || FrequencyGoverner.silent)
 			return false;
 
-		return RTBServer.frequencyGoverner.contains(name,br);
+		return RTBServer.frequencyGoverner.contains(name, br);
 	}
+
 	/**
 	 * Return the Lucene query string for this campaign's attributes
+	 * 
 	 * @return String. The lucene query.
 	 */
-	
+
 	@JsonIgnore
 	public String getLucene() {
 		return getLuceneFromAttrs(attributes);
 	}
-	
+
 	String getLuceneFromAttrs(List<Node> attributes) {
 		String str = "";
-		
+
 		List<String> strings = new ArrayList<String>();
-		for (int i=0; i < attributes.size(); i++) {
+		for (int i = 0; i < attributes.size(); i++) {
 			Node x = attributes.get(i);
 			String s = x.getLucene();
 			if (s != null && s.length() > 0)
 				strings.add(s);
 		}
-		
-		for (int i=0; i<strings.size();i++) {
+
+		for (int i = 0; i < strings.size(); i++) {
 			String s = strings.get(i);
 			str += s;
 			if (i + 1 < strings.size())
 				str += " AND ";
 		}
-		
+
 		return str;
 	}
-	
+
 	/**
 	 * Return the lucene query string for the named creative.
+	 * 
 	 * @param crid String. The creative id.
 	 * @return String. The lucene string for this query.
 	 */
@@ -432,30 +466,31 @@ public class Campaign implements Comparable, Portable  {
 
 		String pre = "((-_exists_: imp.bidfloor) OR imp.bidfloor :<=" + c.price + ") AND ";
 		if (c.isNative()) {
-			
-		} else
-		if (c.isVideo()) {
-			pre += "imp.video.w: " + c.w + " AND imp.video.h: " + c.h + " AND imp.video.maxduration:< " + c.videoDuration;
+
+		} else if (c.isVideo()) {
+			pre += "imp.video.w: " + c.w + " AND imp.video.h: " + c.h + " AND imp.video.maxduration:< "
+					+ c.videoDuration;
 			pre += " AND imp.video.mimes: *" + c.mime_type + "* AND imp.video.protocols: *" + c.videoProtocol + "*";
 		} else {
 			pre += "imp.banner.w: " + c.w + " AND imp.banner.h: " + c.h;
 		}
-		
+
 		String str = getLucene();
 		String rest = getLuceneFromAttrs(c.attributes);
-		
-		if (str == null || str.length() == 0)  {
+
+		if (str == null || str.length() == 0) {
 			return pre + " AND " + rest;
 		}
-		
+
 		if (rest == null || rest.length() == 0)
 			return pre + " AND " + str;
-		
+
 		return pre + " AND " + str + " AND " + rest;
 	}
-	
+
 	/**
 	 * Get a creative of this campaign.
+	 * 
 	 * @param crid: String. The creative id.
 	 * @return Creative. The creative or null;
 	 */
@@ -467,59 +502,64 @@ public class Campaign implements Comparable, Portable  {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Creates a copy of this campaign
+	 * 
 	 * @return Campaign. A campaign that is an exact clone of this one
 	 * @throws Exception on JSON parse errors.
 	 */
 	public Campaign copy() throws Exception {
 
-		String str =  DbTools.mapper.writer().writeValueAsString(this);
+		String str = DbTools.mapper.writer().writeValueAsString(this);
 		Campaign x = DbTools.mapper.readValue(str, Campaign.class);
 		x.encodeAttributes();
 		return x;
 	}
-	
+
 	/**
 	 * Constructor with pre-defined node.
-	 * @param id String - the id of this campaign.
+	 * 
+	 * @param id    String - the id of this campaign.
 	 * @param nodes nodes. List - the list of nodes to add.
 	 */
 	public Campaign(String id, List<Node> nodes) {
 		this.name = id;
 		this.attributes.addAll(nodes);
 	}
-	
+
 	/**
-	 * Enclose the URL fields. GSON doesn't pick the 2 encoded fields up, so you have to make sure you encode them.
-	 * This is an important step, the WIN processing will get mangled if this is not called before the campaign is used.
-	 * Configuration.getInstance().addCampaign() will call this for you.
+	 * Enclose the URL fields. GSON doesn't pick the 2 encoded fields up, so you
+	 * have to make sure you encode them. This is an important step, the WIN
+	 * processing will get mangled if this is not called before the campaign is
+	 * used. Configuration.getInstance().addCampaign() will call this for you.
 	 */
 	public void encodeCreatives() throws Exception {
-		
+
 		for (Creative c : creatives) {
 			c.encodeUrl();
 			c.encodeAttributes();
 		}
 	}
-	
+
 	/**
-	 * Encode the values of all the attributes, instantiating from JSON does not do this, it's an incomplete serialization
-	 * Always call this if you add a campaign without using Configuration.getInstance().addCampaign();
+	 * Encode the values of all the attributes, instantiating from JSON does not do
+	 * this, it's an incomplete serialization Always call this if you add a campaign
+	 * without using Configuration.getInstance().addCampaign();
+	 * 
 	 * @throws Exception if the attributes of the node could not be encoded.
 	 */
 	public void encodeAttributes() throws Exception {
-		for (int i=0;i<attributes.size();i++) {
+		for (int i = 0; i < attributes.size(); i++) {
 			Node n = attributes.get(i);
 			n.setValues();
 		}
-		
+
 		if (category == null) {
 			category = new ArrayList<String>();
 		}
-		
-		if (category.size()>0) {
+
+		if (category.size() > 0) {
 			String str = "\"cat\":" + DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(category);
 			encodedIab = new StringBuilder(str);
 		}
@@ -532,11 +572,12 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Set this campaign's assigned weights.
+	 * 
 	 * @param weight String. The weight of the creatives.
 	 * @throws Exception on parsing errors
 	 */
 	public void setWeights(String weight) throws Exception {
-		if (weight == null || weight.length()==0) {
+		if (weight == null || weight.length() == 0) {
 			weightAssignment = null;
 			weights = null;
 			return;
@@ -546,11 +587,13 @@ public class Campaign implements Comparable, Portable  {
 	}
 
 	/**
-	 * Calculate the effective spend rate. It is equal to assigned spend rate by the number of members. Then
-	 * call the Limiter to fix the rate limiter access for it.
+	 * Calculate the effective spend rate. It is equal to assigned spend rate by the
+	 * number of members. Then call the Limiter to fix the rate limiter access for
+	 * it.
 	 *
-	 * This is called when the campaign is instantiated (via the encode attributes method, or whenever the
-	 * bidder determines there has been a change in the number of bidders in the bid farm
+	 * This is called when the campaign is instantiated (via the encode attributes
+	 * method, or whenever the bidder determines there has been a change in the
+	 * number of bidders in the bid farm
 	 */
 	public void establishSpendRate() {
 		int k = RTBServer.biddersCount;
@@ -562,6 +605,7 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Add an evaluation node to the campaign.
+	 * 
 	 * @param node Node - the evaluation node to be added to the set.
 	 */
 	public void add(Node node) {
@@ -569,22 +613,24 @@ public class Campaign implements Comparable, Portable  {
 	}
 
 	/**
-	 * The compareTo method to ensure that multiple campaigns
-	 * don't exist with the same id.
+	 * The compareTo method to ensure that multiple campaigns don't exist with the
+	 * same id.
+	 * 
 	 * @param o Object. The object to compare with.
 	 * @return int. Returns 1 if the ids match, otherwise 0.
 	 */
 	@Override
 	public int compareTo(Object o) {
-		Campaign other = (Campaign)o;
+		Campaign other = (Campaign) o;
 		if (this.name.equals(other.name))
 			return 1;
-		
+
 		return 0;
 	}
-	
+
 	/**
 	 * Returns this object as a JSON string
+	 * 
 	 * @return String. The JSON representation of this object.
 	 */
 	public String toJson() {
@@ -599,8 +645,10 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Answers the question, can this campaign use the named exchange?
+	 * 
 	 * @param exchange String. The name of the exchange
-	 * @return boolean. Returns true if we can use the exchange, otherwise returns false.
+	 * @return boolean. Returns true if we can use the exchange, otherwise returns
+	 *         false.
 	 */
 	public boolean canUseExchange(String exchange) {
 		boolean canUse = false;
@@ -609,15 +657,14 @@ public class Campaign implements Comparable, Portable  {
 				canUse = false;
 				Object obj = node.value;
 				if (obj instanceof String) {
-					String str = (String)obj;
+					String str = (String) obj;
 					if (str.equals(exchange)) {
 						canUse = true;
 					} else {
 						canUse = false;
 					}
-				} else
-				if (obj instanceof List) {
-					List<String> list = (List<String>)obj;
+				} else if (obj instanceof List) {
+					List<String> list = (List<String>) obj;
 					if (list.contains(exchange))
 						canUse = true;
 					else
@@ -635,7 +682,7 @@ public class Campaign implements Comparable, Portable  {
 
 	@Override
 	public int getClassId() {
-		
+
 		return CLASS_ID;
 	}
 
@@ -643,7 +690,7 @@ public class Campaign implements Comparable, Portable  {
 	public void writePortable(PortableWriter writer) throws IOException {
 		String json = DbTools.mapper.writeValueAsString(this);
 		writer.writeUTF("json", json);
-		
+
 	}
 
 	@Override
@@ -657,22 +704,23 @@ public class Campaign implements Comparable, Portable  {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Node version of init
+	 * 
 	 * @param node
 	 * @throws Exception
 	 */
-	public void init (JsonNode node) throws Exception {
+	public void init(JsonNode node) throws Exception {
 		myNode = node;
 		updated_at = node.get("updated_at").asLong();
 		setup();
 		process();
 		doTargets();
 	}
-	
+
 	////////////////////////////
-	
+
 	public void runUsingElk() {
 		try {
 
@@ -697,7 +745,6 @@ public class Campaign implements Comparable, Portable  {
 	public double costAsDouble() {
 		return budget.totalCost.doubleValue();
 	}
-	
 
 	protected void park(Creative c) {
 		creatives.remove(c);
@@ -711,14 +758,17 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Is the campaign expired? Returns true if expired. If no budget returns false.
-	 * @return boolean. Returns true or false depending on if the campaign expiration was reached. Always return false if no budget is set (Not expired...)
+	 * 
+	 * @return boolean. Returns true or false depending on if the campaign
+	 *         expiration was reached. Always return false if no budget is set (Not
+	 *         expired...)
 	 */
 	public boolean isExpired() {
 		Date date = new Date();
-		
+
 		if (budget == null)
 			return false;
-		
+
 		boolean expired = date.getTime() > budget.expire_time;
 		if (expired)
 			return expired;
@@ -735,7 +785,7 @@ public class Campaign implements Comparable, Portable  {
 		if (creatives.size() == 0) {
 			return false;
 		}
-		
+
 		if (regions != null) {
 			if (regions.toLowerCase().contains(CrosstalkConfig.getInstance().region.toLowerCase()) == false) {
 				return false;
@@ -746,7 +796,7 @@ public class Campaign implements Comparable, Portable  {
 			logger.debug("BUDGET EXCEEDED: {}", name);
 			return false;
 		}
-		
+
 		if (budget == null)
 			return true;
 
@@ -767,14 +817,12 @@ public class Campaign implements Comparable, Portable  {
 		}
 	}
 
-
-
 	public boolean budgetExceeded() throws Exception {
-		if (budget == null || budget.totalBudget.doubleValue()==0)
+		if (budget == null || budget.totalBudget.doubleValue() == 0)
 			return false;
 
-		return BudgetController.getInstance().checkCampaignBudgets(name,budget.totalBudget, 
-				budget.dailyBudget, budget.hourlyBudget);
+		return BudgetController.getInstance().checkCampaignBudgets(name, budget.totalBudget, budget.dailyBudget,
+				budget.hourlyBudget);
 	}
 
 	public boolean compareTo(Campaign t) {
@@ -783,6 +831,7 @@ public class Campaign implements Comparable, Portable  {
 
 	/**
 	 * Check and see if this campaign is deletable fron the system
+	 * 
 	 * @return boolean. If campaign is expired or the total spend has been reached.
 	 * @throws Exception on errors computing budgets.
 	 */
@@ -800,37 +849,37 @@ public class Campaign implements Comparable, Portable  {
 		return true;
 	}
 
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
+
 	public void setup(JsonNode n) throws Exception {
 		myNode = n;
 		setup();
 	}
-	
+
 	void setup() throws Exception {
 		// process
+		customer_id = myNode.get("customer_id").asText();
 		name = myNode.get("name").asText();
 		id = myNode.get(CAMPAIGN_ID).asInt();
 		stringId = "" + id;
-		
+
 		budget = new Budget();
-		
+
 		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
 		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost"));
 		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost"));
 		if (myNode.get(EXPIRE_TIME) != null)
-				expire_time = budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
+			expire_time = budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
 		if (myNode.get(ACTIVATE_TIME) != null)
 			activate_time = budget.activate_time = myNode.get(ACTIVATE_TIME).asLong();
 		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
 
 		if (myNode.get(DAYPART) != null && myNode.get(DAYPART) instanceof MissingNode == false) {
 			day_parting_utc = myNode.get(DAYPART).asText();
-				if (day_parting_utc.equals("null") || day_parting_utc.length()==0)
-					budget.daypart = null;
+			if (day_parting_utc.equals("null") || day_parting_utc.length() == 0)
+				budget.daypart = null;
 			else
 				budget.daypart = new DayPart(day_parting_utc);
 		} else
@@ -839,22 +888,22 @@ public class Campaign implements Comparable, Portable  {
 		if (myNode.get("bcat") != null) {
 			String str = myNode.get("bcat").asText();
 			if (str.trim().length() != 0) {
-				if (str.equals("null")==false)
+				if (str.equals("null") == false)
 					Targeting.getList(bcat, str);
 			}
 		}
-		
+
 		if (myNode.get("rules") != null) {
-			ArrayNode n = (ArrayNode)myNode.get("rules");
+			ArrayNode n = (ArrayNode) myNode.get("rules");
 			rules = new ArrayList<Integer>();
-			for (int i=0;i<n.size();i++) {
+			for (int i = 0; i < n.size(); i++) {
 				rules.add(n.get(i).asInt());
 			}
 		}
-		
+
 		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
 			exchanges.clear();
-			
+
 			String str = getMyNode().get("exchanges").asText(null);
 			if (str != null) {
 				Targeting.getList(exchanges, str);
@@ -863,7 +912,8 @@ public class Campaign implements Comparable, Portable  {
 
 		Object x = myNode.get(DAILY_BUDGET);
 		if (x != null && !(x instanceof NullNode)) {
-			if (budget.dailyBudget == null || (budget.dailyBudget.doubleValue() != myNode.get(DAILY_BUDGET).asDouble())) {
+			if (budget.dailyBudget == null
+					|| (budget.dailyBudget.doubleValue() != myNode.get(DAILY_BUDGET).asDouble())) {
 				budget.dailyBudget = new AtomicBigDecimal(myNode.get(DAILY_BUDGET).asDouble());
 			}
 		} else
@@ -871,14 +921,15 @@ public class Campaign implements Comparable, Portable  {
 
 		x = myNode.get(HOURLY_BUDGET);
 		if (x != null && !(x instanceof NullNode)) {
-			if (budget.hourlyBudget == null || (budget.hourlyBudget.doubleValue() != myNode.get(HOURLY_BUDGET).asDouble())) {
+			if (budget.hourlyBudget == null
+					|| (budget.hourlyBudget.doubleValue() != myNode.get(HOURLY_BUDGET).asDouble())) {
 				budget.hourlyBudget = new AtomicBigDecimal(myNode.get(HOURLY_BUDGET).asDouble());
 			}
 		} else
 			budget.hourlyBudget = null;
-		
+
 		status = myNode.get("status").asText();
-		ad_domain = myNode.get("ad_domain").asText(); 
+		ad_domain = myNode.get("ad_domain").asText();
 		forensiq = myNode.get("forensiq").asBoolean();
 		spendrate = myNode.get("spendrate").asInt();
 		regions = myNode.get("regions").asText();
@@ -890,7 +941,7 @@ public class Campaign implements Comparable, Portable  {
 			audios = getList(myNode.get("audios"));
 		if (myNode.get("natives") != null)
 			natives = getList(myNode.get("natives"));
-		
+
 		if (myNode.get("capspec") != null) {
 			capSpec = myNode.get("capspec").asText();
 		}
@@ -903,7 +954,7 @@ public class Campaign implements Comparable, Portable  {
 		if (myNode.get("capunit") != null) {
 			capUnit = myNode.get("capunit").asText();
 		}
-			
+
 		processCreatives();
 		/**
 		 * Do this last
@@ -911,37 +962,38 @@ public class Campaign implements Comparable, Portable  {
 
 		x = myNode.get("target_id");
 		if (x != null)
-			target_id = ((JsonNode)x).asInt();
+			target_id = ((JsonNode) x).asInt();
 	}
-	
+
 	List<Integer> getList(JsonNode n) {
 		List<Integer> list = new ArrayList<>();
 		if (n instanceof ArrayNode == false)
 			throw new RuntimeException("Node is not not an array");
-		ArrayNode an = (ArrayNode)n;
-		for (int i=0;i<an.size();i++) {
+		ArrayNode an = (ArrayNode) n;
+		for (int i = 0; i < an.size(); i++) {
 			list.add(an.get(i).asInt());
 		}
 		return list;
 	}
-	
+
 	/**
 	 * Load the creatives from the db and attach them to the the campaign.
+	 * 
 	 * @throws Exception if there is a database error.
 	 */
 	void processCreatives() throws Exception {
-		if (creatives == null) 
+		if (creatives == null)
 			creatives = new ArrayList<>();
 		try {
-			banners.stream().forEach(id->creatives.add(Creative.getInstance(id,"banner")));
-			videos.stream().forEach(id->creatives.add(Creative.getInstance(id,"video")));
-			audios.stream().forEach(id->creatives.add(Creative.getInstance(id,"audio")));
-			natives.stream().forEach(id->creatives.add(Creative.getInstance(id,"native")));
+			banners.stream().forEach(id -> creatives.add(Creative.getInstance(id, "banner", customer_id)));
+			videos.stream().forEach(id -> creatives.add(Creative.getInstance(id, "video", customer_id)));
+			audios.stream().forEach(id -> creatives.add(Creative.getInstance(id, "audio", customer_id)));
+			natives.stream().forEach(id -> creatives.add(Creative.getInstance(id, "native", customer_id)));
 		} catch (Exception error) {
 			logger.error("Database error loading creatives for campaign id: " + id + ", error: " + error.getMessage());
 		}
 	}
-	
+
 	public boolean process() throws Exception {
 		boolean change = false;
 		int n = creatives.size();
@@ -964,39 +1016,33 @@ public class Campaign implements Comparable, Portable  {
 		for (Creative c : list) {
 			park(c);
 		}
-		
+
 		updated_at = myNode.get("updated_at").asLong();
 
 		return change;
 	}
-	
+
 	JsonNode getMyNode() {
 		return myNode;
 	}
-	
+
 	protected void doTargets() throws Exception {
 		if (target_id != 0) {
 			try {
-				targeting = Targeting.getInstance(target_id); 
 			} catch (Exception err) {
 				logger.warn("Campaign id: " + id + " references unknown target id: " + target_id);
 				status = "offline";
 			}
 		}
-
-		//instantiate(Creative.SQL_BANNERS);
-		//instantiate(Creative.SQL_VIDEOS);
-		//instantiate(Creative.SQL_AUDIOS);
-		//instantiate(Creative.SQL_NATIVES);
 		compile();
 	}
-	
+
 	public void compile() throws Exception {
-		
+
 		for (Creative c : creatives) {
 			c.compile();
 		}
-		
+
 		if (forensiq != null) {
 			if (forensiq)
 				forensiq = true;
@@ -1039,18 +1085,18 @@ public class Campaign implements Comparable, Portable  {
 		if (capSpec != null && capSpec.length() > 0 && capCount > 0 && capExpire > 0) {
 			List<String> spec = new ArrayList<>();
 			Targeting.getList(spec, capSpec);
-			frequencyCap = new FrequencyCap(spec,capCount,capExpire,capUnit);
+			frequencyCap = new FrequencyCap(spec, capCount, capExpire, capUnit);
 		}
 		doStandardRtb();
 	}
-	
+
 	/**
 	 * Call after you compile!
 	 * 
 	 * @throws Exception on JSON errors.
 	 */
 	void doStandardRtb() throws Exception {
-		rules.forEach(id->{
+		rules.forEach(id -> {
 			try {
 				attributes.add(Node.getInstance(id));
 			} catch (Exception e) {
@@ -1058,14 +1104,16 @@ public class Campaign implements Comparable, Portable  {
 				e.printStackTrace();
 			}
 		});
-	
+
 	}
+
 	/**
 	 * Report why the campaign is not runnable.
+	 * 
 	 * @return String. The reasons why...
 	 * @throws Exception on ES errors.
 	 */
-	public String report() throws Exception { 
+	public String report() throws Exception {
 		String reason = "";
 		if (budgetExceeded()) {
 			if (reason.length() != 0)
@@ -1077,7 +1125,7 @@ public class Campaign implements Comparable, Portable  {
 			if (BudgetController.getInstance().checkCampaignBudgetsHourly(name, budget.hourlyBudget))
 				reason += "Campaign hourly budget exceeded. ";
 		}
-		
+
 		if (creatives.size() == 0) {
 			if (reason.length() > 0)
 				reason += " ";
@@ -1103,24 +1151,24 @@ public class Campaign implements Comparable, Portable  {
 		if (creatives.size() != 0) {
 			for (Creative p : parkedCreatives) {
 				Map<String, Object> r = new HashMap<String, Object>();
-				r.put("creative",p.impid);
+				r.put("creative", p.impid);
 				List<String> reasons = new ArrayList<String>();
 				if (p.budgetExceeded(name)) {
 					reasons.add("nobudget");
 				}
 
-				r.put("reasons",reasons);
+				r.put("reasons", reasons);
 			}
 		}
-		
+
 		if (regions != null) {
 			if (regions.toLowerCase().contains(CrosstalkConfig.getInstance().region.toLowerCase()) == false) {
-				reason += "Campaign in wrong bidding region, campaign in: " + regions + ", this region: " 
-							+ CrosstalkConfig.getInstance().region + ". " ;
+				reason += "Campaign in wrong bidding region, campaign in: " + regions + ", this region: "
+						+ CrosstalkConfig.getInstance().region + ". ";
 			}
 		}
-		
-		if (status.equals("runnable")==false) {
+
+		if (status.equals("runnable") == false) {
 			reason += "Marked offline. ";
 		}
 
@@ -1128,40 +1176,32 @@ public class Campaign implements Comparable, Portable  {
 			reason += DbTools.mapper.writeValueAsString(xreasons);
 		}
 		if (reason.length() > 0)
-			logger.info("Campaign {} not loaded: {}",name, reason);
+			logger.info("Campaign {} not loaded: {}", name, reason);
 
 		if (reason.length() == 0)
 			reason = "Runnable";
 		return reason;
 	}
-	
+
 	/**
 	 * Instantiate a creative.
 	 * 
-	 * @param type
-	 *            String. The type of creative.
-	 * @param isBanner
-	 *            boolean. Is this a banner
+	 * @param type     String. The type of creative.
+	 * @param isBanner boolean. Is this a banner
 	 * @throws Exception on SQL or JSON errors.
 	 * 
 	 *
-	protected void instantiate(String type) throws Exception {
+	 *                   protected void instantiate(String type) throws Exception {
+	 * 
+	 *                   ArrayNode array = (ArrayNode) getMyNode().get(type); if
+	 *                   (array == null) return;
+	 * 
+	 *                   for (int i = 0; i < array.size(); i++) { ObjectNode node =
+	 *                   (ObjectNode) array.get(i); Creative creative = new
+	 *                   Creative(node); if (!(creative.budgetExceeded(name))) {
+	 *                   unpark(creative); } else { park(creative); } } }
+	 */
 
-		ArrayNode array = (ArrayNode) getMyNode().get(type);
-		if (array == null)
-			return;
-
-		for (int i = 0; i < array.size(); i++) {
-			ObjectNode node = (ObjectNode) array.get(i);
-			Creative creative = new Creative(node); 
-			if (!(creative.budgetExceeded(name))) {
-				unpark(creative);
-			} else {
-				park(creative);
-			}
-		}
-	} */
-	
 	public boolean isRunnable() throws Exception {
 		if (status == null)
 			status = "runnable";
@@ -1169,164 +1209,152 @@ public class Campaign implements Comparable, Portable  {
 			return false;
 		return true;
 	}
-	
+
 	public static void touchCampaignsWithCreative(int id) throws Exception {
-		touchCampaignsWithCreative(Creative.SQL_BANNERS,id);
-		touchCampaignsWithCreative(Creative.SQL_VIDEOS,id);
-		touchCampaignsWithCreative(Creative.SQL_AUDIOS,id);
-		touchCampaignsWithCreative(Creative.SQL_NATIVES,id);
+		touchCampaignsWithCreative(Creative.SQL_BANNERS, id);
+		touchCampaignsWithCreative(Creative.SQL_VIDEOS, id);
+		touchCampaignsWithCreative(Creative.SQL_AUDIOS, id);
+		touchCampaignsWithCreative(Creative.SQL_NATIVES, id);
 	}
-	
+
 	public static void touchCampaignsWithCreative(String table, int id) throws Exception {
-		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
+				.prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
-		while(rs.next()) {
+		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id);	
-			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
+			Campaign c = Campaign.getInstance(id,null);
+			Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection()).execute();
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 			w.run();
 		}
-		
+
 		st.close();
 	}
-	
+
 	/**
 	 * Remove the target id from all campaigns pinned to it.
+	 * 
 	 * @param id int. The target id.
 	 * @throws Exception on SQL errors;
 	 */
-	public static void removeTargetFromCampaigns(int id) throws Exception {
-		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-				prepareStatement("select * from campaigns where target_id=?");
+	public static void removeTargetFromCampaigns(int id, TokenData td) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
+				.prepareStatement("select * from campaigns where target_id=?");
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
-		while(rs.next()) {
+		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id);
-			c.target_id = 0;
-			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
-			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
-			w.run();
+			Campaign c = Campaign.getInstance(id, td);
+			if (c != null) {
+				c.target_id = 0;
+				Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection()).execute();
+				CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+				w.run();
+			}
 		}
-		
+
 		st.close();
 	}
-	
-	
-	public static void removeCreativeFromCampaigns(int id) throws Exception {
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_BANNERS,id);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_VIDEOS,id);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_AUDIOS,id);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_NATIVES,id);	
+
+	public static void removeCreativeFromCampaigns(int id, TokenData td) throws Exception {
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_BANNERS, id, td);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_VIDEOS, id, td);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_AUDIOS, id, td);
+		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_NATIVES, id, td);
 	}
-	
-	public static void removeSpecificTypeCreativeFromCampaigns(String table, int id) throws Exception {
-		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
+
+	public static void removeSpecificTypeCreativeFromCampaigns(String table, int id, TokenData td) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
+				.prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(" + table + ") FROM campaigns)");
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
-		while(rs.next()) {
+		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id);
-			int index = -1; 
-			switch(table) {
-			case "banners":
-				index = c.banners.indexOf(id);
-				c.banners.remove(index); break;
-			case "banner_videos":
-				index = c.videos.indexOf(id);
-				c.videos.remove(index); break;
-			case "banner_audios":
-				index = c.audios.indexOf(id);
-				c.audios.remove(index); break;
-			case "banner_natives":
-				index = c.natives.indexOf(id);
-				c.natives.remove(index); break;
+			Campaign c = Campaign.getInstance(id,td);
+			if (td.isAuthorized(c.customer_id)) {
+				int index = -1;
+				switch (table) {
+				case "banners":
+					index = c.banners.indexOf(id);
+					c.banners.remove(index);
+					break;
+				case "banner_videos":
+					index = c.videos.indexOf(id);
+					c.videos.remove(index);
+					break;
+				case "banner_audios":
+					index = c.audios.indexOf(id);
+					c.audios.remove(index);
+					break;
+				case "banner_natives":
+					index = c.natives.indexOf(id);
+					c.natives.remove(index);
+					break;
 				default:
 					throw new Exception("Cant update cratives type " + table + " for campaign " + cid);
+				}
+				c.creatives.clear();
+				c.processCreatives();
+
+				Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection()).execute();
+				CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+				w.run();
 			}
-			c.creatives.clear();
-			c.processCreatives();
-				
-			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
-			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
-			w.run();
 		}
-		
+
 		st.close();
 	}
-	
-	
-	public static void removeRuleFromCampaigns(int id) throws Exception {
-		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().
-				prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(rules) FROM campaigns)");
+
+	public static void removeRuleFromCampaigns(int id, TokenData td) throws Exception {
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
+				.prepareStatement("SELECT * FROM campaigns WHERE ? IN (SELECT unnest(rules) FROM campaigns)");
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
-		while(rs.next()) {
+		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id);
-			int index = c.banners.indexOf(id);
-			c.rules.remove(index);
-			
-			c.process();
+			Campaign c = Campaign.getInstance(id, td);
+			if (td.isAuthorized(c.customer_id)) {
+				int index = c.banners.indexOf(id);
+				c.rules.remove(index);
 
-			Campaign.toSql(c,CrosstalkConfig.getInstance().getConnection()).execute();
-			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
-			w.run();
+				c.process();
+
+				Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection()).execute();
+				CampaignBuilderWorker w = new CampaignBuilderWorker(c);
+				w.run();
+			}
 		}
-		
+
 		st.close();
 	}
 
 	public static PreparedStatement toSql(Campaign c, Connection conn) throws Exception {
-		if (c.id == 0) 
+		if (c.id == 0)
 			return doNew(c, conn);
 		return doUpdate(c, conn);
 	}
-	
+
 	static PreparedStatement doNew(Campaign c, Connection conn) throws Exception {
 		PreparedStatement p = null;
-		Array rulesArray  = null;
+		Array rulesArray = null;
 		if (c.rules != null) {
-			rulesArray = conn.createArrayOf("int",c.rules.toArray());
+			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		}
-		
-		String sql = "INSERT INTO campaigns (" 
-		 +"activate_time,"
-		 +"expire_time,"
-		 +"cost,"
-		 +"ad_domain,"
-		 +"name,"
-		 +"status,"
-		 +"budget_limit_daily,"
-		 +"budget_limit_hourly,"
-		 +"total_budget,"
-		 +"forensiq,"
-		 +"created_at,"
-		 +"exchanges,"
-		 +"regions,"
-		 +"target_id,"
-		 +"rules,"
-		 +"banners,"
-		 +"videos,"
-		 +"audios,"
-		 +"natives,"
-		 +"day_parting_utc,"
-		 +"capspec,"
-		 +"capcount,"
-		 +"capexpire,"
-		 +"capunit,"
-		 +"spendrate) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
-		
+
+		String sql = "INSERT INTO campaigns (" + "activate_time," + "expire_time," + "cost," + "ad_domain," + "name,"
+				+ "status," + "budget_limit_daily," + "budget_limit_hourly," + "total_budget," + "forensiq,"
+				+ "created_at," + "exchanges," + "regions," + "target_id," + "rules," + "banners," + "videos,"
+				+ "audios," + "natives," + "day_parting_utc," + "capspec," + "capcount," + "capexpire," + "capunit,"
+				+ "customer_id," + "spendrate) VALUES("
+				+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 		p = conn.prepareStatement(sql);
-		
+
 		if (c.budget != null) {
-			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
-			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
+			p.setTimestamp(1, new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2, new Timestamp(c.budget.expire_time));
 		} else {
 			p.setNull(1, Types.TIMESTAMP);
 			p.setNull(2, Types.TIMESTAMP);
@@ -1335,28 +1363,28 @@ public class Campaign implements Comparable, Portable  {
 		p.setString(4, c.ad_domain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
-		
-		if (c.budget==null || c.budget.dailyBudget == null) {
+
+		if (c.budget == null || c.budget.dailyBudget == null) {
 			p.setNull(7, Types.DECIMAL);
 			p.setNull(8, Types.DECIMAL);
 			p.setNull(9, Types.DECIMAL);
-		}  else {
-			p.setDouble(7,  c.budget.dailyBudget.doubleValue());
-			p.setDouble(8,  c.budget.hourlyBudget.doubleValue());
-			p.setDouble(9,  c.budget.totalBudget.doubleValue());
+		} else {
+			p.setDouble(7, c.budget.dailyBudget.doubleValue());
+			p.setDouble(8, c.budget.hourlyBudget.doubleValue());
+			p.setDouble(9, c.budget.totalBudget.doubleValue());
 		}
 		if (c.forensiq == null)
-			p.setNull(10,  Types.BOOLEAN);
+			p.setNull(10, Types.BOOLEAN);
 		else
-			p.setBoolean(10,c.forensiq);
-		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
+			p.setBoolean(10, c.forensiq);
+		p.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
 		if (c.exchanges == null || c.exchanges.size() == 0)
 			p.setNull(12, Types.VARCHAR);
 		else {
 			var s = "";
-			for (int i=0;i<c.exchanges.size();i++) {
+			for (int i = 0; i < c.exchanges.size(); i++) {
 				s += c.exchanges.get(i);
-				if (i+1 < c.exchanges.size())
+				if (i + 1 < c.exchanges.size())
 					s += ",";
 			}
 			p.setString(12, s);
@@ -1365,201 +1393,177 @@ public class Campaign implements Comparable, Portable  {
 		if (c.regions == null)
 			p.setNull(13, Types.VARCHAR);
 		else
-			p.setString(13,  c.regions);
+			p.setString(13, c.regions);
 		if (c.target_id == 0)
 			p.setNull(14, Types.INTEGER);
 		else
-			p.setInt(14,  c.target_id);
+			p.setInt(14, c.target_id);
 		if (rulesArray != null)
 			p.setArray(15, rulesArray);
 		else
 			p.setNull(15, Types.ARRAY);
 
-		if (c.banners != null)  {
+		if (c.banners != null) {
 			System.out.println("BANNERS: " + c.banners);
-			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
-		}
+			p.setArray(16, conn.createArrayOf("int", c.banners.toArray()));
+		} else
+			p.setNull(16, Types.ARRAY);
+		if (c.videos != null)
+			p.setArray(17, conn.createArrayOf("int", c.videos.toArray()));
 		else
-			p.setNull(16,Types.ARRAY);
-		if (c.videos != null) 
-			p.setArray(17, conn.createArrayOf("int",c.videos.toArray()));
+			p.setNull(17, Types.ARRAY);
+		if (c.audios != null)
+			p.setArray(18, conn.createArrayOf("int", c.audios.toArray()));
 		else
-			p.setNull(17,Types.ARRAY);
-		if (c.audios != null) 
-			p.setArray(18, conn.createArrayOf("int",c.audios.toArray()));
+			p.setNull(18, Types.ARRAY);
+		if (c.natives != null)
+			p.setArray(19, conn.createArrayOf("int", c.natives.toArray()));
 		else
-			p.setNull(18,Types.ARRAY);
-		if (c.natives != null) 
-			p.setArray(19, conn.createArrayOf("int",c.natives.toArray()));
-		else
-			p.setNull(19,Types.ARRAY);
-		
-		if (c.day_parting_utc != null) 
+			p.setNull(19, Types.ARRAY);
+
+		if (c.day_parting_utc != null)
 			p.setString(20, c.day_parting_utc);
 		else
 			p.setNull(20, Types.VARCHAR);
-		
-		if (c.capSpec != null) 
+
+		if (c.capSpec != null)
 			p.setString(21, c.capSpec);
 		else
 			p.setNull(21, Types.VARCHAR);
 		if (c.capCount == null)
 			p.setNull(22, Types.INTEGER);
 		else
-			p.setInt(22,  c.capCount);
+			p.setInt(22, c.capCount);
 		if (c.capExpire == null)
 			p.setNull(23, Types.INTEGER);
 		else
-			p.setInt(23,  c.capExpire);
-		if (c.capUnit != null) 
+			p.setInt(23, c.capExpire);
+		if (c.capUnit != null)
 			p.setString(24, c.capUnit);
 		else
 			p.setNull(24, Types.VARCHAR);
-		
-		p.setInt(25,(int)c.spendrate);
-		
+
+		p.setString(25, c.customer_id);
+
+		p.setInt(26, (int) c.spendrate);
+
 		return p;
 	}
 
-	
-	static PreparedStatement doUpdate(Campaign c,  Connection conn) throws Exception {
+	static PreparedStatement doUpdate(Campaign c, Connection conn) throws Exception {
 		PreparedStatement p = null;
-		Array rulesArray  = null;
+		Array rulesArray = null;
 		c.updated_at = System.currentTimeMillis();
 		if (c.rules != null) {
-			rulesArray = conn.createArrayOf("int",c.rules.toArray());
+			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		}
-		
-		String sql = "UPDATE campaigns SET "
-		 +"activate_time=?,"
-		 +"expire_time=?,"
-		 +"cost=?,"
-		 +"ad_domain=?,"
-		 +"name=?,"
-		 +"status=?,"
-		 +"budget_limit_daily=?,"
-		 +"budget_limit_hourly=?,"
-		 +"total_budget=?,"
-		 +"forensiq=?,"
-		 +"updated_at=?,"
-		 +"exchanges=?,"
-		 +"regions=?,"
-		 +"target_id=?,"
-		 +"rules=?,"
-		 +"banners=?,"
-		 +"videos=?,"
-		 +"audios=?,"
-		 +"natives=?,"
-		 +"day_parting_utc=?,"
-		 +"capspec=?,"
-		 +"capcount=?,"
-		 +"capexpire=?,"
-		 +"capunit=?,"
-		 +"spendrate=? WHERE id=?";
 
-		
+		String sql = "UPDATE campaigns SET " + "activate_time=?," + "expire_time=?," + "cost=?," + "ad_domain=?,"
+				+ "name=?," + "status=?," + "budget_limit_daily=?," + "budget_limit_hourly=?," + "total_budget=?,"
+				+ "forensiq=?," + "updated_at=?," + "exchanges=?," + "regions=?," + "target_id=?," + "rules=?,"
+				+ "banners=?," + "videos=?," + "audios=?," + "natives=?," + "day_parting_utc=?," + "capspec=?,"
+				+ "capcount=?," + "capexpire=?," + "capunit=?," + "spendrate=? WHERE id=?";
+
 		p = conn.prepareStatement(sql);
-		
+
 		if (c.budget != null) {
-			p.setTimestamp(1,new Timestamp(c.budget.activate_time));
-			p.setTimestamp(2,new Timestamp(c.budget.expire_time));
+			p.setTimestamp(1, new Timestamp(c.budget.activate_time));
+			p.setTimestamp(2, new Timestamp(c.budget.expire_time));
 		} else {
 			p.setNull(1, Types.TIMESTAMP);
 			p.setNull(2, Types.TIMESTAMP);
 		}
-		
+
 		p.setDouble(3, c.costAsDouble());
 		p.setString(4, c.ad_domain);
 		p.setString(5, c.name);
 		p.setString(6, c.status);
-		if (c.budget==null || c.budget.dailyBudget == null) {
+		if (c.budget == null || c.budget.dailyBudget == null) {
 			p.setNull(7, Types.DECIMAL);
 			p.setNull(8, Types.DECIMAL);
 			p.setNull(9, Types.DECIMAL);
-		}  else {
-			p.setDouble(7,  c.budget.dailyBudget.doubleValue());
-			p.setDouble(8,  c.budget.hourlyBudget.doubleValue());
-			p.setDouble(9,  c.budget.totalBudget.doubleValue());
+		} else {
+			p.setDouble(7, c.budget.dailyBudget.doubleValue());
+			p.setDouble(8, c.budget.hourlyBudget.doubleValue());
+			p.setDouble(9, c.budget.totalBudget.doubleValue());
 		}
 		if (c.forensiq == null)
-			p.setNull(10,  Types.VARCHAR);
+			p.setNull(10, Types.VARCHAR);
 		else
 			p.setBoolean(10, c.forensiq);
-		p.setTimestamp(11,new Timestamp(System.currentTimeMillis()));
-		
+		p.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
+
 		if (c.exchanges == null || c.exchanges.size() == 0)
 			p.setNull(12, Types.VARCHAR);
 		else {
 			var s = "";
-			for (int i=0;i<c.exchanges.size();i++) {
+			for (int i = 0; i < c.exchanges.size(); i++) {
 				s += c.exchanges.get(i);
-				if (i+1 < c.exchanges.size())
+				if (i + 1 < c.exchanges.size())
 					s += ",";
 			}
 			// System.out.println("=======>" + c.exchanges);
 			p.setString(12, s);
 		}
-		
+
 		if (c.regions == null)
 			p.setNull(13, Types.VARCHAR);
 		else
-			p.setString(13,  c.regions);
+			p.setString(13, c.regions);
 		if (c.target_id == 0)
 			p.setNull(14, Types.INTEGER);
 		else
-			p.setInt(14,  c.target_id);
-		
+			p.setInt(14, c.target_id);
+
 		if (rulesArray != null)
 			p.setArray(15, rulesArray);
 		else
 			p.setNull(15, Types.ARRAY);
-		
-		if (c.banners != null)  {
+
+		if (c.banners != null) {
 			// System.out.println("======> BANNERS: " + c.banners);
-			p.setArray(16, conn.createArrayOf("int",c.banners.toArray()));
-		}
+			p.setArray(16, conn.createArrayOf("int", c.banners.toArray()));
+		} else
+			p.setNull(16, Types.ARRAY);
+		if (c.videos != null)
+			p.setArray(17, conn.createArrayOf("int", c.videos.toArray()));
 		else
-			p.setNull(16,Types.ARRAY);
-		if (c.videos != null) 
-			p.setArray(17, conn.createArrayOf("int",c.videos.toArray()));
+			p.setNull(17, Types.ARRAY);
+		if (c.audios != null)
+			p.setArray(18, conn.createArrayOf("int", c.audios.toArray()));
 		else
-			p.setNull(17,Types.ARRAY);
-		if (c.audios != null) 
-			p.setArray(18, conn.createArrayOf("int",c.audios.toArray()));
+			p.setNull(18, Types.ARRAY);
+		if (c.natives != null)
+			p.setArray(19, conn.createArrayOf("int", c.natives.toArray()));
 		else
-			p.setNull(18,Types.ARRAY);
-		if (c.natives != null) 
-			p.setArray(19, conn.createArrayOf("int",c.natives.toArray()));
-		else
-			p.setNull(19,Types.ARRAY);
-		
+			p.setNull(19, Types.ARRAY);
+
 		if (c.day_parting_utc == null)
 			p.setNull(20, Types.VARCHAR);
 		else
-			p.setString(20,  c.day_parting_utc);
-		
-		if (c.capSpec != null) 
+			p.setString(20, c.day_parting_utc);
+
+		if (c.capSpec != null)
 			p.setString(21, c.capSpec);
 		else
 			p.setNull(21, Types.VARCHAR);
 		if (c.capCount == null)
 			p.setNull(22, Types.INTEGER);
 		else
-			p.setInt(22,  c.capCount);
+			p.setInt(22, c.capCount);
 		if (c.capExpire == null)
 			p.setNull(23, Types.INTEGER);
 		else
-			p.setInt(23,  c.capExpire);
-		if (c.capUnit != null) 
+			p.setInt(23, c.capExpire);
+		if (c.capUnit != null)
 			p.setString(24, c.capUnit);
 		else
 			p.setNull(24, Types.VARCHAR);
-		
-		p.setInt(25, (int)c.spendrate);
-		
+
+		p.setInt(25, (int) c.spendrate);
+
 		p.setInt(26, c.id);
 
-		
 		return p;
 	}
 }

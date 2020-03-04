@@ -39,34 +39,6 @@ public class SQLDeleteCreativeCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLDeleteCreativeCmd(String username, String password) {
-		super(username, password);
-		type = SQLDELETE_RULE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLDeleteCreativeCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLDELETE_RULE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -103,7 +75,7 @@ public class SQLDeleteCreativeCmd extends ApiCommand {
 				st.executeUpdate();
 				st.close(); */
 				 
-				Campaign.removeCreativeFromCampaigns(id);
+				Campaign.removeCreativeFromCampaigns(id, tokenData);
 				return;
 			} catch (Exception err) { 
 				err.printStackTrace();

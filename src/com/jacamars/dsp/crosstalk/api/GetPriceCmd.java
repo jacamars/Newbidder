@@ -34,33 +34,6 @@ public class GetPriceCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public GetPriceCmd(String username, String password) {
-		super(username, password);
-		type = GetPrice;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 * @param creative String. The target creative.
-	 */
-	public GetPriceCmd(String username, String password, String campaign, String creative) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		type = GetPrice;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -80,6 +53,12 @@ public class GetPriceCmd extends ApiCommand {
 			if (c == null) {
 				error = true;
 				message = "No campaign defined: " + campaign;
+				return;
+			}
+			
+			if (tokenData.isAuthorized(c.customer_id) == false) {
+				error = true;
+				message = "No such campaign";
 				return;
 			}
 

@@ -57,6 +57,7 @@ var undef;
     c.isBanner = true;
     c.type = "banner";
     c.price = c.bid_ecpm;
+    c.siteorapp = "";
     setCreative(c);
   }
 
@@ -96,6 +97,8 @@ var undef;
         map[n[0]] = n[1];
       }
       c.extensions = map;
+      if (map["site_or_app"] !== undef)
+        c.siteorapp = map["site_or_app"];
     }
 
     c.bid_ecpm = c.price;
@@ -121,6 +124,7 @@ var undef;
     c.isNative = false;
     c.isBanner = false;
     c.price = c.bid_ecpm;
+    c.siteorapp = "";
 
     setCreative(c);
   }
@@ -142,6 +146,7 @@ var undef;
     c.native_context = [1];
     c.native_contextsubtype = [10];
     c.price = c.bid_ecpm;
+    c.siteorapp = "";
 
     setCreative(c);
   }
@@ -162,6 +167,7 @@ var undef;
     c.isNative = false;
     c.isBanner = false;
     c.price = c.bid_ecpm;
+    c.siteorapp = "";
     setCreative(c);
   }
 

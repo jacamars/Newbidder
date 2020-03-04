@@ -39,35 +39,6 @@ public class SetPriceCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * 
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public SetPriceCmd(String username, String password) {
-		super(username, password);
-		type = SetPrice;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * 
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 * @param creative String. The target creative.
-	 * @param price    double. The price to set.
-	 */
-	public SetPriceCmd(String username, String password, String campaign, String creative, double price) {
-		super(username, password);
-		this.campaign = campaign;
-		this.creative = creative;
-		this.price = price;
-		type = SetPrice;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -84,11 +55,12 @@ public class SetPriceCmd extends ApiCommand {
 
 		try {
 			c = Crosstalk.getInstance().getKnownCampaign(campaign);
-			if (c == null) {
+			if (c == null || tokenData.isAuthorized(c.customer_id)) {
 				error = true;
 				message = "No campaign defined: " + campaign;
 				return;
 			}
+
 		} catch (Exception e) {
 			error = true;
 			message = e.getMessage();

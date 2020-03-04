@@ -1,11 +1,12 @@
 package com.jacamars.dsp.crosstalk.budget;
 
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
-import com.hazelcast.core.ITopic;
-import com.hazelcast.core.Message;
-import com.hazelcast.core.MessageListener;
+import com.hazelcast.topic.ITopic;
+import com.hazelcast.topic.Message;
+import com.hazelcast.topic.MessageListener;
 import com.jacamars.dsp.crosstalk.api.ApiCommand;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.SelfExpiringHashMap;

@@ -15,16 +15,6 @@ public class PingCmd extends ApiCommand {
 		
 	}
 	
-	/** 
-	 * Basic form of the command.
-	 * @param username String. The username.
-	 * @param password String. The password.
-	 */
-	public PingCmd(String username, String password) {
-		super(username,password);
-		type = Ping;
-	}
-	
 	/**
 	 * Convert to JSON
 	 */

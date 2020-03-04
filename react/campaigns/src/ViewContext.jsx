@@ -12,6 +12,7 @@ const axiosInstance = axios.create({
   httpAgent,  // httpAgent: httpAgent -> for non es6 syntax
 });
 
+var jwt;
 
 const  ViewContext = () => {
 
@@ -63,7 +64,6 @@ const  ViewContext = () => {
     const [name,setName] = useState('');
     const [password,setPassword] = useState('');
     const [server, setServer] = useState('localhost:7379');
-    const [jwt, setJwt] = useState('23skiddoo');
     const [members, setMembers] = useState([]);
     const [accounting, setAccounting] = useState({});
     const [runningCampaigns, setRunningCampaigns] = useState([])
@@ -73,12 +73,15 @@ const  ViewContext = () => {
     const [targets, setTargets] = useState([]);
     const [creatives, setCreatives] = useState([]);
     const [macros,setMacros] = useState({});
+    const [customer, setCustomer] = useState('');
 
     const reset = () => {
+      jwt = undef;
       setLoggedIn(false);
       setServer('');
+      setCustomer('');
+      setPassword('')
       setName('');
-      setJwt('');
       setMembers([]);
       setAccounting([]);
       setRunningCampaigns([]);
@@ -96,26 +99,64 @@ const  ViewContext = () => {
       return loggedIn;
     }
 
-    const listCampaigns = async(name,password,server) => {
-      if (server != undef)
-        setServer(name);
-      if (password != undef)
-        setPassword(password);
-      if (server != undef) 
-        setServer(server);
+    const getToken = async(c,n,p,s) => {
+      if (c !== undef)
+        setCustomer(c);
+      if (s !== undef)
+        setServer(s);
+      if (n !== undef)
+        setName(n);
+      if (p !== undef)
+        setPassword(p);
 
-      // get a token, if the tokken is valid, proceed
+      var cmd;
+      var srvr;
+      if (c === undef) {
+        cmd = {
+          type: "GetToken#",
+          customer: customer,
+          username: name,
+          password: password,
+       }
+       srvr = server;
+      } else {
+        cmd = {
+          type: "GetToken#",
+          customer: c,
+          username: n,
+          password: p
+       }
+       srvr = s;
+      }
 
+      console.log("GetToken starts: " + JSON.stringify(cmd,null,2));
+      var data = await execute(cmd,srvr);
+      console.log("GetToken returns: " + JSON.stringify(data,null,2));
+      if (data === undef) {
+        jwt = undef;
+        return;
+      }
+      jwt = data.token;
+      return data.token;
+    }
+  
+
+    const listCampaigns = async() => {
       var cmd = {
         token: jwt,
         type: "ListCampaigns#"
       };
+
+      console.log("LIST CAMPAIGNS START: " + JSON.stringify(cmd,null,2));
+
       var data = await execute(cmd);
 
-      if (data === undef)
+      if (data === undef) {
+        alert("Execution failed");
         return;
+      }
       
-        console.log("ListCampaigns returns: " + JSON.stringify(data,null,2));
+      console.log("ListCampaigns returns: " + JSON.stringify(data,null,2));
       setRunningCampaigns(data.campaigns);
       return data.campaigns;
     }
@@ -155,6 +196,9 @@ const  ViewContext = () => {
     const listTargets = async() => {
       // get a token, if the tokken is valid, proceed
 
+      if (jwt === undef) {
+        alert("JWT UNDEF");
+      }
       var cmd = {
         token: jwt,
         type: "SQLListTargets#"
@@ -302,10 +346,10 @@ const  ViewContext = () => {
         type: "ListBigData#"
       };
       var data = await execute(cmd);
+      console.log("=====> listSymbols returns: " + JSON.stringify(data,null,2));
       if (!data)
         return;
 
-     console.log("=====> listSymbols returns: " + JSON.stringify(data,null,2));
      return data;
     }
 
@@ -587,11 +631,25 @@ const  ViewContext = () => {
       return result.reasons;
     }
 
-
-    const  execute = async (cmd) =>  {
+    const  execute = async (cmd, srvr) =>  {
+      if (srvr === undef)
+        srvr = server;
       try {
-        var response = await axiosInstance.post("http://" + server + "/api",JSON.stringify(cmd), { responseType: 'text' }); 
+        var response = await axiosInstance.post("http://" + srvr + "/api",JSON.stringify(cmd), { responseType: 'text' }); 
         if (response.data && response.data.error) {
+          if (response.data.message === 'Timed out' || response.data.message === 'Token expired') {
+            jwt = await getToken();
+            if (jwt === undef) {
+              alert("Can't get a new token");
+              return;
+            } else {
+              cmd.token = jwt;
+              response = await axiosInstance.post("http://" + srvr + "/api",JSON.stringify(cmd), { responseType: 'text' }); 
+              if (!response.error) {
+                return response.data;
+              }
+            }
+          }
           alert("Error: " + response.data.message);
           return;
         }
@@ -625,7 +683,7 @@ const  ViewContext = () => {
       getDbCampaigns, campaigns, getNewCreative, addNewCampaign, deleteCampaign, getDbCampaign,
       listRules, rules, addNewRule, getRule, deleteRule, addNewTarget, listTargets, targets, getTarget, deleteTarget,
       creatives, listCreatives, addNewCreative, getCreative, deleteCreative, findCreativeByName,
-      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol, listMacros,
+      forceUpdate, getReasons, macroSub, listSymbols, deleteSymbol, listMacros, getToken,
 
       ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 

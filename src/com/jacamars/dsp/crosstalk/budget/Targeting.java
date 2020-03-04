@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.common.Node;
+import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
@@ -68,6 +69,8 @@ public class Targeting {
 
 	public String iab_category = "";
 	public String iab_category_blklist = "";
+	
+	public String customer_id;
 
 	List<String> listofpages = new ArrayList<String>();
 	List<String> transparency = new ArrayList<String>();
@@ -84,7 +87,7 @@ public class Targeting {
 	protected String TRANSPARENCY = "pagetransparency";
 	protected String RTB_STANDARD = "rtb_standard";
 
-	public static Targeting getInstance(int id) throws Exception {
+	public static Targeting getInstance(int id, TokenData td) throws Exception {
 		String select = "select * from targets where id="+id;
 		var conn = CrosstalkConfig.getInstance().getConnection();
 		var stmt = conn.createStatement();
@@ -93,9 +96,13 @@ public class Targeting {
 		
 		ArrayNode inner = JdbcTools.convertToJson(rs);
 		ObjectNode y = (ObjectNode) inner.get(0);
+		
 		if (y == null)
 			throw new Exception("Missing target id: " + id + " in database");
-		return new Targeting(y);
+		var t = new Targeting(y);
+		if (td.isAuthorized(t.customer_id))
+			return t;
+		return null;
 	}
 	public Targeting() {
 
@@ -111,6 +118,7 @@ public class Targeting {
 
 	// ///////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void process() throws Exception {
+		customer_id = myNode.get("customer_id").asText();
 		if (myNode.get("name") != null)
 			name = myNode.get("name").asText();
 		
@@ -509,7 +517,7 @@ public class Targeting {
 		ResultSet rs = prep.executeQuery();
 		while(rs.next()) {
 			int id = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id);
+			Campaign c = Campaign.getInstance(id,null);
 			c.updated_at = System.currentTimeMillis();
 			Campaign.toSql(c, conn);
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
@@ -540,8 +548,9 @@ public class Targeting {
 				+"iab_category,"
 				+"iab_category_blklist,"
 				+"created_at,"
+				+"customer_id,"
 				+"name) VALUES ("
-				+"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -599,7 +608,8 @@ public class Targeting {
 		else
 			p.setString(13,c.iab_category_blklist);
 		p.setTimestamp(14,new Timestamp(System.currentTimeMillis()));
-		p.setString(15, c.name);
+		p.setString(15, c.customer_id);
+		p.setString(16, c.name);
 		
 		return p;
 	}

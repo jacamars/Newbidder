@@ -1,7 +1,7 @@
 package com.jacamars.dsp.rtb.shared;
 
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.MapStore;
+import com.hazelcast.map.IMap;
+import com.hazelcast.map.MapStore;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.RecordedBid;
 import com.jacamars.dsp.rtb.common.RecordedVideo;

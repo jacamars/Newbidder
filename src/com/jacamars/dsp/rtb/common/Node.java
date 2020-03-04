@@ -205,6 +205,7 @@ public class Node {
 		OPNAMES.add("NOT_REGEX");
 	}
 
+	public String customer_id;
 	/** campaign identifier */
 	public String name;
 	/** dotted form of the item in the bid to pull (eg user.geo.lat) */
@@ -273,6 +274,7 @@ public class Node {
 	}
 	
 	public Node(JsonNode n) throws Exception {
+		 customer_id = n.get("customer_id").asText();
 		 id = n.get("id").asInt();
 		 hierarchy = n.get("rtbspecification").asText();
 		 if (n.get("operator") != null)
@@ -358,8 +360,9 @@ public class Node {
 		 +"operand_ordinal,"
 		 +"rtb_required,"
 		 +"name,"
+		 +"customer_id,"
 		 +"description) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -377,7 +380,8 @@ public class Node {
 		else
 			p.setInt(6, 0);
 		p.setString(7, n.name);
-		p.setString(8, n.description);;
+		p.setString(8, n.customer_id);
+		p.setString(9, n.description);;
 		
 		return p;
 	}
@@ -502,6 +506,7 @@ public class Node {
 
 	public Node(Map map) throws Exception {
 		this.name = (String) map.get("name");
+		this.customer_id = (String)map.get("customer_id");
 		Object test = map.get("op");
 		op = (String) test;
 		test = map.get("notPresentOk");

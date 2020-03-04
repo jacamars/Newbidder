@@ -38,34 +38,6 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 	}
 
 	/**
-	 * Deletes a campaign from the bidders.
-	 *
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public SQLAddNewCreativeCmd(String username, String password) {
-		super(username, password);
-		type = SQLADD_NEW_CREATIVE;
-	}
-
-	/**
-	 * Targeted form of command. starts a specific bidder.
-	 *
-	 * @param username
-	 *            String. User authorizatiom.
-	 * @param password
-	 *            String. Password authorization.
-	 * @param target
-	 *            String. The bidder to start.
-	 */
-	public SQLAddNewCreativeCmd(String username, String password, String target) {
-		super(username, password);
-		type = SQLADD_NEW_CREATIVE;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -81,6 +53,7 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 			try {
 				System.out.println("NEW Creative: " + creative);
 				ObjectNode node = mapper.readValue(creative,ObjectNode.class);
+				node.put("customer_id", tokenData.customer);
 				String stype = node.get("type").asText();
 				Creative c = new Creative(node);
 				c.compile();

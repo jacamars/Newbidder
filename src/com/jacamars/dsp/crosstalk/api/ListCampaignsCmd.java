@@ -20,25 +20,12 @@ public class ListCampaignsCmd extends ApiCommand {
 
 	/** The list of campaigns */
 	public List<String> campaigns;
-
+	
 	/**
 	 * Default constructor
 	 */
 	public ListCampaignsCmd() {
-
-	}
-
-	/**
-	 * Deletes a campaign from the bidders.
-	 * 
-	 * @param username
-	 *            String. User authorization for command.
-	 * @param password
-	 *            String. Password authorization for command.
-	 */
-	public ListCampaignsCmd(String username, String password) {
-		super(username, password);
-		type = ListCampaigns;
+		
 	}
 
 	/**
@@ -47,7 +34,7 @@ public class ListCampaignsCmd extends ApiCommand {
 	public String toJson() throws Exception {
 		return WebAccess.mapper.writeValueAsString(this);
 	}
-
+	
 	/**
 	 * Execute the command, msrshal the results.
 	 */
@@ -58,10 +45,12 @@ public class ListCampaignsCmd extends ApiCommand {
 				campaigns = new ArrayList<String>(); 
 				var list = Configuration.getInstance().getCampaignsList();
 				list.stream().forEach(e->{
-					campaigns.add(e.name);
+					if (tokenData.isAuthorized(e.customer_id))
+						campaigns.add(e.name);
 				});
 				return;
 			} catch (Exception err) {
+				err.printStackTrace();
 				error = true;
 				message = err.toString();
 			}

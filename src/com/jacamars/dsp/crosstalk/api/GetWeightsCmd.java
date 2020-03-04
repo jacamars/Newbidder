@@ -23,28 +23,6 @@ public class GetWeightsCmd extends ApiCommand {
 	}
 
 	/**
-	 * Basic form of the command.
-	 * @param username String. The username to use for authorization.
-	 * @param password String. The password to use for authorization.
-	 */
-	public GetWeightsCmd(String username, String password) {
-		super(username, password);
-		type = GetWeights;
-
-	}
-
-	/**
-	 * Targeted form of the command.
-	 * @param username String. The user authorization.
-	 * @param password String. THe password authorization.
-	 * @param campaign String. The target campaign.
-	 */
-	public GetWeightsCmd(String username, String password, String campaign) {
-		super(username, password);
-		this.campaign = campaign;
-	}
-
-	/**
 	 * Convert to JSON
 	 */
 	public String toJson() throws Exception {
@@ -59,7 +37,7 @@ public class GetWeightsCmd extends ApiCommand {
 		super.execute();
 		
 		try {
-			pe = Configuration.getInstance().getWeights(campaign);
+			pe = Configuration.getInstance().getWeights(campaign, tokenData);
 		} catch (Exception err) {
 			error = true;
 			message = err.getMessage();
