@@ -295,7 +295,6 @@ public class Creative {
 			}
 
 			var conn = CrosstalkConfig.getInstance().getConnection();
-			var stmt = conn.createStatement();
 			var prep = conn.prepareStatement(select);
 			ResultSet rs = prep.executeQuery();
 

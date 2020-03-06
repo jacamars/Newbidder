@@ -61,6 +61,9 @@ const Rules = (props) => {
          <tr key={'rulesview-' + row}>
            <td>{index}</td>
            <td key={'rules-name-' + index} className="text-left">{row.name}</td>
+           {vx.user.sub_id === 'superuser' &&
+            <td key={'rules-cust-' + index} className="text-left">{row.customer_id}</td>
+           }
            <td key={'rules-id-' + index} className="text-right">{row.id}</td>
            <td key={'rules-hierarchy' + index} className="text-right">{row.hierarchy}</td>
            <td key={'rules-edit-'+ index} className="text-center">
@@ -121,6 +124,9 @@ const Rules = (props) => {
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                                <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Hierarchy</th>
                             <th className="text-center">Actions</th>

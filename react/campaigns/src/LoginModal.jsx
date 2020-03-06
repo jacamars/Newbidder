@@ -82,6 +82,7 @@ const LoginModal = (props) => {
       return;
     }
 
+    await vx.getUser();
     await vx.getAccounting();
     await vx.getDbCampaigns();
     await vx.listRules();

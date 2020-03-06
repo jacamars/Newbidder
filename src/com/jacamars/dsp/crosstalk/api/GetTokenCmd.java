@@ -30,6 +30,7 @@ public class GetTokenCmd extends ApiCommand {
 	public String username;
 	public String password;
 	public String token;
+	public boolean superUser;
 
 
 	/**
@@ -59,6 +60,10 @@ public class GetTokenCmd extends ApiCommand {
 				if (rs.next()) {
 					token = UUID.randomUUID().toString();
 					TokenData t = new TokenData(customer,username, rs.getString("sub_id"));
+					if (t.role.toLowerCase().equals("superuser"))
+						superUser = true;
+					else
+						superUser = false;
 					BidCachePool.getInstance().setToken(token, t);
 					customer = null;
 					username = null;

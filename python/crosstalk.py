@@ -44,8 +44,21 @@ def GetToken(c,u,p):
     try:
         r = requests.post(globalHost, data='{"type":"GetToken#","customer":"'+c+'","username":"'+u+'", "password":"'+p+'"}')
         data = json.loads(r.text)
+        if (data['error']):
+        	print(data['message'])
+        	return
+        	
         global token
         token = data['token']
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+         
+def GetUser():
+    try:
+        r = requests.post(globalHost, data='{"type":"SqlGetUser#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

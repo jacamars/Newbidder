@@ -26,10 +26,15 @@ var undef;
 
   // Called when page first loads
   const loadDataOnce = async() => {
-    await vx.getDbCampaigns();
     await vx.listCampaigns();
+    await vx.getDbCampaigns();
     redraw();
   }
+
+  useEffect(() => {
+    if (vx.loggedIn)
+      loadDataOnce();
+  }, []);
 
   const [count, setCount] = useState(0);
   const [campaign, setCampaign] = useState(null);
@@ -40,7 +45,7 @@ var undef;
   }
 
   const setInstances = () => {
-
+    loadDataOnce();
   };
 
   const refresh = async() => {
@@ -146,6 +151,11 @@ var undef;
         <tr key={'campaignsview-' + index} style={getStyle(row.status,row.name)}>
           <td>{index}</td>
           <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
+
+          {vx.user.sub_id === 'superuser' &&
+            <td key={'campaignsview-cust-' + index} className="text-right">{row.customer_id}</td>
+          }
+
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
           <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
           <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
@@ -215,6 +225,9 @@ var undef;
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                                <th className="text-right">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Runnable</th>
                             <th className="text-right">Is Running</th>

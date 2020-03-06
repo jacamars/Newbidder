@@ -198,6 +198,9 @@ var undef;
         <tr key={'banner-' + row}>
           <td>{index}</td>
           <td key={'banner-name-' + index} className="text-left">{row.name}</td>
+          {vx.user.sub_id === 'superuser' &&
+              <td key={'banner-cust-' + index} className="text-left">{row.customer_id}</td>
+          }
           <td key={'banner-id-' + index} className="text-right">{row.id}</td>
           <td className="text-center">
             <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'banner')}>View</Button>
@@ -216,6 +219,9 @@ var undef;
         <tr key={'video-' + row}>
           <td>{index}</td>
           <td key={'video-name-' + index} className="text-left">{row.name}</td>
+          {vx.user.sub_id === 'superuser' &&
+              <td key={'video-cust-' + index} className="text-left">{row.customer_id}</td>
+          }
           <td key={'video-id-' + index} className="text-right">{row.id}</td>
           <td className="text-center">
             <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'video')}>View</Button>
@@ -234,6 +240,9 @@ const getAudiosView = () => {
       <tr key={'audio-' + row}>
         <td>{index}</td>
         <td key={'audio-name-' + index} className="text-left">{row.name}</td>
+        {vx.user.sub_id === 'superuser' &&
+              <td key={'audio-cust-' + index} className="text-left">{row.customer_id}</td>
+          }
         <td key={'audio-id-' + index} className="text-right">{row.id}</td>
         <td className="text-center">
           <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'audio')}>View</Button>
@@ -252,6 +261,9 @@ const getNativesView = () => {
       <tr key={'native-' + row}>
         <td>{index}</td>
         <td key={'native-name-' + index} className="text-left">{row.name}</td>
+        {vx.user.sub_id === 'superuser' &&
+              <td key={'native-cust-' + index} className="text-left">{row.customer_id}</td>
+          }
         <td key={'native-id-' + index} className="text-right">{row.id}</td>
         <td className="text-center">
           <Button color="success" size="sm" onClick={()=>editCreative('VIEW',row.id,'native')}>View</Button>
@@ -312,6 +324,9 @@ const getNativesView = () => {
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                              <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-center">Actions</th>
                           </tr>
@@ -341,6 +356,9 @@ const getNativesView = () => {
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                              <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Name</th>
                           </tr>
@@ -370,6 +388,9 @@ const getNativesView = () => {
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                              <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Name</th>
                           </tr>
@@ -399,6 +420,9 @@ const getNativesView = () => {
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                              <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-right">Name</th>
                           </tr>

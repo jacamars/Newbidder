@@ -83,6 +83,9 @@ var undef;
          <tr key={'targetsview-' + row}>
            <td>{index}</td>
            <td key={'targets-name-' + index} className="text-left">{row.name}</td>
+           {vx.user.sub_id === 'superuser' &&
+              <td key={'targets-cust-' + index} className="text-left">{row.customer_id}</td>
+           }
            <td key={'targets-id-' + index} className="text-right">{row.id}</td>
            <td className="text-center"><Button color="success" size="sm" onClick={()=>editTarget(row.id)}>Edit</Button>
            &nbsp;
@@ -132,6 +135,9 @@ var undef;
                           <tr>
                             <th>#</th>
                             <th className="text-center">Name</th>
+                            {vx.user.sub_id === 'superuser' &&
+                                <th className="text-center">Customer</th>
+                            }
                             <th className="text-right">SQL-ID</th>
                             <th className="text-center">Actions</th>
                           </tr>

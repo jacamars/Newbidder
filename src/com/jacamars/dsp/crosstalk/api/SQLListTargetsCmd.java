@@ -71,6 +71,8 @@ public class SQLListTargetsCmd extends ApiCommand {
 			Map m = new HashMap<>();
 			m.put("id", id);
 			m.put("name", name);
+			if (tokenData.isRtb4FreeSuperUser())
+				m.put("customer_id", rs.getString("customer_id"));
 			list.add(m);
 		}
 		return list;

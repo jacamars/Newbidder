@@ -100,6 +100,10 @@ public class SQLListCreatives extends ApiCommand {
 			m.put("start", start);
 			m.put("end", end);
 			m.put("type", key);
+			
+			if (tokenData.isRtb4FreeSuperUser()) {
+				m.put("customer_id", rs.getString("customer_id"));		
+			}
 			list.add(m);
 		}
 		return list;

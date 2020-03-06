@@ -180,6 +180,10 @@ public class ApiCommand {
     public static final String LIST_MACROS = "ListMacros#";
     
     public static final String GET_TOKEN = "GetToken#";
+    
+    public static final String GET_USER = "SQLGetUser#";
+    
+    public static final String SET_USER = "SQLAddNewUser#";
    
     /**
      * This class'es sl4j log object
@@ -504,8 +508,19 @@ public class ApiCommand {
             	cmd = mapper.readValue(data, GetTokenCmd.class);
             	break;
             	
+            case GET_USER:
+            	cmd = mapper.readValue(data, SQLGetUserCmd.class);
+            	break;
+            	
+            case SET_USER:
+            	cmd = mapper.readValue(data, SQLAddNewUserCmd.class);
+            	break;
+            	
+            	
             default:
                 cmd = new UnknownCmd(token);
+                cmd.error = true;
+                cmd.message = "Unkown command: " + token;
                 return cmd;
         }
         

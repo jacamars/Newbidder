@@ -42,6 +42,7 @@ public class SQLListCampaigns extends ApiCommand {
 			super.execute();
 			try {
 				String select;
+				String cid = null;
 				
 				if (tokenData.isRtb4FreeSuperUser())
 					select = "select * from campaigns";
@@ -58,12 +59,16 @@ public class SQLListCampaigns extends ApiCommand {
 					int id = rs.getInt("id");
 					String name = rs.getString("name");
 					String status = rs.getString("status");
+					if (tokenData.isRtb4FreeSuperUser())
+						cid = rs.getString("customer_id");
 					if (status == null)
 						status = "offline";
 					Map m= new HashMap();
 					m.put("id", id);
 					m.put("name", name);
 					m.put("status", status);
+					if (cid != null)
+						m.put("customer_id", cid);
 					campaigns.add(m);
 				}
 				

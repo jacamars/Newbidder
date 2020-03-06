@@ -15,7 +15,9 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React , { useState, useEffect } from "react";
+import {useViewContext } from "../ViewContext";
+import LoginModal from '../LoginModal'
 
 // reactstrap components
 import {
@@ -32,10 +34,64 @@ import {
   Col
 } from "reactstrap";
 
+var undef;
+
 const UserProfile = () => {
+
+  const vx = useViewContext();
+  const [count, setCount] = useState(1);
+
+
+  const setInstances = async() => {
+    if (!vx.user.company)
+      await vx.getUser();
+  };
+
+  const doSave = () => {
+    var u = vx.user;
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    var email = document.getElementById("email").value;
+    var firstname = document.getElementById("firstname").value;
+    var lastname = document.getElementById("lastname").value;
+    var title = document.getElementById("title").value;
+    var address = document.getElementById("address").value;
+    var citystate = document.getElementById("citystate").value;
+    var country = document.getElementById("country").value;
+    var postalcode = document.getElementById("postalcode").value;
+    var about = document.getElementById("about").value;
+    var picture = document.getElementById("picture").value;
+    var description = document.getElementById("description").value;
+  
+    u.username = username;
+    u.password = password;
+    u.email = email;
+    u.firstname = firstname;
+    u.lastname = lastname;
+    u.address = address;
+    u.citystate = citystate;
+    u.country = country;
+    u.postalcode = postalcode;
+    u.about = about;
+    u.picture = picture;
+    u.title = title;
+    u.description = description;
+
+   // alert(JSON.stringify(u,null,2));
+    if (vx.setNewUser(u)) 
+      alert("Saved...");
+    setCount(count+1);
+  }
+
+  const CENTER = { 
+      textAlign: "center"
+  }
+
     return (
       <>
-        <div className="content">
+        <div key={"profile-"+count} className="content">
+        { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
+        { vx.user.company &&
           <Row>
             <Col md="8">
               <Card>
@@ -49,10 +105,11 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>Company (disabled)</label>
                           <Input
-                            defaultValue="Creative Code Inc."
+                            defaultValue={vx.user.company}
                             disabled
                             placeholder="Company"
                             type="text"
+                            id="company"
                           />
                         </FormGroup>
                       </Col>
@@ -60,18 +117,29 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>Username</label>
                           <Input
-                            defaultValue="michael23"
+                            defaultValue={vx.user.username}
                             placeholder="Username"
                             type="text"
+                            id="username"
                           />
                         </FormGroup>
                       </Col>
                       <Col className="pl-md-1" md="4">
                         <FormGroup>
+                          <label htmlFor="password">
+                            Password
+                          </label>
+                          <Input defaultValue={vx.user.password} placeholder="Password" type="password" id="password" />
+                        </FormGroup>
+                      </Col>
+                      </Row>
+                      <Row>
+                      <Col className="pl-md-1" md="5">
+                        <FormGroup>
                           <label htmlFor="exampleInputEmail1">
                             Email address
                           </label>
-                          <Input placeholder="mike@email.com" type="email" />
+                          <Input defaultValue={vx.user.email} placeholder="email" type="email" id="email" />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -80,9 +148,10 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>First Name</label>
                           <Input
-                            defaultValue="Mike"
-                            placeholder="Company"
+                            defaultValue={vx.user.firstname}
+                            placeholder="First Name"
                             type="text"
+                            id="firstname"
                           />
                         </FormGroup>
                       </Col>
@@ -90,9 +159,10 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>Last Name</label>
                           <Input
-                            defaultValue="Andrew"
+                            defaultValue={vx.user.lastname}
                             placeholder="Last Name"
                             type="text"
+                            id="lastname"
                           />
                         </FormGroup>
                       </Col>
@@ -102,9 +172,10 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>Address</label>
                           <Input
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            placeholder="Home Address"
+                            defaultValue={vx.user.address}
+                            placeholder="Work Address"
                             type="text"
+                            id="address"
                           />
                         </FormGroup>
                       </Col>
@@ -114,9 +185,10 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>City</label>
                           <Input
-                            defaultValue="Mike"
-                            placeholder="City"
+                            defaultValue={vx.user.citystate}
+                            placeholder="City, State"
                             type="text"
+                            id="citystate"
                           />
                         </FormGroup>
                       </Col>
@@ -124,16 +196,17 @@ const UserProfile = () => {
                         <FormGroup>
                           <label>Country</label>
                           <Input
-                            defaultValue="Andrew"
+                            defaultValue={vx.user.country}
                             placeholder="Country"
                             type="text"
+                            id="country"
                           />
                         </FormGroup>
                       </Col>
                       <Col className="pl-md-1" md="4">
                         <FormGroup>
                           <label>Postal Code</label>
-                          <Input placeholder="ZIP Code" type="number" />
+                          <Input defaultValue={vx.user.postalcode} placeholder="ZIP Code" type="number" id="postalcode" />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -143,11 +216,11 @@ const UserProfile = () => {
                           <label>About Me</label>
                           <Input
                             cols="80"
-                            defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                            that two seat Lambo."
-                            placeholder="Here can be your description"
+                            defaultValue={vx.user.about}
+                            placeholder="About the user"
                             rows="4"
                             type="textarea"
+                            id="about"
                           />
                         </FormGroup>
                       </Col>
@@ -155,7 +228,7 @@ const UserProfile = () => {
                   </Form>
                 </CardBody>
                 <CardFooter>
-                  <Button className="btn-fill" color="primary" type="submit">
+                  <Button className="btn-fill" color="primary" type="submit" onClick={doSave}>
                     Save
                   </Button>
                 </CardFooter>
@@ -174,17 +247,32 @@ const UserProfile = () => {
                       <img
                         alt="..."
                         className="avatar"
-                        src={require("assets/img/emilyz.jpg")}
+                        src={vx.user.picture}
                       />
-                      <h5 className="title">Mike Andrew</h5>
+                      <h5 className="title">{vx.user.firstname} {vx.user.lastname}</h5>
                     </a>
-                    <p className="description">Ceo/Co-Founder</p>
+                    <Input
+                        defaultValue={vx.user.title}
+                        placeholder="User title"
+                        type="text"
+                        id="title"
+                        style={CENTER}
+                    />
                   </div>
-                  <div className="card-description">
-                    Do not be scared of the truth because we need to restart the
-                    human foundation in truth And I love you like Kanye loves
-                    Kanye I love Rick Owens’ bed design but the back is...
-                  </div>
+                  <Input
+                      cols="20"
+                      defaultValue={vx.user.description}
+                      placeholder="Description..."
+                      rows="4"
+                      type="textarea"
+                      id="description"
+                    />
+                     <Input
+                            defaultValue={vx.user.picture}
+                            placeholder="Picture"
+                            type="text"
+                            id="picture"
+                          />
                 </CardBody>
                 <CardFooter>
                   <div className="button-container">
@@ -202,6 +290,7 @@ const UserProfile = () => {
               </Card>
             </Col>
           </Row>
+}
         </div>
       </>
     );

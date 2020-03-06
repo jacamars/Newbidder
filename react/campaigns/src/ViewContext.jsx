@@ -74,6 +74,7 @@ const  ViewContext = () => {
     const [creatives, setCreatives] = useState([]);
     const [macros,setMacros] = useState({});
     const [customer, setCustomer] = useState('');
+    const [user, setUser] = useState({});
 
     const reset = () => {
       jwt = undef;
@@ -211,6 +212,79 @@ const  ViewContext = () => {
       console.log("ListTargets returns: " + JSON.stringify(data,null,2));
       setTargets(data.targets);
       return data.targets;
+    }
+
+    const getUser = async(username) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        username: username,
+        type: "SQLGetUser#"
+      };
+      var data = await execute(cmd);
+      console.log("GetUser returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+      
+      var user = JSON.parse(data.user);
+      setUser(user);
+      return user;
+    }
+
+    const setNewUser = async(user) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        user: JSON.stringify(user),
+        type: "SQLAddNewUser#"
+      };
+      var data = await execute(cmd);
+      if (data === undef)
+        return;
+      
+      if (data.error) {
+        alert(data.message);
+      }
+      setUser(user);
+      return true;
+    }
+
+    const deleteUser = async(user, cid) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        user: user,
+        customer_id: cid,
+        type: "SQLDeleteUser#"
+      };
+      var data = await execute(cmd);
+      console.log("SetNewUser returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+      
+      var u = JSON.parse(data.user);
+      setUser(u);
+      return true;
+    }
+
+    const listUsers = async(cid) => {
+       // get a token, if the tokken is valid, proceed
+       var cmd = {
+        token: jwt,
+        customer_id: cid,
+        type: "SQLListUsers#"
+      };
+      var data = await execute(cmd);
+      console.log("ListUsers returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+      
+      var u = JSON.parse(data.user);
+      setUser(u);
+      return true;
     }
 
     const getBidders = async() => {
@@ -687,7 +761,9 @@ const  ViewContext = () => {
 
       ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
-      changeWinsent
+      changeWinsent, 
+
+      user, getUser, setNewUser, deleteUser, listUsers
     };
 };
 
