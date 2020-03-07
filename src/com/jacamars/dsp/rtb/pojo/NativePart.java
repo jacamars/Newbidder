@@ -3,6 +3,7 @@ package com.jacamars.dsp.rtb.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hazelcast.internal.json.JsonObject;
 import com.jacamars.dsp.rtb.nativeads.creative.Data;
 import com.jacamars.dsp.rtb.nativeads.creative.Img;
 import com.jacamars.dsp.rtb.nativeads.creative.NativeVideo;
@@ -31,6 +32,11 @@ public class NativePart {
 	 * An empty constructor 
 	 */
 	public NativePart() {
+		
+	}
+	
+	public NativePart(JsonObject node) {
+		
 		
 	}
 }

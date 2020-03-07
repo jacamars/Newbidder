@@ -151,7 +151,7 @@ const getSelectedRules = () => {
         x.height_range = undef;
         break;
       default:
-        if (!x.isAudio) {
+        if (!(x.isAudio || x.isNative)) {
           alert("Don't know what size type this creative is");
           return;
         }
@@ -330,7 +330,7 @@ const getSelectedRules = () => {
   }
 
   // Set multi selection keys in the creative (like from NativeEditor)
-  const setMulti = (e, key) => {
+  const setMulti = (e,key) => {
     var s = [...document.getElementById(key).options]
       .filter((x) => x.selected)
       .map((x)=>Number(x.value));

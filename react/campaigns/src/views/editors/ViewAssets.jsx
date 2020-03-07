@@ -33,20 +33,20 @@ var undef;
 
 const ViewAssets = (props) => {
 
-  const [rSelected, setRSelected] = useState(props.creative.dealType);
-
   const handler = (e, i, key ) => {
-    props.assets[i][key] = e.target.value;
+    props.nativead.assets[i][key] = e.target.value;
   }
 
   const deleteAsset = (i) => {
       console.log("Delete asset: " + i);
-      props.assets.splice(i,1);
+      props.nativead.assets.splice(i,1);
       props.setter(props.assets);
   }
 
+  alert("PROPS: " + JSON.stringify(props,null,2));
+
   return(
-    props.assets.map((row,i) => (
+    props.nativead.assets.map((row,i) => (
         <>
             {row.type === 'title' && <>
             <Alert color="primary">

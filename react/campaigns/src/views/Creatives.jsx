@@ -102,7 +102,6 @@ var undef;
     }
 
     c.bid_ecpm = c.price;
-
     setCreative(c);
   }
 

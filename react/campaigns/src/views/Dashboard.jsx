@@ -21,31 +21,22 @@ var undef;
 
  const Dashboard = (props) => {
 
-  // This should be called when the page first loads
-  const loadDataOnce = async() => {
-    await vx.getAccounting();
-    await vx.listCampaigns();
-    await vx.getDbCampaigns();
-  }
-
   const vx = useViewContext();
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (vx.loggedIn)
-      loadDataOnce();
+      refresh();
   }, []);
 
   const refresh = async() => {
-    await vx.getAccounting();
-    await vx.getDbCampaigns();
-    await vx.listRules();
-    await vx.listTargets();
     await vx.listCampaigns();
+    await vx.getBidders();
+    await vx.getAccounting();
     setCount(count+1);
   }
 
   const setInstances = () => {
-
+    refresh();
   };
 
   const setBiddersView = (rows) => {

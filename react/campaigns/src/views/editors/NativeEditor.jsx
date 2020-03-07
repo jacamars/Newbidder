@@ -35,7 +35,7 @@ const NativeEditor = (props) => {
 
   const [rSelected, setRSelected] = useState(props.creative.dealType);
   const [count, setCount] = useState(0);
-  const [assets, setAssets] = useState( props.creative.native_assets ); 
+  const [assets, setAssets] = useState( props.creative.nativead.native_assets ); 
 
   const newTitleAsset = () => {
     var n = {
@@ -110,7 +110,7 @@ const NativeEditor = (props) => {
         <label>Ad Link</label>
         <Input
           id="link"
-          defaultValue={props.creative.native_link}
+          defaultValue={props.creative.nativead.native_link}
           onChange={ (e) => props.callback(e,"native_link")}
           type="text">
           </Input>
@@ -121,7 +121,7 @@ const NativeEditor = (props) => {
         <label>Imp Tracker URLS</label>
         <Input
           id="imptrackers"
-          defaultValue={props.creative.native_trk_urls}
+          defaultValue={props.creative.nativead.native_trk_urls}
           type="select">
             {mimeTypes(props.creative.native_trk_urls)}
           </Input>
@@ -133,7 +133,7 @@ const NativeEditor = (props) => {
         <Input
           id="jstracker"
           onChange={ (e) => props.callback(e,"native_js_tracker")}
-          defaultValue={props.creative.native_js_tracker}
+          defaultValue={props.creative.nativead.native_js_tracker}
           type="textarea"
         />
       </FormGroup>
@@ -147,7 +147,7 @@ const NativeEditor = (props) => {
             id="native_context"
             onChange={(e) => props.multiHandler(e,"native_context")}
             type="select" multiple>
-              {contextType(props.creative.native_context)}}
+              {contextType(props.creative.nativead.native_context)}}
           </Input>
       </FormGroup>
       </Col>
@@ -158,7 +158,7 @@ const NativeEditor = (props) => {
             id="native_contextsubtype"
             onChange={(e) => props.multiHandler(e,"native_context")}
             type="select" multiple>
-              {contextSubType(props.creative.native_contextsubtype)}}
+              {contextSubType(props.creative.nativead.native_contextsubtype)}}
           </Input>
       </FormGroup>
       </Col>
@@ -181,7 +181,7 @@ const NativeEditor = (props) => {
     </Row>
     <ViewAssets key={"assets-"+count} 
       assets={assets} 
-      creative={props.creative} 
+      nativead={props.creative.nativead} 
       setter={setAndRedraw} 
       callback={handler} />
    </>

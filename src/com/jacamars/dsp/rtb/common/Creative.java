@@ -33,7 +33,7 @@ import com.jacamars.dsp.crosstalk.budget.BudgetController;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
-import com.jacamars.dsp.rtb.exchanges.Nexage;
+
 import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
 
 import com.jacamars.dsp.rtb.nativeads.creative.NativeCreative;
@@ -419,7 +419,11 @@ public class Creative {
 				p.setNull(i++, Types.INTEGER);
 
 		} else if (c.isNative) {
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			sql += "native_assets,native_link,native_js_tracker,native_trk_urls,native_context,native_contextsubtype,native_plcmttype,native_plcmtct"
+					
+				+ ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+			
+			System.out.println(sql);
 			p = conn.prepareStatement(sql);
 
 			if (c.nativead.native_assets != null) {
@@ -564,6 +568,27 @@ public class Creative {
 		else
 			throw new Exception("Can't tell what kind of creative id: " + c.id + " is.");
 		return table;
+	}
+
+	
+	/**
+	 * Returns the array attribute name in the campaigns table this creative will belong to.
+	 * @return String. The array name in the campaingns table this is an entry in.
+	 * @throws Exception if we can't figure out the type.
+	 */
+	public String getAttributeType() throws Exception {
+		String attr = null;
+		if (isAudio)
+			attr = "audios";
+		else if (isNative)
+			attr = "natives";
+		else if (isVideo)
+			attr = "videos";
+		else if (isBanner)
+			attr = "banners";
+		else
+			throw new Exception("Can't tell what kind of creative id: " + id + " is.");
+		return attr;
 	}
 
 	static PreparedStatement doUpdate(Creative c, Connection conn) throws Exception {
@@ -1171,6 +1196,11 @@ public class Creative {
 			return true;
 		return false;
 	}
+	
+	@JsonIgnore
+	public boolean isAudio() {
+		return isAudio;
+	}
 
 	/**
 	 * Encodes the attributes of the node after the node is instantiated.
@@ -1349,67 +1379,6 @@ public class Creative {
 	}
 
 	/**
-	 * Creates a sample of the ADM field, useful for testing your ad markup to make
-	 * sure it works.
-	 * 
-	 * @param camp Campaign. The campaign to use with this creative.
-	 * @return String. The ad markup HTML.
-	 */
-	public String createSample(Campaign camp) {
-		BidRequest request = new Nexage();
-
-		String page = null;
-		String str = null;
-		File temp = null;
-
-		Impression imp = new Impression();
-
-		imp.w = 666;
-		imp.h = 666;
-
-		BidResponse br = null;
-
-		try {
-			if (this.isVideo()) {
-				br = new BidResponse(request, imp, camp, this, "123", 1.0, null, 0);
-				imp.video = new Video();
-				imp.video.linearity = this.videoLinearity;
-				imp.video.protocol.add(this.videoProtocol);
-				imp.video.maxduration = this.videoDuration + 1;
-				imp.video.minduration = this.videoDuration - 1;
-
-				str = br.getAdmAsString();
-				/**
-				 * Read in the stubbed video page and patch the VAST into it
-				 */
-				page = new String(Files.readAllBytes(Paths.get("web/videostub.html")), StandardCharsets.UTF_8);
-				page = page.replaceAll("___VIDEO___", "http://localhost:8080/vast/onion270.xml");
-			} else if (this.isNative()) {
-
-				// br = new BidResponse(request, camp, this,"123",0);
-				// request.nativead = true;
-				// request.nativePart = new NativePart();
-				// str = br.getAdmAsString();
-
-				page = "<html><title>Test Creative</title><body><img src='images/under-construction.gif'></img></body></html>";
-			} else {
-				br = new BidResponse(request, imp, camp, this, "123", 1.0, null, 0);
-				str = br.getAdmAsString();
-				page = "<html><title>Test Creative</title><body><xmp>" + str + "</xmp>" + str + "</body></html>";
-			}
-			page = page.replaceAll("\\{AUCTION_PRICE\\}", "0.2");
-			page = page.replaceAll("\\$", "");
-			temp = File.createTempFile("test", ".html", new File("www/temp"));
-			temp.deleteOnExit();
-
-			Files.write(Paths.get(temp.getAbsolutePath()), page.getBytes());
-		} catch (Exception error) {
-			error.printStackTrace();
-		}
-		return "temp/" + temp.getName();
-	}
-
-	/**
 	 * Find a node of the named hierarchy.
 	 * 
 	 * @param hierarchy String. The hierarchy you are looking for. Note, nodes can
@@ -1443,12 +1412,15 @@ public class Creative {
 		return true;
 	}
 
-	String getType() {
+	public String getType() {
 		if (isNative())
 			return "native";
 		if (isVideo())
 			return "video";
+		if (isAudio())
+			return "audio";
 		return "banner";
+		
 	}
 
 	public boolean isActive(String cid) throws Exception {
@@ -1583,6 +1555,8 @@ public class Creative {
 		if (isAudio) {
 			compileAudio();
 		}
+		else
+			compileNative();
 
 		if (interstitialOnly) {
 			Node n = new Node(INTERSTITIAL, "imp.0.instl", Node.EQUALS, 1);
@@ -1615,6 +1589,8 @@ public class Creative {
 			attributes.add(n);
 		}
 	}
+	
+
 	/**
 	 * Compiles the exchange specific attributes, like for Stroer and
 	 * Adx.
@@ -1732,6 +1708,10 @@ public class Creative {
 	}
 	
 	void compileAudio() throws Exception {
+		
+	}
+	
+	void compileNative() throws Exception {
 		
 	}
 
@@ -1976,7 +1956,7 @@ public class Creative {
 			if (node.get("mime_type") != null)
 				mime_type = node.get("mime_type").asText();
 		} else if (isNative) {
-
+			nativead = new NativeCreative(node);
 		} else
 			throw new Exception("Can't tell what kind of creative " + name + " is.");
 

@@ -766,7 +766,7 @@ public class RTBServer implements Runnable {
 		statusUpdater = () -> {
 			try {
 				while (true) {
-					//Controller.getInstance().setMemberStatus();
+					Controller.getInstance().setMemberStatus();
 					Controller.getInstance().reportNoBidReasons();
 
 					CampaignProcessor.probe.reset();

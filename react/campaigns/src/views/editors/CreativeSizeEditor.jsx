@@ -44,7 +44,7 @@ const CreativeSizeEditor = (props) => {
 
   return(
     <Row>
-    <Col className="px-md-1" md="6">
+    <Col className="px-md-1" md="7">
   <ButtonGroup>
     <label>Match Size:</label>
     <Button color="primary" onClick={() => setSelection(1)} active={rSelected === 1}>Any</Button>

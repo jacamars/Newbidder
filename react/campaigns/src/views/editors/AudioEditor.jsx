@@ -2,12 +2,18 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
+  Alert,
+  Button,
+  ButtonGroup,
   FormGroup,
   Input,
+  Label,
   Row,
   Col
 } from "reactstrap";
-import DemoTag from "../simulator/DemoTag.jsx"
+import DemoTag from "../simulator/DemoTag"
+import BannerEditor from "./BannerEditor";
+import CreativeSizeEditor from "./CreativeSizeEditor"
 import {mimeTypes, protocolOptions, apiOptions} from "../../Utils"
 
 var undef;
@@ -15,11 +21,50 @@ var undef;
 const AudioEditor = (props) => {
 
   const [rSelected, setRSelected] = useState(props.creative.dealType);
+  const [showCompanion, setShowCompanion] = useState(false);
+  const [companion, setCompanion] = useState({
+    htmltemplate: '',
+    sizeType: '0'
+  });
+  const [count, setCount] = useState(1);
 
   const setDealSelection = (r) => {
     setRSelected(r);
     props.selector(r);
   }
+
+const newCompanion = () => {
+  setShowCompanion(true);
+}
+
+const deleteCompanion = () => {
+  setShowCompanion(false);
+}
+
+const setHtml = (e,type) => {
+  companion[type]=e.target.value;
+  setCompanion(companion);
+  setCount(count+1);
+}
+
+// Callback for w/h in CreativeSizeEditor
+const setSize = (e, key) => {
+  if (e == null) {
+    companion[key] = "0";
+    setCompanion(companion)
+    return;
+  }
+
+  companion[key] = e.target.value;
+  setCompanion(companion);
+}
+
+// Set the dimension type
+const setSizeType = (t) => {
+  companion.sizeType = t;
+  setCompanion(companion);
+}
+
 
   return(
     <>
@@ -68,7 +113,7 @@ const AudioEditor = (props) => {
         />
       </FormGroup>
    </Col>
-    <Col className="px-md-1" md="1">
+    <Col className="px-md-1" md="2">
       <FormGroup>
         <label>Supported Protocols</label>
         <Input
@@ -79,7 +124,7 @@ const AudioEditor = (props) => {
         </Input>
       </FormGroup>
     </Col>
-    <Col className="px-md-1" md="1">
+    <Col className="px-md-1" md="2">
       <FormGroup>
         <label>Supported API</label>
         <Input
@@ -94,7 +139,7 @@ const AudioEditor = (props) => {
    <Row>
     <Col className="px-md-1" md="6">
       <FormGroup>
-        <label>Outgoing File</label>
+        <label>DAAST FILE</label>
         <Input
           id="height"
           spellCheck={false}
@@ -111,6 +156,28 @@ const AudioEditor = (props) => {
         </FormGroup>
     </Col>
    </Row>
+   <Row>
+      <ButtonGroup>
+        <Label>Companion</Label>
+          &nbsp;
+        <Button color="success" size="sm" onClick={()=>newCompanion()}>Companion</Button>
+      </ButtonGroup>
+    </Row>
+      {showCompanion &&  
+        <Alert color="success">
+        <Row>
+            <Label>Banner Ad</Label>
+              <Button color="warning" size="sm" onClick={()=>deleteCompanion()}>Remove</Button>
+        </Row>
+        <CreativeSizeEditor 
+                  creative={companion} 
+                  callback={setSize} 
+                  selector={setSizeType}/>
+        <BannerEditor key={"audio-companion-"-count} 
+                  creative={companion} 
+                  callback={setHtml}/>
+        </Alert>
+        }
    </>
   );
 };

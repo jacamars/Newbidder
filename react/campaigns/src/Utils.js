@@ -64,6 +64,9 @@ export const mimeTypes = (e) => {
 
 export const contextType = (e) => {
     var items = [];
+    if (!e) 
+        return items;
+
     contextValues.map(row => {
         items.push(<option selected={e.indexOf(row.e) !== -1} value={row.value}>{row.content}</option>);
     });
@@ -72,6 +75,9 @@ export const contextType = (e) => {
 
 export const contextSubType = (e) => {
     var items = [];
+    if (!e)
+        return items;
+        
         contextSubValues.map(row => {
             items.push(<option selected={e.indexOf(row.e) !== -1} value={row.value}>{row.content}</option>);
     });

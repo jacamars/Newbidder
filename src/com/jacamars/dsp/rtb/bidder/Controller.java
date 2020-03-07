@@ -658,7 +658,7 @@ public enum Controller {
     public void setMemberStatus() throws Exception {
         String member = Configuration.instanceName;
         Echo m = RTBServer.getStatus();
-        m.timestamp = SharedTimer.getInstance().getValue();
+        m.timestamp = System.currentTimeMillis();
         bidCachePool.setMemberStatus(member, m);
 
     }

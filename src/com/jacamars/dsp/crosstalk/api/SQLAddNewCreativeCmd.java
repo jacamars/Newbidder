@@ -59,7 +59,7 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 				c.compile();
 				c.saveToDatabase();
 				if (c.id != 0) {
-					Campaign.touchCampaignsWithCreative(c.getTable(),c.id);
+					Campaign.touchCampaignsWithCreative(c.getAttributeType(),c.id);
 				}
 				return;
 			} catch (Exception err) {

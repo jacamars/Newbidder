@@ -52,6 +52,8 @@ const UserProfile = () => {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
     var email = document.getElementById("email").value;
+    var cid = document.getElementById('cid').value;
+    var role = document.getElementById("role").value;
     var firstname = document.getElementById("firstname").value;
     var lastname = document.getElementById("lastname").value;
     var title = document.getElementById("title").value;
@@ -66,6 +68,8 @@ const UserProfile = () => {
     u.username = username;
     u.password = password;
     u.email = email;
+    u.sub_id = role;
+    u.customer_id = cid;
     u.firstname = firstname;
     u.lastname = lastname;
     u.address = address;
@@ -134,12 +138,35 @@ const UserProfile = () => {
                       </Col>
                       </Row>
                       <Row>
+
+                      { (vx.user.sub_id === 'superuser' && vx.user.customer_id === 'rtb4free') &&
+                        <Col className="pl-md-1" md="5">
+                          <FormGroup>
+                            <label htmlFor="cid">
+                               Customer Id
+                            </label>
+                            <Input defaultValue={vx.user.customer_id} 
+                              placeholder="cid" 
+                              type="text" 
+                              id="cid" />
+                            </FormGroup>
+                          </Col>
+                      }
+
                       <Col className="pl-md-1" md="5">
                         <FormGroup>
                           <label htmlFor="exampleInputEmail1">
                             Email address
                           </label>
                           <Input defaultValue={vx.user.email} placeholder="email" type="email" id="email" />
+                        </FormGroup>
+                      </Col>
+                      <Col className="pl-md-1" md="3">
+                        <FormGroup>
+                          <label htmlFor="role">
+                            Role
+                          </label>
+                          <Input defaultValue={vx.user.sub_id} placeholder="Sub id" type="role" id="text" />
                         </FormGroup>
                       </Col>
                     </Row>
