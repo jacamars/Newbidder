@@ -314,10 +314,12 @@ const  ViewContext = () => {
       return data.accounting;
     }
 
-    const getNewCreative = async () => {
+    const getNewCreative = async (ctype,name) => {
       var cmd = {
         token: jwt,
         type: "SQLGetNewCreative#",
+        ctype: ctype,
+
         campaign: name
       };
       var result = await execute(cmd);

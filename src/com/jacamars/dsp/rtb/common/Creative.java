@@ -446,15 +446,13 @@ public class Creative {
 			} else
 				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_context != null) {
-				Array arr = conn.createArrayOf("varchar", c.nativead.native_context.toArray());
-				p.setArray(i++, arr);
+				p.setInt(i++, c.nativead.native_context);
 			} else
-				p.setNull(i++, Types.ARRAY);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_contextsubtype != null) {
-				Array arr = conn.createArrayOf("varchar", c.nativead.native_contextsubtype.toArray());
-				p.setArray(i++, arr);
+				p.setInt(i++, c.nativead.native_contextsubtype);
 			} else
-				p.setNull(i++, Types.ARRAY);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_plcmttype != null)
 				p.setInt(i++, c.nativead.native_plcmttype);
 			else
@@ -720,20 +718,18 @@ public class Creative {
 			} else
 				p.setNull(i++, Types.ARRAY);
 			if (c.nativead.native_context != null) {
-				Array arr = conn.createArrayOf("varchar", c.nativead.native_context.toArray());
-				p.setArray(i++, arr);
+				p.setInt(i++, c.nativead.native_context);
 			} else
-				p.setNull(i++, Types.ARRAY);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_contextsubtype != null) {
-				Array arr = conn.createArrayOf("varchar", c.nativead.native_contextsubtype.toArray());
-				p.setArray(i++, arr);
+				p.setInt(i++, c.nativead.native_contextsubtype );
 			} else
-				p.setNull(i++, Types.ARRAY);
+				p.setNull(i++, Types.INTEGER);
 			if (c.nativead.native_plcmttype != null)
 				p.setInt(i++, c.nativead.native_plcmttype);
 			else
 				p.setNull(i++, Types.INTEGER);
-			if (c.nativead.native_plcmttype != null)
+			if (c.nativead.native_plcmtct != null)
 				p.setInt(i++, c.nativead.native_plcmtct);
 			else
 				p.setNull(i++, Types.INTEGER);

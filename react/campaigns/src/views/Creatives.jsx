@@ -48,7 +48,7 @@ var undef;
     if (creative !== null)
     return;
 
-    var c = await vx.getNewCreative("My New Banner");
+    var c = await vx.getNewCreative("banner");
     c = setDates(c);
     c.id = 0;
     c.isVideo = false;
@@ -116,7 +116,7 @@ var undef;
     if (creative !== null)
       return;
 
-    var c = await vx.getNewCreative("My New Video");
+    var c = await vx.getNewCreative("video");
     c = setDates(c);
     c.isVideo = true;
     c.isAudio = false;
@@ -132,18 +132,22 @@ var undef;
     if (creative !== null)
     return;
 
-    var c = await vx.getNewCreative("My New Native");
+    var c = await vx.getNewCreative("native");
     c = setDates(c);
     c.isVideo = false;
     c.isAudio = false;
     c.isNative = true;
     c.isBanner = false;
-    c.native_assets = [];
-    c.native_link = "";
-    c.native_trk_urls = [];
-    c.native_js_tracker = "";
-    c.native_context = [1];
-    c.native_contextsubtype = [10];
+    c.nativead = {};
+    c.nativead.assets = [];
+    c.nativead.native_link = "";
+    c.nativead.native_trk_urls = [];
+    c.nativead.native_js_tracker = "";
+    c.nativead.native_context = 1;
+    c.nativead.native_contextsubtype = 10;
+    c.nativead.native_plcmttype = 1;
+    c.nativead.plcmtcnt = 1;
+
     c.price = c.bid_ecpm;
     c.siteorapp = "";
 
@@ -159,7 +163,7 @@ var undef;
     if (creative !== null)
       return;
 
-    var c = await vx.getNewCreative("My New Audio");
+    var c = await vx.getNewCreative("audio");
     c = setDates(c);
     c.isVideo = false;
     c.isAudio = true;
@@ -185,8 +189,19 @@ var undef;
       }
       
       x.bid_ecpm = x.price;
+
+      /** Map the nativead to the database equivalent */
+      if (x.nativead) {
+        x.native_assets = x.nativead.assets;
+        x.native_context = x.nativead.native_context;
+        x.native_contextsubtype = x.nativead.native_contextsubtype;
+        x.native_plcmttype = x.nativead.native_plcmttype;
+        x.native_plcmtcnt = x.nativead.native_plcmtcnt = 1;
+      }
+
       vx.addNewCreative(x);
     }
+
     setCreative(null)
     setTimeout(refresh,2000);
   }

@@ -1258,11 +1258,23 @@ public class Campaign implements Comparable, Portable {
 		st.close();
 	}
 
-	public static void removeCreativeFromCampaigns(int id, TokenData td) throws Exception {
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_BANNERS, id, td);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_VIDEOS, id, td);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_AUDIOS, id, td);
-		removeSpecificTypeCreativeFromCampaigns(Creative.SQL_NATIVES, id, td);
+	public static void removeCreativeFromCampaigns(int id, String key, TokenData td) throws Exception {
+		switch(key) {
+		case "banner":
+			removeSpecificTypeCreativeFromCampaigns("banners", id, td);
+			break;
+		case "video":
+			removeSpecificTypeCreativeFromCampaigns("videos", id, td);
+			break;
+		case "audio":
+			removeSpecificTypeCreativeFromCampaigns("audios", id, td);
+			break;
+		case "native":
+			removeSpecificTypeCreativeFromCampaigns("natives", id, td);
+			break;
+		default:
+			throw new Exception("Don't understand type: " + key);
+		}
 	}
 
 	public static void removeSpecificTypeCreativeFromCampaigns(String table, int id, TokenData td) throws Exception {
@@ -1278,19 +1290,23 @@ public class Campaign implements Comparable, Portable {
 				switch (table) {
 				case "banners":
 					index = c.banners.indexOf(id);
-					c.banners.remove(index);
+					if (c.banners != null)
+						c.banners.remove(index);
 					break;
 				case "banner_videos":
 					index = c.videos.indexOf(id);
-					c.videos.remove(index);
+					if (c.videos != null)
+						c.videos.remove(index);
 					break;
 				case "banner_audios":
 					index = c.audios.indexOf(id);
-					c.audios.remove(index);
+					if (c.audios  != null)
+						c.audios.remove(index);
 					break;
 				case "banner_natives":
 					index = c.natives.indexOf(id);
-					c.natives.remove(index);
+					if (c.natives != null)
+						c.natives.remove(index);
 					break;
 				default:
 					throw new Exception("Cant update cratives type " + table + " for campaign " + cid);

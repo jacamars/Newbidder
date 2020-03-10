@@ -27,11 +27,14 @@ import {
   Row,
   Col
 } from "reactstrap";
-import {mimeTypes, protocolOptions} from "../../Utils"
+import {mimeTypes, protocolOptions, assetDataType} from "../../Utils";
+import VideoEditor from "./VideoEditor";
 
 var undef;
 
 const ViewAssets = (props) => {
+
+const [video, setVideo] = useState({});
 
   const handler = (e, i, key ) => {
     props.nativead.assets[i][key] = e.target.value;
@@ -43,7 +46,9 @@ const ViewAssets = (props) => {
       props.setter(props.assets);
   }
 
-  alert("PROPS: " + JSON.stringify(props,null,2));
+  const setVideoAsset = () => {
+
+  }
 
   return(
     props.nativead.assets.map((row,i) => (
@@ -115,16 +120,30 @@ const ViewAssets = (props) => {
                <Row>
                 <Col className="px-md-1" md="4">
                     <FormGroup>
-                        <label>Vasttag</label>
+                        <label>Landing URL</label>
                         <Input
                             id="title"
-                            onChange={ (e) => handler(e,i,"vasttag")}
-                            defaultValue={row.vasttag}
+                            onChange={ (e) => handler(e,i,"url")}
+                            defaultValue={row.url}
+                            type="text">
+                        </Input>
+                    </FormGroup>
+                </Col>
+                <Col className="px-md-1" md="4">
+                    <FormGroup>
+                        <label>Clicktracker</label>
+                        <Input
+                            id="title"
+                            onChange={ (e) => handler(e,i,"url")}
+                            defaultValue={row.clicktracker}
                             type="text">
                         </Input>
                     </FormGroup>
                 </Col>
               </Row>
+              <VideoEditor key={'video-asset'} 
+                              creative={video} 
+                              callback={setVideoAsset}/>
               </Alert>
             </>}
             {row.type === 'data' && <>
@@ -134,9 +153,20 @@ const ViewAssets = (props) => {
               <Row>
               <Col className="px-md-1" md="4">
                   <FormGroup>
+                      <label>Type</label>
+                      <Input
+                          id="datatype"
+                          onChange={ (e) => handler(e,i,"datatype")}
+                          type="select">
+                            {assetDataType(row.datatype)}
+                      </Input>
+                  </FormGroup>
+              </Col>
+              <Col className="px-md-1" md="4">
+                  <FormGroup>
                       <label>Label</label>
                       <Input
-                          id="title"
+                          id="label"
                           onChange={ (e) => handler(e,i,"label")}
                           defaultValue={row.label}
                           type="text">
@@ -184,7 +214,7 @@ const ViewAssets = (props) => {
                       </Input>
                   </FormGroup>
               </Col>
-              <Col className="px-md-1" md="1">
+              <Col className="px-md-1" md="4">
                   <FormGroup>
                       <label>Fallback</label>
                       <Input

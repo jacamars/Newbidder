@@ -1,5 +1,7 @@
 import React  from "react";
 
+var undef;
+
 const contextValues = [
     {e:1,value:"1",content:"Content-centric content"},
     {e:2,value:"2",content:"Social-centric content"},
@@ -19,6 +21,30 @@ const contextSubValues = [
     {e:30, value:"30", content:"Content focused on selling products"},
     {e:31, value:"31", content:"Application store/marketplace"},
     {e:32, value:"32", content:"Product review site"}
+];
+
+const plcmtIds = [
+    {e:0, value:"0", content:"Not specified."},
+    {e:1, value:"1", content:"In the feed of content"},
+    {e:2, value:"2", content:"In the atomic unit of the content."},
+    {e:3, value:"3", content:"Outside the core content"},
+    {e:4, value:"4", content:"Recommendation widget"},
+];
+
+const assetTypes = [
+    {e:0, value:"0", content:"None (Not recommended)."},
+    {e:1, value:"1", content:"Sponsored"},
+    {e:2, value:"2", content:"Descriptive text"},
+    {e:3, value:"3", content:"Rating, formatted as a number"},
+    {e:4, value:"4", content:"Likes, formatted as a string"},
+    {e:5, value:"5", content:"Downloads, formatted as a number"},  
+    {e:6, value:"6", content:"Price of product. Include currency symbol"}, 
+    {e:7, value:"7", content:"Saleprice, if on sale"}, 
+    {e:8, value:"8", content:"Phone number"}, 
+    {e:9, value:"9", content:"Address"}, 
+    {e:10, value:"10", content:"Additional descriptive text"}, 
+    {e:11, value:"11", content:"Displayurl"}, 
+    {e:12, value:"5", content:"Call to Action Button Text"}, 
 ];
 
 export const ssp = ['Nexage','Admedia', 'Adprudence', 'Appnexus', 'Adventurefeeds','Atomx','Axonix','Bidswitch','c1x', 
@@ -62,24 +88,47 @@ export const mimeTypes = (e) => {
     );
 }
 
-export const contextType = (e) => {
+export const placementType = (value) => {
     var items = [];
-    if (!e) 
+    if (value === undef) 
+        value = 0;
+
+    plcmtIds.map(row => {
+        items.push(<option selected={row.e === value} value={row.value}>{row.content}</option>);
+    });
+    return items;
+}
+
+export const assetDataType = (value) => {
+    var items = [];
+    alert("ASSET: " + value);
+    if (value === undef) 
+        value = 0;
+
+    assetTypes.map(row => {
+        items.push(<option selected={row.e === value} value={row.value}>{row.content}</option>);
+    });
+    return items;
+}
+
+export const contextType = (value) => {
+    var items = [];
+    if (!value) 
         return items;
 
     contextValues.map(row => {
-        items.push(<option selected={e.indexOf(row.e) !== -1} value={row.value}>{row.content}</option>);
+        items.push(<option selected={row.e === value} value={row.value}>{row.content}</option>);
     });
     return items;
 };
 
-export const contextSubType = (e) => {
+export const contextSubType = (value) => {
     var items = [];
-    if (!e)
+    if (!value)
         return items;
         
         contextSubValues.map(row => {
-            items.push(<option selected={e.indexOf(row.e) !== -1} value={row.value}>{row.content}</option>);
+            items.push(<option selected={row.e === value} value={row.value}>{row.content}</option>);
     });
     return items;
 }

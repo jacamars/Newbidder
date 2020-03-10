@@ -329,6 +329,12 @@ const getSelectedRules = () => {
     setCount(count+1);
   }
 
+  const setNative = (e,type) => {
+    creative.nativead[type]=e.target.value;
+    setCreative(creative);
+    setCount(count+1);
+  }
+
   // Set multi selection keys in the creative (like from NativeEditor)
   const setMulti = (e,key) => {
     var s = [...document.getElementById(key).options]
@@ -446,8 +452,8 @@ const getSelectedRules = () => {
                           { creative.isNative && 
                             <NativeEditor key={'native-creative'-count} 
                               creative={creative} 
-                              multiHandler={setMulti}
-                              callback={setHtml}/>}
+                              mult={setMulti}
+                              callback={setNative}/>}
 
                           <Row>
                             <Col className="pr-md-1" md="12">

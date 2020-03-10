@@ -8,6 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.jacamars.dsp.rtb.bidder.Controller;
+import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.common.URIEncoder;
 import com.jacamars.dsp.rtb.nativeads.assets.Asset;
 import com.jacamars.dsp.rtb.nativeads.assets.Entity;
@@ -31,10 +32,10 @@ public class NativeCreative {
 		public String native_link;
 		public List<String> native_assets;
 		public String native_js_tracker;
-		public List<Integer> native_context;
-		public List<Integer> native_contextsubtype;
+		public Integer native_context;
+		public Integer native_contextsubtype;
 		public Integer native_plcmttype;
-		public Integer native_plcmtct;
+		public Integer native_plcmtct = 1;
 			
 		/** The data asset of this creative. Transient because in the campaign it is defined with all the assets in 
 		 * an  array, but we will pull out img, video, link, and title  so we can quickly find them later. Only
@@ -59,6 +60,7 @@ public class NativeCreative {
 		
 	}
 	
+	
 	public NativeCreative(JsonNode node) {
 		if (node.get("native_assets") != null) {
 			ArrayNode an = (ArrayNode)node.get("native_assets");
@@ -79,6 +81,16 @@ public class NativeCreative {
 			}
 		}
 		
+		if (node.get("native_context") != null) {
+			native_context = node.get("native_context").asInt();
+		}
+		
+		if (node.get("native_contextsubtype") != null) {
+			native_contextsubtype = node.get("native_contextsubtype").asInt();
+		}
+				
+		if (node.get("native_plcmttype") != null)
+			native_plcmttype = node.get("native_plcmttype").asInt();
 			
 	}	
 		

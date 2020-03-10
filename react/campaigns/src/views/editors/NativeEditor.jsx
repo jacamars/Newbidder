@@ -26,7 +26,7 @@ import {
   Row,
   Col
 } from "reactstrap";
-import {mimeTypes, protocolOptions, contextType, contextSubType} from "../../Utils";
+import {mimeTypes, protocolOptions, contextType, contextSubType, placementType} from "../../Utils";
 import ViewAssets from "./ViewAssets";
 
 var undef;
@@ -35,7 +35,7 @@ const NativeEditor = (props) => {
 
   const [rSelected, setRSelected] = useState(props.creative.dealType);
   const [count, setCount] = useState(0);
-  const [assets, setAssets] = useState( props.creative.nativead.native_assets ); 
+  const [assets, setAssets] = useState( props.creative.nativead.assets ); 
 
   const newTitleAsset = () => {
     var n = {
@@ -102,63 +102,41 @@ const NativeEditor = (props) => {
     setCount(count+1);
   }
 
+  //alert("PROPS:  " + JSON.stringify(props,null,2));
+
   return(
     <>
     <Row>
-    <Col className="px-md-1" md="4">
-      <FormGroup>
-        <label>Ad Link</label>
-        <Input
-          id="link"
-          defaultValue={props.creative.nativead.native_link}
-          onChange={ (e) => props.callback(e,"native_link")}
-          type="text">
-          </Input>
-      </FormGroup>
-    </Col>
-    <Col className="px-md-1" md="4">
-      <FormGroup>
-        <label>Imp Tracker URLS</label>
-        <Input
-          id="imptrackers"
-          defaultValue={props.creative.nativead.native_trk_urls}
-          type="select">
-            {mimeTypes(props.creative.native_trk_urls)}
-          </Input>
-      </FormGroup>
-    </Col>
-    <Col className="px-md-1" md="4">
-    <FormGroup>
-        <label>JS Tracker</label>
-        <Input
-          id="jstracker"
-          onChange={ (e) => props.callback(e,"native_js_tracker")}
-          defaultValue={props.creative.nativead.native_js_tracker}
-          type="textarea"
-        />
-      </FormGroup>
-    </Col>
-    </Row>
-    <Row>
-      <Col className="px-md-1" md="4">
+      <Col className="px-md-1" md="3">
         <FormGroup>
           <label>Context</label>
           <Input
             id="native_context"
-            onChange={(e) => props.multiHandler(e,"native_context")}
-            type="select" multiple>
+            onChange={(e) => props.callback(e,"native_context")}
+            type="select">
               {contextType(props.creative.nativead.native_context)}}
           </Input>
       </FormGroup>
       </Col>
-      <Col className="px-md-1" md="4">
+      <Col className="px-md-1" md="3">
         <FormGroup>
           <label>Sub-Context</label>
           <Input
             id="native_contextsubtype"
-            onChange={(e) => props.multiHandler(e,"native_context")}
-            type="select" multiple>
+            onChange={(e) => props.callback(e,"native_contextsubtype")}
+            type="select">
               {contextSubType(props.creative.nativead.native_contextsubtype)}}
+          </Input>
+      </FormGroup>
+      </Col>
+      <Col className="px-md-1" md="3">
+        <FormGroup>
+          <label>Placement Type</label>
+          <Input
+            id="native_plcmttype"
+            onChange={(e) => props.callback(e,"native_plcmttype")}
+            type="select">
+              {placementType(props.creative.nativead.native_plcmttype)}}
           </Input>
       </FormGroup>
       </Col>
