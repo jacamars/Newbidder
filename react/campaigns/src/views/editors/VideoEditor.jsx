@@ -47,7 +47,7 @@ const VideoEditor = (props) => {
         <Input
           id="mime_type"
           spellCheck={false}
-          onChange={ (e) => props.callback(e,"mime_type")}
+          onChange={ (e) => props.callback(e,"mime_type",props.index)}
           type="select">
             {mimeTypes(props.creative.mime_type)}
         </Input>
@@ -58,7 +58,7 @@ const VideoEditor = (props) => {
         <label>Linearity</label>
         <Input
           id="vast_video_linearity"
-          onChange={ (e) => props.callback(e,"vast_video_linearity")}
+          onChange={ (e) => props.callback(e,"vast_video_linearity",props.index)}
           defaultValue={props.creative.vast_video_linearity}
           type="text"
         />
@@ -69,7 +69,7 @@ const VideoEditor = (props) => {
         <label>Duration</label>
         <Input
           id="vast_video_duration"
-          onChange={ (e) => props.callback(e,"vast_video_duration")}
+          onChange={ (e) => props.callback(e,"vast_video_duration",props.index)}
           defaultValue={props.creative.vast_video_duration}
           type="text"
         />
@@ -81,7 +81,7 @@ const VideoEditor = (props) => {
         <Input
           id="vast_video_protocol"
           type="select"
-          onChange={ (e) => props.callback(e,"vast_video_protocol")}>
+          onChange={ (e) => props.callback(e,"vast_video_protocol",props.index)}>
               {protocolOptions(props.creative.vast_video_protocol)}
          </Input>
       </FormGroup>
@@ -91,7 +91,7 @@ const VideoEditor = (props) => {
         <label>Bit Rate</label>
         <Input
           id="vast_video_bitrate"
-          onChange={ (e) => props.callback(e,"vast_video_bitrate")}
+          onChange={ (e) => props.callback(e,"vast_video_bitrate",props.index)}
           defaultValue={props.creative.vast_video_bitrate}
           type="text"
         />
@@ -104,7 +104,7 @@ const VideoEditor = (props) => {
         <label>Outgoing File</label>
         <Input
           id="outgoingfile"
-          onChange={ (e) => props.callback(e,"htmltemplate")}
+          onChange={ (e) => props.callback(e,"htmltemplate",props.index)}
           defaultValue={props.creative.htmltemplate}
           type="textarea"
         />

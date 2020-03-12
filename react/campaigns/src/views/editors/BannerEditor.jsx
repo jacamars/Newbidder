@@ -23,6 +23,15 @@ const BannerEditor = (props) => {
     props.selector(r);
   }
 
+const substituteRedirect = (text) => {
+  var cthru = props.creative.extensions["clickthrough_url"]
+  if (cthru !== undef && cthru !== "") {
+    var re = new RegExp("_REDIRECT_URL_");
+    text = text.replace(re,cthru);
+  }
+  return text;
+}
+
   return(
     <>
     <Row>
@@ -38,13 +47,23 @@ const BannerEditor = (props) => {
         </Input>
       </FormGroup>
     </Col>
-    <Col className="px-md-1" md="6">
+    <Col className="px-md-1" md="4">
       <FormGroup>
         <label>Image Url</label>
         <Input
           id="height"
           onChange={ (e) => props.callback(e,"imageurl")}
           defaultValue={props.creative.imageurl}
+          type="text"
+        />
+      </FormGroup>
+   </Col>
+   <Col className="px-md-1" md="4">
+      <FormGroup>
+        <label>Click Through Url</label>
+        <Input
+          id="clickthrough_url"
+          defaultValue={props.creative.extensions["clickthrough_url"]}
           type="text"
         />
       </FormGroup>
@@ -67,7 +86,7 @@ const BannerEditor = (props) => {
       <Col className="px-md-1" md="6">
         <FormGroup>
           <label>Visualization</label>
-          <DemoTag isVideo={false} adm={vx.macroSub(props.creative.htmltemplate)} />
+          <DemoTag isVideo={false} adm={substituteRedirect(vx.macroSub(props.creative.htmltemplate))} />
         </FormGroup>
       </Col>
    </Row>

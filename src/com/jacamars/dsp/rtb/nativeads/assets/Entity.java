@@ -12,6 +12,8 @@ public class Entity {
 	public String text;
 	/** The value field, used when this is a data asset */		
 	public String value;	
+	/** The label field when used as a data asset */
+	public String label;
 	/** The value when used as a video or image asset */
 	public String url;			
 	/** The fallback url when used as a link asset */
@@ -30,7 +32,16 @@ public class Entity {
 	public String protocol;
 	/** The clicktrackers used in a link asset */
 	public List<String>clicktrackers;
+	/** Video bitrate */
+	public Integer bitrate;
 	
+	////////////////////////// VIDEO /////////////////////////////////////////////
+	public String mime_type;
+	/**
+	 * vast-url, a non standard field for passing an http reference to a file for
+	 * the XML VAST
+	 */
+	public String vasturl;
 	
 	/** A link that is attacked to this object */
 	public String callToAction;

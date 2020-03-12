@@ -93,12 +93,20 @@ var undef;
       var map = {};
       for (var i=0;i<c.ext_spec.length;i++) {
         var str = c.ext_spec[i];
-        var n = str.split(":");
+        var n = str.split(":#:");
         map[n[0]] = n[1];
       }
       c.extensions = map;
       if (map["site_or_app"] !== undef)
         c.siteorapp = map["site_or_app"];
+    }
+
+    if (c.nativead) {
+      c.nativead.assets = [];
+      for (var i=0;i<c.nativead.native_assets.length;i++) {
+        var asset = JSON.parse(c.nativead.native_assets[i]);
+        c.nativead.assets.push(asset);
+      }
     }
 
     c.bid_ecpm = c.price;
@@ -192,11 +200,23 @@ var undef;
 
       /** Map the nativead to the database equivalent */
       if (x.nativead) {
-        x.native_assets = x.nativead.assets;
+
+        alert(JSON.stringify(x.nativead.assets,null,2));
+
         x.native_context = x.nativead.native_context;
         x.native_contextsubtype = x.nativead.native_contextsubtype;
         x.native_plcmttype = x.nativead.native_plcmttype;
         x.native_plcmtcnt = x.nativead.native_plcmtcnt = 1;
+        x.native_link = x.nativead.native_link;
+        x.native_trk_urls = [];
+        if (x.nativead.native_trk_urls !== '')
+          x.native_trk_urls.push(x.nativead.native_trk_urls);
+        x.native_js_tracker = x.nativead.native_js_tracker;
+        x.native_assets = [];
+        for (var j = 0; j<x.nativead.assets.length;j++) {
+          var asset = x.nativead.assets[j];
+          x.native_assets.push(JSON.stringify(asset));
+        }
       }
 
       vx.addNewCreative(x);

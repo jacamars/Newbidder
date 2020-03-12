@@ -10,7 +10,7 @@ export const SampleBanner = {
 		"banner": {
 			"h": 50,
 			"w": 320,
-			"mimes": ["image/jpg", "text/javascript" ],
+			"mimes": ["image/jpg", "image/gif", "text/javascript" ],
 			"pos": 0
 		},
 		"ext": {

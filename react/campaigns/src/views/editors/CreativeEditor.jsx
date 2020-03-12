@@ -237,6 +237,9 @@ const getSelectedRules = () => {
 
     // handle extensions
     var ext = [];
+
+    var clickthrough_url = getValue(document.getElementById("clickthrough_url"));
+
     var appnexus_crid = getValue(document.getElementById("appnexus_crid"));
     var agency_name = getValue(document.getElementById("agency_name"));
     var advertiser_name = getValue(document.getElementById("advertiser_name"));
@@ -247,21 +250,24 @@ const getSelectedRules = () => {
         .filter((x) => x.selected)
         .map((x)=>x.value);
 
-    if (appnexus_crid !== "") ext.push("appnexus_crid"+":"+appnexus_crid);
-    if (agency_name !== "") ext.push("agency_name"+":"+agency_name);
-    if (advertiser_name !== "") ext.push("advertiser_name"+":"+advertiser_name);
-    if (billing_id !== "") ext.push("billing_id"+":"+billing_id);
-    if (avr !== "") ext.push("avr"+":"+avr);
-    if (avn !== "") ext.push("avn"+":"+avn);
+    if (appnexus_crid !== "") ext.push("appnexus_crid:#:"+appnexus_crid);
+    if (agency_name !== "") ext.push("agency_name"+":#:"+agency_name);
+    if (advertiser_name !== "") ext.push("advertiser_name"+":#:"+advertiser_name);
+    if (billing_id !== "") ext.push("billing_id"+":#:"+billing_id);
+    if (avr !== "") ext.push("avr"+":#:"+avr);
+    if (avn !== "") ext.push("avn"+":#:"+avn);
     if (cnames.length !== 0) {
-      ext.push("categories"+":"+cnames.join());
+      ext.push("categories"+":#:"+cnames.join());
     }
     if (siteorapp !== "")
-      ext.push("site_or_app:"+siteorapp);
+      ext.push("site_or_app:#:"+siteorapp);
+    if (clickthrough_url !== "")
+      ext.push("clickthrough_url:#:"+clickthrough_url);
     if (ext.length !== 0) 
       x.ext_spec = ext;
     else
       x.ext_spec = undef;
+
 
 
     // alert(JSON.stringify(x,null,2));

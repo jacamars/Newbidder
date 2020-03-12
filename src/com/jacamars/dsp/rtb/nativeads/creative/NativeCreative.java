@@ -7,12 +7,14 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.common.URIEncoder;
 import com.jacamars.dsp.rtb.nativeads.assets.Asset;
 import com.jacamars.dsp.rtb.nativeads.assets.Entity;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
+import com.jacamars.dsp.rtb.tools.DbTools;
 
 /**
  * The native part of a creative.
@@ -61,7 +63,7 @@ public class NativeCreative {
 	}
 	
 	
-	public NativeCreative(JsonNode node) {
+	public NativeCreative(JsonNode node) throws Exception {
 		if (node.get("native_assets") != null) {
 			ArrayNode an = (ArrayNode)node.get("native_assets");
 			native_assets = new ArrayList<>();
@@ -91,6 +93,15 @@ public class NativeCreative {
 				
 		if (node.get("native_plcmttype") != null)
 			native_plcmttype = node.get("native_plcmttype").asInt();
+		
+		if (node.get("native_assets") != null) {
+			ArrayNode an = (ArrayNode)node.get("native_assets");
+			for (int i=0;i<an.size();i++) {
+				String sa = an.get(i).asText();
+				ObjectNode oj = DbTools.mapper.readValue(sa, ObjectNode.class);
+				assets.add(new Asset(oj));
+			}
+		}
 			
 	}	
 		

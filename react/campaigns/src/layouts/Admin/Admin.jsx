@@ -25,14 +25,21 @@ import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 import FixedPlugin from "components/FixedPlugin/FixedPlugin.jsx";
+import UserProfile from "../../views/Icons.jsx";
 
 import routes from "routes.js";
+
+import { useViewContext } from "../../ViewContext";
+
 
 import logo from "assets/img/react-logo.png";
 
 var ps;
 
 const Admin = (props) => {
+
+  const vx = useViewContext();
+
   const [backgroundColor, setBackgroundColor] = useState('blue');
   const [sidebarOpened, setSidebarOpened] = useState( document.documentElement.className.indexOf("nav-open") !== -1);
 
@@ -41,6 +48,7 @@ const Admin = (props) => {
     document.documentElement.classList.toggle("nav-open");
     setSidebarOpened(!sidebarOpened);
   };
+
 
   const getRoutes = routes => {
     return routes.map((prop, key) => {

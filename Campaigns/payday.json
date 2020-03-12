@@ -32,8 +32,9 @@
     "concurrency" : "1",
     "systemMacros": {
     	"{rtb_pixel}": "<img src='{pixel_url}/exchange={exchange}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/bid_id={bid_id}/ip={ip}/site_domain={site_domain}/lat={lat}/lon={lon}' height=1 width=1 style='display:none;'/>",
-    	"{rtb_click}": "<a href='$EXTERNAL/redirect?url=$EXTERNAL/test.html?EXCHANGE={exchange}&EXTERNAL=$EXTERNAL&AD_ID={ad_id}&CREATIVE_ID={creative_id}&BID_ID={bid_id}' target='_blank' rel='noopener'>",
+    	"{rtb_click}": "<a href='$EXTERNAL/redirect?url=_REDIRECT_URL_?EXCHANGE={exchange}&EXTERNAL=$EXTERNAL&AD_ID={ad_id}&CREATIVE_ID={creative_id}&BID_ID={bid_id}' target='_blank' rel='noopener'>",
     	"{/rtb_click}": "</a>"
+ 
     },
     "deadmanswitch":"accountingsystem",
     "threads": "128",

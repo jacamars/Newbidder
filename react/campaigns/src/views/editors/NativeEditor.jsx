@@ -33,61 +33,35 @@ var undef;
 
 const NativeEditor = (props) => {
 
-  const [rSelected, setRSelected] = useState(props.creative.dealType);
   const [count, setCount] = useState(0);
   const [assets, setAssets] = useState( props.creative.nativead.assets ); 
 
-  const newTitleAsset = () => {
-    var n = {
-      type: 'title',
-      text: ''
-    };
-    assets.push(n)
-    setAssets(assets);
-    setCount(count+1);
-  }
 
-  const newImageAsset = () => {
-    var n = {
-      type: 'image',
-      url: '',
-      w: 0,
-      h: 0
+  const newAsset = () => {
+    var a = {
+      title: {
+        text: ''
+      },
+      image: {
+        url: '',
+        w: 0,
+        h: 0
+      },
+      video: {
+        vasttag: ''
+      },
+      data: {
+        datatype: '',
+        label: '',
+        value: ''
+      },
+      link: {
+        url: '',
+        clicktracker: '',
+        fallback: ''
+      }
     };
-    assets.push(n)
-    setAssets(assets);
-    setCount(count+1);
-  }
-
-  const newVideoAsset = () => {
-    var n = {
-      type: 'video',
-      vasttag: '',
-    };
-    assets.push(n)
-    setAssets(assets);
-    setCount(count+1);
-  }
-
-  const newDataAsset = () => {
-    var n = {
-      type: 'data',
-      label: '',
-      value: ''
-    };
-    assets.push(n)
-    setAssets(assets);
-    setCount(count+1);
-  }
-
-  const newLinkAsset = () => {
-    var n = {
-      type: 'link',
-      url: '',
-      clicktrackers: [],
-      fallback: ''
-    };
-    assets.push(n)
+    assets.push(a);
     setAssets(assets);
     setCount(count+1);
   }
@@ -106,6 +80,39 @@ const NativeEditor = (props) => {
 
   return(
     <>
+      <Row>
+      <Col className="px-md-1" md="4">
+        <FormGroup>
+          <label>Link</label>
+          <Input
+            id="native_link"
+            onChange={(e) => props.callback(e,"native_link")}
+            defaultValue={props.creative.nativead.native_link}
+            type="text"/>
+      </FormGroup>
+      </Col>
+      <Col className="px-md-1" md="4">
+        <FormGroup>
+          <label>IMP Tracker</label>
+          <Input
+            id="native_trk_urls"
+            defaultValue={props.creative.nativead.native_trk_urls}
+            onChange={(e) => props.callback(e,"native_trk_urls")}
+            type="text"/>
+      </FormGroup>
+      </Col>
+      <Col className="px-md-1" md="4">
+        <FormGroup>
+          <label>JS Tracker</label>
+          <Input
+            id="native_plcmttype"
+            onChange={(e) => props.callback(e,"native_js_tracker")}
+            onChange={ (e) => props.callback(e,"native_js_tracker")}
+            defaultValue={props.creative.nativead.native_js_tracker}
+            type="textarea"/>
+      </FormGroup>
+      </Col>
+    </Row>
     <Row>
       <Col className="px-md-1" md="3">
         <FormGroup>
@@ -145,15 +152,7 @@ const NativeEditor = (props) => {
        <ButtonGroup>
         <Label>Assets</Label>
         &nbsp;
-        <Button color="success" size="sm" onClick={()=>newTitleAsset()}>Title</Button>
-        &nbsp;
-        <Button color="success" size="sm" onClick={()=>newImageAsset()}>Image</Button>
-        &nbsp;
-        <Button color="success" size="sm" onClick={()=>newVideoAsset()}>Video</Button>
-        &nbsp;
-        <Button color="success" size="sm" onClick={()=>newDataAsset()}>Data</Button>
-        &nbsp;
-        <Button color="success" size="sm" onClick={()=>newLinkAsset()}>Link</Button>
+        <Button color="success" size="sm" onClick={()=>newAsset()}>New</Button>
        </ButtonGroup>
        <hr/>
     </Row>

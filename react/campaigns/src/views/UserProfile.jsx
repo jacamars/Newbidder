@@ -317,7 +317,23 @@ const UserProfile = () => {
               </Card>
             </Col>
           </Row>
-}
+          }
+          <Row>
+          <Col md="8">
+              <Card>
+                <CardHeader>
+                  <h5 className="title">Edit Other Users</h5>
+                </CardHeader>
+                <CardBody>
+                </CardBody>
+                <CardFooter>
+                  <Button className="btn-fill" color="primary" type="submit" onClick={doSave}>
+                    Save
+                  </Button>
+                </CardFooter>
+              </Card>
+              </Col>
+          </Row>
         </div>
       </>
     );

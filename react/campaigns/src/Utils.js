@@ -32,19 +32,19 @@ const plcmtIds = [
 ];
 
 const assetTypes = [
-    {e:0, value:"0", content:"None (Not recommended)."},
-    {e:1, value:"1", content:"Sponsored"},
-    {e:2, value:"2", content:"Descriptive text"},
-    {e:3, value:"3", content:"Rating, formatted as a number"},
-    {e:4, value:"4", content:"Likes, formatted as a string"},
-    {e:5, value:"5", content:"Downloads, formatted as a number"},  
-    {e:6, value:"6", content:"Price of product. Include currency symbol"}, 
-    {e:7, value:"7", content:"Saleprice, if on sale"}, 
-    {e:8, value:"8", content:"Phone number"}, 
-    {e:9, value:"9", content:"Address"}, 
-    {e:10, value:"10", content:"Additional descriptive text"}, 
-    {e:11, value:"11", content:"Displayurl"}, 
-    {e:12, value:"5", content:"Call to Action Button Text"}, 
+    {e:'0', value:"0", content:"None (Not recommended)."},
+    {e:'1', value:"1", content:"Sponsored"},
+    {e:'2', value:"2", content:"Descriptive text"},
+    {e:'3', value:"3", content:"Rating, formatted as a number"},
+    {e:'4', value:"4", content:"Likes, formatted as a string"},
+    {e:'5', value:"5", content:"Downloads, formatted as a number"},  
+    {e:'6', value:"6", content:"Price of product. Include currency symbol"}, 
+    {e:'7', value:"7", content:"Saleprice, if on sale"}, 
+    {e:'8', value:"8", content:"Phone number"}, 
+    {e:'9', value:"9", content:"Address"}, 
+    {e:'10', value:"10", content:"Additional descriptive text"}, 
+    {e:'11', value:"11", content:"Displayurl"}, 
+    {e:'12', value:"5", content:"Call to Action Button Text"}, 
 ];
 
 export const ssp = ['Nexage','Admedia', 'Adprudence', 'Appnexus', 'Adventurefeeds','Atomx','Axonix','Bidswitch','c1x', 
@@ -101,7 +101,7 @@ export const placementType = (value) => {
 
 export const assetDataType = (value) => {
     var items = [];
-    alert("ASSET: " + value);
+    //alert("ASSET: " + value);
     if (value === undef) 
         value = 0;
 

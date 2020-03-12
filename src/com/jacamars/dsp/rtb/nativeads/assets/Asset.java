@@ -1,7 +1,11 @@
 package com.jacamars.dsp.rtb.nativeads.assets;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 /**
@@ -39,6 +43,62 @@ public class Asset  {
 	 * Empty constuctor used by Jackson when the campaign is created.
 	 */
 	public Asset() {
+		
+	}
+	
+	public Asset(ObjectNode oj) throws Exception {
+		JsonNode x = oj.get("title");
+		var str = x.get("text").asText();
+		if (str.length()!= 0) {
+			title = new Entity();
+			title.text = str;
+		}
+		
+		x = oj.get("image");
+		str = x.get("url").asText();
+		if (str.length() != 0) {
+			img = new Entity();
+			img.url = str;
+			img.w = x.get("w").asInt(0);
+			img.h = x.get("h").asInt(0);
+		}
+		
+		x = oj.get("link");
+		str = x.get("url").asText();
+		if (str != null) {
+			link = new Entity();
+			link.url = str;
+			str = x.get("clicktracker").asText();
+			link.clicktrackers = new ArrayList<>();
+			link.clicktrackers.add(str);
+			str = x.get("fallback").asText();
+			link.fallback = str;
+		}
+		
+		x = oj.get("data");
+		str = x.get("value").asText();
+		if (str.length() != 0) {
+			data = new Entity();
+			data.value = str;
+			data.label = x.get("label").asText();
+			data.type = x.get("datatype").asInt();
+		}
+		
+		x = oj.get("video");
+		str = x.get("htmltemplate").asText();
+		if (str != null) {
+			video = new Entity();
+			video.vasturl = str;
+			if (x.get("w") != null)
+				video.w = x.get("w").asInt(0);
+			if (x.get("h")!=null)
+				video.h = x.get("h").asInt(0);
+			video.mime_type = x.get("mime_type").asText();
+			video.duration = x.get("vast_video_duration").asInt(0);
+			video.protocol = x.get("vast_video_protocol").asText();
+			video.linearity = x.get("vast_video_linearity").asInt();
+			video.bitrate = x.get("vast_video_bitrate").asInt();
+		}
 		
 	}
 	

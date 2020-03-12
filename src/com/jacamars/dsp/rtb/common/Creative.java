@@ -998,6 +998,12 @@ public class Creative {
 		if (imageurl != null) // only used on banners
 			imageurl = Configuration.getInstance().replaceAllSystemMacros(imageurl);
 		
+		
+		if (extensions != null && extensions.get("clickthrough_url") != null) {
+			forwardurl = forwardurl.replace("_REDIRECT_URL_", extensions.get("clickthrough_url"));
+		}
+		
+		
 		MacroProcessing.findMacros(macros, forwardurl);
 		MacroProcessing.findMacros(macros, imageurl);
 
@@ -1053,7 +1059,9 @@ public class Creative {
 		if (ext_spec != null) {
 			extensions = new HashMap<>();
 			ext_spec.forEach((val)->{
-				String[] parts = val.split(":");
+				String[] parts = val.split(":#:");
+				if (parts.length==1)
+					parts = val.split(":");
 				extensions.put(parts[0], parts[1]);
 			});
 		}
