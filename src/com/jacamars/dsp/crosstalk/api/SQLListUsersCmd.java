@@ -44,9 +44,9 @@ public class SQLListUsersCmd extends ApiCommand {
 			try {
 				String select;
 				if (tokenData.isRtb4FreeSuperUser()) 
-					select = "select * from users";
+					select = "select * from users order by customer_id, username asc";
 				else
-					select = "select * from users where customer_id='"+tokenData.customer+"'";
+					select = "select * from users where customer_id='"+tokenData.customer+"' order by username asc";
 				var conn = CrosstalkConfig.getInstance().getConnection();
 				var stmt = conn.createStatement();
 				var prep = conn.prepareStatement(select);

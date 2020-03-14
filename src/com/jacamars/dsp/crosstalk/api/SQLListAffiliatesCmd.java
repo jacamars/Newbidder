@@ -44,7 +44,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 			try {
 				String select;
 				if (tokenData.isRtb4FreeSuperUser()) 
-					select = "select * from companies";
+					select = "select * from companies order by customer_id";
 				else
 					select = "select * from companies where customer_id='"+tokenData.customer+"'";
 				var conn = CrosstalkConfig.getInstance().getConnection();
@@ -78,6 +78,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 			String postalcode = rs.getString("postalcode");
 			Map m = new HashMap<>();
 			m.put("id", id);
+			m.put("email", email);
 			m.put("customer_id", customer);
 			m.put("telephone",telephone);
 			m.put("firstname",firstname);
