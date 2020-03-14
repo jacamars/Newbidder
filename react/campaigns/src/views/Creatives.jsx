@@ -89,7 +89,7 @@ var undef;
       c.deals = undef;
     }
 
-    if (c.ext_spec != undef) {
+    if (c.ext_spec !== undef) {
       var map = {};
       for (var i=0;i<c.ext_spec.length;i++) {
         var str = c.ext_spec[i];

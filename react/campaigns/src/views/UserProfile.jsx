@@ -18,6 +18,7 @@
 import React , { useState, useEffect } from "react";
 import {useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
+import EditSuperUser from '../EditSuperUser';
 
 // reactstrap components
 import {
@@ -52,8 +53,8 @@ const UserProfile = () => {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
     var email = document.getElementById("email").value;
-    var cid = document.getElementById('cid').value;
-    var role = document.getElementById("role").value;
+    var cid = vx.user.customer_id;
+    var role = vx.user.sub_id;
     var firstname = document.getElementById("firstname").value;
     var lastname = document.getElementById("lastname").value;
     var title = document.getElementById("title").value;
@@ -233,7 +234,7 @@ const UserProfile = () => {
                       <Col className="pl-md-1" md="4">
                         <FormGroup>
                           <label>Postal Code</label>
-                          <Input defaultValue={vx.user.postalcode} placeholder="ZIP Code" type="number" id="postalcode" />
+                          <Input defaultValue={vx.user.postalcode} placeholder="ZIP Code" type="text" id="postalcode" />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -294,7 +295,7 @@ const UserProfile = () => {
                       type="textarea"
                       id="description"
                     />
-                     <Input
+                    Picture url: <Input
                             defaultValue={vx.user.picture}
                             placeholder="Picture"
                             type="text"
@@ -318,22 +319,9 @@ const UserProfile = () => {
             </Col>
           </Row>
           }
-          <Row>
-          <Col md="8">
-              <Card>
-                <CardHeader>
-                  <h5 className="title">Edit Other Users</h5>
-                </CardHeader>
-                <CardBody>
-                </CardBody>
-                <CardFooter>
-                  <Button className="btn-fill" color="primary" type="submit" onClick={doSave}>
-                    Save
-                  </Button>
-                </CardFooter>
-              </Card>
-              </Col>
-          </Row>
+          { vx.user.sub_id === 'superuser' && 
+            <EditSuperUser />
+          }
         </div>
       </>
     );

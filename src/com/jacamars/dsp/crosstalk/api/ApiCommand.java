@@ -184,6 +184,18 @@ public class ApiCommand {
     public static final String GET_USER = "SQLGetUser#";
     
     public static final String SET_USER = "SQLAddNewUser#";
+    
+    public static final String SQLDELETE_USER = "SQLDeleteUser#";
+    
+    public static final String SQLLIST_USERS = "SQLListUsers#";
+    
+    public static final String SQLLIST_AFFILIATES = "SQLListAffiliates#";
+    
+    public static final String SQLGET_AFFILIATES = "SQLGetAffiliate#";
+    
+    public static final String SQLDELETE_AFFILIATE = "SQLDeleteAffiliate#";
+    
+    public static final String SQLADD_AFFILIATE = "SQLAddNewAffiliate#";
    
     /**
      * This class'es sl4j log object
@@ -307,6 +319,8 @@ public class ApiCommand {
      */
     public static ApiCommand instantiate(String ip, String data) throws Exception {
     	
+        logger.info("From IP: {}, size: {}, command: {}", ip, data.length(), data);
+        
         int i = data.indexOf("\"type");
         int j = data.substring(i).indexOf("#");
         String token = data.substring(i + 8, i + j + 1);
@@ -316,7 +330,6 @@ public class ApiCommand {
         
         boolean requireLeader = false;
         
-        logger.info("From IP: {}, size: {}, command: {}", ip, data.length(), data);
         switch (token) {
             case Ping:
                 cmd = mapper.readValue(data, PingCmd.class);
@@ -514,6 +527,26 @@ public class ApiCommand {
             	
             case SET_USER:
             	cmd = mapper.readValue(data, SQLAddNewUserCmd.class);
+            	break;
+            	
+            case SQLDELETE_USER:
+            	cmd = mapper.readValue(data, SQLDeleteUserCmd.class);
+            	break;
+            	
+            case SQLLIST_USERS:
+            	cmd = mapper.readValue(data,  SQLListUsersCmd.class);
+            	break;
+            	
+            case SQLLIST_AFFILIATES:
+            	cmd = mapper.readValue(data, SQLListAffiliatesCmd.class);
+            	break;
+            	
+            case SQLADD_AFFILIATE:
+            	cmd = mapper.readValue(data,  SQLAddAffiliateCmd.class);
+            	break;
+            	
+            case SQLDELETE_AFFILIATE:
+            	cmd = mapper.readValue(data,  SQLDeleteAffiliateCmd.class);
             	break;
             	
             	

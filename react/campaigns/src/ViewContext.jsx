@@ -232,6 +232,38 @@ const  ViewContext = () => {
       return user;
     }
 
+    const addNewUser = async(user) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        user: JSON.stringify(user),
+        type: "SQLAddNewUser#"
+      };
+      var data = await execute(cmd);
+      console.log("AddNewUser returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+    
+      return true;
+    }
+
+    const addNewAffiliate = async(af) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        affiliate: JSON.stringify(af),
+        type: "SQLAddNewAffiliate#"
+      };
+      var data = await execute(cmd);
+      console.log("AddNewAffiliate returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
+    
+      return true;
+    }
+
     const setNewUser = async(user) => {
       // get a token, if the tokken is valid, proceed
 
@@ -251,22 +283,33 @@ const  ViewContext = () => {
       return true;
     }
 
-    const deleteUser = async(user, cid) => {
+    const deleteUser = async(id) => {
       // get a token, if the tokken is valid, proceed
 
       var cmd = {
         token: jwt,
-        user: user,
-        customer_id: cid,
+        id: id,
         type: "SQLDeleteUser#"
       };
       var data = await execute(cmd);
       console.log("SetNewUser returns: " + JSON.stringify(data,null,2));
       if (data === undef)
         return;
-      
-      var u = JSON.parse(data.user);
-      setUser(u);
+      return true;
+    }
+
+    const deleteAffiliate = async(id) => {
+      // get a token, if the tokken is valid, proceed
+
+      var cmd = {
+        token: jwt,
+        id: id,
+        type: "SQLDeleteAffiliate#"
+      };
+      var data = await execute(cmd);
+      console.log("DeleteAffiliate returns: " + JSON.stringify(data,null,2));
+      if (data === undef)
+        return;
       return true;
     }
 
@@ -282,10 +325,23 @@ const  ViewContext = () => {
       if (data === undef)
         return;
       
-      var u = JSON.parse(data.user);
-      setUser(u);
-      return true;
+      return data.users;
     }
+
+    const listAffiliates = async() => {
+      // get a token, if the tokken is valid, proceed
+      var cmd = {
+       token: jwt,
+       type: "SQLListAffiliates#"
+     };
+     var data = await execute(cmd);
+     if (data === undef)
+       return;
+     
+     var u = data.affiliates;
+     console.log("ListAffiliates returns: " + JSON.stringify(u,null,2));
+     return u;
+   }
 
     const getBidders = async() => {
 
@@ -765,7 +821,7 @@ const  ViewContext = () => {
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
       changeWinsent, 
 
-      user, getUser, setNewUser, deleteUser, listUsers
+      user, getUser, setNewUser, deleteUser, listUsers, listAffiliates, deleteAffiliate, addNewUser, addNewAffiliate
     };
 };
 
