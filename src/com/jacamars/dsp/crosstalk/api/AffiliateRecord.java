@@ -1,5 +1,6 @@
 package com.jacamars.dsp.crosstalk.api;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +22,7 @@ public class AffiliateRecord {
 	public String citystate;
 	public String country;
 	public String postalcode;
+	public BigDecimal budget;
 
 	
 	public AffiliateRecord() {
@@ -46,6 +48,7 @@ public class AffiliateRecord {
 		citystate = rs.getString("citystate");
 		country = rs.getString("country");
 		postalcode = rs.getString("postalcode");
+		budget = rs.getBigDecimal("budget");
 		
 	}
 	
@@ -66,8 +69,9 @@ public class AffiliateRecord {
 				+"address,"
 				+"citystate,"
 				+"country,"
-				+"postalcode"
-				+") values(?,?,?,?,?,?,?,?,?);";
+				+"postalcode,"
+				+"budget"
+				+") values(?,?,?,?,?,?,?,?,?,?);";
 		PreparedStatement p = conn.prepareStatement(sql);
 		int k = 1;
 		k = insert(k,p,customer_id);
@@ -79,6 +83,7 @@ public class AffiliateRecord {
 		k = insert(k,p,citystate);
 		k = insert(k,p,country);
 		k = insert(k,p,postalcode);
+		k = insert(k,p,budget);
 		
 		id = p.executeUpdate();
 	}
@@ -93,7 +98,8 @@ public class AffiliateRecord {
 				+"address=?,"
 				+"citystate=?,"
 				+"country=?,"
-				+"postalcode=?"
+				+"postalcode=?,"
+				+"budget=?"
 				+" where id=?";
 		PreparedStatement p = conn.prepareStatement(sql);
 		int k = 1;
@@ -106,6 +112,7 @@ public class AffiliateRecord {
 		k = insert(k,p,citystate);
 		k = insert(k,p,country);
 		k = insert(k,p,postalcode);
+		k = insert(k,p,budget);
 		k = insert(k,p,id);
 		
 		p.execute();
@@ -121,6 +128,11 @@ public class AffiliateRecord {
 	
 	int insert(int k,PreparedStatement p, int value) throws Exception {
 		p.setInt(k,  value);
+		return ++k;
+	}
+	
+	int insert(int k, PreparedStatement p, BigDecimal value) throws Exception {
+		p.setBigDecimal(k, value);
 		return ++k;
 	}
 }

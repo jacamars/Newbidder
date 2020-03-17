@@ -1,6 +1,7 @@
 package com.jacamars.dsp.crosstalk.api;
 
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -76,6 +77,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 			String citystate = rs.getString("citystate");
 			String  country = rs.getString("country");
 			String postalcode = rs.getString("postalcode");
+			BigDecimal budget = rs.getBigDecimal("budget");
 			Map m = new HashMap<>();
 			m.put("id", id);
 			m.put("email", email);
@@ -87,6 +89,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 			m.put("citystate",citystate);
 			m.put("country",country);
 			m.put("postalcode",postalcode);
+			m.put("budget", budget);
 			
 			
 			list.add(m);

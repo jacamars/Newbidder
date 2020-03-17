@@ -159,7 +159,8 @@ public enum Crosstalk {
 				"sql/create/banner_videos_rtb_standards.sql", "sql/create/banners.sql",
 				"sql/create/campaigns_rtb_standards.sql", "sql/create/campaigns.sql",
 				"sql/create/rtb_standards.sql", "sql/create/exchange_attributes.sql", "sql/create/targets.sql",
-				"sql/create/banner_audios.sql", "sql/create/banner_natives.sql","sql/create/users.sql","sql/create/cande.sql");
+				"sql/create/banner_audios.sql", "sql/create/banner_natives.sql","sql/create/users.sql",
+				"sql/create/companies.sql","sql/create/cande.sql");
 
 		final var stmt = conn.createStatement();
 		specs.stream().forEach(e -> {

@@ -1,9 +1,12 @@
 import React , { useState, useEffect } from "react";
 import {useViewContext } from "./ViewContext";
+import LoginModal from './LoginModal'
 
 // reactstrap components
 import {
+  Alert,
   Button,
+  ButtonGroup,
   Card,
   CardHeader,
   CardBody,
@@ -16,6 +19,7 @@ import {
   Table,
   Col
 } from "reactstrap";
+import { PayPalButton } from "react-paypal-button-v2";
 import ViewAssets from "./views/editors/ViewAssets";
 
 var undef;
@@ -26,8 +30,11 @@ const EditSuperUser = () => {
   const [users, setUsers] = useState([]);
   const [affiliates, setAffiliates] = useState([]);
   const [count, setCount] = useState(1);
-  const [show, setShow] = useState(false);
-;
+  const [paypal, setPaypal] = useState(false);
+  const [amount, setAmount] = useState(.02);
+  const [paypalUser, setPaypallUser] = useState(-1);
+  const [showPaypalwidget, setShowPaypalwidget] = useState(false);
+
 
   const refresh = async () => {
     var list = await vx.listAffiliates();
@@ -35,8 +42,12 @@ const EditSuperUser = () => {
     setAffiliates(list);
 
     setUsers(us);
-    setShow(true);
   }
+
+  useEffect(() => {    
+    refresh();
+  },[]);
+
 
   const newCompany = () => {
     var company = {
@@ -51,6 +62,7 @@ const EditSuperUser = () => {
         country: '',
         postalcode: '',
         description: '',
+        budget:'0'
     };
 
     affiliates.push(company);
@@ -93,6 +105,18 @@ const EditSuperUser = () => {
     await vx.addNewAffiliate(u);
     setAffiliates(await vx.listAffiliates());
     setCount(count+1);
+
+    alert("Affiliate: " + u.customer_id + " saved");
+  }
+
+  const updateTheBudgetFor = async() => {
+    var u = affiliates[paypalUser];
+    u.budget =  Number(u.budget) + Number(amount);
+    await vx.addNewAffiliate(u);
+    setAffiliates(await vx.listAffiliates());
+    setCount(count+1);
+
+    alert("Budget: " + u.customer_id + " updated");
   }
 
   const deleteCompany = async (index) => {
@@ -125,6 +149,8 @@ const EditSuperUser = () => {
     await vx.addNewUser(u);
     setUsers(await vx.listUsers());
     setCount(count+1);
+
+    alert("User: " + u.username + " saved");
   }
 
   const deleteUser = async (index) => {
@@ -142,15 +168,30 @@ const EditSuperUser = () => {
     setCount(count+1);
   }
 
+  const addBudget = async (index) => {
+    var c = affiliates[index];
+    setPaypallUser(index);
+    setAmount(100.0);
+    setPaypal(true);
+  }
+
+  const setInstances = async() => {
+    var list = await vx.listAffiliates();
+    var us = await vx.listUsers();
+    setAffiliates(list);
+
+    setUsers(us);
+  }
+
   const getCompanies = () => {
     var items = [];
 
-    console.log("AFFILIATES: " + JSON.stringify(affiliates,null,2));
     affiliates.map((row, index) => {
         items.push(
             <tr key={'aff-' + index}>
             <td>{index}</td>
             <td key={'aff-name-' + index}><Input 
+              disabled={vx.user.customer_id != 'rtb4free'}
               onChange={(e) => changeCompanyField(e,index,'customer_id')}
               defaultValue={row.customer_id}/></td>
             <td key={'aff-email-' + index}><Input
@@ -174,10 +215,14 @@ const EditSuperUser = () => {
             <td key={'aff-pc-' + index}><Input
               onChange={(e) => changeCompanyField(e,index,'postal_code')}
               defaultValue={row.postalcode}/></td>
+              <td key={'aff-budget-' + index}  className="text-right">
+              {row.budget}</td>
             <td className="text-center">
               <Button color="success" size="sm" onClick={()=>editCompany(index)}>Save</Button>
               &nbsp;
               <Button color="warning" size="sm" onClick={()=>deleteCompany(index)}>Delete</Button>
+              &nbsp;
+              <Button color="info" size="sm" onClick={()=>addBudget(index)}>Budget</Button>
             </td>
           </tr>
         );
@@ -220,20 +265,79 @@ const EditSuperUser = () => {
     return items;
   }
 
-  const doSave = () => {
+  const handleBudget = () => {
+    if (vx.user.customer_id === 'rtb4free') {
+      updateTheBudgetFor(paypalUser);
+      setPaypal(false);
+      setPaypallUser(-1)
+      setAmount(0);
+    } else {
+      setShowPaypalwidget(true);
+    }
+  }
 
+  const cancelPaypal = () => {
+    setPaypallUser(-1);
+    setPaypal(false);
+    setShowPaypalwidget(false);
   }
 
   return(
     <>
-    <Row>
-      <Col>
-      <Button className="btn-fill" color="success" type="submit" onClick={refresh}>Administration</Button>
+   { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
+
+   { paypal && <>
+    <Alert color="success">
+      <Row>
+      <Col className="px-md-1" md="1">
+        <FormGroup>
+          <label>Add Amount</label>
+          <Input
+              defaultValue={amount}
+              placeholder="Budget"
+              onChange={(e)=>{setAmount(e.target.value)}}
+              type="text"
+              disabled={showPaypalwidget}
+          />
+        </FormGroup>
       </Col>
-    </Row>
-   { show && vx.user.customer_id === 'rtb4free' &&
+      <Col className="px-md-1" md="2">
+        <ButtonGroup>
+        <Button className="btn-fill" color="success" type="submit" onClick={handleBudget}>Add Funds</Button>
+        <Button className="btn-fill" color="warn" type="submit" onClick={cancelPaypal}>Cancel</Button>
+        </ButtonGroup>
+      </Col>
+      <Col  className="px-md-1" md="1">
+        {' '}
+      </Col>
+      { showPaypalwidget &&
+      <Col  className="px-md-1" md="4">
+        <PayPalButton
+        amount= {amount.toString()}
+        shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
+        onSuccess={(details, data) => {
+          setPaypal(false);
+          updateTheBudgetFor(paypalUser);
+          // alert("Transaction completed by index: " + paypalUser + ", " + details.payer.name.given_name + " Amount: " + amount);
+          
+          // OPTIONAL: Call your server to save the transaction
+          return fetch("/paypal-transaction-complete", {
+            method: "post",
+            body: JSON.stringify({
+              orderId: data.orderID
+            })
+          });
+        }}
+        />
+      </Col>}
+      </Row>
+      </Alert>
+      </>
+   }
+
+   { vx.loggedIn && vx.user.sub_id === 'superuser' &&
     <Row>
-        <Col md="8">
+        <Col md="12">
         <Card>
          <CardHeader>
            <h5 className="title">Edit Affiliates</h5>
@@ -252,6 +356,7 @@ const EditSuperUser = () => {
                         <th className="text-right">Address</th>
                         <th className="text-right">City, State</th>
                         <th className="text-right">Postal Code</th>
+                        <th className="text-right">Account</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -265,9 +370,9 @@ const EditSuperUser = () => {
        </Col>
    </Row>
    }
+    {vx.loggedIn && 
     <Row>
-      {show && 
-      <Col md="8">
+      <Col md="12">
         <Card>
          <CardHeader>
            <h5 className="title">Edit Users</h5>
@@ -293,8 +398,8 @@ const EditSuperUser = () => {
         
          </CardFooter>
        </Card>
-       </Col>}
-    </Row>
+       </Col>
+    </Row>}
    </>
   );
 

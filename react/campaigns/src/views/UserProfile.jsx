@@ -41,6 +41,7 @@ const UserProfile = () => {
 
   const vx = useViewContext();
   const [count, setCount] = useState(1);
+  const [admin, setAdmin] = useState(false);
 
 
   const setInstances = async() => {
@@ -88,15 +89,44 @@ const UserProfile = () => {
     setCount(count+1);
   }
 
+  const doProfile = () => {
+    setAdmin(false);
+  }
+
+  const doAdmin  = () => {
+    setAdmin(true)
+  }
+
   const CENTER = { 
       textAlign: "center"
   }
 
+    if (admin) {
+      return (
+        <>
+        <div className="content">
+        <Row>
+          <Col>
+            <Button className="btn-fill" color="success" type="submit" onClick={doProfile}>Edit User Profile</Button>
+          </Col>
+        </Row>
+          <EditSuperUser />
+        </div>
+       </>
+      );
+    }
+    else {
     return (
       <>
         <div key={"profile-"+count} className="content">
         { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
-        { vx.user.company &&
+        { vx.loggedIn && vx.user.sub_id === 'superuser' &&
+          <>
+          <Row>
+            <Col>
+              <Button className="btn-fill" color="success" type="submit" onClick={doAdmin}>Admin Users</Button>
+            </Col>
+          </Row>
           <Row>
             <Col md="8">
               <Card>
@@ -318,13 +348,12 @@ const UserProfile = () => {
               </Card>
             </Col>
           </Row>
-          }
-          { vx.user.sub_id === 'superuser' && 
-            <EditSuperUser />
+          </>
           }
         </div>
       </>
     );
+        }
 }
 
 export default UserProfile;
