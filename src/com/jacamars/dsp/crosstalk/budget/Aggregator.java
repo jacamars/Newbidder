@@ -1,26 +1,42 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.nio.entity.NStringEntity;
-import org.apache.http.util.EntityUtils;
+import javax.net.ssl.SSLContext;
 
+
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.nio.entity.NStringEntity;
+
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +161,68 @@ public class Aggregator {
 		restClient = RestClient.builder(new HttpHost(host, port, "http")).build();
 	}
 
+	public Aggregator(int mode, String host, int port, String username, String password) throws Exception {
+		this.mode = mode;
+		if (mode != TOTAL)
+			content = new String(Files.readAllBytes(Paths.get(DAILY_FILE)), StandardCharsets.UTF_8);
+		else
+			content = new String(Files.readAllBytes(Paths.get(TOTAL_FILE)), StandardCharsets.UTF_8);
+
+		
+		final CredentialsProvider credentialsProvider =
+			    new BasicCredentialsProvider();
+			credentialsProvider.setCredentials(AuthScope.ANY,
+			    new UsernamePasswordCredentials(username, password));
+
+			RestClientBuilder builder = RestClient.builder(
+			    new HttpHost(host, port))
+			    .setHttpClientConfigCallback(new HttpClientConfigCallback() {
+			        @Override
+			        public HttpAsyncClientBuilder customizeHttpClient(
+			                HttpAsyncClientBuilder httpClientBuilder) {
+			            return httpClientBuilder
+			                .setDefaultCredentialsProvider(credentialsProvider);
+			        }
+			    });
+			
+			restClient = builder.build();
+	}
+	
+	// Source: https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_encrypted_communication.html
+	public Aggregator(int mode, String host, int port, String username, String password, String certPath) throws Exception {
+		this.mode = mode;
+		if (mode != TOTAL)
+			content = new String(Files.readAllBytes(Paths.get(DAILY_FILE)), StandardCharsets.UTF_8);
+		else
+			content = new String(Files.readAllBytes(Paths.get(TOTAL_FILE)), StandardCharsets.UTF_8);
+		
+		Path caCertificatePath = Paths.get(certPath);
+		CertificateFactory factory =
+		    CertificateFactory.getInstance("X.509");
+		Certificate trustedCa;
+		try (InputStream is = Files.newInputStream(caCertificatePath)) {
+		    trustedCa = factory.generateCertificate(is);
+		}
+		KeyStore trustStore = KeyStore.getInstance("pkcs12");
+		trustStore.load(null, null);
+		trustStore.setCertificateEntry("ca", trustedCa);
+		org.apache.http.conn.ssl.SSLContextBuilder sslContextBuilder = SSLContexts.custom()
+		    .loadTrustMaterial(trustStore, null);
+		final SSLContext sslContext = sslContextBuilder.build();
+		RestClientBuilder builder = RestClient.builder(
+		    new HttpHost(host, port, "https"))
+		    .setHttpClientConfigCallback(new HttpClientConfigCallback() {
+		        @Override
+		        public HttpAsyncClientBuilder customizeHttpClient(
+		            HttpAsyncClientBuilder httpClientBuilder) {
+		            return httpClientBuilder.setSSLContext(sslContext);
+		        }
+		    });
+		
+		restClient = builder.build();
+	}
+
+
 	/**
 	 * Close the elk rest client.
 	 * @throws Exception on network errors.
@@ -219,12 +297,15 @@ public class Aggregator {
 		   index = "bidagg-*";
 		}
 
-		HttpEntity entity = new NStringEntity(data, ContentType.APPLICATION_JSON);
 		Response indexResponse = null;
 
 		try {
-			indexResponse = restClient.performRequest("GET", "/" + index + "/_search",
-				Collections.<String, String>emptyMap(), entity);
+			
+		    Request request = new Request("GET", "/" + index + "/_search");
+		    request.setEntity(new NStringEntity(
+                    "{\"json\":\"text\"}",
+                    ContentType.APPLICATION_JSON));
+			indexResponse = restClient.performRequest(request);
 		} catch (Exception e) {
 			// e.printStackTrace();
 			logger.error("*** ELK TEST, Index is missing for {}, msg: {}",index, e.getMessage());
@@ -239,7 +320,7 @@ public class Aggregator {
 		revolution++;
 
 	}
-
+ 
 	/**
 	 * Do the total query.
 	 * @param indexResponse Response. The returned values from ELK.

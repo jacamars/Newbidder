@@ -78,7 +78,7 @@ public enum BudgetController {
 	 */
 	public static BudgetController getInstance(String host1, String host2, int port) throws Exception {
 
-		BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host1, port);
+		BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host1, port); 
 		BudgetController.daily = new Aggregator(Aggregator.DAILY, host1, port);
 		BudgetController.total = new Aggregator(Aggregator.TOTAL, host2, port);
 		BudgetController.lastLog = new LastLogTracker(host1, port);
@@ -93,6 +93,27 @@ public enum BudgetController {
 			}
 		}, 0L, 60000, TimeUnit.MILLISECONDS);
 
+		return INSTANCE;
+	}
+	
+	public static BudgetController getInstance(Elk elk) throws Exception  {
+		String host = elk.getHost();
+		int port = elk.getPort();
+		if (elk.getElasticUser() == null) {
+			BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host, port); 
+			BudgetController.daily = new Aggregator(Aggregator.DAILY, host, port);
+			BudgetController.total = new Aggregator(Aggregator.TOTAL, host, port);
+			BudgetController.lastLog = new LastLogTracker(host, port);
+		} else {
+			String username = elk.getElasticUser();
+			String password = elk.getElasticPassword();
+			String path = elk.getElasticCaPath();
+			
+			BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host, port, username, password, path); 
+			BudgetController.daily = new Aggregator(Aggregator.DAILY, host, port, username, password, path);
+			BudgetController.total = new Aggregator(Aggregator.TOTAL, host, port, username, password, path);
+			BudgetController.lastLog = new LastLogTracker(host, port, username, password, path);
+		}
 		return INSTANCE;
 	}
 	

@@ -44,9 +44,9 @@ public enum CrosstalkConfig {
 		statement = connect.createStatement();
 		
 		if (crosstalk.get("elk")==null) 
-			throw new Exception("ELK is not configured");
+			throw new Exception("ELK is not configured"); 
 		
-		elk = new Elk((Map<String,String>)crosstalk.get("elk"));
+		elk = Elk.build((Map)crosstalk.get("elk"));
 		
 		String webaccess = (String)crosstalk.get("webaccess");
 		if (webaccess != null && webaccess.length() != 0) {

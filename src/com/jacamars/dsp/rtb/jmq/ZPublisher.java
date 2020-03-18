@@ -22,7 +22,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.kafka.clients.producer.*;
-
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -773,18 +773,18 @@ public class ZPublisher implements Runnable, Callback {
                         document = mapper.writeValueAsString(msg);
                         xtopic = getElasticSearchIndex(msg);
                     }
-
-                    StringBuilder topo = new StringBuilder();
-
-                    Map<String, String> params = Collections.emptyMap();
-                    HttpEntity entity = new NStringEntity(document, ContentType.APPLICATION_JSON);
-                    Response response = esClient.performRequest("PUT", xtopic, params, entity);
+                    
+                    Request request = new Request("PUT",xtopic);
+                    request.setEntity(new NStringEntity(
+                            "{\"json\":\"text\"}",
+                            ContentType.APPLICATION_JSON));
+                    Response response = esClient.performRequest(request);
                     System.out.println(response);
 
                 }
                 Thread.sleep(1);
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace(); 
                 // return;
             }
         }

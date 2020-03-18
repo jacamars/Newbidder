@@ -26,7 +26,7 @@ public enum  Env {
 
     	if (address == null)
 			return address;
-    	
+    	 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		 while (address.contains("$BIDSCHANNEL"))

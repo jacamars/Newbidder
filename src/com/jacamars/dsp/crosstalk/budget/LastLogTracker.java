@@ -1,22 +1,34 @@
 package com.jacamars.dsp.crosstalk.budget;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -62,8 +74,38 @@ public class LastLogTracker {
 	 */
 	public LastLogTracker(String host, int port) throws Exception {
 		restClient = RestClient.builder(new HttpHost(host, port, "http")).build();
-		contents = new String(Files.readAllBytes(Paths.get(LASTLOG)), StandardCharsets.UTF_8);
+		contents = new String(Files.readAllBytes(Paths.get(LASTLOG)), StandardCharsets.UTF_8); 
 	}
+	
+	public LastLogTracker(String host, int port, String username, String password, String certPath) throws Exception {
+		contents = new String(Files.readAllBytes(Paths.get(LASTLOG)), StandardCharsets.UTF_8); 
+		
+		Path caCertificatePath = Paths.get(certPath);
+		CertificateFactory factory =
+		    CertificateFactory.getInstance("X.509");
+		Certificate trustedCa;
+		try (InputStream is = Files.newInputStream(caCertificatePath)) {
+		    trustedCa = factory.generateCertificate(is);
+		}
+		KeyStore trustStore = KeyStore.getInstance("pkcs12");
+		trustStore.load(null, null);
+		trustStore.setCertificateEntry("ca", trustedCa);
+		org.apache.http.conn.ssl.SSLContextBuilder sslContextBuilder = SSLContexts.custom()
+		    .loadTrustMaterial(trustStore, null);
+		final SSLContext sslContext = sslContextBuilder.build();
+		RestClientBuilder builder = RestClient.builder(
+		    new HttpHost(host, port, "https"))
+		    .setHttpClientConfigCallback(new HttpClientConfigCallback() {
+		        @Override
+		        public HttpAsyncClientBuilder customizeHttpClient(
+		            HttpAsyncClientBuilder httpClientBuilder) {
+		            return httpClientBuilder.setSSLContext(sslContext);
+		        }
+		    });
+		
+		restClient = builder.build();
+	}
+
 
 	/**
 	 * Query the Last log. Watch out, rolling over a day might mean no index for the day is available.
@@ -76,8 +118,13 @@ public class LastLogTracker {
 		String data = contents;
 		HttpEntity entity = new NStringEntity(data, ContentType.APPLICATION_JSON);
 		Response indexResponse = null;
-		try {
-			indexResponse = restClient.performRequest("GET", index + "/_search",Collections.<String, String>emptyMap(), entity);
+		try { 
+		    Request request = new Request("GET",  index + "/_search");
+		    request.setEntity(new NStringEntity(
+                    "{\"json\":\"text\"}",
+                    ContentType.APPLICATION_JSON));
+		    
+			indexResponse = restClient.performRequest(request);
 		} catch (Exception error) {
 			// We might have just crossed the day, so go back 1
 			if (error.toString().contains("404")) {
@@ -85,7 +132,13 @@ public class LastLogTracker {
 			    cal.add(Calendar.DATE, -1);
 				index  = "/wins-" + format1.format(cal.getTime());
 				entity = new NStringEntity(data, ContentType.APPLICATION_JSON);
-				indexResponse = restClient.performRequest("GET", index + "/_search",Collections.<String, String>emptyMap(), entity);
+				
+			    Request request = new Request("GET",  index + "/_search");
+			    request.setEntity(new NStringEntity(
+	                    "{\"json\":\"text\"}",
+	                    ContentType.APPLICATION_JSON));
+				indexResponse = restClient.performRequest(request);
+				
 			}
 			else
 				throw error;
