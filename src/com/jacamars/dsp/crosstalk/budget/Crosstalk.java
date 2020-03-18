@@ -118,7 +118,7 @@ public enum Crosstalk {
 		}
 
 		// Start the connection to elastic search
-		BudgetController.getInstance();
+		BudgetController.getInstance(CrosstalkConfig.elk);
 
 		Config config = RTBServer.getSharedInstance().getConfig();
 		deletedCampaigns = RTBServer.getSharedInstance().getMap(DELETED_CAMPAIGNS_KEY);
