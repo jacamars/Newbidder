@@ -693,15 +693,17 @@ public class RTBServer implements Runnable {
 			
 			server.join();
 		} catch (Exception error) {
+			String reason = error.getMessage();
+			error.printStackTrace();
 			if (error.toString().contains("Interrupt"))
 
 				try {
-					logger.error("HALT: : {}", error.toString());
+					logger.error("HALT: : {}", reason);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			else
-				logger.error("HALT: : {}", error.toString());
+				logger.error("HALT: : {}", reason);
 			System.exit(1);
 		}
 	}

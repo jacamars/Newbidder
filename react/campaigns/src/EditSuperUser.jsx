@@ -21,6 +21,7 @@ import {
 } from "reactstrap";
 import { PayPalButton } from "react-paypal-button-v2";
 import ViewAssets from "./views/editors/ViewAssets";
+import {uuidv4, customerIds} from "./Utils"
 
 var undef;
 
@@ -42,6 +43,7 @@ const EditSuperUser = () => {
     setAffiliates(list);
 
     setUsers(us);
+    setCount(count+1);
   }
 
   useEffect(() => {    
@@ -52,7 +54,7 @@ const EditSuperUser = () => {
   const newCompany = () => {
     var company = {
         id: 0,
-        customer_id: '',
+        customer_id: uuidv4(),
         email: '',
         telephone: '',
         firstname: '',
@@ -193,7 +195,7 @@ const EditSuperUser = () => {
             <td key={'aff-name-' + index}><Input 
               disabled={vx.user.customer_id != 'rtb4free'}
               onChange={(e) => changeCompanyField(e,index,'customer_id')}
-              defaultValue={row.customer_id}/></td>
+              type="select">{customerIds(affiliates,row.customer_id)}</Input></td>
             <td key={'aff-email-' + index}><Input
               onChange={(e) => changeCompanyField(e,index,'email')}
               defaultValue={row.email}/></td>
@@ -236,12 +238,10 @@ const EditSuperUser = () => {
         items.push(
             <tr key={'user-' + index}>
             <td>{index}</td>
-            <td key={'u-name-' + index}>
-                <Input 
-                    type="text"
-                    defaultValue={row.customer_id} 
-                    onChange={(e) => changeUserField(e,index,'customer_id')}
-                    disabled={vx.user.customer_id !== 'rtb4free'}/></td>
+              <td key={'u-name-' + index}><Input 
+                  disabled={vx.user.customer_id != 'rtb4free'}
+                  onChange={(e) => changeUserField(e,index,'customer_id')}
+                  type="select">{customerIds(affiliates,row.customer_id)}</Input></td>
             <td key={'u-role' + index}>
                 <Input 
                     defaultValue={row.sub_id}
@@ -344,6 +344,8 @@ const EditSuperUser = () => {
          </CardHeader>
          <CardBody>
          <Button className="btn-fill" color="primary" type="submit" onClick={newCompany}>+Affiliates</Button>
+         &nbsp;
+        <Button color="warning" size="sm" onClick={()=>refresh()}>Revert</Button>
             <Table key={"afn-table-"+count} size="sm">
                 <thead>
                     <tr>
@@ -356,7 +358,7 @@ const EditSuperUser = () => {
                         <th className="text-right">Address</th>
                         <th className="text-right">City, State</th>
                         <th className="text-right">Postal Code</th>
-                        <th className="text-right">Account</th>
+                        <th className="text-right">Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -379,6 +381,8 @@ const EditSuperUser = () => {
          </CardHeader>
          <CardBody>
             <Button className="btn-fill" color="primary" type="submit" onClick={newUser}>+User</Button>
+            &nbsp;
+            <Button color="warning" size="sm" onClick={()=>refresh()}>Revert</Button>
             <Table key={"afn-table-"+count} size="sm">
                 <thead>
                     <tr>

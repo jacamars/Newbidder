@@ -14,6 +14,7 @@ public class AffiliateRecord {
 
 	public int id;
 	public String customer_id;
+	public String customer_name;
 	public String email;
 	public String telephone;
 	public String firstname;
@@ -40,6 +41,7 @@ public class AffiliateRecord {
 		}
 		id = rs.getInt("id");
 		customer_id = rs.getString("customer_id");
+		customer_name = rs.getString("customer_name");
 		email = rs.getString("email");
 		telephone = rs.getString("telephone");
 		firstname = rs.getString("firstname");
@@ -62,6 +64,7 @@ public class AffiliateRecord {
 	void doNew() throws Exception {
 		Connection conn =  CrosstalkConfig.getInstance().getConnection();
 		String sql = "insert into companies (customer_id,"
+				+"customer_name,"
 				+"email,"
 				+"telephone,"
 				+"firstname,"
@@ -71,10 +74,11 @@ public class AffiliateRecord {
 				+"country,"
 				+"postalcode,"
 				+"budget"
-				+") values(?,?,?,?,?,?,?,?,?,?);";
+				+") values(?,?,?,?,?,?,?,?,?,?,?);";
 		PreparedStatement p = conn.prepareStatement(sql);
 		int k = 1;
 		k = insert(k,p,customer_id);
+		k = insert(k,p,customer_name);
 		k = insert(k,p,email);
 		k = insert(k,p,telephone);
 		k = insert(k,p,firstname);
@@ -91,6 +95,7 @@ public class AffiliateRecord {
 	void doUpdate() throws Exception {
 		Connection conn =  CrosstalkConfig.getInstance().getConnection();
 		String sql = "update  companies set customer_id=?,"
+				+"customer_name=?"
 				+"email=?,"
 				+"telephone=?,"
 				+"firstname=?,"
@@ -104,6 +109,7 @@ public class AffiliateRecord {
 		PreparedStatement p = conn.prepareStatement(sql);
 		int k = 1;
 		k = insert(k,p,customer_id);
+		k = insert(k,p,customer_name);
 		k = insert(k,p,email);
 		k = insert(k,p,telephone);
 		k = insert(k,p,firstname);

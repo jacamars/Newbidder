@@ -89,6 +89,10 @@ const UserProfile = () => {
     setCount(count+1);
   }
 
+  const refresh = () => {
+    setCount(count+1);
+  }
+
   const doProfile = () => {
     setAdmin(false);
   }
@@ -131,7 +135,9 @@ const UserProfile = () => {
             <Col md="8">
               <Card>
                 <CardHeader>
-                  <h5 className="title">Edit Profile</h5>
+                  <h5 className="title">Edit Profile
+                  &nbsp;
+                  <Button color="warning" size="sm" onClick={()=>refresh()}>Revert</Button></h5>
                 </CardHeader>
                 <CardBody>
                   <Form>

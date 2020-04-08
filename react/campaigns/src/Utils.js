@@ -47,6 +47,13 @@ const assetTypes = [
     {e:'12', value:"5", content:"Call to Action Button Text"}, 
 ];
 
+
+export const uuidv4 = () => {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
 export const ssp = ['Nexage','Admedia', 'Adprudence', 'Appnexus', 'Adventurefeeds','Atomx','Axonix','Bidswitch','c1x', 
     'Cappture', 'Citenko','Epomx', 'Fyber', 'Gotham','Google', 'Index','Intango', 'Kadam', 'Medianexusnetwork', 'Mobfox', 'Openssp', 
     'Openx','Pokkt', 'Pubmatic', 'Republer', 'Smaato', 'Smartyads', 'Smartadserver', 'Spotx', 'Ssphwy','Stroer', 'Taggify', 'Tappx', 
@@ -86,6 +93,16 @@ export const mimeTypes = (e) => {
         <option selected={e === 'video/pgg'}>video/ogg</option>
         </>
     );
+}
+
+export const customerIds = (cids,value) => {
+    var items = [];
+    if (cids === undef) 
+        return items;
+    cids.map(row => {
+        items.push(<option selected={row.customer_id === value} value={row.customer_id}>{row.customer_id}</option>);
+    })
+    return items;
 }
 
 export const placementType = (value) => {

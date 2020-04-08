@@ -63,6 +63,8 @@ public class Elk {
 		if (elastic_host.startsWith("$")) {
 			String name = elastic_host.substring(1);
 			elastic_host = System.getenv(name);
+			if (elastic_host == null)
+				elastic_host = "localhost";
 		}
 		return elastic_host;
 	}
