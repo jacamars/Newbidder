@@ -58,6 +58,7 @@ var undef;
     c.type = "banner";
     c.price = c.bid_ecpm;
     c.siteorapp = "";
+    c.extensions = [];
     setCreative(c);
   }
 
