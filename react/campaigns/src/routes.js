@@ -15,20 +15,14 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.jsx";
-import Icons from "views/Icons.jsx";
-import LeafMap from "views/LeafMap.jsx";
-import Notifications from "views/Notifications.jsx";
-import TableList from "views/TableList.jsx";
-import Typography from "views/Typography.jsx";
-import UserProfile from "views/UserProfile.jsx"
-import Simulator from "views/Simulator.jsx"
-import ConsoleLog from "views/ConsoleLog.jsx"
-import Campaigns from "views/Campaigns.jsx"
-import Targets from "views/Targets.jsx"
-import Creatives from "views/Creatives.jsx"
-import Rules from "views/Rules.jsx"
-import Sets from "views/Sets.jsx"
+import Dashboard from   "./views/Dashboard.jsx";
+import UserProfile from "./views/UserProfile.jsx"
+import Simulator from   "./views/Simulator.jsx"
+import Campaigns from   "./views/Campaigns.jsx"
+import Targets from     "./views/Targets.jsx"
+import Creatives from   "./views/Creatives.jsx"
+import Rules from       "./views/Rules.jsx"
+import Sets from        "./views/Sets.jsx"
 
 
 var routes = [

@@ -3,6 +3,8 @@
 build: application
 
 react-control:
+	rm react/control/package.lock || true
+	rm react/control/yarn.lock || true
 	cd react/control && npm update
 	cd react/control && yarn install
 	cd react/control && npm run-script build
@@ -11,6 +13,8 @@ react-control:
 	mv www/build www/control
 	
 react-exchange:
+	rm react/exchange/package.lock || true
+	rm react/exchange/yarn.lock || true
 	cd react/exchange && npm update
 	cd react/exchange && yarn install
 	cd react/exchange && npm run-script build
@@ -19,6 +23,8 @@ react-exchange:
 	mv www/build www/exchange
 	
 react-campaigns:
+	rm react/campaigns/package.lock || true
+	rm react/campaigns/yarn.lock || true
 	cd react/campaigns && npm update
 	cd react/campaigns && yarn install
 	cd react/campaigns && npm run-script build

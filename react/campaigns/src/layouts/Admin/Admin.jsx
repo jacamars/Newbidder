@@ -21,18 +21,17 @@ import { Route, Switch } from "react-router-dom";
 import PerfectScrollbar from "perfect-scrollbar";
 
 // core components
-import AdminNavbar from "components/Navbars/AdminNavbar.jsx";
-import Footer from "components/Footer/Footer.jsx";
-import Sidebar from "components/Sidebar/Sidebar.jsx";
-import FixedPlugin from "components/FixedPlugin/FixedPlugin.jsx";
-import UserProfile from "../../views/Icons.jsx";
+import AdminNavbar from "../../components/Navbars/AdminNavbar.jsx";
+import Footer from      "../../components/Footer/Footer.jsx";
+import Sidebar from     "../../components/Sidebar/Sidebar.jsx";
+import FixedPlugin from "../../components/FixedPlugin/FixedPlugin.jsx";
 
-import routes from "routes.js";
+import routes from "../../routes.js";
 
 import { useViewContext } from "../../ViewContext";
 
 
-import logo from "assets/img/react-logo.png";
+import logo from "../../assets/img/react-logo.png";
 
 var ps;
 
