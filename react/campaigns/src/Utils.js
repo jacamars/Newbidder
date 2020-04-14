@@ -105,6 +105,17 @@ export const customerIds = (cids,value) => {
     return items;
 }
 
+export const customerNames = (cids,r) => {
+    var items = [];
+    if (cids === undef) 
+        return items;
+    cids.map((row,index) => {
+        items.push(<option key={"cnames-"+index}  value={r.customer_id}>{row.customer_name}</option>);
+    //    items.push(<option selected={row.customer_id === r.customer_id} value={row.customer_id}>{row.customer_name}</option>);
+    })
+    return items;
+}
+
 export const placementType = (value) => {
     var items = [];
     if (value === undef) 

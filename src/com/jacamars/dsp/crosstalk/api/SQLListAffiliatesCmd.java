@@ -69,6 +69,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 		while(rs.next()) {
 			int id = rs.getInt("id");
 			String customer = rs.getString("customer_id");
+			String customer_name = rs.getString("customer_name");
 			String email = rs.getString("email");
 			String telephone = rs.getString("telephone");
 			String firstname = rs.getString("firstname");
@@ -82,6 +83,7 @@ public class SQLListAffiliatesCmd extends ApiCommand {
 			m.put("id", id);
 			m.put("email", email);
 			m.put("customer_id", customer);
+			m.put("customer_name", customer_name);
 			m.put("telephone",telephone);
 			m.put("firstname",firstname);
 			m.put("lastname",lastname);
