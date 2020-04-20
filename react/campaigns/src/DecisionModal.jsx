@@ -5,12 +5,12 @@ const DecisionModal = (props) => {
   const [modal, setModal] = useState(true);
 
   const toggle = (t) => {
-    props.callback(t);
     setModal(!modal);
+    props.callback(t);
   }
 
   return (
-    <>
+      <div>
       <Modal isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>{props.title}</ModalHeader>
         <ModalBody>
@@ -21,7 +21,7 @@ const DecisionModal = (props) => {
           <Button color="secondary" onClick={(e) => toggle(false)}>Cancel</Button>
         </ModalFooter>
       </Modal>
-    </>
+    </div>
   );
 }
 

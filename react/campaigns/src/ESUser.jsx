@@ -26,89 +26,67 @@ import DecisionModal from "./DecisionModal";
 
 var undef;
 
+
 const ESUser = (props) => {
 
     const vx = useViewContext();
-    const [userModal, setUserModal] = useState(false);
 
-    const editUser = async(id) => {
-        var u = getUserById(id);
-        await vx.addNewUser(u);
-        alert("User: " + u.username + " saved");
-      }
-    
-      const getUserById = (id) => {
-        var c;
-        for (var i=0;i<users.length;i++) {
-          if (users[i].id === id) {
-            var c = users[i];
-            c.index = i;
-            return c;
-          }
-        }
-        return undef;
-      }
-    
-      const deleteUser = async (id) => {
-        var c = getUserById(id);
-        setRecord(c);
-        console.log("DELETE: " + c.username);
-        setUserModal(true);
-      }
-    
-
-    return (
+    const showUsers = () => {
+        var items  =[];
         props.users.map((row, index) => {
-            <Alert color="info" key={"users-"+index}>
+            items.push(
+            <Alert color="info" key={"alert-users-"+index}>
               <Row>
-                <Col md="12">
-                  <Card>
-                    <CardHeader>
-                      <Row>
-                        <Input 
-                          disabled={vx.user.customer_id != 'rtb4free'}
-                          onChange={(e) => changeUserField(e,index,'customer_id')}
-                          type="select">{customerNames(affiliates,row)}</Input>
-                      </Row>
-                    </CardHeader>
-                    <CardBody>
-                      <Row>
-                        <Col className="pr-md-1" md="2">
-                          <FormGroup>
-                          <label>Username</label>
-                          <Input 
-                            defaultValue={row.username}
-                            onChange={(e) => changeUserField(e,index,'username')}/>
-                          </FormGroup>
-                        </Col>
-                        <Col className="pr-md-1" md="2">
-                          <FormGroup>
-                          <label>Role</label>
-                          <Input 
-                            defaultValue={row.sub_id}
-                            onChange={(e) => changeUserField(e,index,'sub_id')}/>
-                          </FormGroup>
-                      </Col>
-                      <Col className="pr-md-1" md="2">
-                          <FormGroup>
-                          <label>Password</label>
-                          <Input 
-                            defaultValue={row.password}
-                            onChange={(e) => changeUserField(e,index,'password')}/>
-                          </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Button color="success" size="sm" onClick={()=>editUser(row.id)}>Save</Button>
-                      &nbsp;
-                      <Button color="warning" size="sm" onClick={()=>deleteUser(row.id)}>Delete</Button>
-                    </Row>
-                    </CardBody>
-                  </Card>
+                <Col className="pr-md-1" md="2">
+                    <Input 
+                        disabled={vx.user.customer_id != 'rtb4free'}
+                        onChange={(e) => props.changeUserField(e,index,'customer_id')}
+                        type="select">{customerNames(props.affiliates,row)}</Input>
                 </Col>
               </Row>
+              <Row>
+                  <Col className="pr-md-1" md="2">
+                      <FormGroup>
+                        <label>Username</label>
+                          <Input 
+                            defaultValue={row.username}
+                            onChange={(e) => props.changeUserField(e,index,'username')}/>
+                      </FormGroup>
+                  </Col>
+                  <Col className="pr-md-1" md="2">
+                      <FormGroup>
+                        <label>Role</label>
+                          <Input 
+                            defaultValue={row.sub_id}
+                            onChange={(e) => props.changeUserField(e,index,'sub_id')}/>
+                        </FormGroup>
+                    </Col>
+                    <Col className="pr-md-1" md="2">
+                      <FormGroup>
+                        <label>Password</label>
+                          <Input 
+                            defaultValue={row.password}
+                            onChange={(e) => props.changeUserField(e,index,'password')}/>
+                      </FormGroup>
+                    </Col>
+                    </Row>
+                    <Row>
+                      <Button color="success" size="sm" onClick={()=>props.editUser(row.id)}>Save</Button>
+                      &nbsp;
+                      <Button color="warning" size="sm" onClick={()=>props.deleteUser(row.id)}>Delete</Button>
+                    </Row>
             </Alert>
-        })
+            )
+        });
+        return items;
+    }
+
+    return (
+        <>
+        { 
+          showUsers() 
+        }
+        </>
     );
 }
 

@@ -95,7 +95,7 @@ public class AffiliateRecord {
 	void doUpdate() throws Exception {
 		Connection conn =  CrosstalkConfig.getInstance().getConnection();
 		String sql = "update  companies set customer_id=?,"
-				+"customer_name=?"
+				+"customer_name=?,"
 				+"email=?,"
 				+"telephone=?,"
 				+"firstname=?,"

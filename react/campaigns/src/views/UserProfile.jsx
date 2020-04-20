@@ -18,7 +18,9 @@
 import React , { useState, useEffect } from "react";
 import {useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
-import EditSuperUser from '../EditSuperUser';
+import SuperUser from '../SuperUser';
+import SuperAffiliate from '../SuperAffiliate'
+
 
 // reactstrap components
 import {
@@ -41,13 +43,19 @@ const UserProfile = () => {
 
   const vx = useViewContext();
   const [count, setCount] = useState(1);
-  const [admin, setAdmin] = useState(false);
+  const [adminUser, setAdminUser] = useState(false);
+  const [adminCompany, setAdminCompany] = useState(false);
+  const [profile, setProfile] = useState(true);
 
 
   const setInstances = async() => {
     if (!vx.user.company)
       await vx.getUser();
   };
+
+  const redraw = () => {
+    setCount(count+1);
+  }
 
   const doSave = () => {
     var u = vx.user;
@@ -94,43 +102,60 @@ const UserProfile = () => {
   }
 
   const doProfile = () => {
-    setAdmin(false);
+    setAdminUser(false);
+    setAdminCompany(false);
+    setProfile(true);
   }
 
-  const doAdmin  = () => {
-    setAdmin(true)
+  const doAdminUser  = () => {
+    setAdminUser(true);
+    setAdminCompany(false);
+    setProfile(false);
+  }
+
+  const doAdminCompany  = () => {
+    setAdminCompany(true)
+    setAdminUser(false);
+    setProfile(false);
   }
 
   const CENTER = { 
       textAlign: "center"
   }
 
-    if (admin) {
-      return (
-        <>
-        <div className="content">
-        <Row>
-          <Col>
-            <Button className="btn-fill" color="success" type="submit" onClick={doProfile}>Edit User Profile</Button>
-          </Col>
-        </Row>
-          <EditSuperUser />
-        </div>
-       </>
-      );
-    }
-    else {
     return (
-      <>
         <div key={"profile-"+count} className="content">
         { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
         { vx.loggedIn && vx.user.sub_id === 'superuser' &&
-          <>
           <Row>
-            <Col>
-              <Button className="btn-fill" color="success" type="submit" onClick={doAdmin}>Admin Users</Button>
+            <Col className="pr-md-1" md="2">
+              <Button className="btn-fill" 
+                color="success" type="submit" 
+                disabled={profile}
+                onClick={doProfile}>User Profile</Button>
+            </Col>
+            <Col className="pr-md-1" md="2">
+              <Button className="btn-fill" 
+                color="success" type="submit" 
+                disabled={adminUser}
+                onClick={doAdminUser}>Admin Users</Button>
+            </Col>
+            <Col className="pr-md-1" md="2">
+              <Button className="btn-fill" 
+                color="success" type="submit" 
+                disabled={adminCompany}
+                onClick={doAdminCompany}>Admin Companies</Button>
             </Col>
           </Row>
+        }
+
+        {vx.loggedIn && adminUser &&
+          <SuperUser key={"superuser-" + count} redrawParent={redraw}/>
+        }
+        {vx.loggedIn && adminCompany &&
+          <SuperAffiliate key={"superaffiliate-" + count} redrawParent={redraw}/>
+        }
+        { vx.loggedIn && profile &&
           <Row>
             <Col md="8">
               <Card>
@@ -354,12 +379,9 @@ const UserProfile = () => {
               </Card>
             </Col>
           </Row>
-          </>
-          }
-        </div>
-      </>
-    );
         }
+        </div>
+    );
 }
 
 export default UserProfile;
