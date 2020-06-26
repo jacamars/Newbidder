@@ -73,11 +73,13 @@ public class LastLogTracker {
 	 * @throws Exception on network errors.
 	 */
 	public LastLogTracker(String host, int port) throws Exception {
+		System.out.println("*** ELASTICCONFIG: h="+host+",p="+port);
 		restClient = RestClient.builder(new HttpHost(host, port, "http")).build();
 		contents = new String(Files.readAllBytes(Paths.get(LASTLOG)), StandardCharsets.UTF_8); 
 	}
 	
 	public LastLogTracker(String host, int port, String username, String password, String certPath) throws Exception {
+		System.out.println("*** ELASTICCONFIG: h="+host+",p="+port+"u="+username+",pass="+password+",ca="+certPath);
 		contents = new String(Files.readAllBytes(Paths.get(LASTLOG)), StandardCharsets.UTF_8); 
 		
 		Path caCertificatePath = Paths.get(certPath);

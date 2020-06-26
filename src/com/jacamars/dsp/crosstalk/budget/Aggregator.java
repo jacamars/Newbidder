@@ -3,7 +3,6 @@ package com.jacamars.dsp.crosstalk.budget;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLContext;
-
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -45,7 +43,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A class that aggregates total, daily and hourly costs for cmapaigns and their creatives.
+ * A class that aggregates total, daily and hourly costs for cmapaigns and their
+ * creatives.
+ * 
  * @author Ben M. Faul
  *
  */
@@ -79,7 +79,7 @@ public class Aggregator {
 	final int mode;
 
 	/** Keeps campaigns in a handy map */
-	static volatile InternalHashMap<String,Campaign> campaigns = new InternalHashMap();
+	static volatile InternalHashMap<String, Campaign> campaigns = new InternalHashMap();
 
 	/** Holds the contents of the template query */
 	final String content;
@@ -106,7 +106,9 @@ public class Aggregator {
 
 	/**
 	 * A test program.
-	 * @param args String []. The first arg, if supplied, is the ELK host. defaults to 54.164.51.156
+	 * 
+	 * @param args String []. The first arg, if supplied, is the ELK host. defaults
+	 *             to 54.164.51.156
 	 * @throws Exception on ELK errora.
 	 */
 	public static void main(String args[]) throws Exception {
@@ -137,15 +139,17 @@ public class Aggregator {
 			hourly.query();
 			daily.query();
 			total.query();
-			logger.debug("Latency = {}, daily latency: {}, hourly latency: {}", total.getLatency(), daily.getLatency() + ", d: " + hourly.getLatency());
+			logger.debug("Latency = {}, daily latency: {}, hourly latency: {}", total.getLatency(),
+					daily.getLatency() + ", d: " + hourly.getLatency());
 			Aggregator.dump();
 			Thread.sleep(60000);
-			logger.debug("Revolution: {}",k++);
+			logger.debug("Revolution: {}", k++);
 		}
 	}
 
 	/**
 	 * Create an aggregator.
+	 * 
 	 * @param mode int. The mode, TOTAL, DAILY, or HOURLY
 	 * @param host String. The ELK host to connect to.
 	 * @param port int. The ELK port to connect to.
@@ -168,63 +172,57 @@ public class Aggregator {
 		else
 			content = new String(Files.readAllBytes(Paths.get(TOTAL_FILE)), StandardCharsets.UTF_8);
 
-		
-		final CredentialsProvider credentialsProvider =
-			    new BasicCredentialsProvider();
-			credentialsProvider.setCredentials(AuthScope.ANY,
-			    new UsernamePasswordCredentials(username, password));
+		final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+		credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-			RestClientBuilder builder = RestClient.builder(
-			    new HttpHost(host, port))
-			    .setHttpClientConfigCallback(new HttpClientConfigCallback() {
-			        @Override
-			        public HttpAsyncClientBuilder customizeHttpClient(
-			                HttpAsyncClientBuilder httpClientBuilder) {
-			            return httpClientBuilder
-			                .setDefaultCredentialsProvider(credentialsProvider);
-			        }
-			    });
-			
-			restClient = builder.build();
+		RestClientBuilder builder = RestClient.builder(new HttpHost(host, port))
+				.setHttpClientConfigCallback(new HttpClientConfigCallback() {
+					@Override
+					public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+						return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+					}
+				});
+
+		restClient = builder.build();
 	}
-	
-	// Source: https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_encrypted_communication.html
-	public Aggregator(int mode, String host, int port, String username, String password, String certPath) throws Exception {
+
+	// Source:
+	// https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_encrypted_communication.html
+	public Aggregator(int mode, String host, int port, String username, String password, String certPath)
+			throws Exception {
 		this.mode = mode;
+		System.out.println("*** AGG host="+host+",port="+port+",username="+username+",password="+password+",certPath="+certPath);
 		if (mode != TOTAL)
 			content = new String(Files.readAllBytes(Paths.get(DAILY_FILE)), StandardCharsets.UTF_8);
 		else
 			content = new String(Files.readAllBytes(Paths.get(TOTAL_FILE)), StandardCharsets.UTF_8);
-		
+
 		Path caCertificatePath = Paths.get(certPath);
-		CertificateFactory factory =
-		    CertificateFactory.getInstance("X.509");
+		CertificateFactory factory = CertificateFactory.getInstance("X.509");
 		Certificate trustedCa;
 		try (InputStream is = Files.newInputStream(caCertificatePath)) {
-		    trustedCa = factory.generateCertificate(is);
+			trustedCa = factory.generateCertificate(is);
 		}
 		KeyStore trustStore = KeyStore.getInstance("pkcs12");
 		trustStore.load(null, null);
 		trustStore.setCertificateEntry("ca", trustedCa);
 		org.apache.http.conn.ssl.SSLContextBuilder sslContextBuilder = SSLContexts.custom()
-		    .loadTrustMaterial(trustStore, null);
+				.loadTrustMaterial(trustStore, null);
 		final SSLContext sslContext = sslContextBuilder.build();
-		RestClientBuilder builder = RestClient.builder(
-		    new HttpHost(host, port, "https"))
-		    .setHttpClientConfigCallback(new HttpClientConfigCallback() {
-		        @Override
-		        public HttpAsyncClientBuilder customizeHttpClient(
-		            HttpAsyncClientBuilder httpClientBuilder) {
-		            return httpClientBuilder.setSSLContext(sslContext);
-		        }
-		    });
-		
+		RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, "https"))
+				.setHttpClientConfigCallback(new HttpClientConfigCallback() {
+					@Override
+					public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+						return httpClientBuilder.setSSLContext(sslContext);
+					}
+				});
+
 		restClient = builder.build();
 	}
 
-
 	/**
 	 * Close the elk rest client.
+	 * 
 	 * @throws Exception on network errors.
 	 */
 	void close() throws Exception {
@@ -233,6 +231,7 @@ public class Aggregator {
 
 	/**
 	 * Returns the latency of the call inside of ELK.
+	 * 
 	 * @return int. The latency in seconds.
 	 */
 	public int getLatency() {
@@ -241,6 +240,7 @@ public class Aggregator {
 
 	/**
 	 * Returns the map of the aggregations.
+	 * 
 	 * @return Map. The hash map representing the aggregations.
 	 */
 	public Map getMap() {
@@ -249,6 +249,7 @@ public class Aggregator {
 
 	/**
 	 * Execute the ELK query.
+	 * 
 	 * @throws Exception on network errors.
 	 */
 	public void query() throws Exception {
@@ -258,8 +259,8 @@ public class Aggregator {
 		Calendar calendar = Calendar.getInstance();
 		hoursPastZero = calendar.get(Calendar.HOUR_OF_DAY);
 		minutesPastZero = calendar.get(Calendar.MINUTE);
-		minutesPastZero += (double)calendar.get(Calendar.SECOND)/60.0;
-		hoursPastZero += minutesPastZero/60;
+		minutesPastZero += (double) calendar.get(Calendar.SECOND) / 60.0;
+		hoursPastZero += minutesPastZero / 60;
 
 		final Map map;
 		String data = content;
@@ -286,29 +287,27 @@ public class Aggregator {
 			 * Set thr time to zero hour, minute and millisecond of today.
 			 */
 
-	       calendar.set(Calendar.HOUR_OF_DAY, 0);
-	       calendar.set(Calendar.MINUTE, 0);
-	       calendar.set(Calendar.SECOND, 0);
-	       calendar.set(Calendar.MILLISECOND, 0);
-				 String nowTime = Long.toString(calendar.getTime().getTime());
-				 logger.info("Total aggregation, from: " + nowTime);
+			calendar.set(Calendar.HOUR_OF_DAY, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			String nowTime = Long.toString(calendar.getTime().getTime());
+			logger.info("Total aggregation, from: " + nowTime);
 
-		   data = data.replaceAll("_NOW_", nowTime);
-		   index = "bidagg-*";
+			data = data.replaceAll("_NOW_", nowTime);
+			index = "bidagg-*";
 		}
 
 		Response indexResponse = null;
 
 		try {
-			
-		    Request request = new Request("GET", "/" + index + "/_search");
-		    request.setEntity(new NStringEntity(
-                    "{\"json\":\"text\"}",
-                    ContentType.APPLICATION_JSON));
+
+			Request request = new Request("GET", "/" + index + "/_search");
+			request.setEntity(new NStringEntity("{\"json\":\"text\"}", ContentType.APPLICATION_JSON));
 			indexResponse = restClient.performRequest(request);
 		} catch (Exception e) {
 			// e.printStackTrace();
-			logger.error("*** ELK TEST, Index is missing for {}, msg: {}",index, e.getMessage());
+			logger.error("*** ELK TEST, Index is missing for {}, msg: {}", index, e.getMessage());
 			return;
 		}
 
@@ -320,9 +319,10 @@ public class Aggregator {
 		revolution++;
 
 	}
- 
+
 	/**
 	 * Do the total query.
+	 * 
 	 * @param indexResponse Response. The returned values from ELK.
 	 * @throws Exception on network errors.
 	 */
@@ -335,12 +335,13 @@ public class Aggregator {
 	}
 
 	/**
-	 * The data handler for total data aggrgeations. This is split from doTotal() so that
-	 * we can easily use simulated data.
+	 * The data handler for total data aggrgeations. This is split from doTotal() so
+	 * that we can easily use simulated data.
+	 * 
 	 * @param data String. The entity data to process.
 	 * @throws Exception on JSON errors.
 	 */
-	void handleTotalData(String data)throws Exception {
+	void handleTotalData(String data) throws Exception {
 
 		map = mapper.readValue(data, Map.class);
 		data = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(map);
@@ -373,7 +374,7 @@ public class Aggregator {
 			}
 			setPrice(c, price);
 
-			x = (Map)x.get("adtypeagg");
+			x = (Map) x.get("adtypeagg");
 			handleTotalCreative(c, x);
 			total += price;
 		}
@@ -383,6 +384,7 @@ public class Aggregator {
 
 	/**
 	 * Execute the daily aggregation.
+	 * 
 	 * @param indexResponse Response. The returned values from ELK.
 	 * @throws Exception on network errors.
 	 */
@@ -396,7 +398,9 @@ public class Aggregator {
 	}
 
 	/**
-	 * Handle the daily hourly data. This is split from doDailyHourly so we can use simulated days.
+	 * Handle the daily hourly data. This is split from doDailyHourly so we can use
+	 * simulated days.
+	 * 
 	 * @param data String. The data to process.
 	 * @throws Exception on JSON errors.
 	 */
@@ -411,20 +415,20 @@ public class Aggregator {
 			throw new Exception("Timed out");
 
 		Map x = (Map) map.get("aggregations");
-		if (x == null) {                        // no data yet
-		    return;
-        }
+		if (x == null) { // no data yet
+			return;
+		}
 		x = (Map) x.get("dailyagg");
 		List<Map> buckets = (List) x.get("buckets");
 
-		//if (buckets.size()!=2) {
-		//	logger.error("DID NOT GWT 2 BUCKETS ON HOURLY/DAILY {}",data);
-		//	return;
-		//}
+		// if (buckets.size()!=2) {
+		// logger.error("DID NOT GWT 2 BUCKETS ON HOURLY/DAILY {}",data);
+		// return;
+		// }
 
 		int pos = buckets.size();
 		if (pos == 0) {
-			logger.warn("DID NOT GET ANY BUCKETS ON HOURLY/DAILY {}",data);
+			logger.warn("DID NOT GET ANY BUCKETS ON HOURLY/DAILY {}", data);
 			return;
 		}
 		pos--;
@@ -463,6 +467,7 @@ public class Aggregator {
 
 	/**
 	 * Set the cost in a campaign, based on the mode of this Aggregation.
+	 * 
 	 * @param c Campaign. The object holding the campaign.
 	 * @param p double. The cost.
 	 */
@@ -483,6 +488,7 @@ public class Aggregator {
 
 	/**
 	 * Set the cost of the Creative, based on the mode.
+	 * 
 	 * @param c Creative. The object holding the creative.
 	 * @param p double. The cost.
 	 */
@@ -503,7 +509,8 @@ public class Aggregator {
 
 	/**
 	 * Parses the results of aggregation and puts it into the campaign.
-	 * @param c Campaign. The object representing the campaign.
+	 * 
+	 * @param c  Campaign. The object representing the campaign.
 	 * @param cr Map. The aggregation results.
 	 */
 	private void handleTotalCreative(Campaign c, Map cr) {
@@ -520,7 +527,7 @@ public class Aggregator {
 				double price = (Double) pagg.get("value");
 				price = price /= 1000;
 
-				Creative creat = c.getCreative(id,key);
+				Creative creat = c.getCreative(id, key);
 				if (creat == null) {
 					creat = new Creative(key, id);
 					c.addCreative(creat);
@@ -535,7 +542,8 @@ public class Aggregator {
 
 	/**
 	 * Handle the creatives in a campaign, from the results of the aggregation.
-	 * @param c Campaign. The object representing the campaign.
+	 * 
+	 * @param c  Campaign. The object representing the campaign.
 	 * @param cr Map. The aggregations of all the creatives in the campaign.
 	 */
 	private void handleCreative(Campaign c, Map cr) {
@@ -567,10 +575,11 @@ public class Aggregator {
 
 	/**
 	 * Add a campaign to the static map.
+	 * 
 	 * @param c Campaign. The campaign to put into the map.
 	 */
 	public static void add(Campaign c) {
-		campaigns.put(c.id,c);
+		campaigns.put(c.id, c);
 	}
 
 	/**
@@ -582,13 +591,14 @@ public class Aggregator {
 
 	/**
 	 * Return a list of campaign ids.
+	 * 
 	 * @return List. The list of campaign id strings.
 	 */
 	public static List<String> getCampaigns() {
 		List<String> ids = new ArrayList<String>();
 		int i = 0;
 		String x = null;
-		while((x=campaigns.getKey(i++)) != null) {
+		while ((x = campaigns.getKey(i++)) != null) {
 			ids.add(x);
 		}
 		return ids;
@@ -596,15 +606,17 @@ public class Aggregator {
 
 	/**
 	 * Return a campaign given it's key.
+	 * 
 	 * @param id String. The id of the campaign.
 	 * @return Campaign. The campaign keyed by id.
 	 */
 	public static Campaign get(String id) {
-		return (Campaign)campaigns.get(id);
+		return (Campaign) campaigns.get(id);
 	}
 
 	/**
 	 * Return a list of creative ids with the campaign.
+	 * 
 	 * @param id String. The campaign id key.
 	 * @return List. A list of strings of the creatives for this campoaign.
 	 */
@@ -615,9 +627,10 @@ public class Aggregator {
 
 	/**
 	 * Return whether the specified campaign/creative/type exists.
+	 * 
 	 * @param campaign String. The campaign id to search for.
 	 * @param creative String. The creative id to search for.
-	 * @param type String. The type of the creative.
+	 * @param type     String. The type of the creative.
 	 * @return boolean. Returns true if found. else returns false.
 	 */
 	public static boolean creativeExists(String campaign, String creative, String type) {
@@ -632,13 +645,14 @@ public class Aggregator {
 	}
 
 	/**
-	 * Patch the totals in the aggregations with the appropriate daily_price. Use this when
-	 * total aggregations is at 0 hour instead of the default, which is 5 minutes old.
+	 * Patch the totals in the aggregations with the appropriate daily_price. Use
+	 * this when total aggregations is at 0 hour instead of the default, which is 5
+	 * minutes old.
 	 */
 	public static void patchTotals() {
 		int i = 0;
 		Campaign entry = null;
-		while((entry=campaigns.getNext(i++)) != null) {
+		while ((entry = campaigns.getNext(i++)) != null) {
 			entry.patchTotals();
 		}
 	}
@@ -653,8 +667,8 @@ public class Aggregator {
 
 		int i = 0;
 		Object x = null;
-		while((x=campaigns.getNext(i++)) != null) {
-			Campaign entry = (Campaign)x;
+		while ((x = campaigns.getNext(i++)) != null) {
+			Campaign entry = (Campaign) x;
 			double d = global.getTotal_price();
 			global.setTotal_price(d + entry.getTotal_price());
 
@@ -665,8 +679,6 @@ public class Aggregator {
 			global.setHourly_price(d + entry.getHourly_price());
 		}
 
-
-
 		global.delta.add(global.getHourly_price());
 	}
 
@@ -676,25 +688,25 @@ public class Aggregator {
 	public static void dump() {
 		logger.info("********************************************");
 
-		for (int i=0;i<campaigns.size();i++) {
+		for (int i = 0; i < campaigns.size(); i++) {
 			Campaign c = campaigns.getNext(i++);
 
-			//if (c.delta != 0) {
-				logger.info("{}, total: {}, daily: {}. hourly: {}, delta: {}",c.id,
-						c.getTotal_price(),c.getDaily_price(),c.getHourly_price(),c.delta.getAverage());
+			// if (c.delta != 0) {
+			logger.info("{}, total: {}, daily: {}. hourly: {}, delta: {}", c.id, c.getTotal_price(), c.getDaily_price(),
+					c.getHourly_price(), c.delta.getAverage());
 
-				double hourly = c.delta.getAverage() * 60;
-				double daily = c.delta.getAverage() * 3600;
-				logger.info("Predict: Daily: {}, Hourly: {}",daily, hourly);
+			double hourly = c.delta.getAverage() * 60;
+			double daily = c.delta.getAverage() * 3600;
+			logger.info("Predict: Daily: {}, Hourly: {}", daily, hourly);
 
-				for (Creative cc : c.creatives) {
-			//		if (cc.delta != 0) {
-						logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}", c.id,cc.id,cc.adtype,cc.total_price,
-							cc.daily_price,cc.hourly_price,cc.delta.getAverage());
-				//	}
-				}
+			for (Creative cc : c.creatives) {
+				// if (cc.delta != 0) {
+				logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}", c.id, cc.id, cc.adtype,
+						cc.total_price, cc.daily_price, cc.hourly_price, cc.delta.getAverage());
+				// }
+			}
 
-			//}
+			// }
 		}
 		logger.info("********************************************");
 	}
@@ -702,22 +714,22 @@ public class Aggregator {
 	/**
 	 * Pretty print dump all the campaigns and creatives.
 	 */
-	 static void dumpAllActive() {
+	static void dumpAllActive() {
 		logger.info("********************************************");
-		for (int i=0;i<campaigns.size();i++) {
+		for (int i = 0; i < campaigns.size(); i++) {
 			Campaign c = campaigns.getNext(i++);
 			if (c.getHourly_price() != 0) {
-				logger.info("{}, total: {}, daily: {}. hourly: {}, delta: {}",c.id,
-						c.getTotal_price(),c.getDaily_price(),c.getHourly_price(),c.delta.getAverage());
+				logger.info("{}, total: {}, daily: {}. hourly: {}, delta: {}", c.id, c.getTotal_price(),
+						c.getDaily_price(), c.getHourly_price(), c.delta.getAverage());
 
 				double hourly = c.delta.getAverage() * 60;
 				double daily = c.delta.getAverage() * 3600;
-				logger.info("Predict: Daily: {}, Hourly: {}",daily, hourly);
+				logger.info("Predict: Daily: {}, Hourly: {}", daily, hourly);
 
 				for (Creative cc : c.creatives) {
 					if (cc.hourly_price != 0) {
-						logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}", c.id,cc.id,cc.adtype,cc.total_price,
-							cc.daily_price,cc.hourly_price,cc.delta.getAverage());
+						logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}", c.id, cc.id, cc.adtype,
+								cc.total_price, cc.daily_price, cc.hourly_price, cc.delta.getAverage());
 					}
 				}
 
@@ -728,25 +740,26 @@ public class Aggregator {
 
 	/**
 	 * Dump the indicated campaign to stdout.
+	 * 
 	 * @param who String. The campaign to dump.
 	 */
-	 static void dump(String who) {
+	static void dump(String who) {
 		logger.info("********************************************");
-		for (int i=0;i<campaigns.size();i++) {
+		for (int i = 0; i < campaigns.size(); i++) {
 			Campaign c = campaigns.getNext(i++);
 			if (c.id.equals(who)) {
-				logger.info("{}, Total: {}, Hourly: {}, Daily: {}, delta: {}",
-						c.id,c.getTotal_price(),c.getDaily_price(),c.getHourly_price(),c.delta.getAverage());
+				logger.info("{}, Total: {}, Hourly: {}, Daily: {}, delta: {}", c.id, c.getTotal_price(),
+						c.getDaily_price(), c.getHourly_price(), c.delta.getAverage());
 
-				double hourly = c.delta .getAverage() * 60;
+				double hourly = c.delta.getAverage() * 60;
 				double daily = c.delta.getAverage() * 3600;
-				logger.info("Predict, Daily: {}, Hourly: {}",daily, hourly);
+				logger.info("Predict, Daily: {}, Hourly: {}", daily, hourly);
 
 				for (Creative cc : c.creatives) {
-					//if (cc.id.equals("420")) {
-						logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}",who,cc.id,cc.adtype,cc.total_price,
-								cc.daily_price,cc.hourly_price,c.delta.getAverage());
-					//}
+					// if (cc.id.equals("420")) {
+					logger.info("{}/{}/{}, Total: {}, Daily: {}, Hourly: {}, Delta: {}", who, cc.id, cc.adtype,
+							cc.total_price, cc.daily_price, cc.hourly_price, c.delta.getAverage());
+					// }
 				}
 
 			}
@@ -755,7 +768,7 @@ public class Aggregator {
 	}
 
 	static void touchAll() {
-		for (int i=0;i<campaigns.size();i++) {
+		for (int i = 0; i < campaigns.size(); i++) {
 			Campaign c = campaigns.getNext(i);
 			c.touch();
 		}
@@ -763,8 +776,10 @@ public class Aggregator {
 }
 
 /**
- * A builtin class for maintaining aggregations for campaigns and creatives. Used only within the budgeting part
- * of the system. No fancy synchronization needed, only 1 thread writes, all others read.
+ * A builtin class for maintaining aggregations for campaigns and creatives.
+ * Used only within the budgeting part of the system. No fancy synchronization
+ * needed, only 1 thread writes, all others read.
+ * 
  * @author Ben M. Faul
  *
  */
@@ -793,6 +808,7 @@ class Campaign {
 
 	/**
 	 * Constructor for the campaign aggregation tracker.
+	 * 
 	 * @param id String. The campaign id.
 	 */
 	public Campaign(String id) {
@@ -808,7 +824,8 @@ class Campaign {
 
 	/**
 	 * Given the creative id and its type, return creative object.
-	 * @param id String. The id of the creative.
+	 * 
+	 * @param id   String. The id of the creative.
 	 * @param type String. The type eg 'banner'
 	 * @return Creative. The object if found, or, null.
 	 */
@@ -821,9 +838,10 @@ class Campaign {
 	}
 
 	/**
-	 * Patch the total_price by adding in the daily_price. Use this when total aggregations are at the
-	 * 0 hour mark of the day. Using the standard aggregation causes a delay of 5 minutes otherwise.
-	 * Note, this also will reset hourly and daily cost to 0 if there were no aggregations
+	 * Patch the total_price by adding in the daily_price. Use this when total
+	 * aggregations are at the 0 hour mark of the day. Using the standard
+	 * aggregation causes a delay of 5 minutes otherwise. Note, this also will reset
+	 * hourly and daily cost to 0 if there were no aggregations
 	 */
 	public void patchTotals() {
 		if (!setTotal) {
@@ -832,7 +850,7 @@ class Campaign {
 		}
 
 		total_price += daily_price;
-		for (int i=0;i<creatives.size();i++) {
+		for (int i = 0; i < creatives.size(); i++) {
 			Creative c = creatives.get(i);
 			c.patchTotals();
 		}
@@ -849,10 +867,12 @@ class Campaign {
 	}
 
 	/**
-	 * Touch the campaign hourly and daily totals. If the budget is exceeded for one of these, then the aggrehgator will not
-	 * report any wins (cuz the budget is exceeded), so the data will not appear and these values will be left over. They
-	 * will never roll over to 0 and then will not bid when the bidget is now available. Note no need to do the total. because
-	 * there will always be a total aggregation of the campaign ever won anything at all.
+	 * Touch the campaign hourly and daily totals. If the budget is exceeded for one
+	 * of these, then the aggrehgator will not report any wins (cuz the budget is
+	 * exceeded), so the data will not appear and these values will be left over.
+	 * They will never roll over to 0 and then will not bid when the bidget is now
+	 * available. Note no need to do the total. because there will always be a total
+	 * aggregation of the campaign ever won anything at all.
 	 *
 	 * Call this before you process the aggrheations.
 	 */
@@ -864,6 +884,7 @@ class Campaign {
 
 	/**
 	 * Return the hourly price.
+	 * 
 	 * @return double. The current running total.
 	 */
 	public double getHourly_price() {
@@ -872,6 +893,7 @@ class Campaign {
 
 	/**
 	 * Return the daily price.
+	 * 
 	 * @return double. The current running total.
 	 */
 	public double getDaily_price() {
@@ -880,6 +902,7 @@ class Campaign {
 
 	/**
 	 * Return the totaal price.
+	 * 
 	 * @return double. The current running total.
 	 */
 	public double getTotal_price() {
@@ -888,6 +911,7 @@ class Campaign {
 
 	/**
 	 * Set the hourly price.
+	 * 
 	 * @param d double. The value to set hourly to.
 	 */
 	public void setHourly_price(double d) {
@@ -897,6 +921,7 @@ class Campaign {
 
 	/**
 	 * Set the daily price.
+	 * 
 	 * @param d double. The value to set daily to.
 	 */
 	public void setDaily_price(double d) {
@@ -906,6 +931,7 @@ class Campaign {
 
 	/**
 	 * Set the total price.
+	 * 
 	 * @param d double. The price to set totsal to.
 	 */
 	public void setTotal_price(double d) {
@@ -915,6 +941,7 @@ class Campaign {
 
 	/**
 	 * Add a creative to the campaign.
+	 * 
 	 * @param c Creative. The creative to add.
 	 */
 	public void addCreative(Creative c) {
@@ -924,8 +951,10 @@ class Campaign {
 }
 
 /**
- * The internal class to track aggregations at the creative level. No need for fancy
- * syncrhonization, only 1 thread updates, all other threads simply read it.
+ * The internal class to track aggregations at the creative level. No need for
+ * fancy syncrhonization, only 1 thread updates, all other threads simply read
+ * it.
+ * 
  * @author Ben M. Faul
  *
  */
@@ -950,8 +979,9 @@ class Creative {
 
 	/**
 	 * Creates the creative.
+	 * 
 	 * @param adtype String. The type, as in 'banner' or 'video'
-	 * @param id String. The creative id.
+	 * @param id     String. The creative id.
 	 */
 	public Creative(String adtype, String id) {
 		this.adtype = adtype;
@@ -966,8 +996,8 @@ class Creative {
 	}
 
 	/**
-	 * Patch the total by adding in the daily_price. Use this when aggregations of the total
-	 * are at zero hour instead of the default (which is 5 minutes old
+	 * Patch the total by adding in the daily_price. Use this when aggregations of
+	 * the total are at zero hour instead of the default (which is 5 minutes old
 	 */
 	public void patchTotals() {
 		total_price += daily_price;

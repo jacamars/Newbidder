@@ -1,27 +1,7 @@
-.PHONY: clean local docker react react-control react-exchange react-campaigns backup-db restore-db
+.PHONY: clean local docker react react-campaigns backup-db restore-db
 
 build: application
 
-react-control:
-	rm react/control/package.lock || true
-	rm react/control/yarn.lock || true
-	cd react/control && npm update
-	cd react/control && yarn install
-	cd react/control && npm run-script build
-	rm -r www/control || true
-	cp -a react/control/build www
-	mv www/build www/control
-	
-react-exchange:
-	rm react/exchange/package.lock || true
-	rm react/exchange/yarn.lock || true
-	cd react/exchange && npm update
-	cd react/exchange && yarn install
-	cd react/exchange && npm run-script build
-	rm -r www/exchange || true
-	cp -a react/exchange/build www
-	mv www/build www/exchange
-	
 react-campaigns:
 	rm react/campaigns/package.lock || true
 	rm react/campaigns/yarn.lock || true
@@ -32,7 +12,7 @@ react-campaigns:
 	cp -a react/campaigns/build www
 	mv www/build www/campaigns
 	
-react: react-exchange react-control react-campaigns
+react: react-campaigns
 
 	
 application: local react docker

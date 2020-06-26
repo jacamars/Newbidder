@@ -60,6 +60,9 @@ public class Elk {
 
 	@JsonIgnore
 	public String getHost() {
+		if (elastic_host == null)
+			return "localhost";
+		
 		if (elastic_host.startsWith("$")) {
 			String name = elastic_host.substring(1);
 			elastic_host = System.getenv(name);
@@ -71,6 +74,9 @@ public class Elk {
 
 	
 	public boolean getElasticSslEnabled() {
+		if (elastic_ssl_enabled == null)
+			return false;
+		
 		if (elastic_ssl_enabled.startsWith("$")) {
 			String name = elastic_ssl_enabled.substring(1);
 			elastic_ssl_enabled = System.getenv(name);
@@ -101,7 +107,7 @@ public class Elk {
 	public String getElasticCaPath() {
 		if (elastic_ca_path.startsWith("$")) {
 			String name = elastic_ca_path.substring(1);
-			elastic_password = System.getenv(name);
+			elastic_ca_path = System.getenv(name);
 		}
 		return elastic_ca_path;
 	}
