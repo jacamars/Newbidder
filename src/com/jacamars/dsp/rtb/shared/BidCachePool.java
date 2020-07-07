@@ -84,7 +84,7 @@ public enum BidCachePool {
 			Config config = inst.getConfig();
 			
 			String name = "BIDCACHE";
-			bidCache = RTBServer.getSharedInstance().getMap(name);
+			bidCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 			bidCache.addEntryListener(new EntryEvictedListener<String, RecordedBid>() {
 				@Override
@@ -111,7 +111,7 @@ public enum BidCachePool {
 			//////////////////////////////////////////////////
 			
 			name = "TOKENCACHE";
-			tokenCache = RTBServer.getSharedInstance().getMap(name);
+			tokenCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 			tokenCache.addEntryListener(new EntryEvictedListener<String, TokenData>() {
 				@Override
@@ -122,12 +122,12 @@ public enum BidCachePool {
 			}, true);
 			
 			name = "MEMBER";
-			memberCache = RTBServer.getSharedInstance().getMap(name);
+			memberCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 		
 
 			name = "VIDEO";
-			videoCache = RTBServer.getSharedInstance().getMap(name);
+			videoCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 			videoCache.addEntryListener(new EntryEvictedListener<String, RecordedVideo>() {
 				@Override
@@ -152,7 +152,7 @@ public enum BidCachePool {
 			}
 
 			name = "MISC";
-			miscCache = RTBServer.getSharedInstance().getMap(name);
+			miscCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 			miscCache.addEntryListener(new EntryEvictedListener<String, RecordedMisc>() {
 				@Override
@@ -364,7 +364,7 @@ public enum BidCachePool {
 		miscCache.setAsync(key, msc, timeout, TimeUnit.SECONDS);
 	}
 	
-	public boolean ready() {
+	public static boolean ready() {
 		if (miscCache == null)
 			return false;
 		if (videoCache == null)

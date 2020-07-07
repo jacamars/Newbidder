@@ -162,7 +162,8 @@ public class ZPublisher implements Runnable, Callback {
     static int k = 0;
 
     public ZPublisher(HazelcastInstance inst, String address) throws Exception {
-    	this.inst = inst;
+    	if (inst != null)
+    		this.inst = inst;
 
         if (address == null || clogger == null) // this can happen if some sub object is not configured by the top level logger
             return;

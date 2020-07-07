@@ -20,7 +20,7 @@
 		<jamm.version>RELEASE</jamm.version>
 		<cache2k.version>1.0.0.CR3</cache2k.version>
 		<redis.version>2.9.0</redis.version>
-		<jackson.version>2.9.8</jackson.version>
+		<jackson.version>2.11.1</jackson.version>
 		<javax.servlet.version>4.0.0</javax.servlet.version>
 		<commons.pool2.version>2.5.0</commons.pool2.version>
 		<commons.io.version>2.5</commons.io.version>

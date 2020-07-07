@@ -1029,7 +1029,7 @@ public class Creative {
 		 * encoded to produce: <script src=\"a=100\">
 		 */
 		if (forwardurl != null) {
-			JsonStringEncoder encoder = BufferRecyclers.getJsonStringEncoder();
+			JsonStringEncoder encoder =  new JsonStringEncoder(); 
 			char[] output = encoder.quoteAsString(forwardurl);
 			forwardurl = new String(output);
 		}
@@ -1044,7 +1044,7 @@ public class Creative {
 			}
 			unencodedAdm = s.replaceAll("\r\n", "");
 			// unencodedAdm = unencodedAdm.replaceAll("\"", "\\\\\"");
-			JsonStringEncoder encoder = BufferRecyclers.getJsonStringEncoder();
+			JsonStringEncoder encoder = new JsonStringEncoder(); // BufferRecyclers.getJsonStringEncoder();
 			char[] output = encoder.quoteAsString(unencodedAdm);
 			unencodedAdm = new String(output);
 			MacroProcessing.findMacros(macros, unencodedAdm);

@@ -794,6 +794,19 @@ public class Configuration {
 		
         RTBServer.getSharedInstance();
         
+        ////////////////////// START HAZELCAST, DON'T CONTINUE UNTIL THEY ARE INITIALIZED ////////////
+        for (int i=0;i<10;i++) {
+        	if (BidCachePool.ready())
+        		break;
+        	else
+        		Thread.sleep(1000);
+        }
+        if (!BidCachePool.ready()) {
+        	logger.error("Hazelcast structures in the BidCachePool are not ready");
+        	System.exit(1);
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////
+        
 		if (deadmanKey != null) {
 			deadmanSwitch = new DeadmanSwitch(deadmanKey);
 			deadmanSwitch.start();

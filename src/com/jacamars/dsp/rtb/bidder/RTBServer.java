@@ -115,7 +115,7 @@ public class RTBServer implements Runnable {
 	public static final String LOGIN_ROOT = "web/login.html";
 	public static final String ADMIN_ROOT = "web/admin.html";
 
-	private static HazelcastInstance hz;
+	private static volatile HazelcastInstance hz = null;
 
 	/** Ten years of seconds */
 	public static final int TEN_YEARS = 315360000;
@@ -349,6 +349,13 @@ public class RTBServer implements Runnable {
 	}
 
 	public static HazelcastInstance getSharedInstance() {
+		/*StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		  for (int i = 1; i < elements.length; i++) {
+		    StackTraceElement s = elements[i];
+		    System.out.println("\tat " + s.getClassName() + "." + s.getMethodName()
+		        + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
+		  }*/
+		
 		if (hz == null) {
 			Config config = new Config();
 			// config.setProperty("hazelcast.logging.type", "slf4j");
@@ -357,10 +364,12 @@ public class RTBServer implements Runnable {
 			Campaign.registerWithHazelCast(config);
 			AtomicBigDecimal.registerWithHazelCast(config);
 			hz = Hazelcast.newHazelcastInstance(config);
+			BidCachePool.getInstance(hz);
 
 			if (logger != null)
 				logger.info("*** Server STARTING, Leader: {} ***", isLeader());
 			try {
+				System.out.println("*** Server STARTING, Leader: " + isLeader() + " ***");
 				//if (Controller.getInstance() != null)						// can happen if this is not a bidder, but is a client.
 				//	Controller.getInstance().setMemberStatus();
 			} catch (Exception e) {

@@ -90,6 +90,7 @@ RUN mkdir -p sql/create
 RUN mkdir logs
 RUN mkdir SampleBids
 RUN mkdir Campaigns
+run mkdir query
 
 COPY stub.json /stub.json
 COPY target/*with-dependencies.jar /target
@@ -106,6 +107,7 @@ COPY shell/ /shell
 COPY www/control/ /www/control/
 COPY www/exchange/ /www/exchange/
 COPY www/campaigns/ /www/campaigns/
+COPY query/ query/
 
 COPY www/index.html /www
 COPY www/js/ /www/js/

@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.hazelcast.core.HazelcastInstance;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
@@ -37,7 +38,8 @@ public class ZPublisher4J extends AppenderSkeleton {
 				return;
 			}
 
-			publisher = new ZPublisher(RTBServer.getSharedInstance(),str);
+			HazelcastInstance hz = null;
+			publisher = new ZPublisher(hz,str);
 		} catch (Exception error) {
 			error.printStackTrace();
 			System.out.println("Log4j failed to open ZPublisher: " + str);
