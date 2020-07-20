@@ -1,0 +1,58 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: eck-pv-volume
+  labels:
+    type: local
+spec:
+#  storageClassName: manual
+  storageClassName: local-storage
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/esdata_eck"
+    type: DirectoryOrCreate
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: es-cluster
+spec:
+  version: 7.8.0
+  nodeSets:
+  - name: default
+    count: 3
+    config:
+      node.master: true
+      node.data: true
+      node.ingest: true
+      # enable for production https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html
+      node.store.allow_mmap: false
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        #storageClassName: manual
+        storageClassName: local-storage
+
+
+
+
+
+
+

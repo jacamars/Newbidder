@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: rtb4free-simulator
+  labels:
+    app: rtb-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rtb-simulator
+  template:
+    metadata:
+      labels:
+        app: rtb-simulator
+    spec:
+      containers:
+      - image: jacamars/rtb4free:v1
+        name: simulator
+        env:
+        - name: BIDDER
+          value: "rtb-bidder-service:8080"
+    #      value: "192.168.64.8:30080"
+        - name: WIN
+          value: "10"
+        - name: PIXEL
+          value: "95"
+        - name: CLICK
+          value: "2"
+        - name: SLEEP
+          value:  "100"
+        command: 
+        - /bin/bash 
+        args:
+        - "-c" 
+        - "./load-elastic -host $$BIDDER -win $$WIN -pixel $$PIXEL -click $$CLICK -sleep $$SLEEP"
+
+# docker run  jacamars/rtb4free:v1  ./load-elastic -host 192.168.64.8:30080 -win 10 -pixel 95 -click 2 -sleep 100
