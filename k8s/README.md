@@ -165,47 +165,53 @@ Start the cluster deployment with the following kubectl commands.
     ```
     kubectl apply -f https://download.elastic.co/downloads/eck/1.1.2/all-in-one.yaml
     ```
-4. Start Elasticsearch and Kibana
+4. Create local Persistent Volumes for Elasticsearch data on nodes 1, 2 and 3
+    ```
+    multipass shell node1
+    sudo mkdir /esdata_eck
+    exit
+    ```
+5. Start Elasticsearch and Kibana
     ```
     kubectl apply -f cluster/eck_cluster.yml
     kubectl apply -f cluster/eck_kibana_cluster.yml
     ```
-5.  Get user "elastic", pwd for kibana login
+6.  Get user "elastic", pwd for kibana login
     ```
     kubectl get secret es-cluster-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode; echo
     ```
-6. Port forward kibana port
+7. Port forward kibana port
     ```
-    kubectl port-forward service/es-cluster-kb-http 5601 &
+    kubectl port-forward service/kb-cluster-kb-http 5601 &
     ```
-7. Log in to Kibana and confirm Elasticsearch is up and active.  
+8. Log in to Kibana and confirm Elasticsearch is up and active.  
     1. Open a browser to https://localhost:5601   
        - **Note: https!**
        - You may need to allow your browser to access https from localhost
     2. Log in with user "elastic" and password from previous step.
-8. Start Logstash.
+9. Start Logstash.
     ```
     kubectl apply -f cluster/logstash_cluster.yml
     ```
     - At this point, Logstash should have connected to Elasticsearch. Logstash will load index templates used by the bidder.  Logstash should now also be connected to Kafka and listening for bidder topics.
   
-9. Start the bidder and open the ports used.
+10. Start the bidder and open the ports used.
     ```
     kubectl apply -f cluster/rtb_cluster.yml
     kubectl port-forward service/rtb-bidder-service 8155 &
     kubectl port-forward service/rtb-bidder-service 7379 &
     kubectl port-forward service/rtb-bidder-service 8080 &
     ```
-10. Connectivity from the bidder to Kafka to Logstash to Elasticsearch should now be established.  .
+11. Connectivity from the bidder to Kafka to Logstash to Elasticsearch should now be established.  .
    1. Go to the Kibana, Dev Tools. List indices with command:
     ```
         GET _cat/indices?s=i
     ```
    2. You should now see indices for rtblogs-<date> and status-<date>.
-11. You can define campaigns in the bidder's Campaign Manger. 
+12. You can define campaigns in the bidder's Campaign Manger. 
     1. Open a browser to http://localhost:8155.
     2. Select Campaign Manager and log in to defined campaigns.
-12. Load the Elasticsearch Data Transform jobs that calculate campaign summaries and budgets.
+13. Load the Elasticsearch Data Transform jobs that calculate campaign summaries and budgets.
    3. Go to the Kibana, Dev Tools
    4. To load data transform jobs for campaign summaries, 
       1. copy these [API commands](elk/bidder_budget_queries/transform_jobs_campaign.json) to the development console
@@ -215,7 +221,7 @@ Start the cluster deployment with the following kubectl commands.
       2. Execute. 
    6. Go to the Kibana, Stack Management, Elasticsearch - Transforms.  You should see the 6 transform jobs.
    7. Start all the Transform jobs.  
-13. Load the Kibana objects.
+14. Load the Kibana objects.
    8. Go to the Kibana, Stack Management, Kibana - Saved Objects.  
    9. Choose Import, and load the [saved objects file for bidder](elk/kibana/rtb_saved_objects.ndjson). This loads the index patterns, visualizations and dashboards
 

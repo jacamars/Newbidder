@@ -45,13 +45,15 @@ https://medium.com/better-programming/local-k3s-cluster-made-easy-with-multipass
 
 1. Create cluster
     ```
-    multipass launch -n node1 -d 20G -m 4G
-    multipass launch -n node2 -d 20G -m 4G
-    multipass launch -n node3 -d 20G -m 4G
+    multipass launch -n node1 -d 20G -m 8G
+    multipass launch -n node2 -d 20G -m 8G
+    multipass launch -n node3 -d 20G -m 8G
     ```
-1. Install k3s on each node
-    - See above.
-1. Get token from node1
+1. Install k3s on master node1
+    ```
+    curl -sfL https://get.k3s.io | sh -
+    ```
+ 1. Get token from node1
     ```
     TOKEN=$(multipass exec node1 sudo cat /var/lib/rancher/k3s/server/node-token)
     ```
@@ -59,12 +61,12 @@ https://medium.com/better-programming/local-k3s-cluster-made-easy-with-multipass
     ```
     IP=$(multipass info node1 | grep IPv4 | awk '{print $2}')
     ```
-1. Joining node2
+1. Create k3s worker node2
     ```
     multipass exec node2 -- \
     bash -c "curl -sfL https://get.k3s.io | K3S_URL=\"https://$IP:6443\" K3S_TOKEN=\"$TOKEN\" sh -"
     ```
-1. Joining node3
+1. Create k3s worker node3
     ```
     multipass exec node3 -- \
     bash -c "curl -sfL https://get.k3s.io | K3S_URL=\"https://$IP:6443\" K3S_TOKEN=\"$TOKEN\" sh -"
@@ -72,12 +74,6 @@ https://medium.com/better-programming/local-k3s-cluster-made-easy-with-multipass
 1. Check cluster
     ```
     multipass exec node1 -- sudo kubectl get nodes
-    ```
-1. If node not joined, remove and retry
-    ```
-    multipass shell node2
-    /usr/local/bin/k3s-uninstall.sh
-    /usr/local/bin/k3s-agent-uninstall.sh
     ```
 1. Get kubectl context
     ```

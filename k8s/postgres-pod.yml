@@ -38,7 +38,7 @@ spec:
     persistentVolumeClaim:
       claimName: postgres-pv-claim
   containers:
-  - image: postgres
+  - image: postgres:12
     name: db
     env:
     - name: POSTGRES_PASSWORD
