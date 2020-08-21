@@ -1,0 +1,20 @@
+site_name: RTB4FREE
+nav:
+  - Home: index.html
+  - Overview: home/overview.md
+  - Building: home/building.md
+  - Deploying: home/deploying.md
+  - User Guides: home/userguides.md
+  - Theory: home/theory.md
+  - Exchanges: home/exchanges.md
+  - License: https://www.apache.org/licenses/LICENSE-2.0
+#theme: readthedocs
+theme: material
+extra_css:
+  - css/custom.css
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - codehilite
+  - attr_list

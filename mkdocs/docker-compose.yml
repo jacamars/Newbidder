@@ -1,0 +1,14 @@
+#
+# Contains the full stack of bidder3 (not including crosstalk, elk, mysql)
+# Does contain zookeeper and kafka.
+#
+
+version: "3"
+
+services:
+
+  web:
+    image: journeys-website
+    ports:
+     - "8080:80"
+

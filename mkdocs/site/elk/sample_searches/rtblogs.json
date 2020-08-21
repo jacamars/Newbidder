@@ -1,0 +1,200 @@
+
+{
+  "took" : 10,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 3149,
+      "relation" : "eq"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "VN8Gz3IBAStA5CowlCXC",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "893",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:00:13.795Z",
+          "source" : "RTBServer",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : "Heartbeat [canbid=true, runnable campaigns=0, parked=0, dailyspend=0.000000 avg-spend-min=0.000000] members: 1, leader: true, total-errors=0, openfiles=164, cpu=243%, mem=79M (2.013%), freedsk=38.333%, threads=203, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=16, requests=0, bids=0, nobids=0, fraud=0, cidrblocked=0, wins=0, pixels=0, clicks=0, exchanges= [], stopped=false, campaigns=0",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "Vd8Gz3IBAStA5CowlCXC",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:00:13.885Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38096, size: 84, command: {"type":"GetToken#","customer":"rtb4free","username":"rtb4free","password":"xxxxxx"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "V98Hz3IBAStA5CowfCW1",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "893",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:01:13.805Z",
+          "source" : "RTBServer",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : "Heartbeat [canbid=true, runnable campaigns=0, parked=0, dailyspend=0.000000 avg-spend-min=0.000000] members: 1, leader: true, total-errors=0, openfiles=158, cpu=227%, mem=86M (2.187%), freedsk=38.332%, threads=205, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=16, requests=0, bids=0, nobids=0, fraud=0, cidrblocked=0, wins=0, pixels=0, clicks=0, exchanges= [], stopped=false, campaigns=0",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "Wd8Iz3IBAStA5CowZyUX",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "893",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:13.804Z",
+          "source" : "RTBServer",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : "Heartbeat [canbid=true, runnable campaigns=0, parked=0, dailyspend=0.000000 avg-spend-min=0.000000] members: 1, leader: true, total-errors=0, openfiles=149, cpu=346%, mem=53M (1.34%), freedsk=38.331%, threads=205, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=16, requests=0, bids=0, nobids=0, fraud=0, cidrblocked=0, wins=0, pixels=0, clicks=0, exchanges= [], stopped=false, campaigns=0",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "Wt8Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:47.818Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 95, command: {"type":"GetToken#","customer":"rtb4free","username":"ben.faul@rtb4free.com","password":"zulu"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "W98Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:47.831Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 69, command: {"token":"b5873358-4e5e-4c4a-bbe9-7c75f5fdb2c5","type":"SQLGetUser#"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "XN8Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:47.882Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 72, command: {"token":"b5873358-4e5e-4c4a-bbe9-7c75f5fdb2c5","type":"GetAccounting#"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "Xd8Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:48.003Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 75, command: {"token":"b5873358-4e5e-4c4a-bbe9-7c75f5fdb2c5","type":"SQLListCampaigns#"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "Xt8Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:48.032Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 71, command: {"token":"b5873358-4e5e-4c4a-bbe9-7c75f5fdb2c5","type":"SQLListRules#"}""",
+          "topic" : "rtblogs"
+        }
+      },
+      {
+        "_index" : "rtblogs-2020.06.20",
+        "_type" : "_doc",
+        "_id" : "X98Iz3IBAStA5Cow7SU6",
+        "_score" : 1.0,
+        "_source" : {
+          "@version" : "1",
+          "field" : "322",
+          "serialClass" : "java.util.HashMap",
+          "@timestamp" : "2020-06-20T00:02:48.060Z",
+          "source" : "ApiCommand",
+          "instance" : "rtb4free-0",
+          "consumer_group" : "logstash1",
+          "sev" : "INFO",
+          "message" : """From IP: 127.0.0.1:38922, size: 73, command: {"token":"b5873358-4e5e-4c4a-bbe9-7c75f5fdb2c5","type":"SQLListTargets#"}""",
+          "topic" : "rtblogs"
+        }
+      }
+    ]
+  }
+}

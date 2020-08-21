@@ -1,0 +1,36 @@
+Gernerally, any Open RTB SSP will work with RTB4FREE once configured. The following have been integrated with RTB4FREE
+in the past:
+
+- admedia  
+- adprudence
+- adventurefeeds
+- appnexus
+- atomx
+- axonix
+- bidswitch
+- cappture
+- citenko
+- epomx 
+- fyber
+- google
+- gotham
+- index
+- intango
+- kadam"
+- medianexusnetwork
+- nexage
+- openssp
+- openx
+- pubmatic
+- republer
+- smaato
+- smartadserver
+- smartyads
+- ssphwy
+- stroer
+- taggify
+- vdopia
+- vertamedia
+- waardx
+- wideorbit
+- xapads

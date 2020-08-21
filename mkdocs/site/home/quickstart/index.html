@@ -1,0 +1,678 @@
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.2">
+    
+    
+      
+        <title>Quickstart - RTB4FREE</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a2408e81.min.css">
+      
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../css/custom.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#building-the-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../.." title="RTB4FREE" class="md-header-nav__button md-logo" aria-label="RTB4FREE">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            RTB4FREE
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Quickstart
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="RTB4FREE" class="md-nav__button md-logo" aria-label="RTB4FREE">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    RTB4FREE
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../index.html" title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../overview/" title="Overview" class="md-nav__link">
+      Overview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../building/" title="Building" class="md-nav__link">
+      Building
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../deploying/" title="Deploying" class="md-nav__link">
+      Deploying
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../userguides.md" title="User Guides" class="md-nav__link">
+      User Guides
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../theory/" title="Theory" class="md-nav__link">
+      Theory
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../exchanges/" title="Exchanges" class="md-nav__link">
+      Exchanges
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="https://www.apache.org/licenses/LICENSE-2.0" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rudder-transform" class="md-nav__link">
+    Rudder-Transform
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#java-cluster-and-service-components" class="md-nav__link">
+    JAVA Cluster and Service Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#make-the-ui" class="md-nav__link">
+    Make the UI
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dockerize" class="md-nav__link">
+    Dockerize
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  
+                
+                
+                <h1 id="building-the-system">Building the System<a class="headerlink" href="#building-the-system" title="Permanent link">&para;</a></h1>
+<h2 id="rudder-transform">Rudder-Transform<a class="headerlink" href="#rudder-transform" title="Permanent link">&para;</a></h2>
+<p>First step is to make a rudder-transforms docker image. This is not part of the CDP code base but CDP uses these transforms. This is the standard transforms build by Rudderstack. You will need to build the docker container for this.</p>
+<p>Here are the instructions:</p>
+<p>A. Either user the C1X cdp-bl code base, or git the standard rudderstack release.</p>
+<p>B. Change directory to cdp-bl/rudder-transformer</p>
+<p>C. Run docker build from there</p>
+<p>$docker build -t c1x/r-transformer .
+Now on to building the CDP components...</p>
+<h2 id="java-cluster-and-service-components">JAVA Cluster and Service Components<a class="headerlink" href="#java-cluster-and-service-components" title="Permanent link">&para;</a></h2>
+<p>This is the second step of the process. Here we make the Java components of the back-plane of CDP. Make the application using JAVA:</p>
+<p>$make application
+React Component</p>
+<h2 id="make-the-ui">Make the UI<a class="headerlink" href="#make-the-ui" title="Permanent link">&para;</a></h2>
+<p>This is the third step of the process. Makes the react components, if you have made changes to the control program:</p>
+<p>$make ui
+Docker Images</p>
+<h2 id="dockerize">Dockerize<a class="headerlink" href="#dockerize" title="Permanent link">&para;</a></h2>
+<p>This is the packaging of everything together. Makes the docker image. Do this if you made changes in the application or UI.</p>
+<p>$make dockerize
+Docker containers are now built, and you can bring the system up.</p>
+<p>DOCKER BASED Operations</p>
+<p>These are the Docker instructions for working with CDP-Cluster, CDP-T Service, Rudderstack Transform</p>
+<p>Docker Compose</p>
+<p>Use Docker Compose to run all the components on your system</p>
+<p>$docker-compose up -d
+To run everything but CDP-Cluster and CDP-Tserver:</p>
+<p>$docker-compose -f support.yml up -d
+Working with Source</p>
+<h1 id="sending-events">SENDING EVENTS<a class="headerlink" href="#sending-events" title="Permanent link">&para;</a></h1>
+<p>There is a sample source, with 3 destinations already configured in the database. You can address this source in these sample programs with the value of 1Zg4SLMGY8rGkj7x1anRIWpMMOa.</p>
+<h2 id="send-a-batch-of-events">Send a batch of events<a class="headerlink" href="#send-a-batch-of-events" title="Permanent link">&para;</a></h2>
+<p>Assuming you have at least one CDP Cluster running and is mapped to localhost:8080 you can generate an event with:</p>
+<p>$cd scripts
+./generate-event 1Zg4SLMGY8rGkj7x1anRIWpMMOa localhost:8080
+Download configuration</p>
+<p>$cd scripts
+./send-download localhost:8080
+Upload a configuration</p>
+<p>$cd scripts
+./send-upload filename localhost:8080 <br />
+Load Representative Sample of All Event Types</p>
+<p>$cd scripts
+$./load-msgs 1Zg4SLMGY8rGkj7x1anRIWpMMOa localhost:8080
+HANDY DOCKER ACTIVITIES</p>
+<p>Running Containers</p>
+<p>$docker ps
+Attach to a Container</p>
+<p>Do a docker ps and then use the container-id or name:</p>
+<p>$docker exec -it <id-or-name> /bin/bash</p>
+<h2 id="attach-to-the-log">Attach to the log<a class="headerlink" href="#attach-to-the-log" title="Permanent link">&para;</a></h2>
+<p>Do a docker ps and then use the container-id or name:</p>
+<p>$docker logs -f <id-or-name></p>
+<h2 id="delete-an-image">Delete an image<a class="headerlink" href="#delete-an-image" title="Permanent link">&para;</a></h2>
+<p>Do a docker ls first</p>
+<p>$docker image ls
+Find the container id</p>
+<p>$docker image rm <image-id> --force
+Correct Checksum Error</p>
+<p>If docker-compose complains about a checksum after you delete a container do this:</p>
+<p>$docker-compose rm
+Connect Intellij Debugger to CDP-Cluster or CDP-T Service:</p>
+<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
+<p>Each of the docker components has its own set of environment variables. Here is a breakdown on those:</p>
+<h2 id="cluster">Cluster<a class="headerlink" href="#cluster" title="Permanent link">&para;</a></h2>
+<p>The cluster has environment variables to set up the different sub-systems used by it. The file Docker.env
+contains the values for the macro substitions below"</p>
+<div class="codehilite"><pre><span></span><code>    environment:
+      OKTADOMAIN: &quot;<span class="cp">${</span><span class="n">OKTADOMAIN</span><span class="cp">}</span>&quot;
+      TOKENTIMEOUT: &quot;300&quot;
+      MESSAGETIMEOUT: &quot;90&quot;
+      HTTPS: &quot;{<span class="nv">$HTTPS</span>}&quot;
+      ORGANIZATION: &quot;<span class="cp">${</span><span class="n">ORGANIZATION</span><span class="cp">}</span>&quot;
+      #INDEXPAGE: &quot;/cdp-control&quot;
+      INDEXPAGE: &quot;/control-plane-ui&quot;
+      PORT: &quot;8080&quot;
+      WSPORT: &quot;8887&quot;
+      BACKUPCOUNT: &quot;3&quot;
+      READBACKUP: &quot;true&quot;
+      THREADS: &quot;128&quot;
+      KINESIS=&quot;<span class="cp">${</span><span class="n">KINESIS</span><span class="cp">}</span>&quot;
+      S3=&quot;<span class="cp">${</span><span class="n">S3</span><span class="cp">}</span>&quot;
+      JDBC: &quot;<span class="cp">${</span><span class="n">JDBC</span><span class="cp">}</span>&quot;
+      JDBCDRIVER: &quot;org.postgresql.Driver&quot;
+      CONVERSION: &quot;userId=properties[consumer.upmId]&quot;
+      MESSAGEFILTER: &quot;userId != null AND properties[consumer.loginStatus] = &#39;logged in&#39;&quot;
+</code></pre></div>
+
+
+<p>Overview of the configuration parameters:</p>
+<ul>
+<li>OKTADOMAIN: This is the issuer domain for verification of session tokens.</li>
+<li>TOKENTIMEOUT: This is the timeout for api/login sessions, in minutes. Default is 30 mins. Here it is set for 5 hours.</li>
+<li>
+<p>MESSAGETIMEOUT: The timeout, in days for messages stored in the cache. Default is forever, here it is set
+to 90 days.</p>
+</li>
+<li>
+<p>HTTPS: Set to true for HTTPS (self signed cert) or false for HTTP. Default is false.</p>
+</li>
+<li>WSPORT: The web services port, set to "8887" by default.</li>
+<li>
+<p>KINESIS: For Kinesis input of messages to the system. Form kinesis://key=value&amp;key=value...</p>
+<ul>
+<li>writekey= Writekey to use when ingesting the messages</li>
+<li>aws_access_key= AWS access key</li>
+<li>aws_secret_key= AWS secret key</li>
+<li>stream= The stream name.</li>
+<li>shard_id= The shard id to use.</li>
+<li>partition= The partition to use.</li>
+<li>region= The region to use.</li>
+<li>record_limit= The number of records to batch on ingest.</li>
+<li>sleep_time= Number of seconds to wait between reads.</li>
+<li>records= Number of records to process at a time</li>
+<li>sleep= Sleep interval between ingests</li>
+<li>create= Set to true to create the stream if it doesn't exist.</li>
+</ul>
+</li>
+<li>
+<p>S3: For S3 output/input. Form is s3://...</p>
+<ul>
+<li>aws_access_key= AWS access key</li>
+<li>aws_secret_key= AWS secret key</li>
+<li>region= The region to use.</li>
+<li>bucket= The bucket to use.</li>
+<li>key= The key to use. Use $datetime to have it use yyyy-mm-dd-hh-mm-ss time format for the key.</li>
+<li>period= Number of seconds to wait per output to S3. Set to 0 for no buffered output</li>
+</ul>
+</li>
+<li>
+<p>JDBC: This is the POSTGRES access string used by CDP to store messages.</p>
+</li>
+<li>CONVERSION - This will promote a subobject to a first level attribute. In this example, userId is null
+it will be replaced by the value in propertis[consumer.loginStatus].</li>
+<li>MESSAGEFILTER - Predicate that screens out unwanted values. In this case we will only process
+messages where userId is not null and the user is logged in.</li>
+</ul>
+<p>T-Service</p>
+<p>The cluster has environment variables to set up the different sub-systems used by it. The file Docker.env
+contains the values for the macro substitions below"</p>
+<div class="codehilite"><pre><span></span><code>   environment:
+      CLUSTERS: &quot;cluster1:5701&quot;
+      TRANSFORMERS: &quot;http://r-transformer1:9090&quot;
+      S3: &quot;<span class="cp">${</span><span class="n">S3</span><span class="cp">}</span>&quot;
+      KINESIS: &quot;<span class="cp">${</span><span class="n">S3</span><span class="cp">}</span>&quot;
+</code></pre></div>
+
+
+<p>The following are the meanings
+- CLUSTERS: Comma separated list of clusters to connect to.
+- TRANSFORMERS: Location of the dockerized RudderStack destinationtransform processes.
+- S3: The S3 definition for saving messages and profiles to S3.
+- KINESIS: The Kinesis specification.</p>
+<h1 id="theory-of-operation">THEORY OF OPERATION<a class="headerlink" href="#theory-of-operation" title="Permanent link">&para;</a></h1>
+<p>Like Rudderstack, CDP is a Segment.io replacement. Unlike Rudderstack or Segment, CDP holds all the 
+messages it receives in a clusterable, in memory data grid. Segment has no query capability and 
+Rudderstack queries against Postgres.</p>
+<p>This means messages received by CDP are queryable at memory speeds. The size of the database 
+is determined by the number of clusters, and queries are distributed, much like Elastic Search.</p>
+<p>The system is fault tolerant, and uses Raft consensus to determine leader-followers. 
+Partitioning of data across shards is completely automatic. The nodes are designed to be 
+triple-redundant (configurable).</p>
+<p>Basically, the INPUTS to the system are from APIs (like Segment or Rudderstack) and flow 
+into the Cluster node. Each Cluster node is a Hazelcast cluster. The more nodes, the larger 
+the potential database in memory. The in memory database is queryable using SQL predicates, 
+the queries are distributed across the nodes. The in memory database is automatically saved 
+to Postgres. Metadata is also stored in postgres (like configuration data).</p>
+<p>The INPUTS from the APIs are Messages (of type track, screen, identify, etc.) These 
+MESSAGEs are stored in a queryable IMDG (in memory data grid).</p>
+<p>Each MESSAGE flowing into the Cluster becomes a Job. JOBs are placed on a blocking 
+distributed Queue. These queues are known as JOBS, DEADLETTER, COMPLETED and ERRORED. 
+A job on the JOB Queue is waiting to be processed. The T-Service takes a job from the 
+JOBS Queue and places it in the RUNNING Cache. While on the RUNNING Cache, the Job can 
+be queried. Note, JOBS, DEADLETTER, COMPLETED and ERRORED are Queues and cannot be queried - 
+but they can be iterated over.</p>
+<p>The T-Service takes a JOB from the JOBS Queue (via poll) - Which identifies a message 
+and outputs to N outputs. The T-Service is a Hazelcast CLIENT - it is not part of the cluster. 
+The outputs correspond to Rudderstack Transforms, and are called TASKS). The T-Service handles 
+multiple jobs concurrently using workers. Multiple T-Service components can be run to handle higher loads.</p>
+<p>The T-Service takes the Job, which identifies the MESSAGE and the output transforms to be used. 
+Using these transforms from the configuration, the corresponding Rudderstack Transformation client 
+is called with an HTTP POST providing the MESSAGE and the configuration for the transformation 
+(Like FB, Kinesis, S3, etc).</p>
+<p>If the T-Service completes its work, then the Job is placed on the COMPLETED Queue and deleted 
+from the RUNNING Cache. A failure to connect to the Rudderstack transform will be designated 
+as an error. The JOB will be placed in the DEADLETTER Queue for the Cluster to deal with as 
+it sees fit.</p>
+<p>Note, the RUNNING Cache entries have a timeout. Thus, if the T-Service crashes or exits, 
+any JOBs it was assigned will be deleted from the RUNNING Cache, but will be automatically 
+placed on the DEADLETTER Queue again.</p>
+<p>The Cluster will take the JOBs on the DEADLETTER Queue and if the retry count is below a 
+configurablethreshold, then it will be placed back onto the JOB Queue. Note, those tasks 
+(transforms) that completed in a previously errored JOB will not be rerun.</p>
+<p>JOBS that end up on the DEADLETTER QUEUE multiple times will be placed on the ERRORED 
+Queue once the number of jobs has exceeded their retry count. These jobs stay on the 
+ERRORED queue, where they remain indefinitely are unless manually restarted or deleted.</p>
+<h2 id="message-flow">Message Flow<a class="headerlink" href="#message-flow" title="Permanent link">&para;</a></h2>
+<h2 id="receive-input">Receive Input<a class="headerlink" href="#receive-input" title="Permanent link">&para;</a></h2>
+<p>The Cluster-Server receives Segment API messages as HTTP POST messages. These messages have unique 
+IDs, each message loads into the MESSAGES cache, with the id as the key. This is a serializable 
+message and is stored into an ICache.</p>
+<p>Messages stay in the cache until they are deleted by a predefined eviction strategy. This could 
+be evicted after N elements are in the cache and FIFO eviction occurs or, if configured, it 
+could be based on the time in the cache.</p>
+<p>In any event, a message written to the cache is always backed up to Postgres database.</p>
+<h2 id="messages-into-jobs">Messages into Jobs<a class="headerlink" href="#messages-into-jobs" title="Permanent link">&para;</a></h2>
+<p>Sending an event to the Cluster will result in the creation of a "Job". A job contains a 
+write key, a message id, and keys for destinations. The job is placed on the JOBS IQueue b
+y the Cluster-Server.</p>
+<p>T-Service polls the JOBS IQueue, and pops a job to be run off the queue. The Job is 
+updated to running, and it is written back to the RUNNING cache. The T-Service creates 
+a job runner, and executes that with its executor service. When the Job completes, its 
+status is updated and it is then written to the COMPLETED IQueue or the DEADLETTER IQueue, 
+depending on status.</p>
+<p>A Job has 1 or more destinations. These destinations are Tasks. The configCache is queried 
+to obtain the destination configurations for each task. The job also contains the id of the 
+message and that is retrieved from the MESSAGES cache. With the destination config parameters 
+in hand and the message, an HTTP POST is sent to the Rudderstack Transform service. When the 
+POST returns, the status of the task is updated.</p>
+<h2 id="how-billing-works">How Billing Works<a class="headerlink" href="#how-billing-works" title="Permanent link">&para;</a></h2>
+<p>Billing is simply a serializable JAVA object with some basic counters. It basically looks 
+like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="err">public class Billing implements Serializable { </span>
+<span class="err">    Instant timestamp;  // The time in UTC format. </span>
+<span class="err">    Long messagesIn;    // messages received by the cluster </span>
+<span class="err">    Long messagesOut;   // messages sent by the services </span>
+<span class="err">    Long bytesIn;       // number of bytes received by the cluster </span>
+<span class="err">    Long bytesOut;      // number of bytes transmitted by the service </span>
+<span class="err">    Long queries;       // number of queries received </span>
+<span class="err">    Long queryTime;     // query time = number-of-ms-for-query * nClusters. </span>
+<span class="err">    Long nClusters;     // number of clusters running. </span>
+<span class="err">    Long nServices;     // number of services running. </span>
+<span class="err">}</span>
+</code></pre></div>
+
+
+<p>This is stored in a Cache called "BILLING". This cache will store the last 10,080 entries. 
+Then they are aged out. Each record is indexed by timestamp - the epoch. Once a minute the 
+Raft leader will create a new Billing record for the clusters and services to update.</p>
+<p>The Billing records are queryable in memory for up to 7 days.</p>
+<h2 id="how-journaling-to-s3-works">How Journaling to S3 Works<a class="headerlink" href="#how-journaling-to-s3-works" title="Permanent link">&para;</a></h2>
+<h2 id="how-journaling-to-postgres-works">How Journaling to Postgres Works<a class="headerlink" href="#how-journaling-to-postgres-works" title="Permanent link">&para;</a></h2>
+<h2 id="queries-with-sql-predicates">QUERIES WITH SQL PREDICATES<a class="headerlink" href="#queries-with-sql-predicates" title="Permanent link">&para;</a></h2>
+<p>Standard Hazelcast predicates can be built to handle queries. The most important records to query are 
+of course the messages. Here is a fragment of a track.</p>
+<div class="codehilite"><pre><span></span><code><span class="err">{</span>
+<span class="err">&quot;sentAt&quot;: &quot;2020-05-06T12:44:04.029Z&quot; </span>
+<span class="err">&quot;channel&quot;: &quot;web&quot;,</span>
+<span class="err">&quot;type&quot;: &quot;track&quot;,</span>
+<span class="err">&quot;context&quot;: {</span>
+<span class="err">    &quot;app&quot;: {</span>
+<span class="err">        &quot;build&quot;: &quot;1.0.0&quot;,</span>
+<span class="err">        &quot;name&quot;: &quot;RudderLabs JavaScript SDK&quot;,</span>
+<span class="err">        &quot;namespace&quot;: &quot;com.rudderlabs.javascript&quot;,</span>
+<span class="err">        &quot;version&quot;: &quot;1.1.1&quot;</span>
+<span class="err">    },</span>
+<span class="err">    &quot;traits&quot;: {</span>
+<span class="err">        &quot;email&quot;: &quot;fan.boi@apple.com&quot;</span>
+<span class="err">    }</span>
+<span class="err">}</span>
+<span class="err">&quot;properties&quot;: {</span>
+<span class="err">    &quot;my_special_type&quot;: 1000,</span>
+<span class="err">    &quot;test_123&quot;: &quot;Hello world&quot;</span>
+<span class="err">},</span>
+<span class="err">...</span>
+</code></pre></div>
+
+
+<p>Besides properties and traits, the fields are accessed as objects using '.' notation. To access 
+traits or properties, use [] format.</p>
+<p>Examples from above:</p>
+<p>context.app.build    --&gt; Equals "1.0.0"
+To access properties attribute value for 'my_special_type' use:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">properties</span><span class="o">[</span><span class="n">my_special_type</span><span class="o">]</span><span class="w">  </span><span class="c1">--&gt; Equals 1000</span>
+</code></pre></div>
+
+
+<p>This is because traits and properties have fields that are not defined in the message schema at 
+compile time. These are all user defined fields.</p>
+<h3 id="query-simple">Query Simple<a class="headerlink" href="#query-simple" title="Permanent link">&para;</a></h3>
+<p>The predicate to query all track messages would be</p>
+<div class="codehilite"><pre><span></span><code><span class="err">&quot;type = track&quot;</span>
+</code></pre></div>
+
+
+<p>Note, the predicate knows the types, so track does not have to be in quotes.</p>
+<h3 id="query-with-and-and-or">Query with AND and OR<a class="headerlink" href="#query-with-and-and-or" title="Permanent link">&para;</a></h3>
+<p>Here is a predicate for track and alias:</p>
+<div class="codehilite"><pre><span></span><code><span class="err">&quot;type = track OR type = alias&quot;</span>
+</code></pre></div>
+
+
+<p>Query With Date Fields.</p>
+<p>Find all track and web events for anonymousId 123456 and between may 5 and may 10:</p>
+<div class="codehilite"><pre><span></span><code><span class="err">&quot;(type = track OR type = alias) AND \</span>
+<span class="err">    anonymousId = 123456 AND \</span>
+<span class="err">    (timestamp &gt;= 2020-05-05T00:00:00.000Z AND timestamp &lt;= 2020-05-10T23:59:99.999Z)&quot;</span>
+</code></pre></div>
+
+
+<p>Note, all the records will be returned that match. This could be a large number of records, so 
+you have to be prepared to deal with it, or, you can use other predicate types to implement paging 
+and filtering.</p>
+<h3 id="query-traits-and-properties">Query traits and properties<a class="headerlink" href="#query-traits-and-properties" title="Permanent link">&para;</a></h3>
+<p>Querying the properties and traits) fields is different than all other fields you will encounter. This is because traits and properties can have user defined values.</p>
+<p>With all other fields you can use the name of the field. With properties and traits, their field names are not set, so, a different query pattern is used. For example, in the above fragment to find a message with the properties field "my_special_type" equal to 1000 we would use this:</p>
+<div class="codehilite"><pre><span></span><code><span class="ss">&quot;properties[my_special_type] contains 1000&quot;</span><span class="w"></span>
+</code></pre></div>
+
+
+<h3 id="query-context-traits">Query Context Traits<a class="headerlink" href="#query-context-traits" title="Permanent link">&para;</a></h3>
+<p>The attribute "traits" may appear at message.traits, or it may appear at message.context.traits. 
+From a user perspective they are treated the same way. However, their implementations are dramatically 
+different. The message.traits uses a distributed IMap evaluator attached to the MESSAGECACHE and 
+PROFILES caches. The 'context' is not at the IMap level, so, it is implemented as a special case by 
+C1X in the Hazelcast source code in file: com.hazelcast.query.impl.QueryableEntry.java at 
+approximately line 127, in the method: extractAttributeValue(String). This is only for support of 
+the messages.context.traits case. It is not a general purpose mapping function.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.d710d30a.min.js"></script>
+      <script src="../../assets/javascripts/bundle.5f27aba8.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.27c6a5e6.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
