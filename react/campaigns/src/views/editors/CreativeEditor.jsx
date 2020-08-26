@@ -259,6 +259,9 @@ const getSelectedRules = () => {
     if (cnames.length !== 0) {
       ext.push("categories"+":#:"+cnames.join());
     }
+    
+    alert(siteorapp);
+
     if (siteorapp !== "")
       ext.push("site_or_app:#:"+siteorapp);
     if (clickthrough_url !== "")

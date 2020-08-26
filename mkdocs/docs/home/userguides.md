@@ -248,10 +248,42 @@ the actions we have encountered over the past several years.
 - INRANGE - Tests that the lat/lon of a geo object in the bid request is within a certain number of Km from a specified point
 - NOT_INRANGE Tests that the lat/lon of a geo object in the bid request is at least a certain number of km from a specified point.
 
-You can create rules to operate on part of the RTB object.
+You can create rules to operate on any part of the RTB object. The following is an example. 
+
+Select the *Rules* icon on the left in the blue area and the following screen will appear:
+
+![image](../images/rules1.png)
+
+Select the the red *New* button to go to the rules editor:
+
+![image](../images/rules2.png)
+
+The following is an explanation of the fields:
+
+- SQL ID: Non-editable field.
+- Name: The name of the rule. *REQUIRED*
+- Required: Set to true if the RTB bid request must have the object we are looking for.
+- RTB Specification: The name of the object you are going to query in the JSON bid request. *REQUIRED*
+- Operator: One of the operators from above, like DOMAIN, or LESS THAN, etc. *REQUIRED*
+- Operand Value: The value you are looking for. *REQUIRED*
+- Use Set as Operand: Use a preloaded SET or Bloomfilter as the Operand. (See Set)
+- Operand Type: The type of the operand value, e.g. integer. *REQUIRED*
+- Operand Ordinal: Whether the operand is an array or a scalar. *REQUIRED*
+
+In this example, we make sure the device.ip attribute is present in the RTB bid request:
+
+![image](../images/rules3.png)
+
+In this rule, Operand value, Use Set as Operand, Operand Type and Operand Ordinal are irrelevant.
 
 
 ##Sets
+###Set
+###Navmap
+###CIDR
+###Bloom Filters
+###IMDG
+###Macros
 ##Simulator
 ##User Profile
 	

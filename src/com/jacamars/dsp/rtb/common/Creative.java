@@ -1001,8 +1001,11 @@ public class Creative {
 		
 		if (extensions != null && extensions.get("clickthrough_url") != null) {
 			forwardurl = forwardurl.replace("_REDIRECT_URL_", extensions.get("clickthrough_url"));
+			forwardurl = forwardurl.replace("{clickthrough_url}", extensions.get("clickthrough_url"));
 		}
 		
+		if (imageurl != null)
+			forwardurl = forwardurl.replace("{image_url}", imageurl);
 		
 		MacroProcessing.findMacros(macros, forwardurl);
 		MacroProcessing.findMacros(macros, imageurl);
@@ -1225,7 +1228,7 @@ public class Creative {
 		fixedNodes.add(new FixedNodeNonStandard());
 		attributes.add(new FixedNodeDoSize());
 		
-		if (extensions != null && extensions.get("site_or_app") != null)
+		if (extensions != null && extensions.get("site_or_app") != null && !extensions.get("site_or_app").equals("undefined"))
 			attributes.add(new FixedNodeAppOrSite(extensions.get("site_or_app")));
 
 		// These are impression related
@@ -1519,7 +1522,11 @@ public class Creative {
 				adm_override = true;
 			} else {
 				adm_override = false;
-				contenttype = MimeTypes.determineType(htmltemplate);
+				var str = htmltemplate;
+				if (imageurl != null)
+					str = htmltemplate.replace("{image_url}", imageurl);
+				
+				contenttype = MimeTypes.determineType(str);
 				if (contenttype != null) {
 					Node n = new Node("contenttype", "imp.0.banner.mimes", Node.MEMBER, contenttype);
 					n.notPresentOk = true;

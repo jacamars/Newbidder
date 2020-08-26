@@ -32,6 +32,11 @@ const substituteRedirect = (text) => {
   return text;
 }
 
+const mangle = () => {
+  var str = props.creative.htmltemplate.replace("{image_url}",props.creative.imageurl);
+  return str;
+}
+
   return(
     <>
     <Row>
@@ -86,7 +91,7 @@ const substituteRedirect = (text) => {
       <Col className="px-md-1" md="6">
         <FormGroup>
           <label>Visualization</label>
-          <DemoTag isVideo={false} adm={substituteRedirect(vx.macroSub(props.creative.htmltemplate))} />
+          <DemoTag isVideo={false} adm={substituteRedirect(vx.macroSub(mangle()))} />
         </FormGroup>
       </Col>
    </Row>
