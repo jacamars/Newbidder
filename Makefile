@@ -29,6 +29,15 @@ backup-db:
 restore-db:
 	pg_restore --dbname=postgresql://postgres:postgres@localhost:5432 --verbose database.backup
 
+docs:
+	cd mkdocs && mkdocs build
+	rm -r www/docs || true
+	cp -ar mkdocs/site www/docs
+	
+website: docs
+	docker build -t jacamars/rtbx-website -f Dockerfile.website .
+	docker push jacamars/rtbx-website
+	
 clean:
 	mvn clean
 

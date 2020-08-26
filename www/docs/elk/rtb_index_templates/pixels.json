@@ -1,0 +1,58 @@
+PUT _template/pixels
+{
+  "index_patterns": [
+    "pixels-*"
+  ],
+  "aliases": {},
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "strings": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    ],
+    "properties": {
+      "y": {
+        "type": "long"
+      },
+      "x": {
+        "type": "long"
+      },
+      "timestamp": {
+        "type": "date"
+      },
+      "price": {
+        "type": "long"
+      },
+      "lon": {
+        "type": "double"
+      },
+      "lat": {
+        "type": "double"
+      },
+      "location": {
+        "type": "geo_point"
+      },
+      "payload": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ nav:
   - Overview: home/overview.md
   - Building: home/building.md
   - Deploying: home/deploying.md
-  - User Guides: home/userguides.md
+  - Campaign Manager Guide: home/userguides.md
   - Theory: home/theory.md
   - Exchanges: home/exchanges.md
   - License: https://www.apache.org/licenses/LICENSE-2.0

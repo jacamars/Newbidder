@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+
+  doc:
+    image: jacamars/rtbx-website
+    ports:
+      - "8080:80"

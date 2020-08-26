@@ -1,0 +1,270 @@
+# transform jobs
+
+
+PUT _transform/budget_total
+{
+  "source": {
+    "index": [
+      "wins-*"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "adtype": {
+        "terms": {
+          "field": "adtype"
+        }
+      }
+    },
+    "aggregations": {
+      "cost.avg": {
+        "avg": {
+          "field": "cost"
+        }
+      },
+      "cost.max": {
+        "max": {
+          "field": "cost"
+        }
+      },
+      "cost.min": {
+        "min": {
+          "field": "cost"
+        }
+      },
+      "price.avg": {
+        "avg": {
+          "field": "price"
+        }
+      },
+      "price.max": {
+        "max": {
+          "field": "price"
+        }
+      },
+      "price.min": {
+        "min": {
+          "field": "price"
+        }
+      },
+      "cost.sum": {
+        "sum": {
+          "field": "cost"
+        }
+      },
+      "price.sum": {
+        "sum": {
+          "field": "price"
+        }
+      },
+      "timestamp.cardinality": {
+        "cardinality": {
+          "field": "timestamp"
+        }
+      }
+    }
+  },
+  "description": "Total budget by campaign and creative",
+  "dest": {
+    "index": "budget_total"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  }
+}
+
+PUT _transform/budget_hourly
+{
+  "source": {
+    "index": [
+      "wins-*"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "adtype": {
+        "terms": {
+          "field": "adtype"
+        }
+      },
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "calendar_interval": "1h"
+        }
+      }
+    },
+    "aggregations": {
+      "cost.avg": {
+        "avg": {
+          "field": "cost"
+        }
+      },
+      "cost.max": {
+        "max": {
+          "field": "cost"
+        }
+      },
+      "cost.min": {
+        "min": {
+          "field": "cost"
+        }
+      },
+      "price.avg": {
+        "avg": {
+          "field": "price"
+        }
+      },
+      "price.max": {
+        "max": {
+          "field": "price"
+        }
+      },
+      "price.min": {
+        "min": {
+          "field": "price"
+        }
+      },
+      "cost.sum": {
+        "sum": {
+          "field": "cost"
+        }
+      },
+      "price.sum": {
+        "sum": {
+          "field": "price"
+        }
+      },
+      "timestamp.cardinality": {
+        "cardinality": {
+          "field": "timestamp"
+        }
+      }
+    }
+  },
+  "description": "Budget hourly history by campaign and creative",
+  "dest": {
+    "index": "budget_hourly"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  }
+}
+
+PUT _transform/budget_daily
+{
+  "source": {
+    "index": [
+      "wins-*"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "adtype": {
+        "terms": {
+          "field": "adtype"
+        }
+      },
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "calendar_interval": "1d"
+        }
+      }
+    },
+    "aggregations": {
+      "cost.avg": {
+        "avg": {
+          "field": "cost"
+        }
+      },
+      "cost.max": {
+        "max": {
+          "field": "cost"
+        }
+      },
+      "cost.min": {
+        "min": {
+          "field": "cost"
+        }
+      },
+      "price.avg": {
+        "avg": {
+          "field": "price"
+        }
+      },
+      "price.max": {
+        "max": {
+          "field": "price"
+        }
+      },
+      "price.min": {
+        "min": {
+          "field": "price"
+        }
+      },
+      "cost.sum": {
+        "sum": {
+          "field": "cost"
+        }
+      },
+      "price.sum": {
+        "sum": {
+          "field": "price"
+        }
+      },
+      "timestamp.cardinality": {
+        "cardinality": {
+          "field": "timestamp"
+        }
+      }
+    }
+  },
+  "description": "Budget daily history by campaign and creative",
+  "dest": {
+    "index": "budget_daily"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  }
+}
+

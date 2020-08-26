@@ -1,0 +1,38 @@
+[
+	{
+		"@version" : "1",
+		"field" : "893",
+		"serialClass" : "java.util.HashMap",
+		"@timestamp" : "2020-06-20T00:00:13.795Z",
+		"source" : "RTBServer",
+		"instance" : "rtb4free-0",
+		"consumer_group" : "logstash1",
+		"sev" : "INFO",
+		"message" : "Heartbeat [canbid=true, runnable campaigns=0, parked=0, dailyspend=0.000000 avg-spend-min=0.000000] members: 1, leader: true, total-errors=0, openfiles=164, cpu=243%, mem=79M (2.013%), freedsk=38.333%, threads=203, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=16, requests=0, bids=0, nobids=0, fraud=0, cidrblocked=0, wins=0, pixels=0, clicks=0, exchanges= [], stopped=false, campaigns=0",
+		"topic" : "rtblogs"
+	},
+	{
+		"@version" : "1",
+		"field" : "322",
+		"serialClass" : "java.util.HashMap",
+		"@timestamp" : "2020-06-20T00:00:13.885Z",
+		"source" : "ApiCommand",
+		"instance" : "rtb4free-0",
+		"consumer_group" : "logstash1",
+		"sev" : "INFO",
+		"message" : """From IP: 127.0.0.1:38096, size: 84, command: {"type":"GetToken#","customer":"rtb4free","username":"rtb4free","password":"xxxxxx"}""",
+		"topic" : "rtblogs"
+	},
+	{
+		"@version" : "1",
+		"field" : "893",
+		"serialClass" : "java.util.HashMap",
+		"@timestamp" : "2020-06-20T00:01:13.805Z",
+		"source" : "RTBServer",
+		"instance" : "rtb4free-0",
+		"consumer_group" : "logstash1",
+		"sev" : "INFO",
+		"message" : "Heartbeat [canbid=true, runnable campaigns=0, parked=0, dailyspend=0.000000 avg-spend-min=0.000000] members: 1, leader: true, total-errors=0, openfiles=158, cpu=227%, mem=86M (2.187%), freedsk=38.332%, threads=205, low-on-threads= false, qps=0.00, avgBidTime=0.00ms, avgNoBidTime=0.00ms, total=16, requests=0, bids=0, nobids=0, fraud=0, cidrblocked=0, wins=0, pixels=0, clicks=0, exchanges= [], stopped=false, campaigns=0",
+		"topic" : "rtblogs"
+	}
+]	  

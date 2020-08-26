@@ -1,0 +1,158 @@
+PUT _template/bids
+  "index_patterns": [
+    "requests-*"
+  ],
+  "aliases": {},
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "0"
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+        {
+            "strings": {
+                "match_mapping_type": "string",
+                "mapping": {
+                    "type":  "keyword",
+                    "ignore_above": 256
+                }
+            }
+        }
+    ],
+    "properties": {
+        "ext": {
+            "properties" :{
+                "carriername":{
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                }
+            }
+        },
+        "site": {
+            "properties" :{
+                "ref": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "domain": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "name": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "publisher": {
+                    "properties": {
+                        "name":{
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        }
+                    }
+                },
+                "keywords": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "page": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "search": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                }
+
+
+
+
+
+
+    "topic": "requests",
+    "user": {
+        "ext": {
+            "nex_kids": "N",
+            "nex_hhi": 75000,
+            "nex_dma": "Boston",
+            "nex_eth": "4",
+            "nex_marital": "M"
+        },
+        "id": "ASDFJKL",
+        "gender": "F",
+        "keywords": "sports",
+        "geo": {
+            "region": "MA",
+            "type": 3,
+            "zip": "02451",
+            "country": "USA",
+            "city": "Waltham"
+        },
+        "yob": 1961
+    },
+    "@version": "1",
+    "device": {
+        "ip": "166.137.138.18",
+        "make": "Apple",
+        "connectiontype": 3,
+        "didsha1": "132079238ec783b0b89dff308e1f9bdd08576273",
+        "dpidsha1": "f22711a823044bb9ce7ace097955de0286eb0182",
+        "geo": {
+            "lat": 42.378,
+            "lon": -71.227,
+            "location": "42.378,-71.227",
+            "country": "USA"
+        },
+        "osv": "3.1.2",
+        "ua": "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_2_1 like Mac OS X; el-gr) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8C148 Safari/6533.18.5",
+        "model": "iPhone",
+        "devicetype": 1,
+        "carrier": "ATT"
+    },
+    "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
+    "Xid": "123",
+    "at": 2,
+    "consumer_group": "logstash1",
+    "logtype": "requests"
+}

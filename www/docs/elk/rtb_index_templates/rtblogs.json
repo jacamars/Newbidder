@@ -1,0 +1,31 @@
+PUT _template/rtblogs
+{
+  "index_patterns": [
+    "rtblogs-*"
+  ],
+  "aliases": {},
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "strings": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    ],
+    "properties": {
+      "message": {
+        "type": "text"
+      }
+    }
+  }
+}

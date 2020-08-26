@@ -1,0 +1,181 @@
+PUT _transform/xform-bids
+{
+  "source": {
+    "index": [
+      "bids-*"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "exchange": {
+        "terms": {
+          "field": "exchange"
+        }
+      },
+      "adtype": {
+        "terms": {
+          "field": "adtype"
+        }
+      },
+      "topic": {
+        "terms": {
+          "field": "topic"
+        }
+      },
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "calendar_interval": "1m"
+        }
+      }
+    },
+    "aggregations": {
+      "timestamp.cardinality": {
+        "cardinality": {
+          "field": "timestamp"
+        }
+      }
+    }
+  },
+  "dest": {
+    "index": "xform-bids"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  }
+}
+
+
+
+PUT _transform/xform-pixels
+{
+  "source": {
+    "index": [
+      "pixels-*"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "topic": {
+        "terms": {
+          "field": "topic"
+        }
+      },
+      "exchange": {
+        "terms": {
+          "field": "exchange"
+        }
+      },
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "calendar_interval": "1m"
+        }
+      }
+    },
+    "aggregations": {
+      "bid_id.cardinality": {
+        "cardinality": {
+          "field": "bid_id"
+        }
+      }
+    }
+  },
+  "dest": {
+    "index": "xform-pixels"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  }
+}
+
+
+
+PUT _transform/xform-wins
+{
+  "source": {
+    "index": [
+      "wins-*"
+    ],
+    "query": {
+      "match_all": {}
+    }
+  },
+  "dest": {
+    "index": "xform-wins"
+  },
+  "sync": {
+    "time": {
+      "field": "@timestamp",
+      "delay": "60s"
+    }
+  },
+  "pivot": {
+    "group_by": {
+      "adid": {
+        "terms": {
+          "field": "adid"
+        }
+      },
+      "crid": {
+        "terms": {
+          "field": "crid"
+        }
+      },
+      "topic": {
+        "terms": {
+          "field": "topic"
+        }
+      },
+      "adtype": {
+        "terms": {
+          "field": "adtype"
+        }
+      },
+      "pubId": {
+        "terms": {
+          "field": "pubId"
+        }
+      },
+      "@timestamp": {
+        "date_histogram": {
+          "field": "@timestamp",
+          "calendar_interval": "1m"
+        }
+      }
+    },
+    "aggregations": {
+      "timestamp.cardinality": {
+        "cardinality": {
+          "field": "timestamp"
+        }
+      }
+    }
+  }
+}
