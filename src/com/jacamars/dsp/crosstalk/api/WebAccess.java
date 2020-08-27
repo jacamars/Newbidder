@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -239,12 +240,8 @@ class Handler extends AbstractHandler {
 	///////////////////////////
 	
 	String executeCommand(String ip, InputStream body) throws Exception {
-		byte [] bytes = new byte[64000];
-		int rc = body.read(bytes);
-		if (rc <= 0) {
-			return "{\"error\":true, \"message\": \"empty command\"}";
-		}
-		String content = new String(bytes,0,rc);
+		
+		String content = IOUtils.toString(body, "UTF-8");
 		String results = ApiCommand.instantiate(ip,content).toJson();
 		return results;
 	}

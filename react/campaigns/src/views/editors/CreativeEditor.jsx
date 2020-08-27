@@ -164,6 +164,8 @@ const getSelectedRules = () => {
       }
     }
 
+    x.forwardurl = undef;       // will be passed in possibly, but will cause errors
+
     if (x.isVideo) {
       var linearity = document.getElementById("vast_video_linearity").value;
       var duration = document.getElementById("vast_video_duration").value;
@@ -197,6 +199,9 @@ const getSelectedRules = () => {
       x.vast_video_duration = Number(duration);
       x.vast_video_bitrate = Number(bitrate);
       x.vast_video_protocol = Number(protocol);
+
+      alert(x.htmltemplate);
+
     }
 
     if (x.isAudio) {
@@ -259,8 +264,7 @@ const getSelectedRules = () => {
     if (cnames.length !== 0) {
       ext.push("categories"+":#:"+cnames.join());
     }
-    
-    alert(siteorapp);
+  
 
     if (siteorapp !== "")
       ext.push("site_or_app:#:"+siteorapp);

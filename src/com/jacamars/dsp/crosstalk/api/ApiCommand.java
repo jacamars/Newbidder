@@ -481,6 +481,9 @@ public class ApiCommand {
             	break;
             	
             case SQLADD_NEW_CREATIVE:
+            	
+            	System.out.println("\n\ntest = \"" + data + ";\n\n");
+            	
             	cmd = mapper.readValue(data, SQLAddNewCreativeCmd.class);
             	requireLeader = true;
             	break;
