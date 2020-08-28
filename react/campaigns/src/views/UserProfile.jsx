@@ -223,6 +223,8 @@ const UserProfile = () => {
                           <Input defaultValue={vx.user.email} placeholder="email" type="email" id="email" />
                         </FormGroup>
                       </Col>
+                      </Row>
+                    <Row>
                       <Col className="pl-md-1" md="3">
                         <FormGroup>
                           <label htmlFor="role">
@@ -231,9 +233,7 @@ const UserProfile = () => {
                           <Input defaultValue={vx.user.sub_id} placeholder="Sub id" type="role" id="text" />
                         </FormGroup>
                       </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-md-1" md="6">
+                      <Col className="pr-md-1" md="4">
                         <FormGroup>
                           <label>First Name</label>
                           <Input
@@ -244,7 +244,7 @@ const UserProfile = () => {
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="pl-md-1" md="6">
+                      <Col className="pl-md-1" md="4">
                         <FormGroup>
                           <label>Last Name</label>
                           <Input

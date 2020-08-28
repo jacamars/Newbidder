@@ -226,6 +226,7 @@ public class Impression {
 	void doAudio() {
 		JsonNode test;
 		JsonNode raudio = rnode.get("audio");
+		audio = new Audio();
 		test = raudio.get("protocol");
 		test = raudio.get("protocols");
 		if (test != null && !(test instanceof MissingNode)) {
@@ -253,6 +254,13 @@ public class Impression {
 		test = raudio.get("startdelay");
 		if (test != null && !(test instanceof MissingNode)) {
 			audio.startdelay = test.intValue();
+		}
+		test = raudio.get("mimes");
+		if (test != null && !(test instanceof MissingNode)) {
+			ArrayNode array = (ArrayNode) test;
+			for (JsonNode member : array) {
+				audio.mimeTypes.add(member.textValue());
+			}
 		}
 		nativead = false;
 	}
@@ -483,5 +491,30 @@ public class Impression {
 	@Override
 	public String toString() {
 		return rnode.toString();
+	}
+	
+	
+	public boolean isBanner() {
+		if (video == null && audio == null && nativePart == null)
+			return true;
+		return false;
+	}
+	
+	public boolean isVideo() {
+		if (video != null)
+			return true;
+		return false;
+	}
+	
+	public boolean isAudio() {
+		if (audio != null)
+			return true;
+		return false;
+	}
+	
+	public boolean usNative() {
+		if (nativePart != null)
+			return true;
+		return false;
 	}
 }

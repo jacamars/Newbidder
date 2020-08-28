@@ -180,10 +180,7 @@ The fields and their valus are described below:
 - Daily Budget: Amount campaign is to spend per day. Setting 0 means no daily constraint.
 - Hourly Budget: Amount campaugn is to spend per hour. Setting 0 means no set hourly constraint.
 
-Select save to save the creative to the database. Your screen w
-
-
-ll show the new creative:
+Select save to save the creative to the database. Your screen wll show the new creative:
 
 ![Image](../images/banner3.png)
 
@@ -200,8 +197,101 @@ Pressing *Save* will bring up the Campaigns status window, the status line shoul
 A video creative is a Video that plays in a VAST player. The video creative is accessed via the the
 "Videos" panel. An example is shown below:
 
+After clicking the *Creatives* icon on the blue field, you will be presented with a screen that looks like this:
+
+![image](../images/creatives.png)
+
+Click the *New* button and a new editor window for Video creatives will be presented to you like so:
+
+![image](../images/videos1.png)
+
+And scrolling down a little further:
+
+![image](../images/videos2.png)
+
+The fields and what they mean are shown below:
+
+- SQL ID: Not editable
+- Name: Name of this creative *REQUIRED*
+- ECPM/Price: Price per 1000 *REQUIRED*
+- App/Site/Both: Whether this is aonly for apps, websites or both. *REQUIRED*
+- Match Size: Any/Specified/W-H Ranges/W-H List: Choose one to set your sizes you are looking for *REQUIRED*
+- Deals: No Deal/Private Only/Private Preferred: Which deal strategy if any. *REQUIRED*
+- Content-Type: The type of the banner *REQUIRED*
+- The URL of the image *REQURED*.
+- Mime Type: Select the technology he video is. *REQUIRED*
+- Linearity: Use 1 or 2. *REQUIRED*
+- Duration: The duration in seconds. *REQUIRED*
+- VAST Video Protocol: The protocol identifier *REQUIRED*
+- Bit Rate: The minimum bits per second rate to support in the player. *REQUIRED*
+- Creative's Categories: Identifies the categories that match this ad. *REQUIRED*
+- Creaticvs Atrributes: Multi selection of the attributes of the ad. *REQUIRED*
+- Outgoing File: The VAST Tag output. *REQUIRED*.
+- Specialty Exchange Attributes. Press the button to input the special key fields required by the respective exchanges. *REQUIRED FOR THOSE EXCANGES* Ignore if these exchanges don't apply.
+- Start date creative is active. *REQURED*
+- End Date creative is active. *REQUIRED*
+- Rules: Select any rules you want attched to this creative.
+- Total Budget: Total amount of US dollars to allocate to this campaign. Setting 0 means no budget.
+- Daily Budget: Amount campaign is to spend per day. Setting 0 means no daily constraint.
+- Hourly Budget: Amount campaugn is to spend per hour. Setting 0 means no set hourly constraint.
+
+Select save to save the creative to the database. Your screen wll show the new creative:
+
+![image](../images/videos3.png)
+
+Don't forget to go back to the *Campaigns* section and add your creative to the system.
+
+![image](../images/campaign7.png)
 
 ### Audio
+An audio creative is an audio that plays in a VAST player. The audio creative is accessed via the the
+"Audios" panel. An example is shown below:
+
+After clicking the *Creatives* icon on the blue field, you will be presented with a screen that looks like this:
+
+![image](../images/creatives.png)
+
+Click the *New* button for the *Audio* section and a new editor window for Audio creatives will be presented to you like so:
+
+![image](../images/audios1.png)
+
+And scrolling down a little further:
+
+![image](../images/audios2.png)
+
+The fields and what they mean are shown below:
+
+- SQL ID: Not editable
+- Name: Name of this creative *REQUIRED*
+- ECPM/Price: Price per 1000 *REQUIRED*
+- App/Site/Both: Whether this is aonly for apps, websites or both. *REQUIRED*
+- Match Size: Any/Specified/W-H Ranges/W-H List: Choose one to set your sizes you are looking for *REQUIRED*
+- Deals: No Deal/Private Only/Private Preferred: Which deal strategy if any. *REQUIRED*
+- Content Type: Select the technology he video is. *REQUIRED*
+- Duration: The duration in seconds. *REQUIRED*
+- Start Delay: How many seconds before the audio plays. *REQUIRED*
+- Bitrate: The desired bit rate. *REQUIRED*
+- Supported Protocol: Select the type of player needed. *REQURED*
+- Supported API: Select the API.
+- DAAST FILE: The VAST/DAAST tag specification.
+- Companion: A companion banner to be displayed while the audio plays.
+- Creatives Atrributes: Multi selection of the attributes of the ad. *REQUIRED*
+- Outgoing File: The VAST Tag output. *REQUIRED*.
+- Specialty Exchange Attributes. Press the button to input the special key fields required by the respective exchanges. *REQUIRED FOR THOSE EXCANGES* Ignore if these exchanges don't apply.
+- Start date creative is active. *REQURED*
+- End Date creative is active. *REQUIRED*
+- Rules: Select any rules you want attched to this creative.
+- Total Budget: Total amount of US dollars to allocate to this campaign. Setting 0 means no budget.
+- Daily Budget: Amount campaign is to spend per day. Setting 0 means no daily constraint.
+- Hourly Budget: Amount campaugn is to spend per hour. Setting 0 means no set hourly constraint.
+
+Select save to save the creative to the database. Your screen will show the new creative:
+
+![image](../images/audios3.png)
+
+Don't forget to go back to the *Campaigns* section and add your creative to the system.
+
+![image](../images/campaign7.png)
 ### Native
 
 ##Rules

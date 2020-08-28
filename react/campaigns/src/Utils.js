@@ -81,6 +81,7 @@ export const mimeTypes = (e) => {
         <option selected={e === 'audio/basic'}>audio/basic</option>
         <option selected={e === 'audio/mid'}>audio/mid</option>
         <option selected={e === 'audio/mpeg'}>audio/mpeg</option>
+        <option selected={e === 'audio/mp4'}>audio/mp4</option>
         <option selected={e === 'audio/vorbis'}>audio/vorbis</option>
         <option selected={e === 'audio/x-aiff'}>audio/x-aiff</option>
         <option selected={e === 'audio/x-mpegurl'}>audio/mpeg</option>

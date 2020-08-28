@@ -106,6 +106,8 @@ const VideoEditor = (props) => {
           id="outgoingfile"
           onChange={ (e) => props.callback(e,"htmltemplate",props.index)}
           defaultValue={props.creative.htmltemplate}
+          spellCheck={false}
+          rows={16}
           type="textarea"
         />
       </FormGroup>

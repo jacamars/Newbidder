@@ -42,7 +42,7 @@ public class Audio {
 	public int nvol = -1;
 	
 	/** The protocol supported as set forth in the rtb  spec */
-	public List<Integer> protocols;
+	public List<Integer> protocols = new ArrayList<>();
 	/** The mime types I like */
 	public List<String> mimeTypes = new ArrayList<String>();
 	

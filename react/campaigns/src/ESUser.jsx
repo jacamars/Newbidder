@@ -38,10 +38,21 @@ const ESUser = (props) => {
             <Alert color="info" key={"alert-users-"+index}>
               <Row>
                 <Col className="pr-md-1" md="2">
+                <FormGroup>
+                        <label>Customer Name</label>
                     <Input 
                         disabled={vx.user.customer_id != 'rtb4free'}
                         onChange={(e) => props.changeUserField(e,index,'customer_id')}
                         type="select">{customerNames(props.affiliates,row)}</Input>
+                </FormGroup>
+                </Col>
+                <Col className="pr-md-1" md="3">
+                    <FormGroup>
+                        <label>Customer ID</label>
+                      <Input
+                        disabled={true}
+                        defaultValue={vx.user.customer_id}/>
+                      </FormGroup>
                 </Col>
               </Row>
               <Row>

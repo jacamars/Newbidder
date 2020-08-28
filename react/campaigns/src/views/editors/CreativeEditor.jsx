@@ -200,8 +200,6 @@ const getSelectedRules = () => {
       x.vast_video_bitrate = Number(bitrate);
       x.vast_video_protocol = Number(protocol);
 
-      alert(x.htmltemplate);
-
     }
 
     if (x.isAudio) {
@@ -216,6 +214,10 @@ const getSelectedRules = () => {
       x.vast_video_inearity = undef;
       x.audio_duration = Number(x.audio_duration);
       x.audio_bitrate = Number(x.audio_bitrate);
+      x.audio_api = Number(x.audio_api);
+      x.htmltemplate = document.getElementById("DAAST").value;
+
+      alert(x.audio_protocol);
     }
 
     if (privateDeals) {
@@ -277,7 +279,7 @@ const getSelectedRules = () => {
 
 
 
-    // alert(JSON.stringify(x,null,2));
+    //alert(JSON.stringify(x,null,2));
     props.callback(x);
   }
 

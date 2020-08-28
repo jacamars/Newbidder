@@ -127,7 +127,15 @@ const Simulator = (props) =>  {
     vars.selectedBidType = name;
     vars.json = copy(file);
     vars.bid = JSON.stringify(file, null, 2);
+
+
+    vars.nurl = '';
+    vars.adm = '';
+    vars.creative = '';
+    vars.winSent = false;
+    vx.setWinSent = false;
     setVars(vars);
+
 
     redraw();
   }
@@ -170,6 +178,9 @@ const Simulator = (props) =>  {
 
 
   const sendBid = async  (event, id) => {
+
+    wClearHandler();
+    
     console.log("SENDING A BID");
     if (vars.jsonError !== false) {
       alert("Can't send, error at line " + vars.jsonError.line + "\n" +

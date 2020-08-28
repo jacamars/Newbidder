@@ -71,13 +71,14 @@ const setSizeType = (t) => {
     <Row>
     <Col className="px-md-1" md="2">
       <FormGroup>
-        <label>Mime Type</label>
+        <label>Content Type</label>
         <Input
-          id="protocol-width"
-          defaultValue={props.creative.mime_type}
+          id="fixed-width"
+          defaultValue={props.creative.contenttype}
+          onChange={ (e) => props.callback(e,"contenttype")}
           type="select">
-            {mimeTypes(props.creative.mime_type)}
-          </Input>
+            {mimeTypes(props.creative.contenttype)}
+        </Input>
       </FormGroup>
     </Col>
     <Col className="px-md-1" md="1">
@@ -118,9 +119,9 @@ const setSizeType = (t) => {
         <label>Supported Protocols</label>
         <Input
           id="height"
-          onChange={ (e) => props.callback(e,"audio_protocols")}
+          onChange={ (e) => props.callback(e,"audio_protocol")}
           type="select">
-                {protocolOptions(props.creative.audio_protocols)}
+                {protocolOptions(props.creative.audio_protocol)}
         </Input>
       </FormGroup>
     </Col>
@@ -141,7 +142,7 @@ const setSizeType = (t) => {
       <FormGroup>
         <label>DAAST FILE</label>
         <Input
-          id="height"
+          id="DAAST"
           spellCheck={false}
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}

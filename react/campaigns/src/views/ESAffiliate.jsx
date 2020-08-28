@@ -118,7 +118,7 @@ const ESAffilates = (props) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="pr-md-1" md="2">
+                  <Col className="pr-md-1" md="3">
                     <FormGroup>
                       <label>Address</label>
                       <Input
