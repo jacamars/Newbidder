@@ -31,6 +31,7 @@ const SuperAffiliate = (props) => {
 
   const vx = useViewContext();
   const [companyModal, setCompanyModal] = useState(false);
+  const [newCompanyModal, setNewCompanyModal] = useState(false);
   const [record, setRecord] = useState(undef)
   const [users, setUsers] = useState([]);
   const [affiliates, setAffiliates] = useState([]);
@@ -57,10 +58,10 @@ const SuperAffiliate = (props) => {
   },[]);
 
 
-  const newCompany = () => {
+  const newCompany = (id) => {
     var company = {
         id: 0,
-        customer_id: uuidv4(),
+        customer_id: id,
         email: '',
         telephone: '',
         firstname: '',
@@ -75,6 +76,11 @@ const SuperAffiliate = (props) => {
     var af = affiliates;
     af.unshift(company);
     setAffiliates(af);
+    setCount(count+1);
+  }
+
+  const makeNewCompany = () => {
+    setNewCompanyModal(true);
     setCount(count+1);
   }
 
@@ -162,8 +168,33 @@ const SuperAffiliate = (props) => {
     props.redrawParent();
   }
 
+  const newCompanyModalCallback = async(doit,id) => {
+    setNewCompanyModal(false)
+    if (doit) {
+      if (id === '') {
+        alert("Empty customer id not allowed, redo");
+        setNewCompanyModal(true);
+        return;
+      }
+      for (var i=0;i<affiliates.length;i++) {
+        if (affiliates[i].customer_id === id) {
+          alert("This customer id already exists, redo");
+          setNewCompanyModal(true);
+          return;
+        }
+      }
+      newCompany(id);
+    }
+  }
+
   return(
     <>
+    { newCompanyModal &&
+          <DecisionModal title={"New Company ID"}
+                         message="Input a new Company name" 
+                         name="SAVE"
+                         input={true}
+                         callback={newCompanyModalCallback} />}
    { companyModal &&
           <DecisionModal title={"Really delete Company: " + record.customer_name}
                          message="You can't undo this if you delete it!!!" 
@@ -174,7 +205,7 @@ const SuperAffiliate = (props) => {
     <Row>
       <Col md="12">
         { vx.user.customer_id === 'rtb4free' && <>
-          <Button className="btn-fill" color="primary" type="submit" onClick={newCompany}>+Company</Button>
+          <Button className="btn-fill" color="primary" type="submit" onClick={makeNewCompany}>+Company</Button>
           {' '}
           </>
         }
