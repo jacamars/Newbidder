@@ -441,7 +441,6 @@ public class RTBServer implements Runnable {
 	 *
 	 * @param fileName  String. The filename of the configuration file.
 	 * @param shard     String. The shard key of this bidder instance.
-	 * @param port      . int. The port to use for this bidder.
 	 * @param exchanges String. The list of exchanges to restrict bidding on.
 	 * @throws Exception if the Server could not start (network error, error reading
 	 *                   configuration)

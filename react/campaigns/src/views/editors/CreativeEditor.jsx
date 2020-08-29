@@ -23,7 +23,7 @@ import NativeEditor from "./NativeEditor";
 import SiteOrAppEditor from "./SiteOrAppEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
-import {attrOptions} from "../../Utils"
+import {attrOptions, blackStyle, whiteStyle} from "../../Utils"
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -398,6 +398,8 @@ const getSelectedRules = () => {
                               <FormGroup>
                                 <label>SQL ID (disabled)</label>
                                 <Input
+                                  style={(document.body.classList.contains("white-content")) 
+                                    ? blackStyle : whiteStyle}
                                   defaultValue={creative.id}
                                   disabled
                                   type="text"

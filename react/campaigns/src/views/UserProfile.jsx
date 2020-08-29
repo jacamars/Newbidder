@@ -20,6 +20,7 @@ import {useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
 import SuperUser from '../SuperUser';
 import SuperAffiliate from '../SuperAffiliate'
+import {undef, whiteStyle, blackStyle} from "../Utils";
 
 
 // reactstrap components
@@ -36,8 +37,6 @@ import {
   Row,
   Col
 } from "reactstrap";
-
-var undef;
 
 const UserProfile = () => {
 
@@ -144,6 +143,8 @@ const UserProfile = () => {
               <Button className="btn-fill" 
                 color="success" type="submit" 
                 disabled={adminCompany}
+                style={(document.body.classList.contains("white-content")) 
+                            ? blackStyle : whiteStyle}
                 onClick={doAdminCompany}>Admin Companies</Button>
             </Col>
           </Row>
@@ -170,13 +171,15 @@ const UserProfile = () => {
                       <Col className="pr-md-1" md="5">
                         <FormGroup>
                           <label>Company (disabled)</label>
-                          <Input
+                      
+                            <Input style={(document.body.classList.contains("white-content")) 
+                                  ? blackStyle : whiteStyle}
                             defaultValue={vx.user.company}
                             disabled
                             placeholder="Company"
                             type="text"
-                            id="company"
-                          />
+                            id="company"/>
+
                         </FormGroup>
                       </Col>
                       <Col className="px-md-1" md="3">

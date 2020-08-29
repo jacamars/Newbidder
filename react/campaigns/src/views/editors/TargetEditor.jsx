@@ -27,7 +27,7 @@ import {
 import { useViewContext } from "../../ViewContext";
 
 import "react-datepicker/dist/react-datepicker.css";
-import {deviceTypes, fromCommaList} from "../../Utils.js"
+import {deviceTypes, fromCommaList, blackStyle, whiteStyle} from "../../Utils.js"
 
 var undef;
 
@@ -202,6 +202,8 @@ const getWBList = (s) => {
                               <FormGroup>
                                 <label>SQL ID (disabled)</label>
                                 <Input
+                                  style={(document.body.classList.contains("white-content")) 
+                                    ?  blackStyle : whiteStyle}
                                   defaultValue={target.id}
                                   disabled
                                   type="text"

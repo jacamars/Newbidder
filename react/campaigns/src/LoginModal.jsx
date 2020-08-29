@@ -94,6 +94,7 @@ const LoginModal = (props) => {
       return;
     console.log("Bidders = " + mx.length);
     vx.changeLoginState(true);
+
     props.callback(mx,server);
   }
 

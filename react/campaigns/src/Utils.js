@@ -2,6 +2,14 @@ import React  from "react";
 
 var undef;
 
+export const blackStyle = {
+    color: 'black'
+  }
+  
+export const whiteStyle = {
+    color: 'white'
+}
+
 const contextValues = [
     {e:1,value:"1",content:"Content-centric content"},
     {e:2,value:"2",content:"Social-centric content"},

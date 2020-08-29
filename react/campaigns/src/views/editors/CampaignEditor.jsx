@@ -19,7 +19,7 @@ import { useViewContext } from "../../ViewContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import DayPartEditor from "./DayPartEditor";
-import {getTrueFalseOptions, ssp} from "../../Utils.js"
+import {getTrueFalseOptions, ssp, blackStyle, whiteStyle} from "../../Utils.js"
 
 var regions = ["US","APAC","EUROPE","Russia"];
 
@@ -271,6 +271,8 @@ const getSelectedRegions = () => {
                                 <Input
                                   defaultValue={campaign.adId}
                                   disabled
+                                  style={(document.body.classList.contains("white-content")) 
+                                    ? blackStyle : whiteStyle}
                                   type="text"
                                 />
                               </FormGroup>

@@ -25,6 +25,7 @@ import {
   Col
 } from "reactstrap";
 import { useViewContext } from "../../ViewContext";
+import { undef, blackStyle, whiteStyle} from "../../Utils";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -33,8 +34,6 @@ var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","INR
   "MEMBER","NOT DOMAIN","NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
 var types =["integer","string","double"];
 var ords =["scalar","list"];
-
-var undef;
 
 const RuleEditor = (props) => {
 
@@ -137,6 +136,8 @@ const getOperandOrdinal = () => {
                               <FormGroup>
                                 <label>SQL ID (disabled)</label>
                                 <Input
+                                  style={(document.body.classList.contains("white-content")) 
+                                    ? blackStyle : whiteStyle}
                                   defaultValue={rule.id}
                                   disabled
                                   type="text"

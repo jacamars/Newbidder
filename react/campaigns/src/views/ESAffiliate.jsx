@@ -21,7 +21,7 @@ import {
   Col
 } from "reactstrap";
 import { PayPalButton } from "react-paypal-button-v2";
-import {uuidv4, customerIds, customerNames} from "../Utils"
+import {uuidv4, customerIds, customerNames, whiteStyle, blackStyle} from "../Utils"
 import DecisionModal from "../DecisionModal";
 
 var undef;
@@ -62,6 +62,8 @@ const ESAffilates = (props) => {
                     <FormGroup>
                       <label>ID (Disabled)</label>
                       <Input
+                          style={(document.body.classList.contains("white-content")) 
+                            ? blackStyle : whiteStyle}
                           disabled={true}
                           defaultValue={row.customer_id}/>
                     </FormGroup>

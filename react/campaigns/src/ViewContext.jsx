@@ -27,6 +27,7 @@ const  ViewContext = () => {
     const [xtime, setXtime] = useState('xtime: 0, rtt: 0');
     const [adm, setAdm] = useState('');
     const [winsent, setWinsent] = useState(false);
+
     const changeSsp = (name) => {
         setSsp(name);
     }
