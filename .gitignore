@@ -86,6 +86,8 @@ yarn-error.log*
 .npm/
 yarn.lock
 package-lock.json
-www/exchange/*
-www/campaigns/*
-www/control/*
+www/exchange/
+www/control/
+mkdocs/site/
+www/docs/
+www/campaigns/
