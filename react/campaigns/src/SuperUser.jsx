@@ -111,6 +111,10 @@ const SuperUser = (props) => {
 
   const changeUserField = (e,i,f) => {
       users[i][f] = e.target.value;
+      if (f === 'customer_id') {
+        var c = getCompanyFromId(e.target.value);
+        users[i]['company'] = c;
+      }
       setUsers(users);
   }
 
@@ -121,6 +125,20 @@ const SuperUser = (props) => {
 
   const editUser = async(id) => {
     var u = getUserById(id);
+
+    if (u.username === '') {
+      alert("User name can't be blank");
+      return;
+    }
+    if (u.password === '') {
+      alert("Sorry, password can't be empty");
+      return;
+    }
+    if (userNameExists(u.username,u.customer_id,u.id)) {
+      alert("User already exists, choose another name");
+      return;
+    }
+
     await vx.addNewUser(u);
     alert("User: " + u.username + " saved");
     props.redrawParent();
@@ -137,6 +155,15 @@ const SuperUser = (props) => {
     } */
     console.log("DELETE: " + c.username);
     setUserModal(true);
+  }
+
+  const getCompanyFromId = (id) => {
+    for (var i = 0; i < affiliates.length;i++) {
+      if (affiliates[i].customer_id === id) {
+        return affiliates[i].customer_nme;
+      }
+    }
+    alert("Can't find name for: " + id);
   }
 
   const addBudget = async (index) => {
@@ -164,6 +191,17 @@ const SuperUser = (props) => {
       }
     }
     return undef;
+  }
+
+  const userNameExists = (name,org,id) => {
+    var c;
+    for (var i=0;i<users.length;i++) {
+      if (users[i].username === name && users[i].customer_id == org) {
+        if (users[i].id !== id)
+          return true;
+      }
+    }
+    return false;
   }
 
 

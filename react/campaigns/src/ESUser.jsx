@@ -37,24 +37,16 @@ const ESUser = (props) => {
               <Row>
                 <Col className="pr-md-1" md="2">
                 <FormGroup>
-                        <label>Customer Name</label>
+                        <label>Customer ID</label>
                     <Input 
                         style={(document.body.classList.contains("white-content")) 
                             ? blackStyle : whiteStyle}
                         disabled={vx.user.customer_id != 'rtb4free'}
-                        onChange={(e) => props.changeUserField(e,index,'customer_id')}
-                        type="select">{customerNames(props.affiliates,row)}</Input>
+                        onChange={(e) =>props.changeUserField(e,index,'customer_id')}
+                        type="select">
+                        { customerIds(props.affiliates,row.customer_id) }
+                      </Input>
                 </FormGroup>
-                </Col>
-                <Col className="pr-md-1" md="3">
-                    <FormGroup>
-                        <label>Customer ID</label>
-                      <Input
-                        style={(document.body.classList.contains("white-content")) 
-                          ? blackStyle : whiteStyle}
-                        disabled={true}
-                        defaultValue={vx.user.customer_id}/>
-                      </FormGroup>
                 </Col>
               </Row>
               <Row>
