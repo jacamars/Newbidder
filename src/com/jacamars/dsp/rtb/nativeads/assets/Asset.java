@@ -93,11 +93,16 @@ public class Asset  {
 				video.w = x.get("w").asInt(0);
 			if (x.get("h")!=null)
 				video.h = x.get("h").asInt(0);
-			video.mime_type = x.get("mime_type").asText();
-			video.duration = x.get("vast_video_duration").asInt(0);
-			video.protocol = x.get("vast_video_protocol").asText();
-			video.linearity = x.get("vast_video_linearity").asInt();
-			video.bitrate = x.get("vast_video_bitrate").asInt();
+			if (x.get("mime_type") != null)
+				video.mime_type = x.get("mime_type").asText();
+			if (x.get("vast_video_duration") != null)
+				video.duration = x.get("vast_video_duration").asInt(0);
+			if (x.get("vast_video_protocol") != null)
+				video.protocol = x.get("vast_video_protocol").asText();
+			if (x.get("vast_video_linearity") != null)
+				video.linearity = x.get("vast_video_linearity").asInt();
+			if (x.get("vast_video_bitrate") != null)
+				video.bitrate = x.get("vast_video_bitrate").asInt();
 		}
 		
 	}
