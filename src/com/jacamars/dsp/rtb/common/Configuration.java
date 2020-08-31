@@ -1295,6 +1295,39 @@ public class Configuration {
 				}
 				logger.info("*** Configuration Initialized {} with {}", name, fileName);
 			}
+			var is3 = (String)m.get("s3");
+			if (is3 != null) {
+				String parts[] = is3.split("/");
+				String bucket = parts[0].trim();
+				String object = parts[1].trim();
+				String name = (String) m.get("name");
+				String type = (String) m.get("type");
+					
+				GetObjectRequest rangeObjectRequest = new GetObjectRequest(bucket, object);
+	            S3Object s3o = s3.getObject(rangeObjectRequest);
+				
+				if (type.toLowerCase().contains("cidr") || type.contains("range")) {
+					new NavMap(name, s3o, type); // file uses ranges
+				} else if (type.toLowerCase().contains("adxgeocodes")) {
+					new AdxGeoCodes(name, s3o);
+				} else if (type.toLowerCase().contains("lookingglass")) {
+					new LookingGlass(name, s3o);
+				} else {
+					// Ok, load it by class name
+					Class cl = Class.forName(type);
+					String size = (String)m.get("size");
+					Constructor<?> cons = null;
+					if (size == null) {
+						cons = cl.getConstructor(String.class, S3Object.class);
+						cons.newInstance(name, s3o);
+					} else {
+						Long sz = Long.parseLong(size);
+						cons = cl.getConstructor(String.class, S3Object.class, Long.class);
+						cons.newInstance(name, s3o, sz);
+					}
+				}
+			}
+				
 		}
 		} catch (Exception error) {
 			logger.error("Error initializing: {}: {}", fileName,error.getMessage());

@@ -2,9 +2,12 @@ package com.jacamars.dsp.rtb.blocks;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.TreeSet;
+
+import com.amazonaws.services.s3.model.S3Object;
 
 
 
@@ -22,6 +25,8 @@ public class Membership extends LookingGlass {
 	// The name of the symbol
 	String name;
 	
+	String file;
+	
 	/**
 	 * Generic constructor
 	 */
@@ -38,7 +43,24 @@ public class Membership extends LookingGlass {
 	public Membership(String name, String file) throws Exception {
 		this.name = name;
 		myMap = null;
-		readData(file);
+		this.file = file;
+		BufferedReader br = new BufferedReader(new FileReader(file));
+
+		readData(br);
+	}
+	
+	/**
+	 * Create a membership from the file provided. We expect a simple list, one entry per line.
+	 * @param name String. The name of the Membership
+	 * @param file String. The filename containing the goodies.
+	 * @throws Exception on File I/O errors.
+	 */
+	public Membership(String name, S3Object object) throws Exception {
+		this.name = name;
+		myMap = null;
+		InputStream objectData = object.getObjectContent();
+		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
+		readData(br);
 	}
 	
 	/**
@@ -46,8 +68,7 @@ public class Membership extends LookingGlass {
 	 * @param file String. The filename
 	 * @throws Exception on I/O errors.
 	 */
-	void readData(String file) throws Exception {		
-		BufferedReader br = new BufferedReader(new FileReader(file));
+	void readData(BufferedReader br) throws Exception {		
 
 		String[] parts = null;	
 		String message = "Initialize Simple Membership: " + file + " as " + name;

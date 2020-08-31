@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WeightedSelector extends LookingGlass {
 
     Map<String,Map<String,Integer>> wMap = new ConcurrentHashMap<String, Map<String, Integer>>();
+    
     public WeightedSelector(String name) {
         logger = LoggerFactory.getLogger(WeightedSelector.class);
 

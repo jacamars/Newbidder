@@ -3,11 +3,15 @@ package com.jacamars.dsp.rtb.blocks;
 import java.io.BufferedReader;
 
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.amazonaws.services.s3.model.S3Object;
 
 public class LookingGlass {
 
@@ -44,6 +48,24 @@ public class LookingGlass {
 
 		String[] parts = null;	
 		String message = "Initialize Simple Map: " + file + " as " + name;
+		for (String line; (line = br.readLine()) != null;) {
+			parts = eatquotedStrings(line);
+			for (int i=0;i<parts.length;i++) {
+				parts[i] = parts[i].replaceAll("\"","");
+			}
+			myMap.put(parts[0], parts);
+		}
+		br.close();
+		symbols.put(name, this);
+		logger.info("{}",message);
+	}
+	
+	public LookingGlass(String name, S3Object obj) throws Exception {
+		InputStream objectData = obj.getObjectContent();
+		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
+
+		String[] parts = null;	
+		String message = "Initialize Simple Map: " + obj.getBucketName() + " as " + name;
 		for (String line; (line = br.readLine()) != null;) {
 			parts = eatquotedStrings(line);
 			for (int i=0;i<parts.length;i++) {

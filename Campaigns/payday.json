@@ -292,6 +292,11 @@
     "bucket" : "$S3BUCKET"
   },
   "lists" : [ {
+    "s3" : "cidr/CIDR2.txt",
+    "name" : "@CIDRX",
+    "type" : "CIDR"
+  },
+  {
     "filename" : "data/adxgeo.csv",
     "name" : "@ISO2-3",
     "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"

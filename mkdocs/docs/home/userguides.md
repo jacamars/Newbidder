@@ -14,7 +14,7 @@ Features at a glance:
 
 A campaign is the offering of one or more creatives over a certain time period, and with specific targets. We use the
 term target to mean constraining rules that filter out those id requests that match your target market. When we say
-reative we mean a banner ad, a video or a native ad. Additionally, you can use the Campaign Manager to review the
+relative we mean a banner ad, a video or a native ad. Additionally, you can use the Campaign Manager to review the
 the running status of your campaign, and to start and stop campaigns.</p>
 
 The process to create a new campaign is:
