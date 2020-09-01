@@ -25,7 +25,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 
@@ -398,6 +398,7 @@ public class Configuration {
 			Map<String, Object> ms3 = (Map) m.get("s3");
 			String accessKey = (String) ms3.get("access_key_id");
 			String secretAccessKey = (String) ms3.get("secret_access_key");
+			String endPoint = (String)ms3.get("endpoint");
 			String region = (String) ms3.get("region");
 			s3_bucket = (String) ms3.get("bucket");
 
@@ -421,9 +422,25 @@ public class Configuration {
 				}
 
 				BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
-				s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
+				
+				if (endPoint == null) {
+					// standard aws
+					s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
 						.withCredentials(new AWSStaticCredentialsProvider(creds)).withRegion(Regions.fromName(region))
 						.build();
+				} else {
+					// Likely using minio
+					ClientConfiguration clientConfiguration = new ClientConfiguration();
+			        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+
+					s3 = AmazonS3ClientBuilder
+			                .standard()
+			                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, Regions.US_EAST_1.name()))
+			                .withPathStyleAccessEnabled(true)
+			                .withClientConfiguration(clientConfiguration)
+			                .withCredentials(new AWSStaticCredentialsProvider(creds))
+			                .build();
+				}
 
 				ObjectListing listing = s3.listObjects(new ListObjectsRequest().withBucketName(s3_bucket));
 
@@ -1273,7 +1290,7 @@ public class Configuration {
 		try {
 		for (Map m : list) {
 			fileName = (String) m.get("filename");
-			if (!(fileName != null && fileName.equals(""))) {
+			if (fileName != null && !fileName.equals("")) {
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
 				System.out.println("*** Configuration Initializing: " + fileName);

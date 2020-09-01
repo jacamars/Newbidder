@@ -60,7 +60,7 @@ const VideoEditor = (props) => {
           id="vast_video_linearity"
           onChange={ (e) => props.callback(e,"vast_video_linearity",props.index)}
           defaultValue={props.creative.vast_video_linearity}
-          type="text"
+          type="number"
         />
       </FormGroup>
    </Col>
@@ -71,7 +71,7 @@ const VideoEditor = (props) => {
           id="vast_video_duration"
           onChange={ (e) => props.callback(e,"vast_video_duration",props.index)}
           defaultValue={props.creative.vast_video_duration}
-          type="text"
+          type="number"
         />
       </FormGroup>
    </Col>
@@ -93,7 +93,7 @@ const VideoEditor = (props) => {
           id="vast_video_bitrate"
           onChange={ (e) => props.callback(e,"vast_video_bitrate",props.index)}
           defaultValue={props.creative.vast_video_bitrate}
-          type="text"
+          type="number"
         />
       </FormGroup>
    </Col>

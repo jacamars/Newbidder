@@ -80,8 +80,10 @@ const clearVideo = (i) => {
 // Linkage to the video editor
 const setVideoAsset = (e,type,index) => {
     console.log(type + ", VALUE: " + e.target.value);
-    props.nativead.assets[index]["video"][type] = e.target.value;
-    props.setter(props.assets);
+    //props.nativead.assets[index]["video"][type] = e.target.value;
+
+    handler(e,index,"video",type);
+  //  props.setter(props.assets);
 }
 
   return(
@@ -91,7 +93,7 @@ const setVideoAsset = (e,type,index) => {
                <Label>TITLE ASSET</Label>
                <Button color="warning" size="sm" onClick={()=>clearTitle(i)}>Clear</Button>
                <Row>
-                <Col className="px-md-1" md="4">
+                <Col className="px-md-1" md="6">
                     <FormGroup>
                         <label>Title Text</label>
                         <Input
@@ -154,7 +156,7 @@ const setVideoAsset = (e,type,index) => {
                           id="video-w"
                           onChange={ (e) => handler(e,i,"video","w")}
                           defaultValue={row.video.w}
-                          type="text">
+                          type="number">
                       </Input>
                   </FormGroup>
               </Col>
@@ -165,7 +167,7 @@ const setVideoAsset = (e,type,index) => {
                           id="video-h"
                           onChange={ (e) => handler(e,i,"video","h")}
                           defaultValue={row.video.h}
-                          type="text">
+                          type="number">
                       </Input>
                   </FormGroup>
               </Col>

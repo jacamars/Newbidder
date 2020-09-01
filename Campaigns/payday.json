@@ -292,7 +292,7 @@
     "bucket" : "$S3BUCKET"
   },
   "lists" : [ {
-    "s3" : "cidr/CIDR2.txt",
+    "Xs3" : "cidr/CIDR2.txt",
     "name" : "@CIDRX",
     "type" : "CIDR"
   },
