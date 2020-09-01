@@ -389,10 +389,6 @@ public class Configuration {
 		//////////////////////////////////////////////////////////////
 
 		seats = new HashMap<String, String>();
-		if (m.get("lists") != null) {
-			filesList = (List) m.get("lists");
-			initializeLookingGlass(filesList);
-		}
 
 		if (m.get("s3") != null) {
 			Map<String, Object> ms3 = (Map) m.get("s3");
@@ -459,6 +455,11 @@ public class Configuration {
 			} else {
 				logger.info("S3 is not configured");
 			}
+		}
+		
+		if (m.get("lists") != null) {
+			filesList = (List) m.get("lists");
+			initializeLookingGlass(filesList);
 		}
 		
 		/**
@@ -1285,10 +1286,10 @@ public class Configuration {
 		return REQUEST_STRATEGY_ALL;
 	}
 
-	public void initializeLookingGlass(List<Map> list) throws Exception {
+	public void initializeLookingGlass(List<Map> list)  {
 		String fileName = null;
-		try {
 		for (Map m : list) {
+			try {
 			fileName = (String) m.get("filename");
 			if (fileName != null && !fileName.equals("")) {
 				String name = (String) m.get("name");
@@ -1329,6 +1330,8 @@ public class Configuration {
 					new AdxGeoCodes(name, s3o);
 				} else if (type.toLowerCase().contains("lookingglass")) {
 					new LookingGlass(name, s3o);
+				} else if (type.toLowerCase().contains("iso2")) {
+					new IsoTwo2Iso3(name,s3o);
 				} else {
 					// Ok, load it by class name
 					Class cl = Class.forName(type);
@@ -1345,10 +1348,9 @@ public class Configuration {
 				}
 			}
 				
-		}
-		} catch (Exception error) {
-			logger.error("Error initializing: {}: {}", fileName,error.getMessage());
-			throw error;
+			} catch (Exception error) {
+				logger.error("Error initializing: {}: {}", fileName,error.getMessage());
+			}
 		}
 	}
 

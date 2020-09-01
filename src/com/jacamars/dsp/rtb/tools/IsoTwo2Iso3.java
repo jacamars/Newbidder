@@ -2,9 +2,12 @@ package com.jacamars.dsp.rtb.tools;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.amazonaws.services.s3.model.S3Object;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 
 /**
@@ -32,6 +35,22 @@ public class IsoTwo2Iso3 extends LookingGlass {
 		super();
 		
 		BufferedReader br = new BufferedReader(new FileReader(file));
+		String[] parts;
+		for (String line; (line = br.readLine()) != null;) {
+			parts = eatquotedStrings(line);
+			InternalIso x = new InternalIso(parts);
+			iso.put(x.iso2, x.iso3);
+		}
+		symbols.put(name, this);
+		br.close();
+	}
+	
+	public IsoTwo2Iso3(String name, S3Object object) throws Exception {
+		super();
+		
+		String file = object.getBucketName();
+		InputStream objectData = object.getObjectContent();
+		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
 		String[] parts;
 		for (String line; (line = br.readLine()) != null;) {
 			parts = eatquotedStrings(line);

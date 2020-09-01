@@ -37,8 +37,9 @@ services:
       JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
       S3REGION: ""
-      S3SECRETKEY: ""
-      S3ACCESSKEY: ""
+\     S3ENDPOINT: "http://minio:9000"
+      AWSACCESKEY: "{$AWSACCESSKEY}"
+      AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""
@@ -62,8 +63,9 @@ services:
       JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
       S3REGION: ""
-      S3SECRETKEY: ""
-      S3ACCESSKEY: ""
+      S3ENDPOINT: "http://minio:9000"
+      AWSACCESKEY: "{$AWSACCESSKEY}"
+      AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
       OPENX_EKEY: ""
@@ -78,4 +80,16 @@ services:
     depends_on:
       - kafka
     command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+    
+  minio:
+    image: minio/minio
+    ports:
+      - '9000:9000'
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - /tmp/s3:/data
+    command: server /data
+
 

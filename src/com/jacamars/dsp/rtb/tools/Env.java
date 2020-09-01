@@ -85,7 +85,9 @@ public enum  Env {
 		while(address.contains("$BIDSWITCH_ID"))
 			address = GetEnvironmentVariable(address,"$BIDSWITCH_ID","bidswitch-id");
 		
-		
+		while(address.contains("$S3ENDPOINT"))
+	        address = GetEnvironmentVariable(address,"$S3ENDPOINT", null);
+
 		while(address.contains("$S3BUCKET"))
 	        address = GetEnvironmentVariable(address,"$S3BUCKET", null);
 

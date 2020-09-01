@@ -277,18 +277,23 @@
     "access_key_id" : "$AWSACCESSKEY",
     "secret_access_key" : "$AWSSECRETKEY",
     "region" : "$AWSREGION",
-    "bucket" : "$S3BUCKET"
+    "bucket" : "$S3BUCKET",
+    "endpoint": "$S3ENDPOINT"   
   },
-  "lists" : [ {
-    "filename" : "data/adxgeo.csv",
+    "lists" : [ {
+    "s3" : "geo/adxgeo.csv",
     "name" : "@ISO2-3",
-    "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
+    "type" : "ISO2"
   }, {
-    "filename" : "$MASTERCIDR",
-    "name" : "@MASTERCIDR",
-    "type" : "CidrMap"
-  },   {
-    "filename" : "data/zip_codes_states.csv",
+    "s3" : "cidr/METHBOT.txt",
+    "name" : "@CIDR",
+    "type" : "CIDR"
+  }, {
+    "s3" : "geo/adxgeo.csv",
+    "name" : "@ADXGEO",
+    "type" : "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
+  }, {
+    "s3" : "geo/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
   } ]

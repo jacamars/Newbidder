@@ -287,29 +287,25 @@
   }],
   "s3" : {
     "access_key_id" : "$AWSACCESSKEY",
-    "secret_access_key" : "$AWSECRETKEY",
+    "secret_access_key" : "$AWSSECRETKEY",
     "region" : "$AWSREGION",
-    "bucket" : "$S3BUCKET"
+    "bucket" : "$S3BUCKET",
+    "endpoint": "$S3ENDPOINT"   
   },
   "lists" : [ {
-    "Xs3" : "cidr/CIDR2.txt",
-    "name" : "@CIDRX",
-    "type" : "CIDR"
-  },
-  {
-    "filename" : "data/adxgeo.csv",
+    "s3" : "geo/adxgeo.csv",
     "name" : "@ISO2-3",
-    "type" : "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
+    "type" : "ISO2"
   }, {
-    "filename" : "data/METHBOT.txt",
+    "s3" : "cidr/METHBOT.txt",
     "name" : "@CIDR",
-    "type" : "CidrMap"
+    "type" : "CIDR"
   }, {
-    "filename" : "data/adxgeo.csv",
+    "s3" : "geo/adxgeo.csv",
     "name" : "@ADXGEO",
     "type" : "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
   }, {
-    "filename" : "data/zip_codes_states.csv",
+    "s3" : "geo/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
   } ]
