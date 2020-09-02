@@ -1,5 +1,4 @@
-import java.io.BufferedReader;
-
+package com.jacamars.dsp.rtb.tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,19 +22,19 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 
-public class S3Sample {
-    private static String bucketName = "cidr";
-    private static String keyName = "CIDR2.txt";
+public class CopyToS3 {
     
 
     public static void main(String[] args) throws Exception {
-    	execute("endpoint=http://localhost:9000"
+    	execute(args[0]); 
+    	
+    	/*"endpoint=http://localhost:9000"
     			+"&aws_access_key=AKIAIOSFODNN7EXAMPLE"
     			+"&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     			+"&bucket=cidr"
     			+"&filename=data/METHBOT.txt"
-    			+"&key=METHBOT.txt");
-    }
+    			+"&key=METHBOT.txt");*/
+    } 
     
     public static void execute(String address) throws Exception {
         String parts[] = address.split("&");
@@ -126,7 +125,7 @@ public class S3Sample {
                 System.out.println("Bucket location: " + bucketLocation);
             }
         	
-        	  PutObjectRequest request = new PutObjectRequest(bucketName, key, new File(fileName));
+        	  PutObjectRequest request = new PutObjectRequest(bucket, key, new File(fileName));
               ObjectMetadata metadata = new ObjectMetadata();
               metadata.setContentType("plain/text");
               metadata.addUserMetadata("title", "someTitle");

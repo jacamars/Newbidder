@@ -1,4 +1,4 @@
-.PHONY: clean local docker react react-campaigns backup-db restore-db
+.PHONY: clean local docker react react-campaigns backup-db restore-db minio
 
 build: application
 
@@ -13,12 +13,20 @@ react-campaigns:
 	mv www/build www/campaigns
 	
 react: react-campaigns
-
 	
 application: local react docker
 
 local:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+
+minio:
+	mkdir -p /tmp/s3
+	docker-compose -f minio.yml up -d
+	bash -c "./wait-for-it.sh localhost:9000 -t 120"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=cidr&filename=data/METHBOT.txt&key=METHBOT.txt"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=geo&filename=data/zip_codes_states.csv&key=zip_codes_states.csv"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=geo&filename=data/adxgeo.csv&key=adxgeo.csv"
+	docker-compose -f  minio.yml down
 
 docker:
 	docker build -t jacamars/newbidder .
