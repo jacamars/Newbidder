@@ -37,7 +37,7 @@ services:
       JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
       S3REGION: ""
-\     S3ENDPOINT: "http://minio:9000"
+      S3ENDPOINT: "http://minio:9000"
       AWSACCESKEY: "{$AWSACCESSKEY}"
       AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
@@ -53,7 +53,7 @@ services:
       - "7380:7379"
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
 
   bidder2:
     image: "newbidder"
@@ -79,15 +79,15 @@ services:
       - "7381:7379"
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
     
   minio:
     image: minio/minio
     ports:
       - '9000:9000'
     environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      - MINIO_ACCESS_KEY="{AWSACCESSKEY}"
+      - MINIO_SECRET_KEY="{AWSSECRETKEY}"
     volumes:
       - /tmp/s3:/data
     command: server /data

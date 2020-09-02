@@ -304,7 +304,7 @@ public class RTBServer implements Runnable {
 	 */
 	public static void main(String[] args) {
 
-		String fileName = "Campaigns/payday.json";
+		String fileName = "s3://config/payday.json";
 		String exchanges = null;
 		String shard = "";
 
@@ -318,11 +318,6 @@ public class RTBServer implements Runnable {
 				case "-s":
 					i++;
 					shard = args[i];
-					i++;
-					break;
-				case "-z":
-					i++;
-					fileName = "zookeeper:" + args[i];
 					i++;
 					break;
 				case "-e":

@@ -285,13 +285,6 @@
     "id" : "$BIDSWITCH_ID",
     "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
   }],
-  "s3" : {
-    "access_key_id" : "$AWSACCESSKEY",
-    "secret_access_key" : "$AWSSECRETKEY",
-    "region" : "$AWSREGION",
-    "bucket" : "$S3BUCKET",
-    "endpoint": "$S3ENDPOINT"   
-  },
   "lists" : [ {
     "s3" : "geo/adxgeo.csv",
     "name" : "@ISO2-3",

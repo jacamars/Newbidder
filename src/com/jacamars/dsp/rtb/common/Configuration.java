@@ -378,84 +378,14 @@ public class Configuration {
 														// directory in www so
 														// preview campaign will
 														// work
-		String str = null;
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
-		str = Env.substitute(str);
-		System.out.println(str);
-
+		
+		setupS3OrMinio();
+		var str = getConfig(path);
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
 		//////////////////////////////////////////////////////////////
 
 		seats = new HashMap<String, String>();
-
-		if (m.get("s3") != null) {
-			Map<String, Object> ms3 = (Map) m.get("s3");
-			String accessKey = (String) ms3.get("access_key_id");
-			String secretAccessKey = (String) ms3.get("secret_access_key");
-			String endPoint = (String)ms3.get("endpoint");
-			String region = (String) ms3.get("region");
-			s3_bucket = (String) ms3.get("bucket");
-
-			if (!(accessKey.length() == 0 || secretAccessKey.length() == 0 || region.length() == 0)) {
-
-				ClientConfiguration cf = new ClientConfiguration();
-
-				if (ms3.get("proxyhost") != null) {
-					String proxyhost = (String) ms3.get("proxyhost");
-					int proxyport = (Integer) ms3.get("proxyport");
-					logger.info("S3 Using host: {}, port: {}", proxyhost, proxyport);
-					String proto = (String) ms3.get("proxyprotocol");
-					cf.setProxyHost(proxyhost);
-					cf.setProxyPort(proxyport);
-					if (proto != null) {
-						if (proto.equalsIgnoreCase("http"))
-							cf.setProtocol(Protocol.HTTP);
-						else
-							cf.setProtocol(Protocol.HTTPS);
-					}
-				}
-
-				BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
-				
-				if (endPoint == null) {
-					// standard aws
-					s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
-						.withCredentials(new AWSStaticCredentialsProvider(creds)).withRegion(Regions.fromName(region))
-						.build();
-				} else {
-					// Likely using minio
-					ClientConfiguration clientConfiguration = new ClientConfiguration();
-			        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
-
-					s3 = AmazonS3ClientBuilder
-			                .standard()
-			                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, Regions.US_EAST_1.name()))
-			                .withPathStyleAccessEnabled(true)
-			                .withClientConfiguration(clientConfiguration)
-			                .withCredentials(new AWSStaticCredentialsProvider(creds))
-			                .build();
-				}
-
-				ObjectListing listing = s3.listObjects(new ListObjectsRequest().withBucketName(s3_bucket));
-
-				/**
-				 * Lazy Load
-				 */
-				Runnable task = () -> {
-					try {
-						processDirectory(s3, listing, s3_bucket);
-					} catch (Exception error) {
-						System.err.println("ERROR IN AWS LISTING: " + error.toString());
-					}
-				};
-				Thread thread = new Thread(task);
-				thread.start();
-			} else {
-				logger.info("S3 is not configured");
-			}
-		}
 		
 		if (m.get("lists") != null) {
 			filesList = (List) m.get("lists");
@@ -845,6 +775,71 @@ public class Configuration {
 	        }, 0L, 30000, TimeUnit.MILLISECONDS); 
 		}
 	}
+	
+	void setupS3OrMinio() {
+		String accessKey = Env.GetEnvironment("AWSACCESSKEY", null);
+		if (accessKey != null) {
+			String secretAccessKey = Env.GetEnvironment("AWSSECRETKEY", null);
+			String endPoint = Env.GetEnvironment("S3ENDPOINT", null);
+			String region = Env.GetEnvironment("S3ENDPOINT", null);
+
+			ClientConfiguration cf = new ClientConfiguration();
+
+			BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
+			
+			if (endPoint == null) {
+				// standard aws
+				s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
+					.withCredentials(new AWSStaticCredentialsProvider(creds)).withRegion(Regions.fromName(region))
+					.build();
+			} else {
+				// Likely using minio
+				ClientConfiguration clientConfiguration = new ClientConfiguration();
+		        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
+
+				s3 = AmazonS3ClientBuilder
+		                .standard()
+		                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, Regions.US_EAST_1.name()))
+		                .withPathStyleAccessEnabled(true)
+		                .withClientConfiguration(clientConfiguration)
+		                .withCredentials(new AWSStaticCredentialsProvider(creds))
+		                .build();
+			}
+		}
+	}
+	
+	/**
+	 * Get configuration file.
+	 * @param path String. If s3://config/file.json, then read from s3, eles use file syste,
+	 * @return String. The JSON configuration, with environment variables subbed in.
+	 * @throws Exception on File or S3 errors.
+	 */
+	public String getConfig(String path) throws Exception {
+		String str = "";
+		
+		if (!path.startsWith("s3://")) {
+			byte[] encoded = Files.readAllBytes(Paths.get(path));
+			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
+		} else {
+			path = path.substring(5);
+			String [] parts = path.split("/");
+			parts[0] = parts[0].trim();
+			parts[1] = parts[1].trim();
+			
+			var object = s3.getObject(parts[0], parts[1]);
+			var inputStream = object.getObjectContent();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+	        String line = null;
+	        while ((line = reader.readLine()) != null) {
+	           str += line + "\n";
+	        }		
+		}
+		str = Env.substitute(str);
+		System.out.println(str);
+		
+		return str;
+	}
+	
 
 	void printEnvironment() throws Exception {
 

@@ -53,9 +53,9 @@ services:
       - "7379:7379"
     depends_on:
       - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free Campaigns/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
     
-   minio:
+  minio:
     image: minio/minio
     ports:
       - '9000:9000'
