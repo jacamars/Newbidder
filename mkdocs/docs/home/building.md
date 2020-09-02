@@ -4,20 +4,31 @@ The source code for the RTB4FREE system is located [here](https://github.com/RTB
 
 ##Makefile
 
-To work with the source you will need Maven, Java 1.11, Make, and Yarn, and Mkdocs. The goal of the makefile
-is to create the docker container necessary for deploying the bidder.
+To work with the source you will need Maven, Java 1.11, Make, and Yarn, and Mkdocs, and Minio Client. The goal of the makefile is to create the docker container necessary for deploying the bidder.
 
 First step is to git pull the distribution.
 
 ##Application
 
-The 'make application', or simply 'make' will create all the components necessary for the docker container.
+The first step is to 'make application', or simply 'make' will create all the components necessary for the docker container.
 
 ```
 	$make application
 ```
 
 This will compile the JAVA application into an all-in-one JAR file, it will then create the campaign manager react application, and then create the docker container.
+
+##Minio
+
+The 'make minio' is executed after 'make application'. The purpose is to copy the initial data files
+the bidder uses to convert 2 character country names into 3 character names, zip code information, and
+CIDR blocks to block common bot addresses.
+
+```
+	$make minio
+```
+Note, the directory /tmp/s3 will contain the buckets and objects used by the bidder. If you want to change
+the location of the hosted volume, or to replace with Amazon S3, modify the makefile.
 
 ##Local
 

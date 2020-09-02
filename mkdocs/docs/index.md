@@ -1,6 +1,6 @@
 ![jacamars logo](./images/jacamars.png) 
 
-#Demand Side Platform
+#RTB4FREE Demand Side Platform
 
 A complete, open source advertising Demand Side Platform (DSP). Completely "Dockerized" and uses well known open source tools. Contains 3 major components:
 

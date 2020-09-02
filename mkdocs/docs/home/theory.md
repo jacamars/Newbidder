@@ -1,17 +1,11 @@
 #Theory of Operation
 
-The bidding engine is based on OpenRTB 2.8 and is written in JAVA running on the 1.11 Java virtual machine. It is a set of 
-dockerized containers employing the RTB bidder, Postgres, Kafka, Zookeeper, and the ELK stack. Not included in the stack but
-a key part of the infrastructure is your own load balancer. Load your SSL certificates in your load balancer, not the bidder.
+The bidding engine is based on OpenRTB 2.8 and is written in JAVA running on the 1.11 Java virtual machine. It is a set of  dockerized containers employing the RTB bidder, Postgres, Kafka, Zookeeper, Minio and the ELK stack. Not included in the stack but a key part of the infrastructure is your own load balancer. Load your SSL certificates in your load balancer, not the bidder.
 
-Internally the bidder is a JAVA program that receives RTB bid requests via HTTP (we use JETTY). The bid requests are converted
-to JSON objects (we use JACKSON for this). Bid requests are compared against campaigns stored in memory (we use Hazelcast IMap to store all the campaigns in shared memory). When requests come in the bids are selected against the campaigns, if one of the
-campaigns mathes then a bid is formed and stored in the shared memory (Hazelcast IMap) then the bid is trasmitted back to the
-SSP. If you win the auction a win notification is sent to the bidder. When the ad is shown in the user's browser a pixel fire
-is received, or if it is a video, various video status messages may be sent to the bidder.
+Internally the bidder is a JAVA program that receives RTB bid requests via HTTP (we use JETTY). The bid requests are converted to JSON objects (we use JACKSON for this). Bid requests are compared against campaigns stored in memory (we use Hazelcast IMap to store all the campaigns in shared memory). When requests come in the bids are selected against the campaigns, if one of the campaigns mathes then a bid is formed and stored in the shared memory (Hazelcast IMap) then the bid is trasmitted back to the
+SSP. If you win the auction a win notification is sent to the bidder. When the ad is shown in the user's browser a pixel fire is received, or if it is a video, various video status messages may be sent to the bidder.
 
-The bidder sends statistical samples of all bid requests to a Kafka channel for use by the ELK stack. Win notifications are
-also sent on a Kafka channel to the ELK stack so that the campaign's performance may be monitored and to perform budgeting. Pixel and video fires are also sent on a Kafka channel back to the ELK stack.
+The bidder sends statistical samples of all bid requests to a Kafka channel for use by the ELK stack. Win notifications are also sent on a Kafka channel to the ELK stack so that the campaign's performance may be monitored and to perform budgeting. Pixel and video fires are also sent on a Kafka channel back to the ELK stack.
 
 The campaign manager is a REACT application that interfaces wih the Postgres database through a simple API. It is possible to
 interface your own campaign manager to the Postgres DB through a well defined schema. A few REST calls are needed to control loading and unloading campaigns, but it is all pretty straightforward. The bidders also act as web servers and you load the SPA
@@ -33,6 +27,9 @@ in the Leader bidder.
 
 All analytics are handled by the ELK stack. Kafka channels route bid requests, bids, wins, pixel fires, video fires, and win
 notifications back to Logstash which loads the data into Elastic. Kibana is used to create views and dashboards.
+
+The bidder loads CIDR lists, bloom filters, audience files, configuration parameters from either S3 or an
+S3 compatible object store. By default, the RTB4FREE system uses *MINIO* to provide a S3 compatible object storage for use with the DSP.
 
 ##Bidding Engine
  
@@ -109,6 +106,14 @@ In the “video_rtb_standards” table there will be zero or more rows with the 
 ###ERD
 When in doubt, look at a campaign created with the RTB4FREE campaign manager to see what the corresponding values look like.
 The [schema for the database is located here](./Crosstalk-DB.pdf){target=_blank}
+
+##MINIO
+Minio is a cloud storage server compatible wth Amazon S3. Using Minio, RTB4FREE can load large data files
+such as Bloom filters, CIDR lists and configuation files from a central location. By default the RTB4FREE
+deployment uses the directory /tmp/S3 to mount the /data volume of MINIO's container. This host directory is used to store and retrieve files. For operational use you might want to 
+deploy to a different location to keep dta persistent over reboots.
+
+Note, you can replace MINIO with Amazon S3. However, if you are not using S3, MINIO will provide the capability needed by the RTB4FREE stack.
 
 ##Data Management Platform
 
