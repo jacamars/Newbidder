@@ -14,6 +14,9 @@ const axiosInstance = axios.create({
 });
 const cannedResponse = {"response": "will go here"};
 
+let ssp = "Nexage";
+var undef;
+
 const Simulator = (props) =>  {
 
   const vx = useViewContext();
@@ -83,17 +86,18 @@ const Simulator = (props) =>  {
 
   const exchangeChangedHandler = (event, id) => {
     const name = event.target.value;
+    var uri;
     for (var i in vars.exchanges) {
       var exchange = vars.exchanges[i]
       if (exchange.name === name) {
         vx.changeSsp(name);
         vx.changeUri(exchange.uri);
-
-        console.log("EXCHANGE IS NOW: " + name);
+        uri = exchange.uri;
+        ssp = name;
       }
     }
 
-    vars.uri = vx.uri;
+    vars.uri = uri;
     vars.url = vx.url;
     setVars(vars);
 
@@ -240,6 +244,45 @@ const Simulator = (props) =>  {
   }
 }
 
+const sendPixel = async () => {
+  var data = vx.adm; 
+  // alert(data);
+  var usesPixel = false;
+  var i = data.indexOf("/pixel");
+  if (i === -1) {
+    i = data.indexOf("/callback?target=pixel");
+    if (i === -1) {
+      alert("ADM has no PIXEL FIRE");
+      return;
+    }
+  } else {
+    usesPixel = true;
+  }
+
+  var j = i;
+  var q = undef;
+
+  while(j>0 && q === undef) {
+    if (j>0) 
+      j--;
+    if (data.charAt(j)==="'" || data.charAt(j)==='"')
+      q = data.charAt(j);
+  }
+
+  if (j > 0)
+    j++;
+  
+  var k = data.indexOf(q,i);
+  k = k - j;
+
+  var pixel=data.substr(j,k);
+  pixel += "&debug=true"
+
+  data = await vx.sendCallback(pixel);
+
+
+}
+
   const sendWinNotice = async (event, id) => {
     var nurl = vars.nurl
     nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
@@ -285,10 +328,10 @@ const Simulator = (props) =>  {
     return (
         <>
             <div className="content">
-              <Endpoint vars={vars} rootHandler={rootHandler} exchangeHandler={exchangeChangedHandler} />
+              <Endpoint key={"ep-"+count} vars={vars} ssp={ssp} rootHandler={rootHandler} exchangeHandler={exchangeChangedHandler} />
               <Bideditor vars={vars} bidTypeChangedHandler={bidTypeChangedHandler}   clearHandler={wClearHandler} 
                 jsonChangedHandler={jsonChangedHandler} sendBid={sendBid} restore={restore} />
-              <Windisplay vars={vars} sendWinNotice={sendWinNotice} />
+              <Windisplay vars={vars} sendPixel={sendPixel} sendWinNotice={sendWinNotice} />
             </div>
         </>
     );

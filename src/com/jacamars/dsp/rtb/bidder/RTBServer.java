@@ -1357,8 +1357,11 @@ class Handler extends AbstractHandler {
 
 				String rs = request.getQueryString();
 				String rtype = request.getParameter("target");
+				if (rtype == null)
+					rtype = request.getParameter("type");
 				if (rtype == null) {
-					logger.warn("Warning, wrong callback message, params: {}", rs);
+					logger.warn("Callback problem on: {}", rs);
+					logger.warn("Warning, wrong callback message, Missing 'type=xxx' or 'target=xxx' params: {}", rs);
 					response.getWriter().println("");
 					return;
 				}

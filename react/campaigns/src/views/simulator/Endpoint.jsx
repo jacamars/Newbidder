@@ -26,7 +26,7 @@ const Endpoint = (props) => {
     }
 
     const optionItems = props.vars.exchanges.map((exchange,index) =>
-        <option selected={exchange.name===vx.ssp} key={"exchange-select" + index}>{exchange.name}</option>
+        <option selected={exchange.name===props.ssp} key={"exchange-select" + index}>{exchange.name}</option>
     );
 
     let estyle = {
@@ -34,8 +34,6 @@ const Endpoint = (props) => {
     }
 
     let composite = props.url + props.uri
-
-    console.log("ENDPOINT: " + props.vars.uri);
 
     return (
         <Card  text="white" style={{ width: '100%' }}>

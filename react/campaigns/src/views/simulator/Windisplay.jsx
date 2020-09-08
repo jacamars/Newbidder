@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Input,
     Card,
@@ -10,7 +10,9 @@ import {
 
 import DemoTag from './DemoTag';
 
-const windisplay = (props) => {
+const Windisplay = (props) => {
+
+    const [showPixelFire, setShowPixelFire] = useState(false);
     
     const textAreaStyle = {
         fontSize: 12
@@ -21,6 +23,11 @@ const windisplay = (props) => {
     const show = !(props.vars.nurl === '');
     console.log("SHOW: " + show);
 
+    const sendWinNotice = () => {
+        props.sendWinNotice();
+        setShowPixelFire(true);
+    }
+
     return (
         <div>
             {show ? (
@@ -29,10 +36,18 @@ const windisplay = (props) => {
                         <h5 className="title">Process Win</h5>
                    </CardHeader>
                    <Row>
-                       <Col>
-                            <Button color="success" onClick={props.sendWinNotice} size="sm">Send Win</Button>
+                       <Col xs="1">
+                            <Button color="success" onClick={(e) => sendWinNotice()} size="sm">Send Win</Button>
+                       </Col>
+                       { showPixelFire &&
+                          <Col xs="1">
+                            <Button color="warning" onClick={props.sendPixel} size="sm">Fire Pixel</Button>
+                           </Col>
+                        }
+                        <Col xs="1">
+                         {' '}   
                         </Col>
-                        <Col>
+                        <Col xs="2">
                             {props.vars.xtime}
                        </Col>
                    </Row>
@@ -68,4 +83,4 @@ const windisplay = (props) => {
     );
 }
 
-export default windisplay;
+export default Windisplay;

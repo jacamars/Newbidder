@@ -794,6 +794,22 @@ const  ViewContext = () => {
       }
     }
 
+    const  sendCallback = async (srvr) =>  {
+      if (srvr === undef) {
+        alert("No callback specified");
+        return;
+      }
+      try {
+        var response = await axiosInstance.get(srvr, { responseType: 'text' }); 
+        
+      } catch (error) {
+        alert(error);
+      }
+    }
+
+
+
+
     // Acc is the accounting array, name is the name in question, and tail is what we are looking for.
     const getCount = (acc,name,tail) => {
       // Convert name to id.
@@ -821,7 +837,7 @@ const  ViewContext = () => {
 
       ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
-      changeWinsent, 
+      changeWinsent, sendCallback,
 
       user, getUser, setNewUser, deleteUser, listUsers, listAffiliates, deleteAffiliate, addNewUser, addNewAffiliate
     };

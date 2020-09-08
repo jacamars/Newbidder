@@ -1,0 +1,10 @@
+<img src="{pixel_url}&exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&price={AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}&lat={lat}&lon={lon}&make={make}&mode={model}&pub={pub}&site_name={site_name}&ua{ua}&deal_id={deal_id}" height="1" width="1" style="display:none;"/>
+<a href="{redirect_url}&exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&bid_id={bid_id}&site_domain={site_domain}?&price={AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}&lat={lat}&lon={lon}&make={make}&mode={model}&pub={pub}&site_name={site_name}&ua{ua}&deal_id={deal_id}&url=https://happyapples.com/product/tajin-apple/" target="_blank">
+<img src="https://surf-creative-assets.s3.amazonaws.com/00018/HappyApples-Tajin300x250-5.jpg" width="300" height="250" /></a>
+
+
+
+
+
+
+<img src="{pixel_url}&exchange={exchange}
