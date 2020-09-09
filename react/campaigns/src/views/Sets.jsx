@@ -23,7 +23,7 @@ var undef;
 const Sets = (props) => {
 
     useEffect(() => {
-
+      refresh();
     }, []);
 
     const [bigdata, setBigdata] = useState([]);
@@ -40,6 +40,8 @@ const Sets = (props) => {
 
     const refresh = async () => {
         var d = await vx.listSymbols();
+        if (d == undef)
+          return;
         setBigdata(d.catalog);
         setHazel(d.hazelcast);
         var m = await vx.listMacros();
