@@ -801,10 +801,11 @@ const  ViewContext = () => {
       }
       try {
         var response = await axiosInstance.get(srvr, { responseType: 'text' }); 
-        
+        return response;
       } catch (error) {
         alert(error);
       }
+      return undef;
     }
 
 

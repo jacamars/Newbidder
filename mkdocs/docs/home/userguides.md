@@ -368,12 +368,116 @@ In this rule, Operand value, Use Set as Operand, Operand Type and Operand Ordina
 
 
 ##Sets
-###Set
-###Navmap
-###CIDR
-###Bloom Filters
-###IMDG
+This view, avaliable from the *SETS* icon on the left hand navigation pane provides a view into the configuration
+of audience files, bloom filters and CIDR maps loaded from S3/Minio into the bidder memory. 
+
+This view will also provide you with a view into the IMDG cache and allow you to query the cache.
+
+Finally, the Macros view will show you the macros you can utilize in your campaigns.
+
+After pressing the *SETS* icon on the left side navigation you will see a listing of the views like this:
+
+![image](../images/sets1.png)
+
+And scrolling down a little....
+
+
+![image](../images/sets2.png)
+
+###Sets/Navmap/CIDR/Bloom Filters
+The *Sets/Navmap/CIDR/Bloom Filters* view provides you with a list of all the available "sets" in the bidder memory.
+These are preloaded when the bidder is loaded and is stored in the *lists* object in the S3/Minio object "config/payday.json". Example:
+
+```
+ "lists" : [ {
+    "s3" : "geo/adxgeo.csv",
+    "name" : "@ISO2-3",
+    "type" : "ISO2"
+  }, {
+    "s3" : "cidr/METHBOT.txt",
+    "name" : "@CIDR",
+    "type" : "CIDR"
+  }, {
+    "s3" : "geo/adxgeo.csv",
+    "name" : "@ADXGEO",
+    "type" : "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
+  }, {
+    "s3" : "geo/zip_codes_states.csv",
+    "name" : "@ZIPCODES",
+    "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
+  } ]
+```
+
+The symbol name, e.g. *@ZIPCODES* is the name you can use in a *Rule* to interrogate some part of the RTB bid to
+produce a boolean value. For example, @CIDR@ is shown as a NavMap. In this case you can set up a rule and 
+test if device.ip's value of a bid request is contained within this CIDR list. This will return true.
+
+Example:
+
+![image](../images/samplerule.png)
+
+
+Note, @ADXGEO and @ISO2-3 are used internally by the bidders and are not generally user SETS. @ISO2-3 maps 2
+character country codes to ISO3 country codes. @ADXGEO maps UN city/country codes to familiar city names and
+ISO3 country codes.
+
+###In Memory Data Grid
+This view allows you you to examine the contents of the bidder's shared memory context. The *bidcache* is the
+current bids that are outstanding without WIN notification. The *videocache* stores all the cached video VAST objects. The *miscCache* stores the miscellaneous bits used by the bidder.
+
 ###Macros
+The *Macros* view shows you all the macro names you can use in your creatives. For example, using *{event_url}* in
+your creative will expand to *http://localhost:8080/track*.
+
+Note, some of these are system provided macros. You can create your own macros by adding them to the *app.systemMacros* object in the S3/Minio object config/payday.json:
+
+```
+ "app" : {
+    "concurrency" : "1",
+    "systemMacros": {
+    	"{rtb_pixel}": "<img src='{pixel_url}/exchange={exchange}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/bid_id={bid_id}/ip={ip}/site_domain={site_domain}/lat={lat}/lon={lon}' height=1 width=1 style='display:none;'/>",
+    	"{rtb_click}": "<a href='$EXTERNAL/redirect?url=_REDIRECT_URL_?EXCHANGE={exchange}&EXTERNAL=$EXTERNAL&AD_ID={ad_id}&CREATIVE_ID={creative_id}&BID_ID={bid_id}' target='_blank' rel='noopener'>",
+    	"{/rtb_click}": "</a>"
+ 
+    },
+```
+
+You can see, {rtb_pixel}, {rtb_click} and {/rtb_click} are provided by the systemMacros. Of course, if you use
+{rtb_click}, please close your creative with {/rtb_click}
+
 ##Simulator
+Pressing the *SIMULATOR* icon on the left navigation pane will bring up the simulator view, which looks like:
+
+![image](../images/simulator1.png)
+
+The top pane has the title *Send Bids/Wins to RTB Server*. The *Root* input will allow you to change the URL prefix to use. The next is the SSP selector, set to *Nexage* by default. The read-only *Endpoint* shows where the bid
+request will be sent.
+
+The next pane, title *Select Request Type* allows you to choose the bid type (Banner, Video, Audio, or Native). It also has 2 JSON pane windows. The left hand side is the editable window and allows you to make changes in the request. The right hand pane shows the response JSON.
+
+Pressing the red *Send Bid* button causes the bid request to sent to the *Endpoint* you selected. You will receive a response, depending on whether a campaign is available, and will look something like:
+
+![image](../images/simulator2.png)
+
+Now a new pane opens up for *Process Win* Here the win URL is shown as well as the ADM field. Also a new red *Fire Pixel* button appears. Pressing the *Send Win* causes the creative to be served. If the creative can be displayed, it will on the right hand side, like below:
+
+![image](../images/simulator3.png)
+
+Pressing the red *Fire Pixel* simulates a pixel fire, and will send that pixel to the bidder, simulating the creative being loaded in the user's page. Note this pixel fire will be sent with debug=true, so the bidder handling the pixel fire will print debug information on its console.
+
+If the Pixel fire works you will get a popup saying "OK, Pixel Fired". If not you will get an error message popup.
+
 ##User Profile
+Selecting *USER PROFILE* from the left hand navigation pane will bring up the logged in user profile screen Depending
+n whether you are a super user, or a super user of the customer_id *rtb4free* you will be presented with additional buttons to administer other users and administer other companies.
+
+The view looks like:
+
+![image](../images/userprofile.png)
+
+###User Profile
+
+###Admin Users
+
+###Admin Companies
 	

@@ -40,7 +40,7 @@ const Sets = (props) => {
 
     const refresh = async () => {
         var d = await vx.listSymbols();
-        if (d == undef)
+        if (d === undef)
           return;
         setBigdata(d.catalog);
         setHazel(d.hazelcast);

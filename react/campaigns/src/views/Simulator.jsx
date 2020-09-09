@@ -279,7 +279,10 @@ const sendPixel = async () => {
   pixel += "&debug=true"
 
   data = await vx.sendCallback(pixel);
-
+  if (data === undef)
+    alert("Pixel Fire failed!");
+  else
+    alert("OK, Pixel Fired!");
 
 }
 
