@@ -153,10 +153,16 @@ public class PixelClickConvertLog {
                             }
                         } else if (exchange.equals(OpenX.OPENX)) {
                             try {
-                                price = OpenXWinObject.decrypt(items[1]);
-                                price /= 1000;
+                            	if (items[1].contains("AUDIT")) {
+                            		price = 0;
+                            		logger.warn("AUDIT message encountered for: {}",str);
+                            	} else {
+                            		price = OpenXWinObject.decrypt(items[1]);
+                            		price /= 1000;
+                            	}
                             } catch (Exception e) {
                                 //e.printStackTrace();
+                            	logger.warn("Decrypt failed ({}) for  message: {}",e.getMessage(),str);
                                 price = 0;
                             }
                         } else if (exchange.equals(AdxBidRequest.ADX)) {
@@ -230,8 +236,8 @@ public class PixelClickConvertLog {
 
         if (exchange == null)
             return;
-
-        parseElements();
+        if (exchange == null)
+        	parseElements();
 
         /**
          * Huge hack. C1X SSP does not do win url's you have to piggy back the the win from the pixel
