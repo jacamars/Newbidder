@@ -1,6 +1,8 @@
 package com.jacamars.dsp.rtb.commands;
 
+import com.jacamars.dsp.rtb.bidder.Controller;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.common.RecordedBid;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.exchanges.adx.AdxWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleWinObject;
@@ -148,7 +150,7 @@ public class PixelClickConvertLog {
                                 price = GoogleWinObject.decrypt(items[1], System.currentTimeMillis());
                                 price /= 1000;
                             } catch (Exception e) {
-                                //e.printStackTrace();
+                            	 logger.warn("Error reading bid_id: {}, error: }", bid_id, e.toString());
                                 price = 0;
                             }
                         } else if (exchange.equals(OpenX.OPENX)) {
@@ -179,6 +181,7 @@ public class PixelClickConvertLog {
                                 price = Double.parseDouble(items[1]);
                             } catch (Exception error) {
                                 //System.err.println("Error in price for: " + payload);
+                            	  logger.warn("Error reading bid_id: {}, error: }", bid_id, error.toString());
                                 price = 0;
                             }
                         }
@@ -236,7 +239,8 @@ public class PixelClickConvertLog {
 
         if (exchange == null)
             return;
-        if (exchange == null)
+        
+        if (ad_id == null)
         	parseElements();
 
         /**
@@ -252,6 +256,13 @@ public class PixelClickConvertLog {
                 sb.append("https://fake:notreal/rtb/win/");
                 sb.append(domain);
                 sb.append("/");
+                
+                if (bidtype.equals("undefined")) {
+                	RecordedBid bid = Controller.getInstance().getBidData(bid_id);
+                	if (bid != null)
+                		bidtype = bid.getBidType();
+                }
+                
                 sb.append(bidtype);
                 sb.append("/");
                 sb.append(exchange);

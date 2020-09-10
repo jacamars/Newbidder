@@ -10,6 +10,8 @@ import {
 
 import DemoTag from './DemoTag';
 
+var undef;
+
 const Windisplay = (props) => {
 
     const [showPixelFire, setShowPixelFire] = useState(false);

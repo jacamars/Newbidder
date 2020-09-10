@@ -27,7 +27,8 @@ public class RecordedBid implements Serializable {
 	private String id; // the bid request id, also used as the key in the mapstore db.
 
 	private String capKey;
-	private String adType; // the ad type
+	private String adType; // the ad type (banner, video, etc
+	private String bidType;  // SITE or APP
 	private Long capTimeout; // the length of this cap in the database. (Not the frequency cap timeout)
 	private Long endtime; // the actual time of eviction (Not the time of eviction of the frequency cap
 
@@ -35,6 +36,15 @@ public class RecordedBid implements Serializable {
 	private String price; // string representation of the bid price.
 	private List<FrequencyCap> frequencyCap; // the frequency cap key in the database.
 
+	
+	public void setBidType(String bidType) {
+		this.bidType = bidType;
+	}
+	
+	public String getBidType() {
+		return bidType;
+	}
+	
 	public Long getEndtime() {
 		return endtime;
 	}

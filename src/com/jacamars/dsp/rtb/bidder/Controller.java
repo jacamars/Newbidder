@@ -1039,6 +1039,12 @@ public enum Controller {
         rb.setPrice( Double.toString(br.cost));
         rb.setAdType( br.adtype);
         rb.setId(br.oidStr);
+        
+        if (br.br.isSite())
+        	rb.setBidType("SITE");
+        else
+        	rb.setBidType("APP");
+        
         rb.setEndtime(System.currentTimeMillis() + Configuration.getInstance().ttl);
         if (br.frequencyCap != null) {
         	rb.setFrequencyCap(br.frequencyCap);

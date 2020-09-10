@@ -176,10 +176,6 @@ const Simulator = (props) =>  {
     return vars.state.url + vars.state.uri;
   }
 
-  const show = () => {
-    alert(JSON.stringify(this.state))
-  };
-
 
   const sendBid = async  (event, id) => {
 
@@ -288,9 +284,18 @@ const sendPixel = async () => {
 
   const sendWinNotice = async (event, id) => {
     var nurl = vars.nurl
-    nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
-    vx.changeNurl(nurl);
-    console.log("NURL: " + nurl)
+    if (nurl !== undef) {
+      nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
+      vx.changeNurl(nurl);
+      console.log("NURL: " + nurl)
+    } else {
+      alert("Use Pixel Fire instead");
+      vars.winSent = true;
+      vx.changeWinsent(true);
+      setVars(vars);
+      redraw();
+      return;
+    }
 
     try {
       const response = await axiosInstance.get(nurl);
