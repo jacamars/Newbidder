@@ -8,9 +8,11 @@ import java.io.FileReader;
 
 import org.apache.commons.codec.binary.Base64;
 
-/** A class for decoding encypted win data: timestamp,site,exchange,encrypted-price
+/** A Test class for decoding encypted win data: timestamp,site,exchange,encrypted-price
  *  Outputs: timestamp,site,exchange,encrypted-price,decrypted-price
  * Created by ben on 10/14/17.
+ * 
+ * This is for testing, this is not operational code.
  */
 public class DecodeWinData {
 
