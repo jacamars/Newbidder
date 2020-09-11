@@ -320,7 +320,7 @@ public class Configuration {
 	}
 
 	/**
-	 * Initialize the system from the JSON or Aerospike configuration file.
+	 * Initialize the system from the JSON configuration file.
 	 * 
 	 * @param path      String - The file name containing the Java Bean Shell code.
 	 * @param shard     Strimg. The shard name
@@ -332,6 +332,10 @@ public class Configuration {
 	public void initialize(String path, String shard, String exchanges) throws Exception {
 		this.fileName = path;
 
+		logger.info("Initialization, path: {}, shard: {}, exchanges: {}",path,shard,exchanges);
+		
+		printEnvironment();
+		
 		/**
 		 * Override the exchanges in payday.json. This means any campaign that does not
 		 * specifically have a rule using "exchange" will be allowed, but any campaign
@@ -380,6 +384,9 @@ public class Configuration {
 														// work
 		
 		setupS3OrMinio();
+		
+		logger.info("PATH AT THIS POINT: {}", path);
+		
 		var str = getConfig(path);
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
 		/*******************************************************************************/
@@ -738,7 +745,6 @@ public class Configuration {
 			logger.warn("*** WIN URL IS SET TO LOCALHOST, NO REMOTE ACCESS WILL WORK FOR WINS ***");
 		}
 		
-		printEnvironment();
 		
         RTBServer.getSharedInstance();
         
@@ -777,23 +783,27 @@ public class Configuration {
 	}
 	
 	void setupS3OrMinio() {
-		String accessKey = Env.GetEnvironment("AWSACCESSKEY", null);
+		String accessKey = Env.GetEnvironment("AWSACCESKEY", null);
 		if (accessKey != null) {
 			String secretAccessKey = Env.GetEnvironment("AWSSECRETKEY", null);
 			String endPoint = Env.GetEnvironment("S3ENDPOINT", null);
-			String region = Env.GetEnvironment("S3ENDPOINT", null);
+			String region = Env.GetEnvironment("S3REGION", null);
 
+			
+			logger.info("AWS SECRET={}",secretAccessKey);
 			ClientConfiguration cf = new ClientConfiguration();
 
 			BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
 			
 			if (endPoint == null) {
 				// standard aws
+				logger.info("Using AWS S3");
 				s3 = AmazonS3ClientBuilder.standard().withClientConfiguration(cf)
 					.withCredentials(new AWSStaticCredentialsProvider(creds)).withRegion(Regions.fromName(region))
 					.build();
 			} else {
 				// Likely using minio
+				logger.info("Using MINIO S3");
 				ClientConfiguration clientConfiguration = new ClientConfiguration();
 		        clientConfiguration.setSignerOverride("AWSS3V4SignerType");
 
@@ -805,7 +815,8 @@ public class Configuration {
 		                .withCredentials(new AWSStaticCredentialsProvider(creds))
 		                .build();
 			}
-		}
+		} else
+			logger.warn("S3 AWSACCESSKEY not set, so no S3!");
 	}
 	
 	/**
@@ -821,6 +832,11 @@ public class Configuration {
 			byte[] encoded = Files.readAllBytes(Paths.get(path));
 			str = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
 		} else {
+			if (s3 == null) {
+				logger.error("S3 is not configured, cannot continue.");
+				Thread.sleep(1000);
+				System.exit(1);
+			}
 			path = path.substring(5);
 			String [] parts = path.split("/");
 			parts[0] = parts[0].trim();

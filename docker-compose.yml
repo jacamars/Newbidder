@@ -1,6 +1,6 @@
 #
-# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
-# Does contain zookeeper and kafka.
+# Contains the full stack of the RTB4FREe stack (not including elk))
+# Does contain zookeeper and kafka, postgres and minio
 #
 version: "3"
 
@@ -38,7 +38,7 @@ services:
       S3BUCKET: ""
       S3REGION: ""
       S3ENDPOINT: "http://minio:9000"
-      AWSACCESKEY: "{$AWSACCESSKEY}"
+      AWSACCESKEY: "${AWSACCESSKEY}"
       AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
@@ -51,9 +51,7 @@ services:
       - "8155:8155"
       - "5701:5701"
       - "7379:7379"
-    depends_on:
-      - kafka
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 -t 120 && ./wait-for-it.sh minio:9000 -t 120 && ./rtb4free s3://config/payday.json"
     
   minio:
     image: minio/minio

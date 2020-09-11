@@ -1,12 +1,125 @@
-FROM alpine:3.6
-FROM nginx
+FROM debian:stretch-slim
 
-RUN adduser -h /etc/nginx -D -s /bin/sh nginx
+# A few reasons for installing distribution-provided OpenJDK:
+#
+#  1. Oracle.  Licensing prevents us from redistributing the official JDK.
+#
+#  2. Compiling OpenJDK also requires the JDK to be installed, and it gets
+#     really hairy.
+#
+#     For some sample build times, see Debian's buildd logs:
+#       https://buildd.debian.org/status/logs.php?pkg=openjdk-11
 
-COPY nginx.conf /etc/nginx/
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		bzip2 \
+		unzip \
+		xz-utils \
+	&& rm -rf /var/lib/apt/lists/*
 
-COPY www/ /usr/share/nginx/html/
+RUN echo 'deb http://deb.debian.org/debian stretch-backports main' > /etc/apt/sources.list.d/stretch-backports.list
 
-EXPOSE 8080
+# Default to UTF-8 file.encoding
+ENV LANG C.UTF-8
 
-CMD ["nginx"]
+# add a simple script that can auto-detect the appropriate JAVA_HOME value
+# based on whether the JDK or only the JRE is installed
+RUN { \
+		echo '#!/bin/sh'; \
+		echo 'set -e'; \
+		echo; \
+		echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
+	} > /usr/local/bin/docker-java-home \
+	&& chmod +x /usr/local/bin/docker-java-home
+
+# do some fancy footwork to create a JAVA_HOME that's cross-architecture-safe
+RUN ln -svT "/usr/lib/jvm/java-11-openjdk-$(dpkg --print-architecture)" /docker-java-home
+ENV JAVA_HOME /docker-java-home
+
+ENV JAVA_VERSION 11.0.2
+ENV JAVA_DEBIAN_VERSION 11.0.2+9-3~bpo9+1
+
+RUN set -ex; \
+	\
+# deal with slim variants not having man page directories (which causes "update-alternatives" to fail)
+	if [ ! -d /usr/share/man/man1 ]; then \
+		mkdir -p /usr/share/man/man1; \
+	fi; \
+	\
+# ca-certificates-java does not work on src:openjdk-11 with no-install-recommends: (https://bugs.debian.org/914860, https://bugs.debian.org/775775)
+# /var/lib/dpkg/info/ca-certificates-java.postinst: line 56: java: command not found
+	ln -svT /docker-java-home/bin/java /usr/local/bin/java; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		openjdk-11-jre-headless="$JAVA_DEBIAN_VERSION" \
+	; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	rm -v /usr/local/bin/java; \
+	\
+# ca-certificates-java does not work on src:openjdk-11: (https://bugs.debian.org/914424, https://bugs.debian.org/894979, https://salsa.debian.org/java-team/ca-certificates-java/commit/813b8c4973e6c4bb273d5d02f8d4e0aa0b226c50#d4b95d176f05e34cd0b718357c532dc5a6d66cd7_54_56)
+	keytool -importkeystore -srckeystore /etc/ssl/certs/java/cacerts -destkeystore /etc/ssl/certs/java/cacerts.jks -deststoretype JKS -srcstorepass changeit -deststorepass changeit -noprompt; \
+	mv /etc/ssl/certs/java/cacerts.jks /etc/ssl/certs/java/cacerts; \
+	/var/lib/dpkg/info/ca-certificates-java.postinst configure; \
+	\
+# verify that "docker-java-home" returns what we expect
+	[ "$(readlink -f "$JAVA_HOME")" = "$(docker-java-home)" ]; \
+	\
+# update-alternatives so that future installs of other OpenJDK versions don't change /usr/bin/java
+	update-alternatives --get-selections | awk -v home="$(readlink -f "$JAVA_HOME")" 'index($3, home) == 1 { $2 = "manual"; print | "update-alternatives --set-selections" }'; \
+# ... and verify that it actually worked for one of the alternatives we care about
+	update-alternatives --query java | grep -q 'Status: manual'
+
+# If you're reading this and have any feedback on how this image could be
+# improved, please open an issue or a pull request so we can discuss it!
+#
+#   https://github.com/docker-library/openjdk/issues
+
+
+RUN apt-get update
+RUN apt-get install bash
+RUN apt-get install -y curl
+
+RUN mkdir shell
+RUN mkdir www
+RUN mkdir web
+RUN mkdir js
+RUN mkdir target
+RUN mkdir -p sql/create
+RUN mkdir logs
+RUN mkdir SampleBids
+RUN mkdir Campaigns
+run mkdir query
+
+COPY stub.json /stub.json
+COPY target/*with-dependencies.jar /target
+
+COPY wait-for-it.sh /
+RUN chmod +x wait-for-it.sh
+
+COPY database.backup /
+COPY tools/* /
+COPY sql/create/* sql/create/
+COPY shell/ /shell
+
+COPY www/control/ /www/control/
+COPY www/exchange/ /www/exchange/
+COPY www/campaigns/ /www/campaigns/
+COPY query/ query/
+
+COPY www/index.html /www
+COPY www/js/ /www/js/
+COPY www/css/ /www/css/
+COPY www/SSI/ www/SSI/
+COPY www/assets/ www/assets/
+
+
+COPY web/* /web/
+COPY log4j.properties /
+COPY SampleBids /SampleBids
+
+COPY sendbid /
+
+EXPOSE 8080 5701
+
+CMD ./rtb4free

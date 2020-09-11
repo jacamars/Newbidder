@@ -18,6 +18,7 @@ application: local react docker
 
 local:
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
+	docker build -t jacamars/newbidder .
 
 minio:
 	mkdir -p /tmp/s3
@@ -31,6 +32,7 @@ minio:
 
 docker:
 	docker build -t jacamars/newbidder .
+	docker push jacamars/newbidder
 
 backup-db:
 	pg_dump -F c -b -v --dbname=postgresql://postgres:postgres@localhost:5432 > database.backup
