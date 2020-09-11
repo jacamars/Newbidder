@@ -14,9 +14,9 @@ react-campaigns:
 	
 react: react-campaigns
 	
-application: local react docker
+application: local docs react docker
 
-local:
+local: docs
 	mvn assembly:assembly -DdescriptorId=jar-with-dependencies  -Dmaven.test.skip=true
 	docker build -t jacamars/newbidder .
 

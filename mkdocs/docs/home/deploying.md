@@ -1,6 +1,148 @@
 #Deployments
 
 ##Docker-Compose
+The easiest way to get setup is to use Docker Compose. While this is not the best way to use in production, for getting
+started and understanding all the parts its a good way to go. By default, the docker-compose.yml file DOES NOT start the
+ELK stack. But all other parts are operational.
+
+The docker-compose uses the following containers:
+
+- Kafka - A single node kafka cluster is provided to test the system. This is located at localhost:9092.
+- Zookeeper - A single node Zookeeper is provided to work with Kafka.
+- Postgres - The SQL DB is provided with postgres. This is located at localhost:5432
+- Minio - An S3 compatible object store is provided. This is located at http://localhost:9000
+- Bidder - The RTB bidder is located in this setup. Located at localhost:8080
+- Documentation - The documentation server is located at http://localhost:9090.
+
+### Using Minio
+By default, configuration files are located in Minio. But can be loaded in S3 or even mounted from your local file system.
+
+To run using Minio, you first need to setup a local volume at /tmp/s3 on your local system. Assuming you have GIT cloned
+the repo and built the system, you can pre-initialize the Minio's S3 system. ([See here for the Makefile directives](/home/building){target=_blank})
+
+Run the makefile.
+
+```
+	$make minio
+```
+
+This will start the Minio docker container and copy the default files to the Minio's S3 compatible store. 
+
+###Using S3 Instead of Minio
+If you are using S3 instead, you will need to edit the *minio* target of the Makefile. Remove the endpoint
+and put the appropriate credentials in your makefile.
+
+Before:
+
+```
+minio:
+	mkdir -p /tmp/s3
+	docker-compose -f minio.yml up -d
+	bash -c "./wait-for-it.sh localhost:9000 -t 120"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=cidr&filename=data/METHBOT.txt&key=METHBOT.txt"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=geo&filename=data/zip_codes_states.csv&key=zip_codes_states.csv"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=geo&filename=data/adxgeo.csv&key=adxgeo.csv"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=config&filename=Campaigns/payday.json&key=payday.json"
+	docker-compose -f  minio.yml down
+```
+
+Choose the appropriate AWS region, add your credentials, and don't start Minio:
+
+```
+minio:
+	./tools/copy2s3 "aws_region=us-east-1&aws_access_key=<yourkey>&aws_secret_key=<yourkey>&bucket=cidr&filename=data/METHBOT.txt&key=METHBOT.txt"
+	./tools/copy2s3 "aws_region=us-east11&aws_access_key=<yourkey>&aws_secret_key=<yourkey>&bucket=geo&filename=data/zip_codes_states.csv&key=zip_codes_states.csv"
+	./tools/copy2s3 "aws_region=us-east-1&aws_access_key=<yourkey>&aws_secret_key=<yourkey>&bucket=geo&filename=data/adxgeo.csv&key=adxgeo.csv"
+	./tools/copy2s3 "aws_region=us-east-1&aws_access_key=<yourkey>&aws_secret_key=<yourkey>&filename=Campaigns/payday.json&key=payday.json"
+```
+
+###Using Hosted Files Instead of Minio/S3
+
+For this option comment out the volumes part of the bidder docker-compose.yml
+
+Before:
+
+```
+  bidder:
+    image: jacamars/newbidder
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
+      S3BUCKET: ""
+      S3REGION: ""
+      S3ENDPOINT: "http://minio:9000"
+      AWSACCESKEY: "${AWSACCESSKEY}"
+      AWSSECRETKEY: "${AWSSECRETKEY}"
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    ports:
+      - "8080:8080"
+      - "8155:8155"
+      - "5701:5701"
+      - "7379:7379"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 -t 120 && ./wait-for-it.sh minio:9000 -t 120 && ./rtb4free"
+```
+
+Presuming you will be using the payload.json in the ./Campaigns, comment out the S3 stuff and uncomment the volumes:
+
+```
+  bidder:
+    image: jacamars/newbidder
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
+      S3BUCKET: ""
+      S3REGION: ""
+      #S3ENDPOINT: "http://minio:9000"
+      #AWSACCESKEY: "${AWSACCESSKEY}"
+      #AWSSECRETKEY: "${AWSSECRETKEY}"
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    volumes:
+      - /payday.json:./Campaigns/payday.json
+    ports:
+      - "8080:8080"
+      - "8155:8155"
+      - "5701:5701"
+      - "7379:7379"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 -t 120 && ./wait-for-it.sh minio:9000 -t 120 && ./rtb4free"
+```
+
+If you are loading any CIDR lists, etc, with payday.json, make the appropriate changes in the "lists" section of payday.json, because it is
+expecting S3 objects.
+
+### Init Sample DB
+The next thing before starting is to initialize the Postgres database. A sample campaign with 4 creatives is ready to be installed now.
+Simply use the command:
+
+```
+	$make restore-db
+```
+
+This will make a database and set up the volume for the Postgres db at /tmp/data. Note, you should change this location. If you reboot your
+host you will lose your db.
+
+###Start Bidder
+Now you are ready to start the system:
+
+```
+	$docker-compose up -d
+```
+
+To run [The campaign manager and simulator go here.](https://localhost:8080){target=_blank}
+
+To access [Minio compatible S3 buckets go here.](https://localhost:9000){target=_blank}
+
 
 ##Kubernetes
 

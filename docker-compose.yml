@@ -46,12 +46,14 @@ services:
       OPENX_IKEY: ""
       ADX_EKEY:   ""
       ADX_IKEY:   ""
+    #volumes:
+    #  - /payday.json:./Campaigns/payday.json
     ports:
       - "8080:8080"
       - "8155:8155"
       - "5701:5701"
       - "7379:7379"
-    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 -t 120 && ./wait-for-it.sh minio:9000 -t 120 && ./rtb4free s3://config/payday.json"
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 -t 120 && ./wait-for-it.sh minio:9000 -t 120 && ./rtb4free"
     
   minio:
     image: minio/minio

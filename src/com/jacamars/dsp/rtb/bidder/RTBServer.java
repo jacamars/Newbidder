@@ -304,7 +304,7 @@ public class RTBServer implements Runnable {
 	 */
 	public static void main(String[] args) {
 
-		String fileName = "s3://config/payday.json";
+		String fileName = null;
 		String exchanges = null;
 		String shard = "";
 
@@ -334,6 +334,14 @@ public class RTBServer implements Runnable {
 			}
 		}
 
+		if (fileName == null) {
+			if (Env.GetEnvironment("AWSACCESKEY", null)==null)
+				fileName = "payday.json";
+			else
+				fileName =  "s3://config/payday.json";
+			
+		}
+		
 		try {
 			new RTBServer(fileName, shard, exchanges);
 		} catch (Exception e) {
