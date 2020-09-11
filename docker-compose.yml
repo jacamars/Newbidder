@@ -58,9 +58,13 @@ services:
     ports:
       - '9000:9000'
     environment:
-      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
-      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      - MINIO_ACCESS_KEY=${AWSACCESSKEY}
+      - MINIO_SECRET_KEY=${AWSSECRETKEY}
     volumes:
       - /tmp/s3:/data
     command: server /data
     
+  doc:
+    image: jacamars/rtbx-website
+    ports:
+      - "9090:80"
