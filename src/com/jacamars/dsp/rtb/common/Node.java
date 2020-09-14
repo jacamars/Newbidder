@@ -1082,7 +1082,7 @@ public class Node {
 			if (value == null || value instanceof MissingNode)
 				rc = false;
 			else
-				rc = value instanceof ObjectNode;
+				rc = true;
 			if (operator == EXISTS)
 				return rc;
 			return !rc;
