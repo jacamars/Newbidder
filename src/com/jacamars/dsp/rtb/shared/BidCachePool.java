@@ -86,7 +86,7 @@ public enum BidCachePool {
 			String name = "BIDCACHE";
 			bidCache = inst.getMap(name);
 			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
-			bidCache.addEntryListener(new EntryEvictedListener<String, RecordedBid>() {
+			/* bidCache.addEntryListener(new EntryEvictedListener<String, RecordedBid>() {
 				@Override
 				public void entryEvicted(EntryEvent<String, RecordedBid> event) {
 					if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
@@ -94,7 +94,7 @@ public enum BidCachePool {
 					}
 					handleWatch(BIDCACHE, event.getKey());
 				}
-			}, true);
+			}, true); */
 
 			///////////////////////////////////////////////////////////////////////////////////////////
 			if (RTBServer.isLeader() && Configuration.getInstance().mapstoredriver != null) {
