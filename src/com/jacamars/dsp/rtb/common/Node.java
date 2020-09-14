@@ -1079,7 +1079,7 @@ public class Node {
 		case EXISTS:
 		case NOT_EXISTS:
 			boolean rc = false;
-			if (value == null)
+			if (value == null || value instanceof MissingNode)
 				rc = false;
 			else
 				rc = value instanceof ObjectNode;
