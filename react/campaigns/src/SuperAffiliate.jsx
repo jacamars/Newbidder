@@ -191,7 +191,7 @@ const SuperAffiliate = (props) => {
     <>
     { newCompanyModal &&
           <DecisionModal title={"New Company ID"}
-                         message="Input a new Company name" 
+                         message="Input a new Company Id" 
                          name="SAVE"
                          input={true}
                          callback={newCompanyModalCallback} />}

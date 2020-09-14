@@ -476,8 +476,40 @@ The view looks like:
 ![image](../images/userprofile.png)
 
 ###User Profile
+The *User Profile* is the profile of the logged in user. On the left hand side are the components of the profile. Note, Company name and company id are not editable. The username and password fields are required.
+
+The right hand side shows a picture and some informative text. 
+
+If you are a superuser then *Admin Users* button will be available. If you are a super user and the customer-id is *rtb4free*, then *Admin Companies* will
+be available.
 
 ###Admin Users
+Pressing the *Admin Users* button at the top brings up the Admin Users pane, which looks like:
+
+![image](../images/useradmin.png)
+
+If your super-user login is of customer-id *rtb4free* then you can edit and add user ids for any organization. If not of the *rtb4free* login group you will be able to edit only your own organization's user ids.
+
 
 ###Admin Companies
+Pressing the *Admin Companies* button at the top brings up the Admin Companies pane.
+
+
+![image](../images/companyadmin.png)
+
+If you are *rtb4free* super-user, you will be presented with all the companies defined. If you are not of organization *rtb4free* you will
+only be able to edit your own company profile.
+
+If you are *rtb4free* org super-user, you can use the *+Company* button and create a new company. Pressing this button will bring up a Dialog and ask you to enter a new *Company Id*. 
+
+![image](../images/newcompany1.png)
+
+This field is used to set the organization key for the company. Once you set it, it can't be changed. Add the new id, and his save, a new Company will appear. 
+
+![image](../images/newcompany2.png)
+
+Add the *Company Name* (required) and fill in the other fields. You must add a Budget, or the new organization will not be able to bid. Then hit the *Save* button. After making a new Company, you will need to make at least one super-user user-id for this company as well, using the *Admin Users* button.
+
+If you are *rtbfree* organization, you can update the budget directly. Just add the value into budget and hit the *Update* button. Otherwise the Update button will not be available. In that case, hit the *Budget* button and you can add budget using a Paypal portal.
+
 	
