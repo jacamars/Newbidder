@@ -1299,13 +1299,13 @@ public class Configuration {
 
 	public void initializeLookingGlass(List<Map> list)  {
 		String fileName = null;
+		String bucket = null;
 		for (Map m : list) {
 			try {
 			fileName = (String) m.get("filename");
 			if (fileName != null && !fileName.equals("")) {
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
-				System.out.println("*** Configuration Initializing: " + fileName);
 				if (name.startsWith("@") == false)
 					name = "@" + name;
 				if (type.contains("NavMap") || type.contains("RangeMap")) {
@@ -1327,11 +1327,12 @@ public class Configuration {
 			var is3 = (String)m.get("s3");
 			if (is3 != null) {
 				String parts[] = is3.split("/");
-				String bucket = parts[0].trim();
+				bucket = parts[0].trim();
 				String object = parts[1].trim();
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
-					
+				
+				fileName = object; 
 				GetObjectRequest rangeObjectRequest = new GetObjectRequest(bucket, object);
 	            S3Object s3o = s3.getObject(rangeObjectRequest);
 				
@@ -1360,7 +1361,7 @@ public class Configuration {
 			}
 				
 			} catch (Exception error) {
-				logger.error("Error initializing: {}: {}", fileName,error.getMessage());
+				logger.error("Error initializing: {}, {}: {}", bucket, fileName,error.getMessage());
 			}
 		}
 	}
