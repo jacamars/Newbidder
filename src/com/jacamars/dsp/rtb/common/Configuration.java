@@ -788,9 +788,10 @@ public class Configuration {
 			String secretAccessKey = Env.GetEnvironment("AWSSECRETKEY", null);
 			String endPoint = Env.GetEnvironment("S3ENDPOINT", null);
 			String region = Env.GetEnvironment("S3REGION", null);
-
 			
-			logger.info("AWS SECRET={}",secretAccessKey);
+			logger.info("AWSACCESSKEY: {}",accessKey);
+			logger.info("AWSSECRETKEY: {}",secretAccessKey);
+			logger.info("S3REGION: {}", region);
 			ClientConfiguration cf = new ClientConfiguration();
 
 			BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretAccessKey);
