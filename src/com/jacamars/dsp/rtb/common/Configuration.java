@@ -783,7 +783,7 @@ public class Configuration {
 	}
 	
 	void setupS3OrMinio() {
-		String accessKey = Env.GetEnvironment("AWSACCESKEY", null);
+		String accessKey = Env.GetEnvironment("AWSACCESSKEY", null);
 		if (accessKey != null) {
 			String secretAccessKey = Env.GetEnvironment("AWSSECRETKEY", null);
 			String endPoint = Env.GetEnvironment("S3ENDPOINT", null);
