@@ -25,12 +25,11 @@ public class SimpleSet extends LookingGlass {
 	 * @throws Exception on I/O errors.
 	 */
 	public SimpleSet(String name, String file) throws Exception {
+		symbols.put(name,set);
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		message = "Initialize Simple Membership: " + file + " as " + name;
 
 		makeSet(br);
-		
-		symbols.put(name,set);
 	}
 	
 	/**
@@ -40,12 +39,11 @@ public class SimpleSet extends LookingGlass {
 	 * @throws Exception on S3 or I/O options.
 	 */
 	public SimpleSet(String name, S3Object object) throws Exception {
+		symbols.put(name, this);
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		message = "Initialize Simple Membership: " + object.getBucketName() + " as " + name;
 		makeSet(br);
-		
-		symbols.put(name, this);
 	}
 	
 	/**

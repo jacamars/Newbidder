@@ -28,13 +28,21 @@ public class Cuckoo extends LookingGlass {
 	 * @param file String, the file name.
 	 * @throws Exception on File Errors.
 	 */
-	public Cuckoo(String name, String file) throws Exception {
+	public Cuckoo(String name, String file) throws Exception {;
 		File f = new File(file);
 		long size = f.length();
+		cuckooFilter = new CuckooFilter.Builder<>(Funnels.stringFunnel(Charset.forName("UTF-8")), size).build();
+		symbols.put(name, cuckooFilter);
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		makeFilter(br,size);
-		
+	}
+	
+	public Cuckoo(String name, String file, long size) throws Exception {
+		cuckooFilter = new CuckooFilter.Builder<>(Funnels.stringFunnel(Charset.forName("UTF-8")), size).build();
 		symbols.put(name, cuckooFilter);
+		File f = new File(file);
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		makeFilter(br,size);
 	}
 	
 	/**
@@ -44,10 +52,11 @@ public class Cuckoo extends LookingGlass {
 	 * @throws Exception on S3 errors.
 	 */
 	public Cuckoo(String name, S3Object object, long size) throws Exception {
+		cuckooFilter = new CuckooFilter.Builder<>(Funnels.stringFunnel(Charset.forName("UTF-8")), size).build();
+		symbols.put(name, cuckooFilter);
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		makeFilter(br,size);
-		symbols.put(name, cuckooFilter);
 	}
 	
 	/**

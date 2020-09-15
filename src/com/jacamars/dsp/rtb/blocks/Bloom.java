@@ -25,6 +25,7 @@ import com.google.common.hash.Funnels;
 public class Bloom extends LookingGlass {
 	BloomFilter<CharSequence> bloomFilter;
 	int size;
+	double fpp = 0.003; // desired false positive probability
 	
 	/**
 	 * Constructor for the File/S3 object to Bloom filter.
@@ -35,7 +36,26 @@ public class Bloom extends LookingGlass {
 	public Bloom(String name, String file) throws Exception {
 		File f = new File(file);
 		long size = f.length();
+		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
+		symbols.put(name, bloomFilter);
+		
 		BufferedReader br = new BufferedReader(new FileReader(file));
+		makeFilter(br,size);
+	}
+	
+
+	/**
+	 * Constructor for the File/S3 object to Bloom filter.
+	 * @param name String. The name of the bloom filter.
+	 * @param file String, the file name.
+	 * @throws Exception on File Errors.
+	 */
+	public Bloom(String name, String fileName, long size) throws Exception {
+		File f = new File(fileName);
+		BufferedReader br = new BufferedReader(new FileReader(fileName));
+		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
+		symbols.put(name, bloomFilter);
+		
 		makeFilter(br,size);
 		
 		symbols.put(name, bloomFilter);
@@ -48,11 +68,13 @@ public class Bloom extends LookingGlass {
 	 * @throws Exception on S3 errors.
 	 */
 	public Bloom(String name, S3Object object, long size) throws Exception {
+		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
+		symbols.put(name, bloomFilter);
+		
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		makeFilter(br,size);
 		
-		symbols.put(name, bloomFilter);
 	}
 	
 	/**
@@ -61,26 +83,10 @@ public class Bloom extends LookingGlass {
 	 * @throws Exception on I/O errors.
 	 */
 	void makeFilter(BufferedReader br, long size) throws Exception {
-		String[] parts;
 		int i;
 		long sz;
-		
-		double fpp = 0.003; // desired false positive probability
-		
-		String line = br.readLine();
-		sz = line.length() - 5;
-		if (sz < 0)
-			sz = 16;                // just a guess
-		sz = size / sz;
-		sz *= 2;
-		parts = eatquotedStrings(line);
-		this.size = 1;
-		for (i = 0; i < parts.length; i++) {
-			parts[i] = parts[i].replaceAll("\"", "");
-		}
-		
-		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), sz,fpp);
-		bloomFilter.put(parts[0]);
+		String line;
+		String  [] parts;
 		
 		while ((line = br.readLine()) != null) {
 			parts = eatquotedStrings(line);

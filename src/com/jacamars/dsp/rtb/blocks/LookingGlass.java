@@ -46,6 +46,7 @@ public class LookingGlass {
 	public LookingGlass(String name, String file) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(file));
 
+		symbols.put(name, this);
 		String[] parts = null;	
 		String message = "Initialize Simple Map: " + file + " as " + name;
 		for (String line; (line = br.readLine()) != null;) {
@@ -56,16 +57,17 @@ public class LookingGlass {
 			myMap.put(parts[0], parts);
 		}
 		br.close();
-		symbols.put(name, this);
 		logger.info("{}",message);
 	}
 	
 	public LookingGlass(String name, S3Object obj) throws Exception {
+		symbols.put(name, this);
 		InputStream objectData = obj.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
 
 		String[] parts = null;	
 		String message = "Initialize Simple Map: " + obj.getBucketName() + " as " + name;
+		
 		for (String line; (line = br.readLine()) != null;) {
 			parts = eatquotedStrings(line);
 			for (int i=0;i<parts.length;i++) {
@@ -74,7 +76,6 @@ public class LookingGlass {
 			myMap.put(parts[0], parts);
 		}
 		br.close();
-		symbols.put(name, this);
 		logger.info("{}",message);
 	}
 	

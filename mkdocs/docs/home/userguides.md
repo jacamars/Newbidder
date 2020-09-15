@@ -421,6 +421,67 @@ Note, @ADXGEO and @ISO2-3 are used internally by the bidders and are not general
 character country codes to ISO3 country codes. @ADXGEO maps UN city/country codes to familiar city names and
 ISO3 country codes.
 
+To identify the various types of objects loaded as *Sets* use the following guide:
+
+#### Bloom Filter
+A Bloom filter is a space-efficient probabilistic data structure, conceived by Burton Howard Bloom in 1970, that is used to test whether an element is a member of a set. False positive matches are possible, but false negatives are not – in other words, a query returns either "possibly in set" or "definitely not in set".
+
+The Bloom filter is simply a list of things, one element per line terminated by a carriage return. For example
+say you had a list of Liveramp IdentiyLinks that you want to target with a special offering. If you have less than 10M records
+perhaps a simple Set would work. But what if you had 100M records. Loading all of these records into memory would be a large
+burden on the bidder. So instead of a Set, one would use a Bloom filter. Here's what a sample bloom filter of Liveramp IDLs
+might look like, in the location s3://bloom/audience200.txt:
+
+```
+XY1000bIVBVah9ium-sZ3ykhPiXQbEcUpn4GjCtxrrw2BRDGM
+XY1000bTYUSah8ium-sZ3ykhPiXQbEcUpn4GjCtxrks3SXSJT
+XY1000bCUMUah7ium-sZ3ykhPiXQbEcUpn4GjCtyzej22MFKI
+.
+.
+.
+```
+
+The actual values are not important, just that each is unique. In the case of using OpenRTB 
+
+To add this to the list of s3://config.payday.json, use this form:
+
+```
+  "lists" : [ {
+    "s3" : "bloom/audience200.txt.",
+    "name" : "@A200",
+    "size":  100000000,
+    "type" : "Bloom"
+  }, 
+  .
+  .
+  . 
+  ],
+```
+In this case we need to add the size parameter, because we need to know the size ahead of time  the bloom filter before allocating it.
+
+Note, reading 100M records into the bloom filter is time consuming, and will stall the bidders. The best way to handle this is to use the lazyload option, like this:
+
+```
+  "lists" : [ {
+    "s3" : "bloom/audience200.txt.",
+    "name" : "@A200",
+    "lazyload": true,
+    "size":  100000000,
+    "type" : "Bloom"
+  }, 
+  .
+  .
+  . 
+  ],
+
+Lazyload allocates a thread and starts the load and allows the bidder to continue on. The bloom filter will
+initialize over time, and you must be aware the results will be correct only as far as it has loaded by the time
+you have used. In other words, it converges towards correctness over time.
+
+#### CIDR 
+
+#### Set
+
 ###In Memory Data Grid
 This view allows you you to examine the contents of the bidder's shared memory context. The *bidcache* is the
 current bids that are outstanding without WIN notification. The *videocache* stores all the cached video VAST objects. The *miscCache* stores the miscellaneous bits used by the bidder.

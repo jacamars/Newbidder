@@ -41,6 +41,7 @@ public class Membership extends LookingGlass {
 	 * @throws Exception on File I/O errors.
 	 */
 	public Membership(String name, String file) throws Exception {
+		symbols.put(name, this);
 		this.name = name;
 		myMap = null;
 		this.file = file;
@@ -80,7 +81,6 @@ public class Membership extends LookingGlass {
 			tree.add(parts[0]);
 		}
 		
-		symbols.put(name, this);
 		// System.out.format("[%s] - %d - %s - %s - %s\n",Controller.sdf.format(new Date()), 1, Configuration.instanceName, this.getClass().getName(),message);
 	}
 	

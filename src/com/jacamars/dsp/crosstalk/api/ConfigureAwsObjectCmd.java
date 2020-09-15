@@ -1,14 +1,11 @@
 package com.jacamars.dsp.crosstalk.api;
 
-
-import java.util.List;
-
+import java.util.Map;
 import java.util.Random;
 
-import com.jacamars.dsp.rtb.blocks.AwsCommander;
 import com.jacamars.dsp.rtb.commands.ConfigureAwsObject;
-import com.jacamars.dsp.rtb.commands.SetPrice;
 import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.tools.DbTools;
 
 /**
  * Web API access to configure an object from AWS S3, a bloom filter, etc.
@@ -56,10 +53,10 @@ public class ConfigureAwsObjectCmd extends ApiCommand {
 				ConfigureAwsObject sp = new ConfigureAwsObject("","",command);
 				sp.from = WebAccess.uuid + "-" + new Random().nextLong();
 				
-				 AwsCommander aws = new AwsCommander(command);
-			     if (aws.errored()) {
+				var errored = Configuration.configureObject((Map) DbTools.mapper.readValue(command ,Map.class));
+			     if (errored != null) {
 			    	 error = true;
-			         message = "AWS Object load failed: " + aws.getMessage();
+			         message = "AWS Object load failed: " + errored;
 			         return;
 			     }
 			     updated = "AWS Object " + command + " loaded ok";

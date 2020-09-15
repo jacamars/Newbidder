@@ -49,6 +49,7 @@ import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.Bloom;
 import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
+import com.jacamars.dsp.rtb.blocks.Membership;
 import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
 import com.jacamars.dsp.rtb.blocks.SimpleMultiset;
@@ -1211,81 +1212,6 @@ public class Configuration {
 		}
 	}
 
-	public static String readData(String fileName) throws Exception {
-		String message = "";
-		int i = fileName.indexOf(".");
-		if (i == -1)
-			throw new Exception("Filename is missing type field");
-		String type = fileName.substring(i);
-		NavMap map;
-		SimpleMultiset set;
-		SimpleSet sset;
-		Bloom b;
-		Cuckoo c;
-		switch (type) {
-		case "range":
-			map = new NavMap(fileName, fileName, false);
-			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
-			break;
-		case "cidr":
-			map = new NavMap(fileName, fileName, true);
-			message = "Added NavMap " + fileName + ": from file, has " + map.size() + " members";
-			break;
-		case "bloom":
-			b = new Bloom(fileName, fileName);
-			message = "Initialize Bloom Filter: " + fileName + " from file, members = " + b.getMembers();
-			break;
-		case "cuckoo":
-			c = new Cuckoo(fileName, fileName);
-			break;
-		case "multiset":
-			set = new SimpleMultiset(fileName, fileName);
-			message = "Initialize Multiset " + fileName + " from file, entries = " + set.getMembers();
-			break;
-		case "set":
-			sset = new SimpleSet(fileName, fileName);
-			message = "Initialize Multiset " + fileName + " from file, entries = " + sset.size();
-			break;
-
-		default:
-			message = "Unknown type: " + type;
-		}
-		logger.info("*** {}", message);
-		return message;
-	}
-
-	public static String readData(String type, String name, S3Object object, long size) throws Exception {
-		String message = "";
-		switch (type) {
-		case "range":
-		case "cidr":
-			NavMap map = new NavMap(name, object, type);
-			message = "Added NavMap " + name + ": has " + map.size() + " members";
-			break;
-		case "set":
-			SimpleSet set = new SimpleSet(name, object);
-			message = "Initialize Set: " + name + " from S3, entries = " + set.size();
-			break;
-		case "bloom":
-			Bloom b = new Bloom(name, object, size);
-			message = "Initialize Bloom Filter: " + name + " from S3, members = " + b.getMembers();
-			break;
-
-		case "cuckoo":
-			Cuckoo c = new Cuckoo(name, object, size);
-			message = "Initialize Cuckoo Filter: " + name + " from S3, entries = " + c.getMembers();
-			break;
-		case "multiset":
-			SimpleMultiset ms = new SimpleMultiset(name, object);
-			message = "Initialize Multiset " + name + " from S3, entries = " + ms.getMembers();
-			break;
-		default:
-			message = "Unknown type: " + type;
-		}
-		logger.info("*** {}", message);
-		return message;
-	}
-
 	public int requstLogStrategyAsInt(String x) {
 		switch (x) {
 		case "all":
@@ -1299,9 +1225,15 @@ public class Configuration {
 	}
 
 	public void initializeLookingGlass(List<Map> list)  {
+		for (Map m : list) {
+			configureObject(m);
+		}
+	}
+		
+	public static String configureObject(Map m) {
 		String fileName = null;
 		String bucket = null;
-		for (Map m : list) {
+		Boolean lazload = false;
 			try {
 			fileName = (String) m.get("filename");
 			if (fileName != null && !fileName.equals("")) {
@@ -1309,14 +1241,22 @@ public class Configuration {
 				String type = (String) m.get("type");
 				if (name.startsWith("@") == false)
 					name = "@" + name;
-				if (type.contains("NavMap") || type.contains("RangeMap")) {
-					new NavMap(name, fileName, false); // file uses ranges
-				} else if (type.contains("CidrMap")) { // file uses CIDR blocks
-					new NavMap(name, fileName, true);
-				} else if (type.contains("AdxGeoCodes")) {
+				if (type.toLowerCase().contains("cidr") || type.contains("range")) {
+					new NavMap(name, fileName, type); // file uses ranges	
+				} else if (type.toLowerCase().contains("adxgeocodes")) {
 					new AdxGeoCodes(name, fileName);
-				} else if (type.contains("LookingGlass")) {
+				} else if (type.toLowerCase().contains("iso2")) {
+					new IsoTwo2Iso3(name,fileName);
+				} else if (type.toLowerCase().contains("lookingglass")) {
 					new LookingGlass(name, fileName);
+				} else if (type.toLowerCase().contains("bloom")) {
+					long records = (Long)m.get("size");
+					new Bloom(name, fileName, records);
+				} else if (type.toLowerCase().contains("cuckoo")) {
+					long records = (Long)m.get("size");
+					new Cuckoo(name, fileName, records);
+				} else if (type.toLowerCase().contains("membershp")) {
+					new Membership(name, fileName);
 				} else {
 					// Ok, load it by class name
 					Class cl = Class.forName(type);
@@ -1345,6 +1285,14 @@ public class Configuration {
 					new LookingGlass(name, s3o);
 				} else if (type.toLowerCase().contains("iso2")) {
 					new IsoTwo2Iso3(name,s3o);
+				} else if (type.toLowerCase().contains("bloom")) {
+					long records = (Long)m.get("size");
+					new Bloom(type, s3o, records);
+				} else if (type.toLowerCase().contains("cuckoo")) {
+					long records = (Long)m.get("size");
+					new Cuckoo(type, s3o, records);
+				} else if (type.toLowerCase().contains("membershp")) {
+						new Membership(type, s3o);
 				} else {
 					// Ok, load it by class name
 					Class cl = Class.forName(type);
@@ -1363,9 +1311,10 @@ public class Configuration {
 				
 			} catch (Exception error) {
 				logger.error("Error initializing: {}, {}: {}", bucket, fileName,error.getMessage());
+				return "Error initializing: " + bucket + ", " + fileName + ", " + error.getMessage();
 			}
+			return null;
 		}
-	}
 
 	/**
 	 * Purpose is to test if the Cache2k system is usable with the win URL specified

@@ -37,43 +37,16 @@ public class NavMap extends LookingGlass implements Set {
 	 * @throws Exception
 	 *             on I/O errors.
 	 */
-	public NavMap(String name, String file, boolean cidr) throws Exception {
+	public NavMap(String name, String file, String type) throws Exception {
 		this.name = name;
-		if (cidr) {
+		symbols.put(name, this);
+		if (type.equalsIgnoreCase("cidr")) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			doCidr(br);
 		} else {
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			doRanges(br);
 		}
-
-		symbols.put(name, this);
-	}
-
-	/**
-	 * A navigable hashmap for handling CIDR lists and range maps made from a
-	 * file.
-	 * 
-	 * @param name
-	 *            String. The name of the object.
-	 * @param file
-	 *            String. The name of the file.
-	 * @throws Exception
-	 *             on I/O errors.
-	 */
-
-	public NavMap(String name, String file) throws Exception {
-		this.name = name;
-		if (file.endsWith("cidr")) {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			doCidr(br);
-		} else if (file.endsWith("range")) {
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			doRanges(br);
-		} else
-			throw new Exception(file + " Not in range or CIDR form");
-
-		symbols.put(name, this);
 	}
 
 	/**

@@ -115,7 +115,6 @@ public class WeightedSelector extends LookingGlass {
             }
         }
 
-
         ProportionalRandomCollection rc = (ProportionalRandomCollection)ws;
         if (rc == null) {
             // This is an error condition.

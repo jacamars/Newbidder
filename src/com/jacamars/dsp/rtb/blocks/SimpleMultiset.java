@@ -30,6 +30,7 @@ public class SimpleMultiset extends LookingGlass {
 	 * @throws Exception on File Errors.
 	 */
 	public SimpleMultiset(String name, String file) throws Exception {
+		symbols.put(name, ms);
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		System.out.print("Initialize  Multiset: " + name + " from " + file + ", enttries = ");
 		while(br.readLine() != null) {
@@ -40,8 +41,6 @@ public class SimpleMultiset extends LookingGlass {
 		br = new BufferedReader(new FileReader(file));
 		makeFilter(br);
 		System.out.println(ms.size() +  " elements");
-		
-		symbols.put(name, ms);
 	}
 	
 	/**
@@ -51,12 +50,11 @@ public class SimpleMultiset extends LookingGlass {
 	 * @throws Exception on S3 errors.
 	 */
 	public SimpleMultiset(String name, S3Object object) throws Exception {
+		symbols.put(name, ms);
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		makeFilter(br);
 		System.out.println(size + " elements");
-		
-		symbols.put(name, ms);
 	}
 	
 	/**

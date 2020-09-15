@@ -39,7 +39,7 @@ public class TestCidr  {
 	  public void testCidr() throws Exception {
 		  
 		  
-		    NavMap sr = new NavMap("CIDR", "data/METHBOT.txt", true);
+		    NavMap sr = new NavMap("CIDR", "data/METHBOT.txt", "cidr");
 		    boolean p = sr.contains("45.33.224.0");
 		    assertTrue(p);
 		    
