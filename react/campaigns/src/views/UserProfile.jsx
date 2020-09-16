@@ -20,7 +20,7 @@ import {useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
 import SuperUser from '../SuperUser';
 import SuperAffiliate from '../SuperAffiliate'
-import {undef, whiteStyle, blackStyle} from "../Utils";
+import {whiteStyle, blackStyle} from "../Utils";
 
 
 // reactstrap components

@@ -500,11 +500,12 @@ const  ViewContext = () => {
      return data;
     }
 
-    const querySymbol = async (name,value) => {
+    const querySymbol = async (name,key) => {
       var cmd = {
         token: jwt,
         type: "QuerySymbol#",
-        symbol: name
+        symbol: name,
+        value: key
       };
       var data = await execute(cmd);
       if (!data)
@@ -514,6 +515,20 @@ const  ViewContext = () => {
      return data.reply;
     }
 
+    const queryHazelcast = async (name,key) => {
+      var cmd = {
+        token: jwt,
+        type: "QuerySymbol#",
+        symbol: name,
+        predicate: key
+      };
+      var data = await execute(cmd);
+      if (!data)
+        return;
+
+     console.log("=====> querySymbols returns: " + JSON.stringify(data,null,2));
+     return data.reply;
+    }
 
     const getDbCampaign = async (id) => {
       var cmd = {
@@ -839,6 +854,8 @@ const  ViewContext = () => {
       ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
       changeWinsent, sendCallback,
+
+      querySymbol, queryHazelcast,
 
       user, getUser, setNewUser, deleteUser, listUsers, listAffiliates, deleteAffiliate, addNewUser, addNewAffiliate
     };

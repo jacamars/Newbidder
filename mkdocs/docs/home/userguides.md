@@ -384,7 +384,7 @@ And scrolling down a little....
 
 ![image](../images/sets2.png)
 
-###Sets/Navmap/CIDR/Bloom Filters
+###Sets/Navmap/CIDR/Bloom 
 The *Sets/Navmap/CIDR/Bloom Filters* view provides you with a list of all the available "sets" in the bidder memory.
 These are preloaded when the bidder is loaded and is stored in the *lists* object in the S3/Minio object "config/payday.json". Example:
 
@@ -450,7 +450,7 @@ To add this to the list of s3://config.payday.json, use this form:
     "s3" : "bloom/audience200.txt.",
     "name" : "@A200",
     "size":  100000000,
-    "type" : "Bloom"
+    "type" : "BLOOM"
   }, 
   .
   .
@@ -463,24 +463,99 @@ Note, reading 100M records into the bloom filter is time consuming, and will sta
 
 ```
   "lists" : [ {
-    "s3" : "bloom/audience200.txt.",
+    "s3" : "bloom/audience200.txt",
     "name" : "@A200",
     "lazyload": true,
     "size":  100000000,
-    "type" : "Bloom"
+    "type" : "BLOOM"
   }, 
   .
   .
   . 
   ],
+```
 
 Lazyload allocates a thread and starts the load and allows the bidder to continue on. The bloom filter will
 initialize over time, and you must be aware the results will be correct only as far as it has loaded by the time
 you have used. In other words, it converges towards correctness over time.
 
-#### CIDR 
+To access the data object in a rule, use the *member* operator.
 
-#### Set
+#### Cuckoo Filter
+A Cuckoo filter is like a Bloom filter but *may* be more space efficient. Use like a bloom filter.
+
+
+To add this to the list of s3://config.payday.json, use this form:
+
+```
+  "lists" : [ {
+    "s3" : "bloom/audience200.txt.",
+    "name" : "@A200",
+    "size":  100000000,
+    "type" : "CUCKOO"
+  }, 
+  .
+  .
+  . 
+  ],
+```
+
+To access the data object in a rule, use the *member* operator.
+
+#### Membership
+
+Memberships are Sets. That is, the set only contains one record. They are used exactly like Bloom filters. Note, querying a Membership is 100% accurate, where Bloom filters have some false positives. But Sets require more memory to store the records.
+
+
+```
+  "lists" : [ {
+    "s3" : "bloom/audience200.txt",
+    "name" : "@A200",
+    "type" : "MEMBERSHIP"
+  }, 
+  .
+  .
+  . 
+  ],
+```
+
+To access the data object in a rule, use the *member* operator.
+
+#### CIDR 
+A CIDR (classless inter-domain routing) is a method for allocating IP addresses using an abbreviaed notation. The following
+is an example of a CIDR list:
+
+```
+# IP ranges identified as being used by the "Methbot" ad fraud operation from
+# October 2016 through December 2016. https://www.whiteops.com/methbot
+45.33.224.0/20
+45.43.128.0/21
+45.43.136.0/22
+45.43.140.0/23
+45.43.144.0/20
+```
+
+This is a list of IP address *ranges*. The first line *45.33.224.0/20* denotes IP addresses from 45.33.224.0 - 45.33.239.255.
+A handy calculator can be [found here: IPADDRESSGUIDE](https://ipaddressguide.com/cidr){target=_blank}
+
+Note, lines beginning with # are comments.
+
+With this list you can block out large blocks of IP addresses easily. To add this object into the lists, see below:
+
+```
+  "lists" : [ {
+    "s3" : "cidr/testcidr.txt",
+    "name" : "@A200",
+    "type" : "CIDR"
+  }, 
+  .
+  .
+  . 
+  ],
+```
+
+To access the data object in a rule, use the *member* operator.
+
 
 ###In Memory Data Grid
 This view allows you you to examine the contents of the bidder's shared memory context. The *bidcache* is the

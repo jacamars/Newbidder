@@ -11,7 +11,7 @@ import com.jacamars.dsp.rtb.bidder.RTBServer;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A class to replace the self expiring hash set. Use cache2k so we don't have to support more home brew code.
+ * A class to replace the self expiring hash set. Use Hazelcast so we don't have to support more home brew code.
  * Created by Ben M. Faul on 1/1/18.
  */
 public enum FreqSetCache  {
@@ -53,6 +53,10 @@ public enum FreqSetCache  {
         Config config = inst.getConfig();
         cache =  RTBServer.getSharedInstance().getMap(NAME);
         return INSTANCE;
+    }
+    
+    public IMap getMap() {
+    	return cache;
     }
     
     public String get(String id) {
@@ -99,6 +103,10 @@ public enum FreqSetCache  {
      */
     public void clear() {
         cache.clear();
+    }
+    
+    public int size() {
+    	return cache.size();
     }
 
 }

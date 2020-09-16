@@ -26,6 +26,8 @@ import com.hazelcast.map.IMap;
 //import com.hazelcast.core.IMap;
 //import com.hazelcast.core.ITopic;
 import com.hazelcast.map.listener.EntryEvictedListener;
+import com.hazelcast.query.Predicate;
+import com.hazelcast.query.impl.predicates.SqlPredicate;
 import com.hazelcast.topic.ITopic;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.commands.Echo;
@@ -248,6 +250,7 @@ public enum BidCachePool {
 		map.put("videocache", videoCache.size());
 		map.put("miscCache", miscCache.size());
 		map.put("watch", watchMap.size());
+		map.put("frequency", FreqSetCache.getInstance().size());
 		
 		return map;
 	}
@@ -293,6 +296,53 @@ public enum BidCachePool {
 		if (list == null)
 			return;
 		list.remove(ifc);
+	}
+	
+	public Object get(String name, String predicate) {
+		Object rets = null;
+		switch(name) {
+		case "bidcache":
+			rets = bidCache.get(predicate);
+			break;
+		case "watch":
+			rets = watchMap.get(predicate);
+			break;
+		case "videocache":
+			rets = videoCache.get(predicate);
+			break;
+		case "miscCache":
+			rets = miscCache.get(predicate);
+			break;
+		case "frequency":
+			rets = FreqSetCache.getInstance().get(predicate);
+		}
+		return rets;
+	}
+	
+	public Object query(String name, String sql) throws Exception {
+		IMap imap = null;
+		switch(name) {
+		case "bidcache":
+			imap = bidCache;
+			break;
+		case "videocache":
+			imap = videoCache;
+			break;
+		case "miscCache":
+			imap = miscCache;
+		case "watch":
+			return watchMap.entrySet();
+		case "frequency":
+			imap = FreqSetCache.getInstance().getMap();
+			break;
+		}
+		Predicate predicate = null;
+		if (sql != null && sql.trim().length() > 0)
+			predicate = new SqlPredicate(sql);
+		if (predicate == null)
+			return imap.entrySet();
+		else
+			return imap.entrySet(predicate);
 	}
 
 	public void setMemberStatus(String key, Echo member) {

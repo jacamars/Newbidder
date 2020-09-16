@@ -287,6 +287,7 @@
   }],
   "lists" : [ {
     "s3" : "geo/adxgeo.csv",
+    "lazyload": true,
     "name" : "@ISO2-3",
     "type" : "ISO2"
   }, {

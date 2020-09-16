@@ -32,6 +32,8 @@ const Sets = (props) => {
     const [count, setCount] = useState(0);
     const [modal, setModal] = useState(false);
     const [name, setName] = useState('');
+    const [querySymbol, setQuerySymbol] = useState(false);
+    const [queryHazelcast, setQueryHazelcast] = useState(false);
     const vx = useViewContext();
   
     const redraw = () => {
@@ -64,11 +66,32 @@ const Sets = (props) => {
   }
 
   const query = (name) => {
+    setName(name);
+    setQuerySymbol(true);
 
   }
 
-  const queryHazel = (key) => {
+  const querySymbolCallback = async (valid,key) => {
+    setQuerySymbol(false);
+    if (!valid)
+      return;
 
+    var reply = await vx.querySymbol(name,key);
+    alert(reply);
+  }
+
+  const queryHazel = (name) => {
+    setName(name);
+    setQueryHazelcast(true);
+  }
+
+  const queryHazelCallback = async (valid,key) => {
+    setQueryHazelcast(false);
+    if (!valid)
+      return;
+
+    var reply = await vx.queryHazelcast(name,key);
+    alert(reply);
   }
 
 
@@ -127,6 +150,18 @@ const Sets = (props) => {
                      message="Only the db admin can undo this if you delete it!!!" 
                      name="DELETE"
                      callback={modalCallback} />}
+    { querySymbol &&
+      <DecisionModal title="Query Symbol" 
+        message="Input key to query" 
+        name="Query"
+        input={true}
+        callback={querySymbolCallback} />}
+    { queryHazelcast &&
+      <DecisionModal title="Query Cache" 
+        message="Input predicate" 
+        name="Predicate"
+        input={true}
+        callback={queryHazelCallback} />}
         <Row>
             <Col xs="12">
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>

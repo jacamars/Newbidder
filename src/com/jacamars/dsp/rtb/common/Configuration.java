@@ -1226,14 +1226,23 @@ public class Configuration {
 
 	public void initializeLookingGlass(List<Map> list)  {
 		for (Map m : list) {
-			configureObject(m);
+			Boolean lazyload = (Boolean)m.get("lazyload");
+			if (lazyload == null || !lazyload)
+				configureObject(m);
+			else {
+				Runnable lazy = () -> {
+					logger.info("Lazyloading start; {}",m);
+					configureObject(m);
+					logger.info("Lazyloading complete: {}",m);
+				};
+				new Thread(lazy).start();
+			}
 		}
 	}
 		
 	public static String configureObject(Map m) {
 		String fileName = null;
 		String bucket = null;
-		Boolean lazload = false;
 			try {
 			fileName = (String) m.get("filename");
 			if (fileName != null && !fileName.equals("")) {
@@ -1241,6 +1250,7 @@ public class Configuration {
 				String type = (String) m.get("type");
 				if (name.startsWith("@") == false)
 					name = "@" + name;
+				
 				if (type.toLowerCase().contains("cidr") || type.contains("range")) {
 					new NavMap(name, fileName, type); // file uses ranges	
 				} else if (type.toLowerCase().contains("adxgeocodes")) {
@@ -1264,6 +1274,7 @@ public class Configuration {
 					cons.newInstance(name, fileName);
 				}
 				logger.info("*** Configuration Initialized {} with {}", name, fileName);
+				
 			}
 			var is3 = (String)m.get("s3");
 			if (is3 != null) {
@@ -1285,7 +1296,7 @@ public class Configuration {
 					new LookingGlass(name, s3o);
 				} else if (type.toLowerCase().contains("iso2")) {
 					new IsoTwo2Iso3(name,s3o);
-				} else if (type.toLowerCase().contains("bloom")) {
+				} else if (type.toLowerCase().contains("")) {
 					long records = (Long)m.get("size");
 					new Bloom(type, s3o, records);
 				} else if (type.toLowerCase().contains("cuckoo")) {
@@ -1307,6 +1318,7 @@ public class Configuration {
 						cons.newInstance(name, s3o, sz);
 					}
 				}
+				logger.info("*** Configuration Initialized {} with {}", name, object);
 			}
 				
 			} catch (Exception error) {

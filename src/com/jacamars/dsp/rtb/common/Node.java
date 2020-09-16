@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.hash.BloomFilter;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.SimpleSet;
@@ -971,13 +972,21 @@ public class Node {
 						t = nm.contains(svalue);
 					} else if (x instanceof BloomFilter) {
 						BloomFilter b = (BloomFilter) x;
-
 						t = b.mightContain(svalue);
 
 					} else if (x instanceof SimpleSet) {
 						SimpleSet set = (SimpleSet) x;
 						t = set.getSet().contains(svalue);
-					} else {
+					} else if (x instanceof Cuckoo) {
+						Cuckoo cuckoo = (Cuckoo) x;
+						Object mem = cuckoo.query(svalue);
+						if (mem == null)
+							t = true;
+						else
+							t = false;
+					}
+					
+					else {
 						// System.out.println("Error: ============> " + this.name + " DONT KNOW WHAT
 						// THIS IS: " + x);
 						t = false;
