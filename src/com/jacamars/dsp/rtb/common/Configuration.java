@@ -43,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.crosstalk.budget.Shadow;
 import com.jacamars.dsp.rtb.bidder.DeadmanSwitch;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 
@@ -114,7 +115,6 @@ public class Configuration {
 
 	public static int concurrency = 1;
 
-	public static final ReentrantLock campaignsLock = new ReentrantLock();
 	/** Geotag extension object */
 	public GeoTag geoTagger = new GeoTag();
 	/** The Nashhorn shell used by the bidder */
@@ -148,7 +148,6 @@ public class Configuration {
 	public volatile int swarmPort;
 
 	/** The campaigns used to make bids */
-	public volatile List<Campaign> campaignsList = new ArrayList<Campaign>();
 	/** The list of exchanges that will be allowed, empty means all allowed */
 	public volatile Set<String> overrideExchanges = null;
 	/**
@@ -300,6 +299,8 @@ public class Configuration {
 
 	/** My Ip Address as known by the outside world */
 	static volatile String myIpAddress = null;
+	
+	Shadow shadow;
 
 	/** 0MQ channel we receive commands from */
 	//public static String COMMANDS = null;
@@ -456,6 +457,8 @@ public class Configuration {
 			return;
 		}
 		CrosstalkConfig.getInstance((Map)m.get("crosstalk"));
+		
+		shadow = Crosstalk.getInstance().shadow;
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		
 		//////////////////// LOAD HAZELCAST PARAMETERS THEN INITIALIZE HAZELCAST ////////////////////
@@ -705,10 +708,6 @@ public class Configuration {
 			}
 		}
 		/********************************************************************/
-
-
-		campaignsList.clear();
-		overrideList.clear();
 
 		vastUrl = (String) m.get("vasturl");
 		if (vastUrl == null) {
@@ -1539,17 +1538,14 @@ public class Configuration {
 	 * This deletes a campaign from the campaignsList (the running commands) this
 	 * does not delete from the database.
 	 *
-	 * @param name String. The id of the campaign to delete
+	 * @param id String. The id of the campaign to delete
 	 * @return boolean. Returns true if the campaign was found, else returns false.
 	 */
 	public boolean deleteCampaign(String id) throws Exception {
-		for (Campaign c : campaignsList) {
-			String cid = ""+c.id;
-			if (c != null && cid.equals(id)) {
-				campaignsList.remove(c);
-				recompile();
-				return true;
-			}
+		if (shadow.get(id) != null) {
+			shadow.delete(id);
+			recompile();
+			return true;
 		}
 
 		return false;
@@ -1558,18 +1554,18 @@ public class Configuration {
 	/**
 	 * Set the weights of a campaign.
 	 * 
-	 * @param name    String. The name of the campaign.
+	 * @param id    String. The id of the campaign.
 	 * @param weights String weights. In the form crid=x,crid=y,crid=z...
 	 * @return boolean. Returns true if the assignment worked, else it returns
 	 *         false.
 	 * @throws Exception on parsing errors.
 	 */
-	public boolean setWeights(String name, String weights) throws Exception {
-		for (Campaign c : campaignsList) {
-			if (c != null && c.name.equals(name)) {
-				c.setWeights(weights); 
-				return true;
-			}
+	public boolean setWeights(String id, String weights) throws Exception {
+		Campaign c = shadow.get(id);
+		if (c != null) {
+			c.setWeights(weights);
+			shadow.add(c);
+			return true;
 		}
 
 		return false;
@@ -1578,20 +1574,19 @@ public class Configuration {
 	/**
 	 * Get the weights set on a campaign.
 	 * 
-	 * @param name String. The name of the campaign,
+	 * @param id String. The id of the campaign,
 	 * @return ProportionalEntry. The PE weights.
 	 * @throws Exception if campaign is not found.
 	 */
-	public ProportionalEntry getWeights(String name, TokenData td) throws Exception {
-		for (Campaign c : campaignsList) {
-			if (c != null && td.isAuthorized(c.customer_id) && c.name.equals(name)) {
-				if (c.weights == null) {
-					return null;
-				}
-				return c.weights;
+	public ProportionalEntry getWeights(String id, TokenData td) throws Exception {
+		Campaign c = shadow.get(id);
+		if (c != null && td.isAuthorized(c.customer_id) && c.stringId.equals(id)) {
+			if (c.weights == null) {
+				return null;
 			}
+			return c.weights;
 		}
-		throw new Exception("No such campaign: " + name);
+		throw new Exception("No such campaign: " + id);
 	}
 
 	/**
@@ -1615,10 +1610,7 @@ public class Configuration {
 	 * @return List. The list of campaigns.
 	 */
 	public List<Campaign> getCampaignsList() {
-		if (overrideExchanges == null)
-			return campaignsList;
-		else
-			return overrideList;
+		return shadow.getCampaigns();
 	}
 
 	/**
@@ -1638,8 +1630,9 @@ public class Configuration {
 			return;
 		}
 
-		for (int i = 0; i < campaignsList.size(); i++) {
-			campaignsList.get(i).sortNodes();
+		List<Campaign> list = shadow.getCampaigns();
+		for (int i = 0; i < list.size(); i++) {
+			list.get(i).sortNodes();
 		}
 
 		RTBServer.setState(state);
@@ -1651,28 +1644,17 @@ public class Configuration {
 	 * @return List. The Campaigns list.
 	 */
 	public List<Campaign> getCampaignsListReal() {
-		return campaignsList;
+		return shadow.getCampaigns();
 	}
 
 	public void clearCampaigns() {
-		campaignsList.clear();
-		overrideList.clear();
+		shadow.clear();
 	}
 
 	public boolean containsCampaign(Campaign c) {
-		try {
-			campaignsLock.lock();
-			for (int i = 0; i < campaignsList.size(); i++) {
-				Campaign test = campaignsList.get(i);
-				if (test.name.equals(c.name)) {
-					return true;
-				}
-			}
-			return false;
-		} finally {
-			campaignsLock.unlock();
-		}
-
+		if (shadow.get(c.stringId)!= null)
+			return true;
+		return false;
 	}
 
 	/**
@@ -1685,37 +1667,10 @@ public class Configuration {
 		if (c == null)
 			return;
 
-		try {
-			campaignsLock.lock();
-			handyMap.addCampaign(c);
+		c.encodeCreatives();
+		c.encodeAttributes();
+		shadow.add(c);
 
-			for (int i = 0; i < campaignsList.size(); i++) {
-				Campaign test = campaignsList.get(i);
-				if (test.name.equals(c.name)) {
-					campaignsList.remove(i);
-					overrideList.remove(test);
-					break;
-				}
-			}
-
-			c.encodeCreatives();
-			c.encodeAttributes();
-			campaignsList.add(c);
-
-			if (overrideExchanges != null) {
-				for (String e : overrideExchanges) {
-					if (c.canUseExchange(e)) {
-						overrideList.add(c);
-						break;
-					}
-				}
-			}
-
-			recompile();
-
-		} finally {
-			campaignsLock.unlock();
-		}
 	}
 
 	/**
@@ -1756,21 +1711,7 @@ public class Configuration {
 		return rets;
 	}
 
-	/**
-	 * Is the identified campaign running?
-	 * 
-	 * @param owner String. The campaign owner
-	 * @param name  String. The campaign adid.
-	 * @return boolean. Rewturns true if it is loaded, else false.
-	 */
-	public boolean isRunning(String owner, String name) {
-		for (Campaign c : campaignsList) {
-			if (c.name.equals(name)) {
-				return true;
-			}
-		}
-		return false;
-	}
+
 
 	/**
 	 * Returns a list of all the campaigns that are running
@@ -1779,33 +1720,11 @@ public class Configuration {
 	 */
 	public List<String> getLoadedCampaignNames() {
 		List<String> list = new ArrayList<String>();
+		List<Campaign> campaignsList = shadow.getCampaigns();
 		for (Campaign c : campaignsList) {
 			list.add(c.name);
 		}
 		return list;
-	}
-
-	/**
-	 * Add a campaign to the campaigns list using the shared map database of
-	 * campaigns
-	 * 
-	 * @param id String. The id of the campaign.
-	 * @throws Exception if the addition of this campaign fails.
-	 */
-	public void addCampaign(String id) throws Exception {
-		try {
-			campaignsLock.lock();
-			List<Campaign> list = CampaignCache.getInstance().getCampaigns();
-			for (Campaign c : list) {
-				String cid = ""+c.id;
-				if (id.equals(cid)) {
-					addCampaign(c);
-				logger.info("Loaded  id: {}, name:{}", c.id, c.name);
-				}
-			}
-		} finally {
-			campaignsLock.unlock();
-		}
 	}
 
 	/**

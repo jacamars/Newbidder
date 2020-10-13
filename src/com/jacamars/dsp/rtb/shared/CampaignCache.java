@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,12 @@ import com.hazelcast.map.listener.EntryEvictedListener;
 import com.hazelcast.map.listener.EntryRemovedListener;
 import com.hazelcast.map.listener.EntryUpdatedListener;
 import com.hazelcast.map.listener.MapListener;
+import com.hazelcast.query.Predicate;
+import com.hazelcast.query.impl.predicates.SqlPredicate;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
 import com.jacamars.dsp.rtb.common.Configuration;
+import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
 import scala.annotation.meta.setter;
@@ -78,7 +82,6 @@ public enum CampaignCache  {
             @Override
             public void entryAdded(EntryEvent<String, Campaign> event) {
             	try {
-            		Configuration.campaignsLock.lock();
             	
             		if (Configuration.getInstance().containsCampaign(event.getValue()))
             				return;
@@ -87,9 +90,7 @@ public enum CampaignCache  {
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				} finally {
-					Configuration.campaignsLock.unlock();
-				}
+				} 
             }
         }, true);
         cache.addEntryListener(new EntryUpdatedListener<String, Campaign>() {
@@ -142,11 +143,34 @@ public enum CampaignCache  {
     public List<Campaign> getCampaigns() {
     	List<Campaign> list = new ArrayList();
     	
+    	System.out.println("LIST CACHESIZE: " + cache.size());
     	cache.entrySet().forEach(e->{
     		list.add(e.getValue());
     	});
     		
     	return list;
+    }
+    
+    public IMap getMap() {
+    	return cache;
+    }
+    
+    public int size() {
+    	return cache.size();
+    }
+    
+    public Campaign get(String id) {
+    	return cache.get(id);
+    }
+    
+    public Creative getCampaignFromCreative(String id, String type) {
+    	Creative cr = null;
+    	List<Campaign> camps = getCampaigns();
+    	for (Campaign c: camps) {
+    		cr = c.getCreative(id,type);
+    		return cr;
+    	}
+    	return null;
     }
     
     public void deleteCampaign(Campaign c ) {
@@ -173,7 +197,7 @@ public enum CampaignCache  {
     }
     
     public void addCampaign(Campaign c) {
-    	cache.set(c.id+"",c);
+    	cache.put(c.id+"",c);
     }
     
     public void deleteCampaigns() throws Exception {
@@ -249,6 +273,17 @@ public enum CampaignCache  {
 	public void write() throws Exception{
 		String content = DbTools.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(getCampaigns());
 	    Files.write(Paths.get(DB_NAME), content.getBytes());
+	}
+	
+	
+	public Set query(String sql) throws Exception {
+		Predicate predicate = null;
+		if (sql != null && sql.trim().length() > 0)
+			predicate = new SqlPredicate(sql);
+		if (predicate == null)
+			return cache.entrySet();
+		else
+			return cache.entrySet(predicate);
 	}
 }
 

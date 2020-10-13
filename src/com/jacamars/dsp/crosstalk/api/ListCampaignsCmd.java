@@ -43,10 +43,10 @@ public class ListCampaignsCmd extends ApiCommand {
 			super.execute();
 			try {
 				campaigns = new ArrayList<String>(); 
-				var list = Configuration.getInstance().getCampaignsList();
+				var list = Crosstalk.getInstance().shadow.entrySet();
 				list.stream().forEach(e->{
-					if (tokenData.isAuthorized(e.customer_id))
-						campaigns.add(e.name);
+					if (tokenData.isAuthorized(e.getValue().customer_id))
+						campaigns.add(e.getValue().name);
 				});
 				return;
 			} catch (Exception err) {

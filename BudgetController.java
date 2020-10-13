@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,75 +65,14 @@ public enum BudgetController {
 	/** If set, is the debug file that is read to simulate ELK */
 	static String debugFile;
 
-	/**
-	 * Get an instance of the controller setting the network parameters.
-	 * 
-	 * @param host1
-	 *            String. The aggregator host.
-	 * @param host2
-	 *            String. The last log object.
-	 * @param port
-	 *            int. The port the aggegators and the log host uses.
-	 * @return BudgetController. The instance.
-	 * @throws Exception
-	 *             on network errors.
-	 */
-	public static BudgetController getInstance(String host1, String host2, int port) throws Exception {
-
-		BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host1, port); 
-		BudgetController.daily = new Aggregator(Aggregator.DAILY, host1, port);
-		BudgetController.total = new Aggregator(Aggregator.TOTAL, host2, port);
-		BudgetController.lastLog = new LastLogTracker(host1, port);
+	
+	public static BudgetController getInstance(AccountingCache ac) throws Exception {
+		BudgetController.hourly = new Aggregator(Aggregator.HOURLY, ac); 
+		BudgetController.daily = new Aggregator(Aggregator.DAILY, ac);
+		BudgetController.total = new Aggregator(Aggregator.TOTAL, ac);
 
 		ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
-		execService.scheduleAtFixedRate(() -> {
-			try {
-				BudgetController.process();
-			} catch (Exception e) {
-				e.printStackTrace();
-				// System.exit(0);
-			}
-		}, 0L, 60000, TimeUnit.MILLISECONDS);
-
-		return INSTANCE;
-	}
-	
-	public static BudgetController getInstance(Elk elk) throws Exception  {
-		String host = elk.getHost();
-		int port = elk.getPort();
-		if (elk.getElasticUser() == null) {
-			BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host, port); 
-			BudgetController.daily = new Aggregator(Aggregator.DAILY, host, port);
-			BudgetController.total = new Aggregator(Aggregator.TOTAL, host, port);
-			BudgetController.lastLog = new LastLogTracker(host, port);
-		} else {
-			String username = elk.getElasticUser();
-			String password = elk.getElasticPassword();
-			String path = elk.getElasticCaPath();
-			
-			BudgetController.hourly = new Aggregator(Aggregator.HOURLY, host, port, username, password, path); 
-			BudgetController.daily = new Aggregator(Aggregator.DAILY, host, port, username, password, path);
-			BudgetController.total = new Aggregator(Aggregator.TOTAL, host, port, username, password, path);
-			BudgetController.lastLog = new LastLogTracker(host, port, username, password, path);
-		}
-		return INSTANCE;
-	}
-	
-	public static BudgetController getInstance(String simFile) throws Exception {
-
-		debugFile = simFile;
-		ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
-		execService.scheduleAtFixedRate(() -> {
-			try {
-				logger.info("*** ELK DEBUG TEST: Getting Aggregate Values {}", revolution);
-
-				BudgetController.debugProcess();
-			} catch (Exception e) {
-				e.printStackTrace();
-				// System.exit(0);
-			}
-		}, 0L, 60000, TimeUnit.MILLISECONDS);
-
+		
 		return INSTANCE;
 	}
 
@@ -145,9 +86,9 @@ public enum BudgetController {
 	}
 	
 	public static void dumpCampaigns(String fileName) throws Exception {
-		List<Campaign> campaigns = new ArrayList<Campaign>();
+		List<AccountingCampaign> campaigns = new ArrayList<AccountingCampaign>();
 		for (int i=0;i<Aggregator.campaigns.size();i++) {
-			Campaign c = Aggregator.campaigns.getNext(i);
+			AccountingCampaign c = Aggregator.campaigns.getNext(i);
 			campaigns.add(c);	
 		}
 		String content = Aggregator.mapper.writer().withDefaultPrettyPrinter().writeValueAsString(campaigns);
@@ -156,10 +97,10 @@ public enum BudgetController {
 	
 	public static void debugProcess() throws Exception {
 		String content = new String(Files.readAllBytes(Paths.get(debugFile)), StandardCharsets.UTF_8);
-		List<Campaign> campaigns = Aggregator.mapper.readValue(content,
-				Aggregator.mapper.getTypeFactory().constructCollectionType(List.class, Campaign.class));
+		List<AccountingCampaign> campaigns = Aggregator.mapper.readValue(content,
+				Aggregator.mapper.getTypeFactory().constructCollectionType(List.class, AccountingCampaign.class));
 		Aggregator.campaigns = new InternalHashMap();
-		for (Campaign c : campaigns) {
+		for (AccountingCampaign c : campaigns) {
 			Aggregator.campaigns.put(c.id, c);
 		}
 		revolution++;
@@ -177,7 +118,7 @@ public enum BudgetController {
 		if (!RTBServer.isLeader())
 			return;
 		
-		logger.debug("*** ELK TEST: Getting Aggregate Values {}", revolution);
+		logger.debug("*** Budget Process: Getting Aggregate Values {}", revolution);
 
 		Aggregator.touchAll();
 
@@ -188,7 +129,6 @@ public enum BudgetController {
 			if (lastLog != null) // can be null in debug
 				lastLog.query();
 
-			Aggregator.patchTotals();
 			Aggregator.updateGlobal();
 
 			predictor.setScale();
@@ -248,8 +188,8 @@ public enum BudgetController {
 	 * @throws Exception
 	 *             on Elastic Search errors.
 	 */
-	public double getCampaignTotalSpend(String id) throws Exception {
-		return getCampaignSpend(id, Aggregator.TOTAL);
+	public double getCampaignTotalSpend(Campaign c) throws Exception {
+		return getCampaignSpend(c, Aggregator.TOTAL);
 	}
 
 	/**
@@ -263,14 +203,14 @@ public enum BudgetController {
 	 * @throws Exception
 	 *             on access errors.
 	 */
-	double getCampaignSpend(String id, int mode) throws Exception {
-		Campaign c;
-		if (id == null)
+	double getCampaignSpend(Campaign cc, int mode) throws Exception {
+		AccountingCampaign c;
+		if (cc == null)
 			c = Aggregator.global;
 		else
-			c = Aggregator.get(id);
+			c = Aggregator.get(""+cc.id);
 		if (c == null) {
-			c = new Campaign(id);
+			c = new AccountingCampaign(cc);
 			Aggregator.add(c);
 			return 0;
 		}
@@ -290,8 +230,8 @@ public enum BudgetController {
 	 * @throws Exception
 	 *             on access errors.
 	 */
-	public double getCampaignDailySpend(String id) throws Exception {
-		return getCampaignSpend(id, Aggregator.DAILY);
+	public double getCampaignDailySpend(Campaign c ) throws Exception {
+		return getCampaignSpend(c, Aggregator.DAILY);
 	}
 
 	/**
@@ -303,8 +243,8 @@ public enum BudgetController {
 	 * @throws Exception
 	 *             on access errors.
 	 */
-	public double getCampaignHourlySpend(String id) throws Exception {
-		return getCampaignSpend(id, Aggregator.HOURLY);
+	public double getCampaignHourlySpend(Campaign c) throws Exception {
+		return getCampaignSpend(c, Aggregator.HOURLY);
 	}
 
 	/**
@@ -318,7 +258,7 @@ public enum BudgetController {
 	 *            String. The type, e.g. 'banner'.
 	 * @return double. The total spend.
 	 */
-	public double getCreativeTotalSpend(String camp, String id, String type) throws Exception {
+	public double getCreativeTotalSpend(Campaign camp, String id, String type) throws Exception {
 		return getCreativeSpend(camp, id, type, Aggregator.TOTAL);
 	}
 
@@ -337,13 +277,14 @@ public enum BudgetController {
 	 * @throws Exception
 	 *             on access errors.
 	 */
-	double getCreativeSpend(String camp, String id, String type, int mode) throws Exception {
-		Campaign c = Aggregator.get(camp);
+	double getCreativeSpend(Campaign camp, String id, String type, int mode) throws Exception {
+		AccountingCampaign c = Aggregator.get(""+camp.id);
 		if (c == null)
 			return 0;
-		Creative cr = c.getCreative(id, type);
+		AccountingCreative cr = c.getCreative(id);
 		if (cr == null) {
-			cr = new Creative(id, type);
+			cr = new AccountingCreative(id);
+			cr.setBudget(camp);
 			c.addCreative(cr);
 			return 0;
 		}
@@ -361,7 +302,7 @@ public enum BudgetController {
 	 * @return double. The standard deviation.
 	 */
 	public double getStdDeviationMinuteSpend(String camp) {
-		Campaign c;
+		AccountingCampaign c;
 		if (camp == null)
 			c = Aggregator.global;
 		else
@@ -384,11 +325,11 @@ public enum BudgetController {
 	 * @return double. The standard deviation.
 	 */
 	public double getStdDeviationMinuteSpend(String camp, String creat, String type) {
-		Campaign c = Aggregator.get(camp);
+		AccountingCampaign c = Aggregator.get(camp);
 		if (c == null)
 			return Double.NaN;
 
-		Creative cr = c.getCreative(creat, type);
+		AccountingCreative cr = c.getCreative(creat);
 		if (cr == null)
 			return Double.NaN;
 
@@ -403,7 +344,7 @@ public enum BudgetController {
 	 * @return double. The creative's daily spend.
 	 * @throws Exception on access errors.
 	 */
-	public double getCreativeDailySpend(String camp, String id, String type) throws Exception {
+	public double getCreativeDailySpend(Campaign camp, String id, String type) throws Exception {
 		return getCreativeSpend(camp, id, type, Aggregator.DAILY);
 	}
 
@@ -415,7 +356,7 @@ public enum BudgetController {
 	 * @return double. The creative's hourly spend.
 	 * @throws Exception on access errors.
 	 */
-	public double getCreativeHourlySpend(String camp, String id, String type) throws Exception {
+	public double getCreativeHourlySpend(Campaign camp, String id, String type) throws Exception {
 		return getCreativeSpend(camp, id, type, Aggregator.HOURLY);
 
 	}
@@ -427,7 +368,7 @@ public enum BudgetController {
 	 * @return double. The value in the campaign object based on type.
 	 * @throws Exception on access errors.
 	 */
-	double get(Campaign c, int mode) throws Exception {
+	double get(AccountingCampaign c, int mode) throws Exception {
 		switch (mode) {
 		case Aggregator.TOTAL:
 			return c.getTotal_price();
@@ -446,7 +387,7 @@ public enum BudgetController {
 	 * @return double. The returned value based on mode.
 	 * @throws Exception on access errors.
 	 */
-	double get(Creative c, int mode) throws Exception {
+	double get(AccountingCreative c, int mode) throws Exception {
 		switch (mode) {
 		case Aggregator.TOTAL:
 			return c.total_price;
@@ -459,24 +400,13 @@ public enum BudgetController {
 	}
 
 	/**
-	 * Close the object's aggregators.
-	 * @throws Exception on network errors.
-	 */
-	public void close() throws Exception {
-		BudgetController.hourly.close();
-		BudgetController.daily.close();
-		BudgetController.total.close();
-		BudgetController.lastLog.close();
-	}
-
-	/**
 	 * Get a campaign's minute spend on average.
 	 * @param id String. The campaign id.
 	 * @return double. The average minute spend on this campaign.
 	 * @throws Exception on JSON parsing errors.
 	 */
 	public double getCampaignSpendAverage(String id) throws Exception {
-		Campaign c;
+		AccountingCampaign c;
 		if (id == null) 
 			c = Aggregator.global;
 		else
@@ -499,10 +429,10 @@ public enum BudgetController {
 	}
 
 	public double getCreativeSpendAverage(String camp, String id, String type) throws Exception {
-		Campaign c = Aggregator.get(camp);
+		AccountingCampaign c = Aggregator.get(camp);
 		if (c == null)
 			throw new Exception("No such campaign " + camp);
-		Creative cr = c.getCreative(id, type);
+		AccountingCreative cr = c.getCreative(id);
 		if (cr == null)
 			throw new Exception("No such creative " + id);
 		return cr.delta.getAverage();
@@ -512,16 +442,16 @@ public enum BudgetController {
 	 * Determine if the total budget was exceeded. This is different than hourly and daily budget checks, If the total budget
 	 * is exceeded the campaign can never restart, and should be removed from the system to save resources.
 	 * @param id String. The campaign id to check.
-	 * @param total_budget AtomicBigDecimal. This is the total budget, retrieved from MySQL.
+	 * @param total_budget AtomicBigDecimal. This is the total budget, retrieved from Postgres.
 	 * @return boolean. Returns true if the total spend is >= total budget.
 	 * @throws Exception on errors accessing ELK.
 	 */
-	public boolean checkCampaignTotalBudgetExceeded(String id, AtomicBigDecimal total_budget) throws Exception {
+	public boolean checkCampaignTotalBudgetExceeded(Campaign c, AtomicBigDecimal total_budget) throws Exception {
 		if (total != null) {
 			double budget = total_budget.getDoubleValue();
-			double spend = getCampaignTotalSpend(id);
+			double spend = getCampaignTotalSpend(c);
 
-			logger.debug("TOTAL {} budget: {} vs spend: {}", id, budget, spend);
+			logger.debug("TOTAL {} budget: {} vs spend: {}", c.id, budget, spend);
 			if (spend >= budget) {
 				return true;
 			}
@@ -540,15 +470,15 @@ public enum BudgetController {
 	 * @return Boolean. Returns true if overspent or ELK error. Otherwise false.
 	 */
 
-	public boolean checkCampaignBudgetsTotal(String id, AtomicBigDecimal total) {
+	public boolean checkCampaignBudgetsTotal(Campaign c, AtomicBigDecimal total) {
 		double spend;
 		double budget;
 		try {
 			if (total != null) {
 				budget = total.getDoubleValue();
-				spend = getCampaignTotalSpend(id);
+				spend = getCampaignTotalSpend(c);
 
-				logger.debug("TOTAL {} budget: {} vs spend: {}", id, budget, spend);
+				logger.debug("TOTAL {} budget: {} vs spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -560,15 +490,15 @@ public enum BudgetController {
 		return false;
 	}
 
-	public boolean checkCampaignBudgetsDaily(String id, AtomicBigDecimal daily) {
+	public boolean checkCampaignBudgetsDaily(Campaign c, AtomicBigDecimal daily) {
 		double spend;
 		double budget;
 
 		try {
 			if (daily != null) {
 				budget = daily.getDoubleValue();
-				spend = getCampaignDailySpend(id);
-				logger.debug("DAILY {} budget: {} vs spend: {}", id, budget, spend);
+				spend = getCampaignDailySpend(c);
+				logger.debug("DAILY {} budget: {} vs spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -581,15 +511,15 @@ public enum BudgetController {
 		return false;
 	}
 
-	public boolean checkCampaignBudgetsHourly(String id, AtomicBigDecimal hourly) {
+	public boolean checkCampaignBudgetsHourly(Campaign c, AtomicBigDecimal hourly) {
 		double spend;
 		double budget;
 
 		try {
 			if (hourly != null) {
 				budget = hourly.getDoubleValue();
-				spend = getCampaignHourlySpend(id);
-				logger.debug("HOURLY {} budget: {} vs spend: {}", id, budget, spend);
+				spend = getCampaignHourlySpend(c);
+				logger.debug("HOURLY {} budget: {} vs spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -602,7 +532,7 @@ public enum BudgetController {
 		return false;
 	}
 
-	public boolean checkCampaignBudgets(String id, AtomicBigDecimal total, AtomicBigDecimal daily,
+	public boolean checkCampaignBudgets(Campaign c, AtomicBigDecimal total, AtomicBigDecimal daily,
 			AtomicBigDecimal hourly) {
 		double spend;
 		double budget;
@@ -610,9 +540,9 @@ public enum BudgetController {
 			
 			if (total != null) {
 				budget = total.getDoubleValue();
-				spend = getCampaignTotalSpend(id);
+				spend = getCampaignTotalSpend(c);
 
-				logger.debug("TOTAL {} budget: {} vs spend: {}", id, budget, spend);
+				logger.debug("TOTAL {} budget: {} vs spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -620,8 +550,8 @@ public enum BudgetController {
 
 			if (daily != null) {
 				budget = daily.getDoubleValue();
-				spend = getCampaignDailySpend(id);			
-				logger.debug("DAILY {} budget: {} vs spend: {}", id, budget, spend);
+				spend = getCampaignDailySpend(c);			
+				logger.debug("DAILY {} budget: {} vs spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -629,8 +559,8 @@ public enum BudgetController {
 
 			if (hourly != null) {
 				budget = hourly.getDoubleValue();
-				spend = getCampaignHourlySpend(id);
-				logger.debug("HOURLY {} budget: {} vs {} spend: {}", id, budget, spend);
+				spend = getCampaignHourlySpend(c);
+				logger.debug("HOURLY {} budget: {} vs {} spend: {}", c.id, budget, spend);
 				if (spend >= budget) {
 					return true;
 				}
@@ -662,7 +592,7 @@ public enum BudgetController {
 	 * @return Boolean. Returns true if overspent or ELK error. Otherwise false.
 	 */
 
-	public boolean checkCreativeBudgets(String id, String crid, String type, AtomicBigDecimal total,
+	public boolean checkCreativeBudgets(Campaign c, String crid, String type, AtomicBigDecimal total,
 			AtomicBigDecimal daily, AtomicBigDecimal hourly) {
 		double spend;
 		double budget;
@@ -670,16 +600,16 @@ public enum BudgetController {
 
 			if (total != null && total.doubleValue() != 0) {
 				budget = total.getDoubleValue();
-				spend = getCreativeTotalSpend(id, crid, type);
-				logger.debug("Creative check -------> ID: {}. TOTAL, {}/{} budget: {} vs spend: {}", id, crid, type, budget, spend);
+				spend = getCreativeTotalSpend(c, crid, type);
+				logger.debug("Creative check -------> ID: {}. TOTAL, {}/{} budget: {} vs spend: {}", c.id, crid, type, budget, spend);
 				if (spend != 0 && spend >= budget)
 					return true;
 			}
 
 			if (daily != null && daily.doubleValue() != 0) {
 				budget = daily.getDoubleValue();
-				spend = getCreativeDailySpend(id, crid, type);
-				logger.debug("Creative check -------> ID: {}. DAILY {}/{} budget: {} vs spend: {}", id, crid, type, budget,
+				spend = getCreativeDailySpend(c, crid, type);
+				logger.debug("Creative check -------> ID: {}. DAILY {}/{} budget: {} vs spend: {}", c.id, crid, type, budget,
 						spend);
 				if (spend >= budget)
 					return true;
@@ -687,8 +617,8 @@ public enum BudgetController {
 
 			if (hourly != null && hourly.doubleValue() != 0) {
 				budget = hourly.getDoubleValue();
-				spend = getCreativeHourlySpend(id, crid, type);
-				logger.debug("Creative check ------->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", id, crid, type, budget,
+				spend = getCreativeHourlySpend(c, crid, type);
+				logger.debug("Creative check ------->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", c.id, crid, type, budget,
 						spend);
 				if (spend >= budget)
 					return true;
@@ -700,31 +630,5 @@ public enum BudgetController {
 		}
 
 		return false;
-	}
-
-	/**
-	 * A simple test. 
-	 * @param args Stringp[]. Args[0] is the hostname.
-	 * @throws Exception on network errors.
-	 */
-
-	public static void main(String[] args) throws Exception {
-		String host1 = "54.164.51.156";
-		String host2 = host1;
-		int port = 9200;
-		if (args.length > 1) {
-			host2 = args[1];
-		}
-		if (args.length == 3) {
-			port = Integer.parseInt(args[2]);
-		}
-		BudgetController bc = BudgetController.getInstance(host1, host2, port);
-		bc.dumpAllActive();
-		// bc.dumpCampaigns("debug.sim");
-		
-		while (bc.getRevolution() < 2) {
-			Thread.sleep(1000);
-		}
-		bc.dumpAllActive();
 	}
 }

@@ -1,7 +1,7 @@
 package com.jacamars.dsp.crosstalk.api;
 
-
-import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 /**
  * Get the spend rate of a campaign or campaign/creative
@@ -47,7 +47,8 @@ public class GetSpendRateCmd extends ApiCommand {
 		// TBD: Needs rewrite for multi tenant
 
 		try {
-			if (campaign == null) {
+			Campaign c = CampaignCache.getInstance().getCampaign(campaign);
+	/*		if (campaign == null) {
 				totalSpend = BudgetController.getInstance().getCampaignTotalSpend(null);
 				dailySpend = BudgetController.getInstance().getCampaignDailySpend(null);
 				hourlySpend = BudgetController.getInstance().getCampaignHourlySpend(null);
@@ -55,20 +56,21 @@ public class GetSpendRateCmd extends ApiCommand {
 				std = BudgetController.getInstance().getStdDeviationMinuteSpend(null);
 			} else {
 				if (creative == null) {
-					totalSpend = BudgetController.getInstance().getCampaignTotalSpend(campaign);
-					dailySpend = BudgetController.getInstance().getCampaignDailySpend(campaign);
-					hourlySpend = BudgetController.getInstance().getCampaignHourlySpend(campaign);
-					minuteSpendAverage = BudgetController.getInstance().getCampaignSpendAverage(campaign);
-					std = BudgetController.getInstance().getStdDeviationMinuteSpend(campaign);
+					totalSpend = c.budget.totalCost.doubleValue();
+					dailySpend = c.budget.dailyCost.doubleValue();
+					hourlySpend = c.budget.hourlyCost.doubleValue();
+					//minuteSpendAverage = BudgetController.getInstance().getCampaignSpendAverage(campaign);
+					//std = BudgetController.getInstance().getStdDeviationMinuteSpend(campaign);
 				} else {
-					totalSpend = BudgetController.getInstance().getCreativeTotalSpend(campaign, creative, type);
-					dailySpend = BudgetController.getInstance().getCreativeDailySpend(campaign, creative, type);
-					hourlySpend = BudgetController.getInstance().getCreativeHourlySpend(campaign, creative, type);
+					Campaign x = CampaignCache.getInstance().getCampaign(campaign);
+					totalSpend = BudgetController.getInstance().getCreativeTotalSpend(x, creative, type);
+					dailySpend = BudgetController.getInstance().getCreativeDailySpend(x, creative, type);
+					hourlySpend = BudgetController.getInstance().getCreativeHourlySpend(x, creative, type);
 					minuteSpendAverage = BudgetController.getInstance().getCreativeSpendAverage(campaign, creative,
 							type);
 					std = BudgetController.getInstance().getStdDeviationMinuteSpend(campaign, creative, type);
 				}
-			}
+			} */
 		} catch (Exception e) {
 			error = true;
 			message = e.getMessage();

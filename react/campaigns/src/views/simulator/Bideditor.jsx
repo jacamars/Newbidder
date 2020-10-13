@@ -1,12 +1,14 @@
 import React from 'react';
-import JSONInput from 'react-json-editor-ajrm';
-import locale from 'react-json-editor-ajrm/locale/en';
+//import JSONInput from 'react-json-editor-ajrm';
+//import locale from 'react-json-editor-ajrm/locale/en';
+import ReactJson from 'react-json-view'
 import {
     Button,
     Card,
     CardHeader,
     Row,
-    Col
+    Col,
+    Collapse
  } from 'reactstrap';
  import { useViewContext } from "../../ViewContext";
 
@@ -22,6 +24,23 @@ const Bideditor = (props) => {
         padding: '1px',
         cursor: 'pointer'
 
+    }
+
+    const edit = (e) => {
+        //alert(JSON.stringify(e,null,2));
+        return true;
+    }
+
+    const del = (e) => {
+        return true;
+    }
+
+    const add = (e) => {
+        return true;
+    }
+
+    const collapse = (e) => {
+        return true;
     }
 
     const textAreaStyle = {
@@ -58,22 +77,30 @@ const Bideditor = (props) => {
 
                 <Row >
                     <Col xs="6">
-                        <JSONInput
+                        <ReactJson
                             id='json_bid'
-                            placeholder={props.vars.json}
-                            theme='dark'
-                            locale={locale}
+                            name="bidrequest"
+                            src={props.vars.json}
+                            sortKeys={true}
+                            shouldCollapse={(e)=>{collapse(e)}}
+                            displayDataTypes={false}
+                            onEdit={(e)=>{edit(e)}}
+                            onDelete={(e)=>{del(e)}}
+                            onAdd={(e)=>{add(e)}}
+                            enableClipboard={true}
+                            theme='monokai'
                             height='266px'
                             width='95%'
                             onChange={props.jsonChangedHandler}
                         />
                     </Col>
                     <Col xs="6">
-                        <JSONInput
+                        <ReactJson
                             id='json_response'
-                            placeholder={props.vars.response}
-                            theme='dark'
-                            locale={locale}
+                            name="bidresponse"
+                            src={props.vars.response}
+                            displayDataTypes={false}
+                            theme='monokai'
                             height='266px'
                             width='95%'
                         />

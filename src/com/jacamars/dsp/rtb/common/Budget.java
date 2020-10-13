@@ -6,7 +6,7 @@ import com.jacamars.dsp.crosstalk.budget.DayPart;
 public class Budget {
 
 	/** The current cost incurred by this campaign */
-	public volatile AtomicBigDecimal totalCost = new AtomicBigDecimal(0); 
+	public AtomicBigDecimal totalCost = new AtomicBigDecimal(0); 
 	
 	/** Total budget of this object */
 	public AtomicBigDecimal totalBudget = new AtomicBigDecimal(0);
@@ -24,10 +24,10 @@ public class Budget {
 	public DayPart daypart;
 
 	/** The current daily cost */
-	public transient AtomicBigDecimal dailyCost = new AtomicBigDecimal(0);
+	public AtomicBigDecimal dailyCost = new AtomicBigDecimal(0);
 	
 	/** The current hourly cost */
-	public transient AtomicBigDecimal hourlyCost = new AtomicBigDecimal(0);
+	public AtomicBigDecimal hourlyCost = new AtomicBigDecimal(0);
 
 	public Budget() {
 		

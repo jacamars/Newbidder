@@ -1,10 +1,7 @@
 package com.jacamars.dsp.rtb.shared;
 
-import java.io.Serializable;
-
-
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +75,11 @@ public enum BidCachePool {
 	static public boolean readBackup = true;
 
 	static public String mapstoreJDBC = null;
+	
+	HazelcastInstance inst;
 
 	public static BidCachePool getInstance(HazelcastInstance inst) {
+		INSTANCE.inst =inst;
 		if (bidCache == null) {
 			MapStoreConfig mapStoreCfg;
 
@@ -251,8 +251,13 @@ public enum BidCachePool {
 		map.put("miscCache", miscCache.size());
 		map.put("watch", watchMap.size());
 		map.put("frequency", FreqSetCache.getInstance().size());
+		map.put("campaigns", CampaignCache.getInstance().size());
 		
 		return map;
+	}
+	
+	public HazelcastInstance getHazelcast() {
+		return inst;
 	}
 	
 	/**
@@ -315,6 +320,10 @@ public enum BidCachePool {
 			break;
 		case "frequency":
 			rets = FreqSetCache.getInstance().get(predicate);
+			break;
+		case "campaigns":
+			rets = CampaignCache.getInstance().get(predicate);
+			break;
 		}
 		return rets;
 	}
@@ -334,6 +343,9 @@ public enum BidCachePool {
 			return watchMap.entrySet();
 		case "frequency":
 			imap = FreqSetCache.getInstance().getMap();
+			break;
+		case "campaigns":
+			imap = CampaignCache.getInstance().getMap();
 			break;
 		}
 		Predicate predicate = null;

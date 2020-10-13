@@ -26,8 +26,6 @@ services:
       - "POSTGRES_PASSWORD=postgres"
     ports:
       - "5432:5432"
-#    networks:
-#      - rtb_net
     volumes:
       - /tmp/data:/var/lib/postgresql/data
       

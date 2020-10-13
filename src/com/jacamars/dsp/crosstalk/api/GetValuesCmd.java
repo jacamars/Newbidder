@@ -1,7 +1,7 @@
 package com.jacamars.dsp.crosstalk.api;
 
-import com.jacamars.dsp.crosstalk.budget.Aggregator;
-import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 /**
  * Web API to get the assigned budget for campaign/creatives
@@ -48,11 +48,12 @@ public class GetValuesCmd extends ApiCommand {
 		// TBD Needs rewrite for multi tenant
 		
 		try {
+			Campaign c = CampaignCache.getInstance().getCampaign(campaign);
 			if (creative == null) {
-				total_value = BudgetController.getInstance().getCampaignTotalSpend(campaign);
-				daily_value = BudgetController.getInstance().getCampaignDailySpend(campaign);
-				hourly_value = BudgetController.getInstance().getCampaignHourlySpend(campaign);
-			} else {
+				total_value = c.budget.totalCost.getDoubleValue();
+				daily_value = c.budget.dailyCost.getDoubleValue();
+				hourly_value = c.budget.hourlyCost.getDoubleValue();
+			} /* else {
 				if (adtype != null) {
 					type = adtype;
 				} else {
@@ -65,10 +66,11 @@ public class GetValuesCmd extends ApiCommand {
 					if (Aggregator.creativeExists(campaign, creative, "audio"))
 						type = "audio";
 				}
-				total_value = BudgetController.getInstance().getCreativeTotalSpend(campaign, creative, type);
-				daily_value = BudgetController.getInstance().getCreativeDailySpend(campaign, creative, type);
-				hourly_value = BudgetController.getInstance().getCreativeHourlySpend(campaign, creative, type);
-			}
+				Campaign x = CampaignCache.getInstance().getCampaign(campaign);
+				total_value = BudgetController.getInstance().getCreativeTotalSpend(x, creative, type);
+				daily_value = BudgetController.getInstance().getCreativeDailySpend(x, creative, type);
+				hourly_value = BudgetController.getInstance().getCreativeHourlySpend(x, creative, type);
+			} */
 		} catch (Exception error) {
 			this.error = true;
 			message = error.toString();

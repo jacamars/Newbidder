@@ -69,9 +69,10 @@ const  addNewCampaign = async () => {
     x.ad_domain = document.getElementById("adomain").value;
     var forensiq = document.getElementById("fraudSelect").value;
     x.status = document.getElementById("statusSelect").value;
-    x.budget.totalBudget = Number(document.getElementById("totalBudget").value);
-    x.budget.dailyBudget = Number(document.getElementById("dailyBudget").value);
-    x.budget.hourlyBudget= Number(document.getElementById("hourlyBudget").value);
+    x.total_budget = Number(document.getElementById("totalBudget").value);
+    x.budget_limit_daily = Number(document.getElementById("dailyBudget").value);
+    x.budget_limit_hourly = Number(document.getElementById("hourlyBudget").value);
+
     x.spendrate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
 
@@ -107,6 +108,7 @@ const  addNewCampaign = async () => {
     x.videos = [];
     x.audios = [];
     x.natives = [];
+    x.creatives = [];
     for(var i=0;i<cnames.length;i++) {
       var name = cnames[i];
       var cr = vx.findCreativeByName(name);

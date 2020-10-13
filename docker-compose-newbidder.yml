@@ -30,15 +30,15 @@ services:
       - /tmp/data:/var/lib/postgresql/data
       
   bidder1:
-    image: "newbidder"
+    image: jacamars/newbidder
     environment:
       BROKERLIST: "kafka:9092"
       EXTERNAL: "http://localhost:8080"
       JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
-      S3REGION: ""
+      S3REGION: "us-east-1"
       S3ENDPOINT: "http://minio:9000"
-      AWSACCESKEY: "{$AWSACCESSKEY}"
+      AWSACCESSKEY: "{$AWSACCESSKEY}"
       AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""
@@ -56,15 +56,15 @@ services:
     command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
 
   bidder2:
-    image: "newbidder"
+    image: jacamars/newbidder
     environment:
       BROKERLIST: "kafka:9092"
       EXTERNAL: "http://localhost:8080"
       JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
       S3BUCKET: ""
-      S3REGION: ""
+      S3REGION: "us-east-1"
       S3ENDPOINT: "http://minio:9000"
-      AWSACCESKEY: "{$AWSACCESSKEY}"
+      AWSACCESSKEY: "{$AWSACCESSKEY}"
       AWSSECRETKEY: "${AWSSECRETKEY}"
       GOOGLE_EKEY: ""
       GOOGLE_IKEY: ""

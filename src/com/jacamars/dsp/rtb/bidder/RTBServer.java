@@ -63,6 +63,7 @@ import com.jacamars.dsp.rtb.fraud.ForensiqClient;
 import com.jacamars.dsp.rtb.logtap.WebMQPublisher;
 
 import com.jacamars.dsp.rtb.pojo.*;
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
 import com.jacamars.dsp.rtb.shared.SharedTimer;
@@ -691,7 +692,8 @@ public class RTBServer implements Runnable {
 			Thread.sleep(1000);
 			int count = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
 			
-			// Start crosstalk after hazelcast comes up
+			// Start acconting and crosstalk after hazelcast comes up
+			AccountingCache.getInstance(hz);
 			Crosstalk.getInstance();
 			
 			if (count > 1) {
@@ -862,7 +864,7 @@ public class RTBServer implements Runnable {
 					
 					// Add crosstalk info if this is the leader
 					if (RTBServer.isLeader()) {
-						msg = Crosstalk.getInstance().info + msg;
+						msg = Crosstalk.info + msg;
 					}
 					
 					Map m = new HashMap();

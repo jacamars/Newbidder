@@ -3,6 +3,8 @@ package com.jacamars.dsp.crosstalk.budget;
 import java.io.IOException;
 
 
+
+
 import java.nio.charset.StandardCharsets;
 
 import java.nio.file.Files;
@@ -10,8 +12,12 @@ import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
@@ -41,10 +47,13 @@ import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.jmq.EventIF;
 import com.jacamars.dsp.rtb.jmq.Subscriber;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
+import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
+
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 
 /**
  * Class that loads,updates,deletes campaigns based on SQL queries. Runs once a
@@ -66,17 +75,13 @@ public enum Crosstalk {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-	/** The cache to contain the general context info on runing campaigns */
-	public static volatile IMap<String, Campaign> campaigns;
+	/** The cache to contain the general context info on running campaigns */
+	public static Shadow shadow;
+//	public static volatile IMap<String, Campaign> campaigns;
+//	public static volatile Map<String, Campaign> scampaigns = new HashMap<>();
 
 	/** The cache to contain the general context info on runing campaigns */
 	public static volatile IMap<String, Campaign> deletedCampaigns;
-
-	/**
-	 * creatives in a map, for fast lookup on win notifications and rollups. Note
-	 * creatives are not deleted
-	 */
-	public static volatile Map<String, Creative> creativesMap = new ConcurrentHashMap<String, Creative>();
 
 	/** The default backup count if you dont set it */
 	static public int backupCount = 3;
@@ -107,9 +112,15 @@ public enum Crosstalk {
 	 * The /log in memory queues
 	 */
 	public static final List<Deque<String>> deqeues = new ArrayList<Deque<String>>();
+	
+	
+	volatile int day;
+	volatile int hour;
+	Integer nowDay;
+	Integer nowHour;
 
 	public static Crosstalk getInstance() throws Exception {
-		if (campaigns != null)
+		if (shadow != null)
 			return INSTANCE;
 		try {
 			initialize();
@@ -118,33 +129,45 @@ public enum Crosstalk {
 		}
 
 		// Start the connection to elastic search
-		BudgetController.getInstance(CrosstalkConfig.elk);
-
+		//BudgetController.getInstance(CrosstalkConfig.elk);
+		
 		Config config = RTBServer.getSharedInstance().getConfig();
 		deletedCampaigns = RTBServer.getSharedInstance().getMap(DELETED_CAMPAIGNS_KEY);
 		config.getMapConfig(DELETED_CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 
-		campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
+		shadow = new Shadow();
+
+		
 		config.getMapConfig(CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
 		
 		signaler = new ZPublisher(RTBServer.getSharedInstance(), "hazelcast://topic=rtbcommands");
 		signals = new Subscriber(RTBServer.getSharedInstance(), new Controller(), "hazelcast://topic=rtbcommands");
 
+		CampaignCache.getInstance();
+		
+		if (RTBServer.isLeader())
+			INSTANCE.refresh(); // Load campaigns.
+		else {
+			shadow.refresh();
+			shadow.getCampaigns().forEach(c->{
+				logger.info("*** Loaded Shared Campaign: {} - {}",c.id,c.name);
+			});
+		}
+		
 		ScheduledExecutorService execService = Executors.newScheduledThreadPool(1);
 		execService.scheduleAtFixedRate(() -> {
 			try {
 				if (RTBServer.isLeader()) {
+					
 					updateBudgets();
 					INSTANCE.scan();
+					
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}, 0L, 1L, TimeUnit.MINUTES);
-
-	
-		INSTANCE.refresh();
 
 		return INSTANCE;
 
@@ -177,9 +200,7 @@ public enum Crosstalk {
 	static void updateBudgets() {
 		if (!RTBServer.isLeader())
 			return;
-		campaigns.entrySet().forEach(e -> {
-			e.getValue().runUsingElk();
-		});
+		shadow.runUsingElk();
 	}
 
 	static void initialize() throws Exception {
@@ -222,7 +243,7 @@ public enum Crosstalk {
 		if (camp == null || deletedCampaigns.get("" + camp.id) != null)
 			return false;
 
-		campaigns.delete("" + camp.id);
+		shadow.delete("" + camp.id);
 		deletedCampaigns.put("" + camp.id, camp); // add to the deleted campaigns map
 
 		return true;
@@ -246,13 +267,17 @@ public enum Crosstalk {
 		if (camp != null)
 			return camp;
 
-		camp = campaigns.get(id);
+		camp = shadow.get(id);
 		return camp;
 	}
 
 	public void setKnownCampaign(Campaign c) {
 		if (deletedCampaigns.get(c.id) != null)
 			deletedCampaigns.set("" + c.id, c);
+	}
+	
+	void addCampaign(Campaign c) {
+		shadow.add(c);
 	}
 
 	public String update(Campaign campaign, boolean add) throws Exception {
@@ -264,7 +289,7 @@ public enum Crosstalk {
 		if (c == null) {
 			c = makeNewCampaign(campaign);
 			if (c.isActive()) {
-				CampaignCache.getInstance().addCampaign(c);
+				addCampaign(c);
 				deletedCampaigns.remove("" + c.id);
 				c.runUsingElk();
 				logger.info("New campaign {} going active", campaign);
@@ -425,20 +450,16 @@ public enum Crosstalk {
 			exchangeAttributes.add(child);
 		}
 	}
-
+	
 	public void scan() {
 
 		try {
 
-			//refresh();
-
-			campaigns = RTBServer.getSharedInstance().getMap(CAMPAIGNS_KEY);
-
 			List<Campaign> deletions = new ArrayList<>();
 
-			campaigns.entrySet().forEach(e -> {
+			shadow.entrySet().forEach(e -> {
 				Campaign camp = e.getValue();
-				camp.runUsingElk();
+//				camp.runUsingElk();
 				try {
 					if (!camp.isActive()) {
 						logger.info("Campaign has become inactive: {}", camp.name);
@@ -491,9 +512,9 @@ public enum Crosstalk {
 
 			var canrun = Configuration.getInstance().deadmanSwitch.canRun();
 			info = String.format("[canbid=%b, runnable campaigns=%d, parked=%d, dailyspend=%f avg-spend-min=%f] ",
-					canrun, campaigns.size(), deletedCampaigns.size(),
-					BudgetController.getInstance().getCampaignDailySpend(null),
-					BudgetController.getInstance().getCampaignSpendAverage(null));
+					canrun, shadow.size(), deletedCampaigns.size(),0.0,0.0);
+	//				BudgetController.getInstance().getCampaignDailySpend(null),
+	//				BudgetController.getInstance().getCampaignSpendAverage(null));
 			//logger.info(info);
 		} catch (Exception error) {
 			error.printStackTrace();
@@ -502,6 +523,8 @@ public enum Crosstalk {
 				System.exit(0);
 			}
 		}
+		
+		setTimes();
 	}
 
 	boolean stillRunnable(Campaign c) throws Exception {
@@ -528,7 +551,7 @@ public enum Crosstalk {
 			deletedCampaigns.remove("" + c.id);
 		}
 
-		campaigns.entrySet().forEach(e -> {
+		shadow.entrySet().forEach(e -> {
 			Campaign c = e.getValue();
 			try {
 				if (c.canBePurged()) {
@@ -551,7 +574,7 @@ public enum Crosstalk {
 	 * @param camp Campaign. The campaign to add.
 	 */
 	void removeFromRTB(Campaign camp) {
-		campaigns.remove(camp.id);
+		shadow.remove(camp);
 	}
 
 	/**
@@ -592,9 +615,110 @@ public enum Crosstalk {
 			list.add(w.toString());
 		}
 
+		shadow.refresh();
+		
 		return list;
 
 	}
+	
+	/////////////////////////
+	
+	public void updateCampaignTotal(String cid, Double price) throws Exception {
+		String sql = "update campaigns set cost=" + price.toString() + " where id="+cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	
+	public void updateCampaignTotalDaily(String cid, Double price) throws Exception {
+		String sql = "update campaigns set daily_cost=" + price.toString() + " where id="+cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	
+	public void updateCampaignTotalHourly(String cid, Double price) throws Exception {
+		String sql = "update campaigns set hourly_cost=" + price.toString() + " where id="+cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	
+	public boolean dayChanged(Integer cd) {
+		if (nowDay == null || cd == null)
+			return true;
+		if (nowDay.equals(cd))
+			return false;
+		return true;
+	}
+	
+	public boolean hourChanged(Integer ch) {
+		if (nowHour == null || ch == null)
+			return true;
+		if (nowHour.equals(ch))
+			return false;
+		return true;
+	}
+	
+	public int getHour() {
+		Calendar calendar = Calendar.getInstance();
+		//var minutesPastZero = calendar.get(Calendar.MINUTE);
+		//return;
+		return calendar.get(Calendar.HOUR_OF_DAY);
+	}
+	
+	public int getDay() {
+		Calendar calendar = Calendar.getInstance();
+		return calendar.get(Calendar.DAY_OF_YEAR);
+	}
+	
+	public boolean timeChanged(Integer cd, Integer ch) {
+		return (hourChanged(ch) || dayChanged(cd));
+	}
+	
+	void getTimes() {
+		day = getDay();
+		hour = getHour();
+	}
+	
+	void setTimes() {
+		nowDay = getDay();
+		nowHour = getHour();
+	}
+	
+	
+	public static Map<String,String> typeMap = new HashMap<>();
+	static {
+		typeMap.put("banner", "banners");
+		typeMap.put("video", "banner_videos");
+		typeMap.put("audio","banner_audios");
+		typeMap.put("natives", "banner_natives");
+	}
+	
+	public void updateCreativeTotal(String cid, String type, Double price) throws Exception {
+		String table = typeMap.get(type);
+		String sql = "update " + table +  " set total_cost=" + price.toString() + " where id="+ cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	
+	public void updateCreativeHourly(String cid,String type, Double price) throws Exception {
+		String table = typeMap.get(type);
+		String sql = "update " + table +  " set hourly_cost=" + price + " where id="+ cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	
+	public void updateCreativeDaily(String cid,String type, Double price) throws Exception {
+		String table = typeMap.get(type);
+		String sql = "update " + table +  " set daily_cost=" + price + " where id="+ cid;
+		
+		var stmt = CrosstalkConfig.getInstance().getConnection().createStatement();
+		stmt.execute(sql);
+	}
+	/////////////////////
 
 }
 
@@ -607,7 +731,8 @@ class Controller implements EventIF {
 			String[] parts = msg.split(" ");
 			switch (parts[0]) {
 			case "load":
-				Configuration.getInstance().addCampaign(parts[1]);
+				String [] array = parts[1].split(",");
+				Configuration.getInstance().addCampaignsList(array);
 				break;
 			case "unload":
 				Configuration.getInstance().deleteCampaign(parts[1]);

@@ -23,6 +23,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.BidResponse;
 import com.jacamars.dsp.rtb.pojo.NobidResponse;
 import com.jacamars.dsp.rtb.pojo.WinObject;
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 
@@ -487,17 +488,6 @@ public enum Controller {
 		responseQueue.add(m);
 	}
 
-	public void removeZnode() {
-		if (Configuration.zk == null)
-			return;
-		try {
-			Configuration.zk.remove();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Delete a campaign.
 	 *
@@ -940,6 +930,7 @@ public enum Controller {
 				domain, bidType);
 		if (winsQueue != null)
 			winsQueue.add(win);
+		AccountingCache.getInstance().increment(adId,cridId,price);
 		MemoryAccounting.getInstance().increment(adId + ".wins");
 	}
 

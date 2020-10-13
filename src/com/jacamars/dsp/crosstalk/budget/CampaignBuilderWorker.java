@@ -42,8 +42,12 @@ public class CampaignBuilderWorker implements Runnable {
 			Campaign check = Crosstalk.getInstance().getKnownCampaign(campaign);   // check is the old one.
 			if (c == null) {                                                         // c is the new one.
 				c = new Campaign(node);
-				c.runUsingElk();
 			}
+			c.runUsingElk();
+			if (c.isActive())
+				Crosstalk.getInstance().shadow.add(c);
+			else
+				Crosstalk.getInstance().shadow.remove(c);
 			
 			// Is this a known campaign? Null is not known
 			if (check == null) {
@@ -51,7 +55,7 @@ public class CampaignBuilderWorker implements Runnable {
 				if (c.isRunnable() && c.isActive()) {
 					logger.info("New campaign {} going active", campaign);
 					msg = "New campaign going active: " + campaign;
-					CampaignCache.getInstance().addCampaign(c);
+					Crosstalk.getInstance().shadow.add(c);
 					Crosstalk.signaler.addString("load " + c.id);
 					return;
 				} else {
@@ -59,16 +63,15 @@ public class CampaignBuilderWorker implements Runnable {
 				}
 			} else {
 				if (c.isRunnable() && c.isActive()) {
+					Crosstalk.getInstance().shadow.add(c);
 					if (check.isRunnable() && check.isActive()) {
 						logger.info("Previous running campaign {}, changed but is active", campaign);
 						msg = "New campaign going active: " + campaign;
-						CampaignCache.getInstance().addCampaign(c);
 						Crosstalk.signaler.addString("load " + c.id);
 						return;
 					} else {
 						logger.info("Previous paused campaign {}, is now active", campaign);
 						msg = "New campaign going active: " + campaign;
-						CampaignCache.getInstance().addCampaign(c);
 						Crosstalk.signaler.addString("load " + c.id);
 						return;
 					}
@@ -79,6 +82,7 @@ public class CampaignBuilderWorker implements Runnable {
 						Crosstalk.getInstance().parkCampaign(c);
 						Crosstalk.getInstance().deletedCampaigns.remove(campaign);
 						Crosstalk.signaler.addString("unload " + c.id);
+						Crosstalk.getInstance().shadow.remove(c);
 						return;
 					} else {
 						logger.info("Previous paused campaign {}, changed, but is still inactive, reason: {}", campaign,c.report());

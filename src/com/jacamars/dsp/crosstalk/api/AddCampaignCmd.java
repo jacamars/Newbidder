@@ -158,7 +158,24 @@ public class AddCampaignCmd extends ApiCommand {
 				ArrayNode inner = JdbcTools.convertToJson(rs);
 				x.set("banner_video", inner);
 			}
+			
+			// audio
+			for (int i = 0; i < nodes.size(); i++) {
+				ObjectNode x = (ObjectNode) nodes.get(i);
+				int campaignid = x.get("id").asInt(); ///////// CHECK
+				rs = stmt.executeQuery("select * from banner_audios where campaign_id = " + campaignid);
+				ArrayNode inner = JdbcTools.convertToJson(rs);
+				x.set("banner_audios", inner);
+			}
 	
+			// audio
+			for (int i = 0; i < nodes.size(); i++) {
+				ObjectNode x = (ObjectNode) nodes.get(i);
+				int campaignid = x.get("id").asInt(); ///////// CHECK
+				rs = stmt.executeQuery("select * from banner_natives where campaign_id = " + campaignid);
+				ArrayNode inner = JdbcTools.convertToJson(rs);
+				x.set("banner_natives", inner);
+			}
 		}
 
 }

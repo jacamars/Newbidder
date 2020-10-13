@@ -52,9 +52,20 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 			super.execute();
 			try {
 				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
+				
+				//System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
+				
 				node.put("customer_id", tokenData.customer);
 				
-				Campaign c =  new Campaign(node); 
+				Campaign x = Crosstalk.getInstance().shadow.get(node.get("id").asText());
+				
+				Campaign c =  new Campaign(node);   // patch running totals back in
+				if (x != null && x.budget != null) {
+					c.budget.totalCost = x.budget.totalCost;
+					c.budget.hourlyCost = x.budget.hourlyCost;
+					c.budget.dailyCost = x.budget.dailyCost;
+				}
+
 	
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
@@ -65,6 +76,7 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 				CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 				w.run();
 				
+				System.out.println(c.toJson());
 				
 				return;
 			} catch (Exception err) {

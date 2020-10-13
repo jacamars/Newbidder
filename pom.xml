@@ -25,8 +25,8 @@
 		<commons.pool2.version>2.5.0</commons.pool2.version>
 		<commons.io.version>2.5</commons.io.version>
 		<postgres.version>9.1-901-1.jdbc4</postgres.version>
-		<hazelcast.version>4.0</hazelcast.version>
-		<hazelcast-client.version>3.12.6</hazelcast-client.version>
+		<hazelcast.version>4.0.2</hazelcast.version>
+		<hazelcast-client.version>3.12.9</hazelcast-client.version>
 		<javax.persistence.version>1.0.2</javax.persistence.version>
 		<http.client.version>4.5.3</http.client.version>
 		<openrtb.core.version>1.5.1</openrtb.core.version>

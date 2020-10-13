@@ -47,7 +47,7 @@ public class GetReasonCmd extends ApiCommand {
 				if (campaign == null) {
 					reasons = new ArrayList();
 					
-					Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
+					Crosstalk.getInstance().shadow.entrySet().forEach(e->{
 						var camp = e.getValue();
 						try {
 							if (tokenData.isAuthorized(camp.customer_id)) 
@@ -73,7 +73,7 @@ public class GetReasonCmd extends ApiCommand {
 				
 				reason = "Unknown campaign";
 				var id = Integer.parseInt(campaign);
-				Crosstalk.getInstance().campaigns.entrySet().forEach(e->{
+				Crosstalk.getInstance().shadow.entrySet().forEach(e->{
 					if (e.getKey().equals("campaign")) {
 						var camp = e.getValue();
 						try {

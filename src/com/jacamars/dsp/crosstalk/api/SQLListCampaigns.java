@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
+import com.jacamars.dsp.rtb.common.Campaign;
 
 /**
  * Deletes a campaign

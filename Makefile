@@ -1,7 +1,19 @@
-.PHONY: clean local docker react react-campaigns backup-db restore-db minio
+.PHONY: clean local docker react react-campaigns backup-db restore-db minio make
 
 build: application
 
+help:
+	@printf "\n"
+	@printf "make application		Builds the entire application\n"
+	@printf "make campaigns			Builds the react campaigns application\n"
+	@printf "make docs			Builds the documentation\n"
+	@printf "make docker			Creates a jacamars/newbidder docker image\n"
+	@printf "make website			Makes the docker for rtb4free.com\n"
+	@printf "make restore-db			Restores the postgres database from the previously saved db\n"
+	@printf "make backup-db			Saves the current db\n"
+	@printf "make minio			Makes a minio s3 setup in /tmp\n"
+	@printf "\n"
+	
 react-campaigns:
 	rm react/campaigns/package.lock || true
 	rm react/campaigns/yarn.lock || true

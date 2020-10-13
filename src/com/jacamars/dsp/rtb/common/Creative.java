@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
-import com.jacamars.dsp.crosstalk.budget.BudgetController;
+import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.MimeTypes;
 import com.jacamars.dsp.rtb.bidder.SelectedCreative;
@@ -39,6 +40,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxCreativeExtensions;
 import com.jacamars.dsp.rtb.nativeads.creative.NativeCreative;
 import com.jacamars.dsp.rtb.pojo.*;
 import com.jacamars.dsp.rtb.probe.Probe;
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.Env;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
@@ -272,6 +274,9 @@ public class Creative {
 	private static final String DAILY_BUDGET = "daily_budget";
 	/** SQL name for the hourly budget */
 	private static final String HOURLY_BUDGET = "hourly_budget";
+
+	transient Integer currentDay;
+	transient Integer currentHour;
 
 	/** SQL name for the vast data attribute */
 
@@ -610,12 +615,11 @@ public class Creative {
 			attrArray = conn.createArrayOf("int", c.attr.toArray());
 
 		String sql = "UPDATE " + table + " SET " + "interval_start=?," + "interval_end=?," + "total_budget=?,"
-				+ "daily_budget=?," + "hourly_budget=?," + "bid_ecpm=?," + "total_cost=?," + "daily_cost=?,"
-				+ "hourly_cost=?," + "updated_at=?," + "rules=?," + "deals=?," + "interstitial=?," + "width_range=?,"
-				+ "height_range=?," + "width_height_list=?," + "name=?," + "cur=?," + "type=?," + "ext_spec=?,"
-				+ "attr=?,";
+				+ "daily_budget=?," + "hourly_budget=?," + "bid_ecpm=?," + "updated_at=?," + "rules=?," + "deals=?,"
+				+ "interstitial=?," + "width_range=?," + "height_range=?," + "width_height_list=?," + "name=?,"
+				+ "cur=?," + "type=?," + "ext_spec=?," + "attr=?,";
 
-		i = 22;
+		i = 19;
 
 		if (c.isBanner) {
 			sql += "imageurl=?," + "width=?," + "height=?," + "contenttype=?," + "htmltemplate=?,"
@@ -672,7 +676,7 @@ public class Creative {
 			p.setInt(i++, c.id);
 		} else if (c.isAudio) {
 			sql += "htmltemplate=?, audio_bitrate=?," + "audio_duration=?," + "audio_start_delay=?," + "audio_api=?,"
-					+ "contenttype=?,"+ "audio_protocol=? WHERE id=?";
+					+ "contenttype=?," + "audio_protocol=? WHERE id=?";
 			p = conn.prepareStatement(sql);
 
 			p.setString(i++, c.htmltemplate);
@@ -770,25 +774,6 @@ public class Creative {
 			p.setNull(i++, Types.DOUBLE);
 
 		p.setDouble(i++, c.price);
-
-		if (c.budget != null) {
-			if (c.budget.totalCost != null)
-				p.setDouble(i++, c.budget.totalCost.doubleValue());
-			else
-				p.setNull(i++, Types.DOUBLE);
-			if (c.budget.dailyCost != null)
-				p.setDouble(i++, c.budget.dailyCost.doubleValue());
-			else
-				p.setNull(i++, Types.DOUBLE);
-			if (c.budget.hourlyCost != null)
-				p.setDouble(i++, c.budget.hourlyCost.doubleValue());
-			else
-				p.setNull(i++, Types.DOUBLE);
-		} else {
-			p.setNull(i++, Types.DOUBLE);
-			p.setNull(i++, Types.DOUBLE);
-			p.setNull(i++, Types.DOUBLE);
-		}
 
 		p.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
 		if (rulesArray != null)
@@ -1409,20 +1394,62 @@ public class Creative {
 
 	////////////////////////
 
-	public boolean runUsingElk(String cid) {
+	public boolean runUsingElk(Campaign cid) {
 
 		try {
-			budget.totalCost.set(BudgetController.getInstance().getCreativeTotalSpend(cid, impid, getType()));
-			budget.dailyCost.set(BudgetController.getInstance().getCreativeDailySpend(cid, impid, getType()));
-			budget.hourlyCost.set(BudgetController.getInstance().getCreativeHourlySpend(cid, impid, getType()));
 
-			logger.debug("*** ELK TEST: Updating budgets: {}/{}/{}", cid, impid, getType());
-			logger.debug("Total cost: {} hourly cost: {}, daily_cost: {}", budget.totalCost.getDoubleValue(),
+			Double x = AccountingCache.getInstance().get("" + cid.id, type + ":" + id);
+			// Double x = BudgetController.getInstance().getCampaignTotalSpend(this);
+
+			logger.info("*** BUDGET TEST: Checking creative budgets: {}/{}/{}", cid, impid, getType());
+			if (x > 0 || Crosstalk.getInstance().timeChanged(currentDay, currentHour)) {
+
+				budget.totalCost.getAndAdd(x);
+				budget.dailyCost.getAndAdd(x);
+				budget.hourlyCost.getAndAdd(x);
+
+				if (Crosstalk.getInstance().hourChanged(currentHour)) {
+					logger.info("Hour changed, creative budget set to 0.0 @{} for {}/{}/{}",
+							Crosstalk.getInstance().getHour(), cid, impid, getType());
+					budget.hourlyCost.set(0.0);
+				}
+				if (Crosstalk.getInstance().dayChanged(currentDay)) {
+					logger.info("Day changed, creative budget set to 0.0 @{} for {}/{}/{}",
+							Crosstalk.getInstance().getDay(), cid, impid, getType());
+					budget.dailyCost.set(0.0);
+				}
+
+				Crosstalk.getInstance().updateCreativeTotal("" + id, type, budget.totalCost.getDoubleValue());
+				Crosstalk.getInstance().updateCreativeDaily("" + id, type, budget.dailyCost.getDoubleValue());
+				Crosstalk.getInstance().updateCreativeHourly("" + id, type, budget.hourlyCost.getDoubleValue());
+
+				currentHour = Crosstalk.getInstance().getHour();
+				currentDay = Crosstalk.getInstance().getDay();
+			}
+
+			logger.info("Total cost: {} hourly cost: {}, daily_cost: {}", budget.totalCost.getDoubleValue(),
 					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
+
 		} catch (Exception error) {
 			error.printStackTrace();
 		}
 		return true;
+	}
+
+	public boolean isExpired() {
+		Date date = new Date();
+
+		if (budget == null)
+			return false;
+
+		boolean expired = date.getTime() > budget.expire_time;
+		if (expired)
+			return expired;
+		expired = date.getTime() < budget.activate_time;
+		if (expired)
+			return expired;
+		return false;
+
 	}
 
 	public String getType() {
@@ -1436,9 +1463,9 @@ public class Creative {
 
 	}
 
-	public boolean isActive(String cid) throws Exception {
+	public boolean isActive(Campaign c) throws Exception {
 
-		if (budgetExceeded(cid))
+		if (budgetExceeded(c))
 			return false;
 		return true;
 	}
@@ -1462,12 +1489,62 @@ public class Creative {
 	 * @return boolean. Returns true if the budget was exceeded.
 	 * @throws Exception on Elk errors.
 	 */
-	public boolean budgetExceeded(String cid) throws Exception {
-		logger.debug("********* CHECKING BUDGET FOR CREATIVE {} of campaign {}", impid, cid);
+	public boolean budgetExceeded(Campaign c) throws Exception {
+		logger.debug("********* CHECKING BUDGET FOR CREATIVE {} of campaign {}", impid, c.id);
 		if (budget == null)
 			return false;
-		return BudgetController.getInstance().checkCreativeBudgets(cid, impid, getType(), budget.totalBudget,
-				budget.dailyBudget, budget.hourlyBudget);
+		return checkCreativeBudgets(c);
+	}
+
+	public boolean checkCreativeBudgets(Campaign c) {
+		double spend;
+		double bdget;
+		try {
+
+			if (budget != null) {
+				bdget = budget.totalBudget.getDoubleValue();
+				spend = budget.totalCost.getDoubleValue();
+
+				if (bdget == 0.0)
+					return false;
+
+				logger.debug("Creative check -------> ID: {}. TOTAL, {}/{} budget: {} vs spend: {}", c.id, id, type,
+						budget, spend);
+				if (spend != 0 && spend >= bdget)
+					return true;
+
+				bdget = budget.dailyBudget.getDoubleValue();
+				spend = budget.dailyCost.getDoubleValue();
+				logger.debug("Creative check -------> ID: {}. DAILY {}/{} budget: {} vs spend: {}", c.id, id, type,
+						budget, spend);
+				if (spend >= bdget)
+					return true;
+
+				bdget = budget.hourlyBudget.getDoubleValue();
+				spend = budget.hourlyCost.getDoubleValue();
+
+				logger.debug("Creative check ------->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", c.id, id, type,
+						budget, spend);
+				if (spend >= bdget)
+					return true;
+				
+				if (budget.daypart != null) {
+					String reason = null;
+					if (budget.daypart.isActive() != true) {
+						logger.debug("Creative Daypart not active -->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", c.id, id, type,
+								budget, spend);
+						return true;
+					}
+					
+				}
+			}
+
+		} catch (Exception error) {
+			error.printStackTrace();
+			return true;
+		}
+
+		return false;
 	}
 
 	protected List<String> getList(String text) {
@@ -1605,7 +1682,6 @@ public class Creative {
 			attributes.add(n);
 		}
 	}
-
 
 	/**
 	 * Compile the video specific components of a creative.
