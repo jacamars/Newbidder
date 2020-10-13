@@ -15,24 +15,22 @@
 		<zookeeper.version>3.5.6</zookeeper.version>
 		<kafka.version>0.10.2.2</kafka.version>
 		<google.protobuf.version>3.3.1</google.protobuf.version>
-		<ehcache.version>0.3.0</ehcache.version>
 		<mapdb.version>3.0.5</mapdb.version>
 		<jamm.version>RELEASE</jamm.version>
-		<cache2k.version>1.0.0.CR3</cache2k.version>
 		<redis.version>2.9.0</redis.version>
-		<jackson.version>2.11.1</jackson.version>
+		<jackson.version>2.11.3</jackson.version>
 		<javax.servlet.version>4.0.0</javax.servlet.version>
 		<commons.pool2.version>2.5.0</commons.pool2.version>
 		<commons.io.version>2.5</commons.io.version>
 		<postgres.version>9.1-901-1.jdbc4</postgres.version>
-		<hazelcast.version>4.0.2</hazelcast.version>
+		<hazelcast.version>4.0.3</hazelcast.version>
 		<hazelcast-client.version>3.12.9</hazelcast-client.version>
 		<javax.persistence.version>1.0.2</javax.persistence.version>
 		<http.client.version>4.5.3</http.client.version>
 		<openrtb.core.version>1.5.1</openrtb.core.version>
 		<grok.version>0.1.9</grok.version>
 		<maxmind.version>2.12.0</maxmind.version>
-		<aws.sdk.version>1.11.534</aws.sdk.version>
+		<aws.sdk.version>1.11.880</aws.sdk.version>
 		<antlr.runtime.version>4.7</antlr.runtime.version>
 		<elastic.rest.version>7.6.1</elastic.rest.version>
 		<jetty.server.version>9.4.18.v20190429</jetty.server.version>
@@ -92,25 +90,11 @@
 			<version>${google.protobuf.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.ehcache/sizeof -->
-		<dependency>
-			<groupId>org.ehcache</groupId>
-			<artifactId>sizeof</artifactId>
-			<version>${ehcache.version}</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
 		<dependency>
 			<groupId>org.mapdb</groupId>
 			<artifactId>mapdb</artifactId>
 			<version>${mapdb.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.cache2k</groupId>
-			<artifactId>cache2k-all</artifactId>
-			<version>${cache2k.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
