@@ -1,5 +1,7 @@
 package com.jacamars.dsp.crosstalk.budget;
 
+import java.util.UUID;
+
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,8 @@ public enum CommandController {
 	
 	public static CommandController  getInstance() {
 		if (commands == null) {
+			
+			  System.out.println("####### COMMAND AND RESPONSE LISTENERS SET UP #######");
 			  commands = RTBServer.getSharedInstance().getTopic(COMMANDS);
 		      commands.addMessageListener(new CommandListener());
 		      responses = RTBServer.getSharedInstance().getTopic(RESPONSES);
@@ -38,14 +42,15 @@ public enum CommandController {
 	}
 	
 	public ApiCommand sendCommand(ApiCommand cmd, int timeout) throws Exception {
-		commands.publish(cmd);
 		String key = cmd.asyncid;
 		ApiCommand response = null;
-		
 		if (timeout == 0)
 			return null;
-		
-		sentUnack.put(cmd.asyncid,cmd);
+		if (key == null) {
+			cmd.asyncid = key = UUID.randomUUID().toString();
+		}
+		commands.publish(cmd);
+		sentUnack.put(key,cmd);
 		
 		long et = System.currentTimeMillis() + timeout;
 		while (System.currentTimeMillis() < et) {

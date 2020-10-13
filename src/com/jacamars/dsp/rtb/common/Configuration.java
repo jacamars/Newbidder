@@ -41,6 +41,7 @@ import com.amazonaws.services.s3.model.Tag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.google.common.collect.Sets;
+import com.jacamars.dsp.crosstalk.budget.CommandController;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.crosstalk.budget.Shadow;
@@ -450,15 +451,6 @@ public class Configuration {
 			RTBServer.GDPR_MODE = Boolean.parseBoolean(gdpr);
 		}
 		
-		/////////////////// INIIIALIZE CROSSTALK ///////////////////////////////////////////////////
-		if (m.get("crosstalk")==null) {
-			logger.error("No crosstalk is defined, not allowed.");
-			RTBServer.panicStop();
-			return;
-		}
-		CrosstalkConfig.getInstance((Map)m.get("crosstalk"));
-		
-		shadow = Crosstalk.getInstance().shadow;
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		
 		//////////////////// LOAD HAZELCAST PARAMETERS THEN INITIALIZE HAZELCAST ////////////////////
@@ -528,6 +520,7 @@ public class Configuration {
 		/**
 		 * Deal with the app object
 		 */
+		var crosstalk = (Map)m.get("crosstalk");
 		m = (Map) m.get("app");
 		
 		if (m.get("geopatch") != null) {
@@ -546,12 +539,6 @@ public class Configuration {
 		if (m.get("throttle") != null) {
 			String key = (String) m.get("throttle");
 			throttle = Long.parseLong(key);
-		}
-
-		if (m.get("deadmanswitch") != null) {
-			deadmanKey = (String) m.get("deadmanswitch");
-			if (deadmanKey.equalsIgnoreCase("NONE"))
-				deadmanKey = null;
 		}
 
 		if (m.get("trace") != null) {
@@ -747,6 +734,24 @@ public class Configuration {
 		
 		
         RTBServer.getSharedInstance();
+        
+		// Check deadman switch before crosstalk, otherwise crosstalk might fail
+	//	Map app = (Map)m.get("app");
+		if (m.get("deadmanswitch") != null) {
+			deadmanKey = (String) m.get("deadmanswitch");
+			if (deadmanKey.equalsIgnoreCase("NONE"))
+				deadmanKey = null;
+		}
+		/////////////////// INIIIALIZE CROSSTALK ///////////////////////////////////////////////////
+        CommandController.getInstance();
+		if (crosstalk==null) {
+			logger.error("No crosstalk is defined, not allowed.");
+			RTBServer.panicStop();
+			return;
+		}	
+		CrosstalkConfig.getInstance(crosstalk);
+		
+		shadow = Crosstalk.getInstance().shadow;
         
         ////////////////////// START HAZELCAST, DON'T CONTINUE UNTIL THEY ARE INITIALIZED ////////////
         for (int i=0;i<10;i++) {
@@ -1652,6 +1657,9 @@ public class Configuration {
 	}
 
 	public boolean containsCampaign(Campaign c) {
+		if (shadow == null)
+			return false;
+		
 		if (shadow.get(c.stringId)!= null)
 			return true;
 		return false;
@@ -1669,6 +1677,8 @@ public class Configuration {
 
 		c.encodeCreatives();
 		c.encodeAttributes();
+		while(shadow == null)
+			Thread.sleep(1000);;
 		shadow.add(c);
 
 	}

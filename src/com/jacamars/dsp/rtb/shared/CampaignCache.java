@@ -103,7 +103,7 @@ public enum CampaignCache  {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-            	logger.info("Campaign Updated: : {}",event.getKey());
+            	logger.debug("Campaign Updated: : {}",event.getKey());
             }
         }, true);
         cache.addEntryListener(new EntryRemovedListener<String, Campaign>() {

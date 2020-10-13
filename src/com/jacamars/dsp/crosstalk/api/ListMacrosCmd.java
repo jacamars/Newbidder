@@ -8,6 +8,7 @@ import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.tools.MacroProcessing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import com.hazelcast.core.HazelcastInstance;
  * @author Ben M. Faul
  *
  */
-public class ListMacrosCmd extends ApiCommand {
+public class ListMacrosCmd extends ApiCommand implements Serializable {
 
 	/** The JSON node that represents the SQL of this campaign */
 	public Map<String,String> macros;

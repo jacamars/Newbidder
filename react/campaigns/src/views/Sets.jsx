@@ -40,14 +40,30 @@ const Sets = (props) => {
         setCount(count+1);
     }
 
-    const refresh = async () => {
+    const refresh = async (name) => {
+        if (name !== undef) {
+          if (name === 'macros') setMacros({});
+          if (name === 'bigdata') setBigdata([]);
+          if (name === 'hazel') setHazel({});
+        } else {
+          setMacros({})
+          setBigdata([]);
+          setHazel({});
+        }
+        redraw();
+
         var d = await vx.listSymbols();
-        if (d === undef)
+        if (d === undef) {
+          alert("List Symbols failed");
           return;
+        }
         setBigdata(d.catalog);
         setHazel(d.hazelcast);
         var m = await vx.listMacros();
-        setMacros(m);
+        if (m === undef) {
+          alert("List Macros failed");
+        } else
+          setMacros(m);
         redraw();
         return d;
       }
@@ -164,7 +180,7 @@ const Sets = (props) => {
         callback={queryHazelCallback} />}
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('bigdata')}}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>Load</Button>
                 <Card className="card-chart">
                     <CardHeader>
@@ -194,7 +210,7 @@ const Sets = (props) => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('hazel')}}>Refresh</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
@@ -222,7 +238,7 @@ const Sets = (props) => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
+            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('macros')}}>Refresh</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>

@@ -189,7 +189,9 @@ const  ViewContext = () => {
 
       if (data === undef)
         return;
-      
+      if (data.error) {
+        return;
+      }
       console.log("ListMacros returns: " + JSON.stringify(data,null,2));
       setMacros(data.macros);
       return data.macros;

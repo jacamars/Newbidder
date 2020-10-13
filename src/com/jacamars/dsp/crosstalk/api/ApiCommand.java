@@ -1,6 +1,7 @@
 package com.jacamars.dsp.crosstalk.api;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import com.jacamars.dsp.rtb.tools.XORShiftRandom;
  * @author Ben M. Faul
  */
 
-public class ApiCommand {
+public class ApiCommand implements Serializable {
     /**
      * Type is Get status
      */
@@ -578,9 +579,11 @@ public class ApiCommand {
         }
         
         ///////////// If this is not the leader, but leadership is required, then send it to the leader ///////////
+        ApiCommand res = null;
         if (requireLeader) {
-        	if (!RTBServer.isLeader()) 
+        	if (!RTBServer.isLeader())  {
         		cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
+        	}
         	else 
         		cmd.execute();
         } else {
