@@ -27,15 +27,17 @@ const Bideditor = (props) => {
     }
 
     const edit = (e) => {
-        //alert(JSON.stringify(e,null,2));
+        props.jsonChangedHandler(e.updated_src);
         return true;
     }
 
     const del = (e) => {
+        props.jsonChangedHandler(e.updated_src);
         return true;
     }
 
     const add = (e) => {
+        props.jsonChangedHandler(e.updated_src);
         return true;
     }
 
@@ -91,7 +93,6 @@ const Bideditor = (props) => {
                             theme='monokai'
                             height='266px'
                             width='95%'
-                            onChange={props.jsonChangedHandler}
                         />
                     </Col>
                     <Col xs="6">

@@ -92,7 +92,7 @@ public class WebAccess implements Runnable {
 	 */
 	 public void run() {
 		Server server = new Server(port);
-		System.out.println("**** WEB ACCES ON PORT: " + port);
+		logger.info("**** WEB ACCES ON PORT: {}", port);
 		Handler handler = new Handler();
 		SessionHandler sh = new SessionHandler(); // org.eclipse.jetty.server.session.SessionHandler
 		sh.setHandler(handler);

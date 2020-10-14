@@ -1,5 +1,6 @@
 package com.jacamars.dsp.rtb.common;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -75,7 +76,7 @@ import redis.clients.jedis.Jedis;
  * @author Ben M. Faul
  *
  */
-public class Node {
+public class Node implements Serializable {
 	/** Keeps up with overlapping error messages */
 	static volatile Map<String, Long> errors = new ConcurrentHashMap<String, Long>();
 	/** Logging object */
@@ -816,6 +817,9 @@ public class Node {
 			test = testInternal(brValue);
 		} else {
 			try {
+				if (hierarchy == null) {
+					System.out.println("HERE");
+				}
 				brValue = br.interrogate(hierarchy);
 			} catch (Exception e) {
 				e.printStackTrace();

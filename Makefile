@@ -45,6 +45,9 @@ minio:
 docker:
 	docker build -t jacamars/newbidder .
 	docker push jacamars/newbidder
+	
+push:
+	docker push jacamars/newbidder
 
 backup-db:
 	pg_dump -F c -b -v --dbname=postgresql://postgres:postgres@localhost:5432 > database.backup

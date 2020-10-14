@@ -151,8 +151,8 @@ const Simulator = (props) =>  {
 
   const jsonChangedHandler = (obj) => {
     try {
-      var x = eval('(' + obj.plainText+ ')');
-      x = JSON.stringify(x,null,2);
+     // var x = eval('(' + obj.plainText+ ')');
+      var x = JSON.stringify(obj,null,2);
       console.log("CHANGED: " + x);    
       vx.changeBidvalue(x);
       vars.bid = x;
@@ -182,9 +182,9 @@ const Simulator = (props) =>  {
     wClearHandler();
     
     console.log("SENDING A BID");
-    if (vars.jsonError !== false) {
-      alert("Can't send, error at line " + vars.jsonError.line + "\n" +
-        vars.jsonError.reason);
+    if (vars.jsonError && vars.jsonError !== false) {
+       alert("Can't send, error at line " + vars.jsonError.line + "\n" +
+       vars.jsonError.reason);
       return;
     }
     const endpoint = document.getElementById('endpoint').value;

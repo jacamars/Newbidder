@@ -353,13 +353,6 @@ public class RTBServer implements Runnable {
 	}
 
 	public static HazelcastInstance getSharedInstance() {
-		/*StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-		  for (int i = 1; i < elements.length; i++) {
-		    StackTraceElement s = elements[i];
-		    System.out.println("\tat " + s.getClassName() + "." + s.getMethodName()
-		        + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
-		  }*/
-		
 		if (hz == null) {
 			Config config = new Config();
 			// config.setProperty("hazelcast.logging.type", "slf4j");
@@ -791,9 +784,6 @@ public class RTBServer implements Runnable {
 						logger.info("Recalculating spend rates, old number of bidders: {}, new number: {}",
 								biddersCount, count);
 						biddersCount = count;
-						for (Campaign c : Configuration.getInstance().getCampaignsList()) {
-							c.establishSpendRate();
-						}
 					}
 
 					Thread.sleep(ZOOKEEPER_UPDATE);

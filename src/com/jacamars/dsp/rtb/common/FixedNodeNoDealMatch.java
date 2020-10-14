@@ -4,6 +4,7 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * Handles deals
  */
 
-public class FixedNodeNoDealMatch extends Node {
+public class FixedNodeNoDealMatch extends Node implements Serializable {
 
     public FixedNodeNoDealMatch() {
         super();

@@ -5,16 +5,17 @@ import com.jacamars.dsp.rtb.pojo.Format;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Fixed node implements a chunk of fixed code, once found in the Creative
  * This handless banner, instl and formats
  */
-public class FixedNodeDoSize extends Node {
+public class FixedNodeDoSize extends Node implements Serializable {
 
     public FixedNodeDoSize() {
-        super();
+        // super();
         name = "FixedNodeDoSize";
     }
 

@@ -4,13 +4,14 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Fixed node implements a chunk of fixed code, once found in the Creative
  * Determines if this is a banner ad.
  */
-public class FixedNodeIsBanner extends Node {
+public class FixedNodeIsBanner extends Node implements Serializable  {
 
     public FixedNodeIsBanner() {
         super();

@@ -32,7 +32,7 @@ public enum CommandController {
 	public static CommandController  getInstance() {
 		if (commands == null) {
 			
-			  System.out.println("####### COMMAND AND RESPONSE LISTENERS SET UP #######");
+			  // System.out.println("####### COMMAND AND RESPONSE LISTENERS SET UP #######");
 			  commands = RTBServer.getSharedInstance().getTopic(COMMANDS);
 		      commands.addMessageListener(new CommandListener());
 		      responses = RTBServer.getSharedInstance().getTopic(RESPONSES);

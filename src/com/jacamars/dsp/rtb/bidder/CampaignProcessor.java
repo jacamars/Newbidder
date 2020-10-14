@@ -131,13 +131,13 @@ public class CampaignProcessor implements Runnable {
 				return;
 			}
 
-			if (!Configuration.getInstance().canBid(camp.name)) {
+/*			if (!Configuration.getInstance().canBid(camp.name)) {
 				probe.process(br.getExchange(), camp.name, Probe.GLOBAL, Probe.SPEND_RATE_EXCEEDED);
 				done = true;
 				if (printNoBidReason)
 					logger.info("camp.adId {} spend rate is exceeded: {}", camp.name, camp.spendrate);
 				return;
-			}
+			} */
 
 			Node n = null;
 			try {

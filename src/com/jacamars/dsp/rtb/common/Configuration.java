@@ -67,7 +67,6 @@ import com.jacamars.dsp.rtb.geo.GeoTag;
 import com.jacamars.dsp.rtb.jmq.Subscriber;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
-import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
@@ -89,9 +88,6 @@ import org.slf4j.LoggerFactory;
  */
 
 public class Configuration {
-
-	/** Keep a sleazy map of the campaigns around for quick lookup */
-	static final Limiter handyMap = Limiter.getInstance();
 
 	/** Log all requests */
 	public static final int REQUEST_STRATEGY_ALL = 0;
@@ -1529,17 +1525,6 @@ public class Configuration {
 	}
 
 	/**
-	 * Can this campaign id bid? If it's instantaneous spend rate exceeds the
-	 * campaign setting, then no, it can't/
-	 * 
-	 * @param adid String. The adid of the campaign.
-	 * @return boolean. Returns true if the campaign can bid.
-	 */
-	public boolean canBid(String adid) {
-		return handyMap.canBid(adid, 0);
-	}
-
-	/**
 	 * This deletes a campaign from the campaignsList (the running commands) this
 	 * does not delete from the database.
 	 *
@@ -1681,17 +1666,6 @@ public class Configuration {
 			Thread.sleep(1000);;
 		shadow.add(c);
 
-	}
-
-	/**
-	 * A horrible hack to find out the ad type.
-	 * 
-	 * @param adid String. The ad id.
-	 * @param crid String. The creative id.
-	 * @return String. Returns the type, or, null if anything goes wrong.
-	 */
-	public String getAdType(String adid, String crid) {
-		return handyMap.getAdType(adid, crid);
 	}
 
 	/**

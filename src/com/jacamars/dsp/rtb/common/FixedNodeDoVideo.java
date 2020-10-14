@@ -4,13 +4,14 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Fixed node implements a chunk of fixed code, once found in the Creative
  * This handles video.
  */
-public class FixedNodeDoVideo extends Node {
+public class FixedNodeDoVideo extends Node implements Serializable {
 
     public FixedNodeDoVideo() {
         super();

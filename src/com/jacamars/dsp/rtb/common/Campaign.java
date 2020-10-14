@@ -2,6 +2,7 @@ package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
 
+
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,7 +48,6 @@ import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.ProportionalEntry;
 
 import com.jacamars.dsp.rtb.pojo.BidRequest;
-import com.jacamars.dsp.rtb.rate.Limiter;
 import com.jacamars.dsp.rtb.shared.AccountingCache;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.FrequencyGoverner;
@@ -374,7 +374,7 @@ public class Campaign implements Comparable, Portable {
 		encodeAttributes();
 	}
 	
-	void overwrite(Campaign camp) {
+	void overwrite(Campaign camp) throws Exception {
 		customer_id = customer_id;
 		id = camp.id;
 		stringId = "" + camp.id;
@@ -402,6 +402,8 @@ public class Campaign implements Comparable, Portable {
 		currentHour = camp.currentHour;
 		currentDay = camp.currentDay;
 
+		encodeCreatives();
+		encodeAttributes();
 	}
 
 	/**
@@ -606,9 +608,6 @@ public class Campaign implements Comparable, Portable {
 			encodedIab = new StringBuilder(str);
 		}
 
-		Limiter.getInstance().addCampaign(this);
-		establishSpendRate();
-
 		setWeights(weightAssignment);
 	}
 
@@ -626,23 +625,6 @@ public class Campaign implements Comparable, Portable {
 		}
 		weightAssignment = weight;
 		weights = new ProportionalEntry(weightAssignment);
-	}
-
-	/**
-	 * Calculate the effective spend rate. It is equal to assigned spend rate by the
-	 * number of members. Then call the Limiter to fix the rate limiter access for
-	 * it.
-	 *
-	 * This is called when the campaign is instantiated (via the encode attributes
-	 * method, or whenever the bidder determines there has been a change in the
-	 * number of bidders in the bid farm
-	 */
-	public void establishSpendRate() {
-		int k = RTBServer.biddersCount;
-		if (k == 0)
-			k = 1;
-		effectiveSpendRate = spendrate / k;
-		Limiter.getInstance().setSpendRate(name, effectiveSpendRate);
 	}
 
 	/**
@@ -739,8 +721,10 @@ public class Campaign implements Comparable, Portable {
 	public void readPortable(PortableReader reader) throws IOException {
 		String json = reader.readUTF("json");
 		Campaign camp = DbTools.mapper.readValue(json, Campaign.class);
+		
 		try {
-			overwrite(camp);
+			overwrite(camp);	
+			// System.out.println("\n\n" + toJson() + "\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

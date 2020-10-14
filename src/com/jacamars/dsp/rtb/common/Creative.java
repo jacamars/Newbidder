@@ -1,7 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.File;
-
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -56,7 +56,7 @@ import com.jacamars.dsp.rtb.tools.MacroProcessing;
  * @author Ben M. Faul
  *
  */
-public class Creative {
+public class Creative implements Serializable {
 
 	public static final String SQL_BANNERS = "banners";
 	public static final String SQL_VIDEOS = "banner_videos";
@@ -913,8 +913,15 @@ public class Creative {
 		c.rules = rules;
 		c.deals = deals;
 		c.ext_spec = ext_spec;
+		c.attributes = attributes;
+		c.fixedNodes = fixedNodes;
 
 		c.encodeUrl();
+		try {
+		c.encodeAttributes();
+		} catch (Exception error) {
+			error.printStackTrace();
+		}
 		return c;
 	}
 
@@ -1216,23 +1223,23 @@ public class Creative {
 		// assign the fixed nodes
 		fixedNodes.add(new FixedNodeStatus());
 		fixedNodes.add(new FixedNodeNonStandard());
-		attributes.add(new FixedNodeDoSize());
+		fixedNodes.add(new FixedNodeDoSize());
 
 		if (extensions != null && extensions.get("site_or_app") != null
 				&& !extensions.get("site_or_app").equals("undefined"))
-			attributes.add(new FixedNodeAppOrSite(extensions.get("site_or_app")));
+			fixedNodes.add(new FixedNodeAppOrSite(extensions.get("site_or_app")));
 
 		// These are impression related
-		attributes.add(new FixedNodeRequiresDeal());
-		attributes.add(new FixedNodeNoDealMatch());
+		fixedNodes.add(new FixedNodeRequiresDeal());
+		fixedNodes.add(new FixedNodeNoDealMatch());
 		if (isVideo)
-			attributes.add(new FixedNodeIsVideo());
+			fixedNodes.add(new FixedNodeIsVideo());
 		if (isNative)
-			attributes.add(new FixedNodeIsNative());
+			fixedNodes.add(new FixedNodeIsNative());
 		if (isBanner)
-			attributes.add(new FixedNodeIsBanner());
+			fixedNodes.add(new FixedNodeIsBanner());
 		if (isAudio)
-			attributes.add(new FixedNodeDoAudio());
+			fixedNodes.add(new FixedNodeDoAudio());
 	}
 
 	/**
@@ -1284,10 +1291,14 @@ public class Creative {
 		/**
 		 * Fixed nodes do not access deals or the br impressions
 		 */
-		for (int i = 0; i < fixedNodes.size(); i++) {
-			Deal d = null;
-			if (!fixedNodes.get(i).test(br, this, adId, null, errorString, probe, null))
-				return null;
+		int n = br.getImpressions();
+		for (int i = 0; i < n; i++) {
+			var imp = br.getImpression(i);
+			for (int j = 0; j < fixedNodes.size(); j++) {
+				var node = fixedNodes.get(j);
+				if (!node.test(br, this, adId, imp, errorString, probe, null))
+					return null;
+			}
 
 		}
 
@@ -1295,7 +1306,6 @@ public class Creative {
 		 * Ok, the standard set has been dealt with, let's work with impressions and
 		 * deals rules.
 		 */
-		int n = br.getImpressions();
 		StringBuilder sb = new StringBuilder();
 		Impression imp;
 

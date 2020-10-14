@@ -4,13 +4,14 @@ import com.jacamars.dsp.rtb.pojo.BidRequest;
 import com.jacamars.dsp.rtb.pojo.Impression;
 import com.jacamars.dsp.rtb.probe.Probe;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Fixed node implements a chunk of fixed code, once found in the Creative
  * Determines if this is a native ad.
  */
-public class FixedNodeIsNative extends Node {
+public class FixedNodeIsNative extends Node implements Serializable {
 
     public FixedNodeIsNative() {
         super();
