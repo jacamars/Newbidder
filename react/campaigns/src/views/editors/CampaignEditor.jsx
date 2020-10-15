@@ -366,15 +366,6 @@ const getSelectedRegions = () => {
                                 </Col>
                                 </FormGroup>
                              </Col>
-                             <Col className="px-md-1" md="3">
-                              <FormGroup>
-                                <label>Spend Rate/Minute</label>
-                                <Input id="spendRate"
-                                  defaultValue={campaign.assignedSpendRate}
-                                  type="number"
-                                />
-                              </FormGroup>
-                            </Col>
                           </Row>
                           <Row>
                             <Col className="pr-md-1" md="4">
