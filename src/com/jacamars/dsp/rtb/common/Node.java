@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.hash.BloomFilter;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.blocks.Bloom;
 import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
@@ -150,6 +151,10 @@ public class Node implements Serializable {
 	public static final int REGEX = 20;
 	/** Not in the REGEX */
 	public static final int NOT_REGEX = 21;
+	/** LIVERAMP OPERATIONS */
+	public static final int IDL = 22;
+	public static final int NOT_IDL = 23;
+	
 	/** If this node contains geo information, it will be found here */
 	transient List<Point> points = new ArrayList<Point>();
 	/**
@@ -179,6 +184,9 @@ public class Node implements Serializable {
 		OPS.put("OR", OR);
 		OPS.put("REGEX", REGEX);
 		OPS.put("NOT_REGEX", NOT_REGEX);
+		OPS.put("IDL", IDL);
+		OPS.put("NOT_IDL", NOT_IDL);
+		
 	}
 
 	public static List<String> OPNAMES = new ArrayList<String>();
@@ -191,6 +199,8 @@ public class Node implements Serializable {
 		OPNAMES.add("INTERSECTS");
 		OPNAMES.add("NOT_INTERSECTS");
 		OPNAMES.add("INRANGE");
+		OPNAMES.add("IDL");
+		OPNAMES.add("NOT_IDL");
 		OPNAMES.add("NOT_INRANGE");
 		OPNAMES.add("LESS_THAN");
 		OPNAMES.add("LESS_THAN_EQUALS");
@@ -875,6 +885,7 @@ public class Node implements Serializable {
 		String svalue = null;
 		// Set qvalue = null;
 		Set qval = null;
+		List list = null;
 
 		if (value instanceof String)
 			svalue = (String) value;
@@ -885,8 +896,12 @@ public class Node implements Serializable {
 			TextNode tn = (TextNode) value;
 			svalue = tn.textValue();
 		} else if (value instanceof ArrayNode) {
-			List list = traverse((ArrayNode) value);
-			qvalue = new TreeSet(list);
+			list = traverse((ArrayNode) value);
+			try {
+				qvalue = new TreeSet(list);
+			} catch (Exception error) {
+
+			}
 		} else if (value instanceof ObjectNode) {
 			ObjectNode n = (ObjectNode) value;
 			mvalue = iterateObject(n);
@@ -955,6 +970,13 @@ public class Node implements Serializable {
 			else
 				return member;
 
+		case IDL:
+		case NOT_IDL:
+			boolean maybe = processIdl(list);
+			if (operator == IDL)
+				return maybe;
+			return !maybe;
+			
 		case MEMBER:
 		case NOT_MEMBER:
 
@@ -1104,6 +1126,32 @@ public class Node implements Serializable {
 			return false;
 		// throw new Exception("Undefined operation attempted");
 		}
+	}
+	
+	Boolean processIdl(List values) {
+		Object x = (Object)LookingGlass.get((String)value);
+		if (x == null) {
+			Long evalue = errors.get(sval);
+			if (evalue == null || (System.currentTimeMillis() - evalue > 60000)) {
+				logger.error("Failed to retrieve symbol: {}", sval);
+				errors.put(sval, System.currentTimeMillis());
+			}
+			return null;
+		}
+		Bloom filter = (Bloom)x;
+		for (int i=0;i<values.size();i++) {
+			JsonNode oj = (JsonNode)values.get(i);
+			String src = oj.get("source").asText("");
+			if (src.equals("liveramp.com")) {
+				ArrayNode nodes = (ArrayNode)oj.get("uids");
+				for (int j=0;j<nodes.size();j++) {
+					String id = nodes.get(j).get("id").asText("");
+					if (filter.isMember(id))
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
