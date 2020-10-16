@@ -841,10 +841,19 @@ public class Configuration {
 			}
 			path = path.substring(5);
 			String [] parts = path.split("/");
-			parts[0] = parts[0].trim();
-			parts[1] = parts[1].trim();
+			var key = parts[0].trim();			// this is the key
+			String s3path = null;
+			if (parts.length == 2)
+				s3path = parts[1].trim();
+			else {
+				s3path = "";
+				for (int i=1;i<parts.length-1;i++) {
+					s3path += parts[i] + "/";
+				}
+				s3path += parts[parts.length-1];
+			}
 			
-			var object = s3.getObject(parts[0], parts[1]);
+			var object = s3.getObject(key,  s3path);
 			var inputStream = object.getObjectContent();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 	        String line = null;
@@ -1280,7 +1289,21 @@ public class Configuration {
 			if (is3 != null) {
 				String parts[] = is3.split("/");
 				bucket = parts[0].trim();
-				String object = parts[1].trim();
+				
+				String object = null;
+				if (parts.length == 2)
+					object = parts[1].trim();
+				if (parts.length == 2)
+					object = parts[1].trim();
+				else {
+					object = "";
+					for (int i=1;i<parts.length-1;i++) {
+						object += parts[i] + "/";
+					}
+					object += parts[parts.length-1];
+				}
+				
+				
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
 				
@@ -1296,7 +1319,7 @@ public class Configuration {
 					new LookingGlass(name, s3o);
 				} else if (type.toLowerCase().contains("iso2")) {
 					new IsoTwo2Iso3(name,s3o);
-				} else if (type.toLowerCase().contains("")) {
+				} else if (type.toLowerCase().contains("bloom")) {
 					long records = (Long)m.get("size");
 					new Bloom(type, s3o, records);
 				} else if (type.toLowerCase().contains("cuckoo")) {

@@ -302,5 +302,10 @@
     "s3" : "geo/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
-  } ]
+  },
+   {
+    "s3" : "cidr/a/b/CIDR2.txt",
+    "name" : "@TRASH",
+    "type" : "CIDR"
+  }]
 }
