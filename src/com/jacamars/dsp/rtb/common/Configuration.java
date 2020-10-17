@@ -323,8 +323,6 @@ public class Configuration {
 	 * 
 	 * @param path      String - The file name containing the Java Bean Shell code.
 	 * @param shard     Strimg. The shard name
-	 * @param port      int. The port the web access listens on
-	 * @param sslPort   int. The port the SSL listens on.
 	 * @param exchanges String. The comma separated list of exchanges
 	 * @throws Exception on file errors.
 	 */
@@ -840,20 +838,9 @@ public class Configuration {
 				System.exit(1);
 			}
 			path = path.substring(5);
-			String [] parts = path.split("/");
-			var key = parts[0].trim();			// this is the key
-			String s3path = null;
-			if (parts.length == 2)
-				s3path = parts[1].trim();
-			else {
-				s3path = "";
-				for (int i=1;i<parts.length-1;i++) {
-					s3path += parts[i] + "/";
-				}
-				s3path += parts[parts.length-1];
-			}
-			
-			var object = s3.getObject(key,  s3path);
+			Map<String,String> map = getS3Components(path);
+
+			var object = s3.getObject(map.get("bucket"),  map.get("key"));
 			var inputStream = object.getObjectContent();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 	        String line = null;
@@ -866,7 +853,30 @@ public class Configuration {
 		
 		return str;
 	}
-	
+
+	/**
+	 * Given a path, return the bucket and key for an S3 object.
+	 * @param path String. The path name of the s3 object bucket/key
+	 * @return Map. A map of the named components, "bucket" and "key".
+	 */
+	public static Map<String,String> getS3Components(String path) {
+		String [] parts = path.split("/");
+		var key = parts[0].trim();			// this is the key
+		String s3path = null;
+		if (parts.length == 2)
+			s3path = parts[1].trim();
+		else {
+			s3path = "";
+			for (int i=1;i<parts.length-1;i++) {
+				s3path += parts[i] + "/";
+			}
+			s3path += parts[parts.length-1];
+		}
+		Map<String,String> x = new HashMap<>();
+		x.put("bucket",parts[0]);
+		x.put("key",s3path);
+		return x;
+	}
 
 	void printEnvironment() throws Exception {
 
@@ -1287,28 +1297,13 @@ public class Configuration {
 			}
 			var is3 = (String)m.get("s3");
 			if (is3 != null) {
-				String parts[] = is3.split("/");
-				bucket = parts[0].trim();
-				
-				String object = null;
-				if (parts.length == 2)
-					object = parts[1].trim();
-				if (parts.length == 2)
-					object = parts[1].trim();
-				else {
-					object = "";
-					for (int i=1;i<parts.length-1;i++) {
-						object += parts[i] + "/";
-					}
-					object += parts[parts.length-1];
-				}
-				
+				Map<String,String> map = getS3Components(is3);
 				
 				String name = (String) m.get("name");
 				String type = (String) m.get("type");
 				
-				fileName = object; 
-				GetObjectRequest rangeObjectRequest = new GetObjectRequest(bucket, object);
+				fileName = map.get("key");
+				GetObjectRequest rangeObjectRequest = new GetObjectRequest(map.get("bucket"), map.get("key"));
 	            S3Object s3o = s3.getObject(rangeObjectRequest);
 				
 				if (type.toLowerCase().contains("cidr") || type.contains("range")) {
@@ -1341,7 +1336,7 @@ public class Configuration {
 						cons.newInstance(name, s3o, sz);
 					}
 				}
-				logger.info("*** Configuration Initialized {} with {}", name, object);
+				logger.info("*** Configuration Initialized {} with {}", name, fileName);
 			}
 				
 			} catch (Exception error) {
