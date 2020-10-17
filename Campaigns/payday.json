@@ -303,7 +303,7 @@
     "name" : "@ZIPCODES",
     "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
   },{
-    "s3" : "bloom/audience.txt",
+    "s3" : "bloom/audience1/test-audience.txt",
     "name" : "@AUDIENCE1",
     "type" : "BLOOM",
     "size": 6
