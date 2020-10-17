@@ -70,7 +70,7 @@ public class Bloom extends LookingGlass {
 	public Bloom(String name, S3Object object, long size) throws Exception {
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
 		symbols.put(name, bloomFilter);
-		
+
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		makeFilter(br,size);
@@ -93,7 +93,7 @@ public class Bloom extends LookingGlass {
 			for (i = 0; i < parts.length; i++) {
 				parts[i] = parts[i].replaceAll("\"", "");
 			}
-			bloomFilter.put(parts[0]);
+			bloomFilter.put(parts[0].trim());
 			this.size++;
 		}
 		br.close();
