@@ -1,11 +1,7 @@
 package com.jacamars.dsp.rtb.blocks;
 
-import java.io.BufferedReader;
+import java.io.*;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -26,7 +22,11 @@ public class Bloom extends LookingGlass {
 	BloomFilter<CharSequence> bloomFilter;
 	int size;
 	double fpp = 0.003; // desired false positive probability
-	
+
+	public Bloom() {
+
+	}
+
 	/**
 	 * Constructor for the File/S3 object to Bloom filter.
 	 * @param name String. The name of the bloom filter.
@@ -98,7 +98,49 @@ public class Bloom extends LookingGlass {
 		}
 		br.close();
 	}
-	
+
+	/**
+	 * Write the bloom filter to a file.
+	 * @param fileName String. The filename of the bloom filter to be.
+	 * @throws Exception on I/O errors.
+	 */
+	public void write(String fileName) throws Exception {
+		OutputStream os = new FileOutputStream(fileName);
+		bloomFilter.writeTo(os);
+		os.close();
+	}
+
+	/**
+	 * Instantiate a bloom filter from serialized input
+	 * @param fileName String. The file name of the serialized bloom filter.
+	 * @return Bloom. The instantiated bloom filter.
+	 * @throws Exception on i/o errors.
+	 */
+	public static Bloom getInstance(String fileName) throws Exception {
+		Bloom f = new Bloom();
+
+		InputStream is = new FileInputStream(fileName);
+		f.bloomFilter = BloomFilter.readFrom(is,Funnels.stringFunnel(Charset.forName("UTF-8")));
+
+		return f;
+	}
+
+	/**
+	 * Instantiate a bloom filter from serialized input
+	 * @param object S3Object. The S3 object that contains the serialized bloom filter.
+	 * @return Bloom. The instantiated bloom filter.
+	 * @throws Exception on i/o errors.
+	 */
+	public static Bloom getInstance(S3Object object) throws Exception {
+		Bloom f = new Bloom();
+
+		InputStream is = object.getObjectContent();
+		f.bloomFilter = BloomFilter.readFrom(is,Funnels.stringFunnel(Charset.forName("UTF-8")));
+
+		return f;
+	}
+
+
 	/**
 	 * Returns the Bloom filter for your use.
 	 * @return BloomFilter. The Guava bloom filter of the contents of this file.
