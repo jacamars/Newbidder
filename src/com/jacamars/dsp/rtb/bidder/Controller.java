@@ -1,5 +1,9 @@
 package com.jacamars.dsp.rtb.bidder;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -637,7 +641,6 @@ public enum Controller {
 	/**
 	 * Record the member stats in Hazelcasr
 	 *
-	 * @param e Echo. The status of this campaign.
 	 */
 	public void setMemberStatus() throws Exception {
 		String member = Configuration.instanceName;
@@ -1063,7 +1066,7 @@ public enum Controller {
 	}
 
 	/**
-	 * Record a vast vdeo tag in hazelcast, it will be retrieved later when the
+	 * Record a vast video tag in hazelcast, it will be retrieved later when the
 	 * video loads.
 	 *
 	 * @param vast String. The video vast tag.
@@ -1100,9 +1103,29 @@ public enum Controller {
 						}
 						return vast;
 					} catch (Exception e) {
-						logger.error("Error from aerospike: {}, retrieving vast for: {}", e.toString(), payload);
+						logger.error("Error from Hazelcast: {}, retrieving vast for: {}", e.toString(), payload);
 						return null;
 					}
+					case "file":
+						try {
+							String vast = Charset.defaultCharset()
+									.decode(ByteBuffer.wrap(Files.readAllBytes(Paths.get(t2[1])))).toString();
+							if (vast == null) {
+								logger.warn("Vast tag requested by {} was not in the cache, returning null", payload);
+							}
+							return vast;
+						} catch (Exception e) {
+							logger.error("Error from file: {}, retrieving vast for: {}", e.toString(), payload);
+							return null;
+						}
+					case "s3":
+						try {
+							String vast = Configuration.readS3(t2[1]);
+							return vast;
+						} catch (Exception e) {
+							logger.error("Error from file: {}, retrieving vast for: {}", e.toString(), payload);
+							return null;
+						}
 				default:
 				}
 			}

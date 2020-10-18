@@ -855,6 +855,26 @@ public class Configuration {
 	}
 
 	/**
+	 * Read the contents of the s3 bucket/key into a string.
+	 * @param path String. The path to read.
+	 * @return String. The string contents of the
+	 * @throws Exception
+	 */
+	public static String readS3(String path) throws Exception {
+		Map<String,String> map = getS3Components(path);
+		var object = s3.getObject(map.get("bucket"),  map.get("key"));
+		InputStream is = object.getObjectContent();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder out = new StringBuilder();
+		String line;
+		while ((line = reader.readLine()) != null) {
+			out.append(line);
+			out.append("\n");
+		}
+		return out.toString();
+	}
+
+	/**
 	 * Given a path, return the bucket and key for an S3 object.
 	 * @param path String. The path name of the s3 object bucket/key
 	 * @return Map. A map of the named components, "bucket" and "key".

@@ -2073,6 +2073,21 @@ class AdminHandler extends Handler {
 			return;
 		}
 
+		if(target.startsWith("/s3")) {
+			String s3 = null;
+			baseRequest.setHandled(true);
+			try {
+				s3 = Configuration.readS3(target.substring(3));
+				baseRequest.setHandled(true);
+				response.setStatus(200);
+			} catch (Exception error) {
+				s3 = error.getMessage();
+				response.setStatus(404);
+			}
+			response.getWriter().println(s3.toString());
+			return;
+		}
+
 		/**
 		 * This set of if's handle non bid request transactions.
 		 *
