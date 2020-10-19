@@ -66,11 +66,26 @@ export const SampleBanner = {
 			"type": 3
 		},
 		"ext": {
-			"nex_eth": "4",
-			"nex_marital": "M",
-			"nex_kids": "N",
-			"nex_hhi": 75000,
-			"nex_dma": "Boston"
+			"eids": [{
+					"source": "liveramp.com",
+					"uids": [{
+						"id": "XY1000bIVBVah9ium-sZ3ykhPiXQbEcUpn4GjCtxrrw2BRDGM",
+						"ext": {
+							"rtiPartner": "idl"
+						}
+					}]
+				},
+				{
+					"source": "adserver.org",
+					"uids": [{
+						"id": "6bca7f6b-a98a-46c0-be05-6020f7604598",
+						"ext": {
+							"rtiPartner": "TDID"
+						}
+					}]
+				}
+			],
+			"gdpr": 0
 		}
 	},
 	"ext": {

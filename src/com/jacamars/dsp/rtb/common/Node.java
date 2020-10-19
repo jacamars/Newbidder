@@ -294,6 +294,9 @@ public class Node implements Serializable {
 		 else
 			 op = n.get("op").asText().toUpperCase();
 		 
+		 if (op.equals("IDL") && hierarchy == null || hierarchy.length()==0)
+			 hierarchy = "user.ext.eids";
+			 
 		 operand = n.get("operand").asText();
 		 operand_type = n.get("operand_type").asText();
 		 
@@ -996,8 +999,8 @@ public class Node implements Serializable {
 					if (x instanceof NavMap) {
 						NavMap nm = (NavMap) x;
 						t = nm.contains(svalue);
-					} else if (x instanceof BloomFilter) {
-						BloomFilter b = (BloomFilter) x;
+					} else if (x instanceof Bloom) {
+						Bloom b = (Bloom) x;
 						t = b.mightContain(svalue);
 
 					} else if (x instanceof SimpleSet) {

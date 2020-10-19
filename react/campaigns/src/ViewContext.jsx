@@ -748,10 +748,10 @@ const  ViewContext = () => {
         var key = keys[i];
         var sub = macros[key];
         var re = new RegExp(key);
-        //console.log("SUB " + sub + " for " + key);
+        console.log("SUB " + sub + " for " + key + ", RE: " + re);
         data = data.replace(re,sub);
       }
-      //console.log("DATA: " + data);
+      console.log("DATA: " + data);
       return data;
     }
 

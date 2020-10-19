@@ -2074,17 +2074,8 @@ class AdminHandler extends Handler {
 		}
 
 		if(target.startsWith("/s3")) {
-			String s3 = null;
 			baseRequest.setHandled(true);
-			try {
-				s3 = Configuration.readS3(target.substring(3));
-				baseRequest.setHandled(true);
-				response.setStatus(200);
-			} catch (Exception error) {
-				s3 = error.getMessage();
-				response.setStatus(404);
-			}
-			response.getWriter().println(s3.toString());
+			outputS3(target,response);
 			return;
 		}
 
@@ -2221,6 +2212,32 @@ class AdminHandler extends Handler {
 				return sb.toString();
 
 			}
+		  void outputS3(String target, HttpServletResponse response) {
+				String s3 = null;
+				try {
+					InputStream is = Configuration.getS3InputStream(target.substring(4));
+					OutputStream out = response.getOutputStream();
+
+					// write to out output stream
+					while (true) {
+						int bytedata = is.read();
+
+						if (bytedata == -1) {
+							break;
+						}
+
+						try {
+							out.write(bytedata);
+						} catch (Exception error) {
+							break; // screw it, pray that it worked....
+						}
+					}
+					response.setStatus(200);
+				} catch (Exception error) {
+					s3 = error.getMessage();
+					response.setStatus(404);
+				}
+		  }
 }
 
 class AddShutdownHook {

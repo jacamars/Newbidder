@@ -853,6 +853,13 @@ public class Configuration {
 		
 		return str;
 	}
+	
+	public static InputStream getS3InputStream(String path) throws Exception {
+		Map<String,String> map = getS3Components(path);
+		var object = s3.getObject(map.get("bucket"),  map.get("key"));
+		InputStream is = object.getObjectContent();
+		return is;
+	}
 
 	/**
 	 * Read the contents of the s3 bucket/key into a string.
@@ -1299,11 +1306,11 @@ public class Configuration {
 				} else if (type.toLowerCase().contains("lookingglass")) {
 					new LookingGlass(name, fileName);
 				} else if (type.toLowerCase().contains("bloom")) {
-					long records = (Long)m.get("size");
-					new Bloom(name, fileName, records);
+					Number records = (Number)m.get("size");
+					new Bloom(name, fileName, records.longValue());
 				} else if (type.toLowerCase().contains("cuckoo")) {
-					long records = (Long)m.get("size");
-					new Cuckoo(name, fileName, records);
+					Number records = (Number)m.get("size");
+					new Cuckoo(name, fileName, records.longValue());
 				} else if (type.toLowerCase().contains("membershp")) {
 					new Membership(name, fileName);
 				} else {
@@ -1335,25 +1342,24 @@ public class Configuration {
 				} else if (type.toLowerCase().contains("iso2")) {
 					new IsoTwo2Iso3(name,s3o);
 				} else if (type.toLowerCase().contains("bloom")) {
-					long records = (Long)m.get("size");
-					new Bloom(type, s3o, records);
+					Number records = (Number)m.get("size");
+					new Bloom(name, s3o, records.longValue());
 				} else if (type.toLowerCase().contains("cuckoo")) {
-					long records = (Long)m.get("size");
-					new Cuckoo(type, s3o, records);
+					Number records = (Number)m.get("size");
+					new Cuckoo(name, s3o, records.longValue());
 				} else if (type.toLowerCase().contains("membershp")) {
 						new Membership(type, s3o);
 				} else {
 					// Ok, load it by class name
 					Class cl = Class.forName(type);
-					String size = (String)m.get("size");
+					Long size = (Long)m.get("size");
 					Constructor<?> cons = null;
 					if (size == null) {
 						cons = cl.getConstructor(String.class, S3Object.class);
 						cons.newInstance(name, s3o);
 					} else {
-						Long sz = Long.parseLong(size);
 						cons = cl.getConstructor(String.class, S3Object.class, Long.class);
-						cons.newInstance(name, s3o, sz);
+						cons.newInstance(name, s3o, size);
 					}
 				}
 				logger.info("*** Configuration Initialized {} with {}", name, fileName);

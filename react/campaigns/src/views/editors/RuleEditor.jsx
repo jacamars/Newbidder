@@ -30,8 +30,9 @@ import { undef, blackStyle, whiteStyle} from "../../Utils";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","INRANGE","LESS THAN","LESS THAN EQUALS",
-  "MEMBER","NOT DOMAIN","NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
+var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","IDL", "INRANGE","LESS THAN","LESS THAN EQUALS",
+  "MEMBER","NOT DOMAIN","NOT EXISTS", "NOT IDL", "NOT INRANGE", "NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
+
 var types =["integer","string","double"];
 var ords =["scalar","list"];
 
@@ -66,17 +67,26 @@ const getTrueFalseOptions = (value)  =>{
 const addNewRule = (r) => {
   if (!rule.id)
     rule.id = 0;
+
+  var operand = document.getElementById("set-operand").value;
+  var type = document.getElementById("type").value;
+  rule.ordinal = document.getElementById("ordinal").value;
+  if (operand === '') {
+    operand = document.getElementById("operand").value;
+  } else {
+    type = 'string';
+  }
+
   rule.name = document.getElementById("name").value;
   rule.rtbspecification = document.getElementById("hierarchy").value;
   rule.op = document.getElementById("operator").value;
-  rule.operand = document.getElementById("operand").value;
-  rule.operand_type = document.getElementById("type").value;
-  rule.operand_ordinal = document.getElementById("ordinal").value;
+  rule.operand = operand
+  rule.operand_type = type;
   if (document.getElementById("required").value ==="true")
     rule.notPresentOk=false;
   else
     rule.notPresentOk=true;
-  alert(JSON.stringify(r,null,2));
+  alert("XXX: " + JSON.stringify(rule,null,2));
   props.callback(rule);
 }
 

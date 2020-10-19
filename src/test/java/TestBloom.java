@@ -43,7 +43,7 @@ public class TestBloom  {
 		  
 		  
 		    new Bloom("$test","data/c1x_cookies.csv");
-		    BloomFilter b = (BloomFilter)LookingGlass.get("$test");
+		    Bloom b = (Bloom)LookingGlass.get("$test");
 		    assertNotNull(b);
 		    
 		    boolean p = b.mightContain("842AAB10FBA04247B3A9CE00C9172350");

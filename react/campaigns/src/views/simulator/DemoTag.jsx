@@ -24,6 +24,7 @@ const DemoTag = (props) => {
 
     let output = props.adm;
 
+
     if (props.isVideo) {
         try {
             JSON.parse(props.adm);
@@ -48,8 +49,11 @@ const DemoTag = (props) => {
                 return <VideoPlayer { ...videoJsOptions } />
             }
     }
-    else
+    else {
+        output = output.replace(/\\"/g, "'");
+        console.log("ADM OUTPUT: " + output);
         return( <div>{ ReactHtmlParser( output) }</div> );
+    }
 }
 
 export default DemoTag;

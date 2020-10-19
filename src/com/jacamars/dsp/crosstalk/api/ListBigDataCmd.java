@@ -56,7 +56,8 @@ public class ListBigDataCmd extends ApiCommand {
 					Map<String,String> m = new HashMap<>();
 					m.put("name", key);
 					m.put("type",type);
-					m.put("size", "" + ((LookingGlass)value).getMembers());
+					LookingGlass x = (LookingGlass)value;
+					m.put("size", "" + x.getMembers());
 					catalog.add(m);
 					hazelcast = BidCachePool.getStats();
 				});

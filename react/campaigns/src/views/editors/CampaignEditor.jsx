@@ -73,7 +73,6 @@ const  addNewCampaign = async () => {
     x.budget_limit_daily = Number(document.getElementById("dailyBudget").value);
     x.budget_limit_hourly = Number(document.getElementById("hourlyBudget").value);
 
-    x.spendrate = Number(document.getElementById("spendRate").value);
     x.regions = document.getElementById("regions").value;
 
     var capspec = document.getElementById("capspec").value;

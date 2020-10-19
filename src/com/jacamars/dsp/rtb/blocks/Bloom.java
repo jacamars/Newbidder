@@ -37,7 +37,7 @@ public class Bloom extends LookingGlass {
 		File f = new File(file);
 		long size = f.length();
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
-		symbols.put(name, bloomFilter);
+		symbols.put(name, this);
 		
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		makeFilter(br,size);
@@ -54,7 +54,7 @@ public class Bloom extends LookingGlass {
 		File f = new File(fileName);
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
-		symbols.put(name, bloomFilter);
+		symbols.put(name, this);
 		
 		makeFilter(br,size);
 		
@@ -69,7 +69,7 @@ public class Bloom extends LookingGlass {
 	 */
 	public Bloom(String name, S3Object object, long size) throws Exception {
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
-		symbols.put(name, bloomFilter);
+		symbols.put(name, this);
 
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
@@ -156,6 +156,10 @@ public class Bloom extends LookingGlass {
 	 */
 	public boolean isMember(String key) {
 		return bloomFilter.mightContain(key);
+	}
+	
+	public boolean mightContain(String key) {
+		return isMember(key);
 	}
 	
 	/**
