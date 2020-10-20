@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.bidder;
 
 import java.nio.ByteBuffer;
+
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,7 +33,6 @@ import com.jacamars.dsp.rtb.shared.BidCachePool;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 import com.jacamars.dsp.rtb.tools.DbTools;
-import com.jacamars.dsp.rtb.tools.MemoryAccounting;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -887,7 +887,7 @@ public enum Controller {
 		if (bidQueue != null)
 			bidQueue.add(bid);
 
-		MemoryAccounting.getInstance().increment(bid.adid + ".bids");
+		AccountingCache.getInstance().incrementEvent(bid.adid, ".bids");
 	}
 
 	/**
@@ -934,7 +934,7 @@ public enum Controller {
 		if (winsQueue != null)
 			winsQueue.add(win);
 		AccountingCache.getInstance().increment(adId,cridId,price);
-		MemoryAccounting.getInstance().increment(adId + ".wins");
+		AccountingCache.getInstance().incrementEvent(adId, ".wins");
 	}
 
 	/**
@@ -952,7 +952,7 @@ public enum Controller {
 				logger.info("Click record: {}", log);
 			clicksQueue.add(log);
 
-			MemoryAccounting.getInstance().increment(log.ad_id + ".clicks");
+			AccountingCache.getInstance().incrementEvent(log.ad_id,".clicks");
 		}
 	}
 
@@ -975,7 +975,7 @@ public enum Controller {
 			}
 			pixelsQueue.add(log);
 
-			MemoryAccounting.getInstance().increment(log.ad_id + ".pixels");
+			AccountingCache.getInstance().incrementEvent(log.ad_id, ".pixels");
 		}
 	}
 
@@ -993,7 +993,7 @@ public enum Controller {
 				logger.info("Postback record {}", e);
 			postbackQueue.add(e);
 		}
-		MemoryAccounting.getInstance().increment(e.adid + ".postback");
+		AccountingCache.getInstance().incrementEvent(e.adid, ".postback");
 	}
 
 	/**
@@ -1011,7 +1011,7 @@ public enum Controller {
 				logger.info("Videoevent: {}", log);
 			videoeventsQueue.add(log);
 		}
-		MemoryAccounting.getInstance().increment(log.adid + ".videoevent");
+		AccountingCache.getInstance().incrementEvent(log.adid,".videoevent");
 	}
 
 	public void publishFraud(FraudLog m) {
@@ -1032,7 +1032,7 @@ public enum Controller {
 		if (clicksQueue != null) {
 			clicksQueue.add(log);
 		}
-		MemoryAccounting.getInstance().increment(log.ad_id + ".convert");
+		AccountingCache.getInstance().incrementEvent(log.ad_id,".convert");
 	}
 
 	/**

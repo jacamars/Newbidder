@@ -59,6 +59,22 @@ public enum AccountingCache {
 		ac.add(creative, value);
 	}
 	
+	/**
+	 * For incrementing .bids, .wins, .pixels, .clicks, .postback
+	 * @param campaign
+	 * @param key
+	 */
+	public void incrementEvent(String campaign, String key) {
+		if (hz == null)
+			return;
+		AccountRecord ac = map.get(campaign);
+		if (ac == null) {
+			ac = new AccountRecord(hz.getCPSubsystem(),campaign);
+			map.put(campaign, ac);
+		}
+		ac.add(campaign+key, 1.0);
+	}
+	
 	public void reset(String campaign, String creative, String type) {
 		AccountRecord ac = map.get(campaign);
 		if (ac == null)
@@ -145,7 +161,7 @@ public enum AccountingCache {
 class AccountRecord {
 	CPSubsystem cp;
 	String campaign;
-	IAtomicReference<Double> counter;
+	IAtomicReference<Double> counter;      // total cost
 	Map<String,IAtomicReference<Double>> counters = new ConcurrentHashMap();
 	
 	public AccountRecord(CPSubsystem cp, String campaign) {
@@ -176,6 +192,20 @@ class AccountRecord {
 		var v = new IncFunction(value);
 		ref.alter(v);
 		counter.alter(v);
+	}
+	
+	/**
+	 * Used to implement ".bids", ".wins", ".pixels", "clicks"
+	 * @param key
+	 */
+	public void increment(String key) {
+		IAtomicReference<Double> ref = counters.get(campaign+key);
+		if (ref == null) {
+			ref = cp.getAtomicReference(campaign+key);
+			counters.put(campaign+key, ref);
+		}
+		var v = new IncFunction(1.0);
+		ref.alter(v);
 	}
 	
 	public Double get() {
@@ -213,11 +243,12 @@ class AccountRecord {
 	
 	public Map<String,Double> asMapAndReset() {
 		Map<String,Double> m = new HashMap<>();
-		m.put("*total*", counter.get());
+		m.put(".total", counter.get());
 		counter.set(Double.valueOf(0));
 		counters.forEach((k,v)->{
 			m.put(k,v.get());
-			v.set(Double.valueOf(0));
+			if (!k.contains("."))
+				v.set(Double.valueOf(0));
 		});
 		return m;
 	}

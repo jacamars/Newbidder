@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.pojo;
 
 import com.jacamars.dsp.rtb.bidder.Controller;
+
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.common.RecordedBid;
@@ -9,7 +10,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.GoogleWinObject;
 import com.jacamars.dsp.rtb.exchanges.google.OpenRTB;
 import com.jacamars.dsp.rtb.exchanges.openx.OpenX;
-import com.jacamars.dsp.rtb.tools.MemoryAccounting;
+import com.jacamars.dsp.rtb.shared.AccountingCache;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -259,8 +260,6 @@ public class WinObject {
 			adType = c.deleteBidFromCache(hash);
 			c.getInstance().sendWin(hash, cost, lat, lon, adId, cridId, pubId, image, forward, price, adm, adType, domain, bidType);
 			value = Double.parseDouble(price);
-			
-			MemoryAccounting.getInstance().increment(adId+".adspend",new Double(value * 100).longValue());
 			RTBServer.adspend += value;
 		} catch (Exception error) {
 			logger.error("Failed to delete bid from cache on exchange: {}, id: {}, error: {}", pubId, hash, error.toString());

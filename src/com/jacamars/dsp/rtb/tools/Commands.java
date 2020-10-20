@@ -194,10 +194,10 @@ public class Commands implements WatchInterface {
 				}
 				break;
 
-			case "get-accounting":
-				var accounting = MemoryAccounting.getInstance().getValues();
+			/* case "get-accounting":
+				var accounting = .getInstance().getValues();
 				System.out.println(accounting);
-				break;
+				break; */
 
 			case "getkey":
 				key = sub.get(0);

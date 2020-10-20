@@ -1170,6 +1170,9 @@ class Handler extends AbstractHandler {
 						body = new GZIPInputStream(body);
 
 					br = x.copy(body);
+					
+					System.out.println(br.toString());
+					
 					br.incrementRequests();
 					if (RTBServer.GDPR_MODE)
 						br.enforceGDPR();
