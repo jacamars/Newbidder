@@ -2214,6 +2214,7 @@ class AdminHandler extends Handler {
 			}
 		  void outputS3(String target, HttpServletResponse response) {
 				String s3 = null;
+				response.setContentType(MimeTypes.substitute(target));
 				try {
 					InputStream is = Configuration.getS3InputStream(target.substring(4));
 					OutputStream out = response.getOutputStream();

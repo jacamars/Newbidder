@@ -787,6 +787,8 @@ public class Configuration {
 			String secretAccessKey = Env.GetEnvironment("AWSSECRETKEY", null);
 			String endPoint = Env.GetEnvironment("S3ENDPOINT", null);
 			String region = Env.GetEnvironment("S3REGION", null);
+			if (region == null)
+				region = Regions.US_WEST_2.getName();
 			
 			logger.info("AWSACCESSKEY: {}",accessKey);
 			logger.info("AWSSECRETKEY: {}",secretAccessKey);
