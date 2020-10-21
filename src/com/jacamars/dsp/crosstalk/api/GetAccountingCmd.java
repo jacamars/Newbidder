@@ -46,16 +46,18 @@ public class GetAccountingCmd extends ApiCommand {
 			try {
 				
 				// TBD rewrite for multi tenant
-				
-				var data = AccountingCache.getInstance().asMap();
 				accounting = new HashMap<>();
-				data.forEach((k,v)->{
-					set(k + ".bids", accounting,v);
-					set(k + ".wins", accounting,v);
-					set(k + ".pixels", accounting,v);
-					set(k + ".clicks", accounting,v);
-					set(k + ".total", accounting,v);			
+				Crosstalk.shadow.entrySet().forEach(entry->{
+					String k = entry.getKey();
+					Map<String,Double> value = AccountingCache.getInstance().get(k);
+					set(k + ".bids", value);
+					set(k + ".wins", value);
+					set(k + ".pixels", value);
+					set(k + ".clicks", value);
+					accounting.put(k + ".total", entry.getValue().
+							budget.totalCost.doubleValue());	
 				});
+	
 				return;
 			} catch (Exception err) {
 				error = true;
@@ -66,7 +68,7 @@ public class GetAccountingCmd extends ApiCommand {
 				message = "Timed out";
 		}
 	
-	void set(String key, Map<String,Double> m, Map<String,Double> v) {
+	void set(String key, Map<String,Double> v) {
 		if (v.get(key) != null) 
 			accounting.put(key,v.get(key));
 		else

@@ -28,6 +28,14 @@ public enum AccountingCache {
 		INSTANCE.hz = hz;
 		return INSTANCE;
 	}
+	
+	public Map<String,Double> get(String campaign) {
+		Map<String,Double> v = new HashMap<>();
+		var ac = map.get(campaign);
+		if (ac == null)
+			return v;
+		return ac.asMap();
+	}
 
 	/**
 	 * Increment values, note value needs to be divided by 1000 at this level. Type is encoded 
@@ -172,7 +180,7 @@ class AccountRecord {
 	
 	public Map<String, Double> asMap() {
 		Map<String,Double> m = new HashMap<>();
-		m.put("*total*", counter.get());
+		m.put(".total", counter.get());
 		counters.forEach((k,v)->{
 			m.put(k,v.get());
 		});
@@ -229,7 +237,8 @@ class AccountRecord {
 	public void reset() {
 		Double value = Double.valueOf(0);
 		counters.forEach((k,v)->{
-			v.set(Double.valueOf(0));
+			if (!k.contains("."))
+				v.set(Double.valueOf(0));
 		});
 		counter.set(Double.valueOf(0));
 	}

@@ -47,13 +47,12 @@ import com.jacamars.dsp.rtb.common.Configuration;
 import com.jacamars.dsp.rtb.jmq.EventIF;
 import com.jacamars.dsp.rtb.jmq.Subscriber;
 import com.jacamars.dsp.rtb.jmq.ZPublisher;
-import com.jacamars.dsp.rtb.shared.BidCachePool;
+
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 import com.jacamars.dsp.rtb.shared.TokenData;
 import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.JdbcTools;
 
-import com.jacamars.dsp.rtb.shared.AccountingCache;
 
 /**
  * Class that loads,updates,deletes campaigns based on SQL queries. Runs once a

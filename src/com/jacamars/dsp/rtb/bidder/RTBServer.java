@@ -361,6 +361,7 @@ public class RTBServer implements Runnable {
 			Campaign.registerWithHazelCast(config);
 			AtomicBigDecimal.registerWithHazelCast(config);
 			hz = Hazelcast.newHazelcastInstance(config);
+			AccountingCache.getInstance(hz);
 			BidCachePool.getInstance(hz);
 
 			if (logger != null)
@@ -686,7 +687,6 @@ public class RTBServer implements Runnable {
 			int count = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
 			
 			// Start acconting and crosstalk after hazelcast comes up
-			AccountingCache.getInstance(hz);
 			Crosstalk.getInstance();
 			
 			if (count > 1) {
@@ -1171,7 +1171,7 @@ class Handler extends AbstractHandler {
 
 					br = x.copy(body);
 					
-					System.out.println(br.toString());
+					// System.out.println(br.toString());
 					
 					br.incrementRequests();
 					if (RTBServer.GDPR_MODE)
