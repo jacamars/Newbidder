@@ -297,10 +297,10 @@ public class Node implements Serializable {
 		 if (op.equals("IDL") && hierarchy == null || hierarchy.length()==0)
 			 hierarchy = "user.ext.eids";
 			 
-		 operand = n.get("operand").asText();
-		 operand_type = n.get("operand_type").asText();
+		 operand = n.get("operand").asText("");
+		 operand_type = n.get("operand_type").asText("integer");
 		 
-		 operand_ordinal = n.get("operand_ordinal").asText();
+		 operand_ordinal = n.get("operand_ordinal").asText("scalar");
 		 
 		 if (operand_ordinal.equalsIgnoreCase("scalar")) {
 			 switch(operand_type.toLowerCase()) {

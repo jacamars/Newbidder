@@ -29,14 +29,24 @@ const SiteOrAppEditor = (props) => {
     props.change(r);
   }
 
+  const check = () => {
+    return (rSelected === undef || rSelected === '' || rSelected === 'undefined');
+  }
+
+  const colorize = (x) => {
+    if (x)
+      return "primary";
+    return "secondary";
+  }
+
   return(
     <Row>
     <Col className="px-md-1" md="6">
       <ButtonGroup>
         <label>App/Site:</label>
-        <Button color="primary" onClick={() => setSelection("app")} active={rSelected === "app"}>App</Button>
-        <Button color="primary" onClick={() => setSelection("site")} active={rSelected === "site"}>Site</Button>
-        <Button color="primary" onClick={() => setSelection('')} active={rSelected === ''}>Both</Button>
+        <Button color={colorize(rSelected === "app")} onClick={() => setSelection("app")} active={rSelected === "app"}>App</Button>
+        <Button color={colorize(rSelected === "site")} onClick={() => setSelection("site")} active={rSelected === "site"}>Site</Button>
+        <Button color={colorize(check())} onClick={() => setSelection('')} active={check()}>Both</Button>
       </ButtonGroup>
     </Col>
 </Row>

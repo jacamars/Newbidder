@@ -63,6 +63,12 @@ const DealEditor = (props) => {
     props.setdeals(deals);
   }
 
+  const colorize = (x) => {
+    if (x)
+      return "primary";
+    return "secondary";
+  }
+
   // Forground color for delete
   const RED = {
     color: 'red'
@@ -121,9 +127,9 @@ const DealEditor = (props) => {
     <Col className="px-md-1" md="6">
     <ButtonGroup>
       <label>Deals:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </label>
-      <Button color="primary" onClick={() => setDealSelection(1)} active={rSelected === 1}>No Deal</Button>
-      <Button color="primary" onClick={() => setDealSelection(2)} active={rSelected === 2}>Private Only</Button>
-      <Button color="primary" onClick={() => setDealSelection(3)} active={rSelected === 3}>Private Preferred</Button>
+      <Button color={colorize(rSelected === 1)} onClick={() => setDealSelection(1)} active={rSelected === 1}>No Deal</Button>
+      <Button color={colorize(rSelected === 2)} onClick={() => setDealSelection(2)} active={rSelected === 2}>Private Only</Button>
+      <Button color={colorize(rSelected === 3)} onClick={() => setDealSelection(3)} active={rSelected === 3}>Private Preferred</Button>
       {rSelected > 1 && <>
         &nbsp; &nbsp; <Button color="primary" size="sm" onClick={makeNewDeal}>+</Button>
       </>}

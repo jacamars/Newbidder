@@ -42,15 +42,21 @@ const CreativeSizeEditor = (props) => {
     props.selector(r);
   }
 
+  const colorize = (x) => {
+    if (x)
+      return "primary";
+    return "secondary";
+  }
+
   return(
     <Row>
-    <Col className="px-md-1" md="7">
+    <Col className="px-md-1" md="8">
   <ButtonGroup>
     <label>Match Size:</label>
-    <Button color="primary" onClick={() => setSelection(1)} active={rSelected === 1}>Any</Button>
-    <Button color="primary" onClick={() => setSelection(2)} active={rSelected === 2}>Specified</Button>
-    <Button color="primary" onClick={() => setSelection(3)} active={rSelected === 3}>W/H Ranges</Button>
-    <Button color="primary" onClick={() => setSelection(4)} active={rSelected === 3}>W/H List</Button>
+    <Button color={colorize(rSelected=== 1)} onClick={() => setSelection(1)} active={rSelected === 1}>Any</Button>
+    <Button color={colorize(rSelected=== 2)} onClick={() => setSelection(2)} active={rSelected === 2}>Specified</Button>
+    <Button color={colorize(rSelected=== 3)} onClick={() => setSelection(3)} active={rSelected === 3}>W/H Ranges</Button>
+    <Button color={colorize(rSelected=== 4)} onClick={() => setSelection(4)} active={rSelected === 4}>W/H List</Button>
   </ButtonGroup>
   </Col>
   { rSelected === 2 && <>

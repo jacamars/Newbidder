@@ -30,8 +30,8 @@ import { undef, blackStyle, whiteStyle} from "../../Utils";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","IDL", "INRANGE","LESS THAN","LESS THAN EQUALS",
-  "MEMBER","NOT DOMAIN","NOT EXISTS", "NOT IDL", "NOT INRANGE", "NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
+var ops = [ "DOMAIN","EQUALS","EXISTS","GREATER THAN","GREATER THAN EQUALS","IDL", "INRANGE","INTERSECTS", "LESS THAN","LESS THAN EQUALS",
+  "MEMBER","NOT DOMAIN","NOT EXISTS", "NOT IDL", "NOT INRANGE", "NOT INTERSECTS", "NOT EQUALS","NOT MEMBER","NOT REGEX","NOT STRING","REGEX","STRINGIN"];
 
 var types =["integer","string","double"];
 var ords =["scalar","list"];
@@ -70,7 +70,7 @@ const addNewRule = (r) => {
 
   var operand = document.getElementById("set-operand").value;
   var type = document.getElementById("type").value;
-  rule.ordinal = document.getElementById("ordinal").value;
+  rule.operand_ordinal = document.getElementById("ordinal").value;
   if (operand === '') {
     operand = document.getElementById("operand").value;
   } else {
@@ -129,7 +129,6 @@ const getOperandOrdinal = () => {
   const redraw = () => {
       setCount(count+1);
   }
-
         return (
             <>
               <div className="content">
