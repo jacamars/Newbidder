@@ -34,7 +34,7 @@ const CreativeSizeEditor = (props) => {
   const [rSelected, setRSelected] = useState(props.creative.sizeType);
 
   const setSelection = (r) => {
-    if (r == 1) {
+    if (r === 1) {
       props.callback(null,"width");
       props.callback(null,"height");
     }

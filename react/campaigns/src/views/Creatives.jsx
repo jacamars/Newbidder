@@ -59,6 +59,9 @@ var undef;
     c.price = c.bid_ecpm;
     c.siteorapp = "";
     c.extensions = [];
+    c.dealType = 1;
+    c.deals = undef;
+    c.sizeType = 1;
     setCreative(c);
   }
 
@@ -133,6 +136,10 @@ var undef;
     c.isBanner = false;
     c.price = c.bid_ecpm;
     c.siteorapp = "";
+    c.dealType = 1;
+    c.deals = undef;
+
+    c.sizeType = 1;
 
     setCreative(c);
   }
@@ -157,6 +164,9 @@ var undef;
     c.nativead.native_plcmttype = 1;
     c.nativead.plcmtcnt = 1;
 
+    c.dealType = 1;
+    c.deals = undef;
+
     c.price = c.bid_ecpm;
     c.siteorapp = "";
 
@@ -180,6 +190,10 @@ var undef;
     c.isBanner = false;
     c.price = c.bid_ecpm;
     c.siteorapp = "";
+
+    c.dealType = 1;
+    c.deals = undef;
+
     setCreative(c);
   }
 
