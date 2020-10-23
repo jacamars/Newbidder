@@ -294,7 +294,7 @@ public class Node implements Serializable {
 		 else
 			 op = n.get("op").asText().toUpperCase();
 		 
-		 if (op.equals("IDL") && hierarchy == null || hierarchy.length()==0)
+		 if ((op.equals("IDL") || op.equals("NOT IDL")) && hierarchy == null || hierarchy.length()==0)
 			 hierarchy = "user.ext.eids";
 			 
 		 operand = n.get("operand").asText("");

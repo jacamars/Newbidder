@@ -38,7 +38,14 @@ var ords =["scalar","list"];
 
 const RuleEditor = (props) => {
 
+  useEffect(() => {
+    if (props.rule.operand === 'IDL' || props.rule.operand === 'NOT IDL')
+      setVisible(false);
+  }, []);
+
+
   const [count, setCount] = useState(0);
+  const [visible, setVisible] = useState(props.rule.operand === 'IDL' || props.rule.operand === 'NOT IDL');
   const [rule, setRule] = useState(props.rule);
   const vx = useViewContext();
 
@@ -99,10 +106,12 @@ const getOperator = () => {
 
 const opchange = (e) => {
   var op = e.target.value;
-  if (op === 'IDL') {
+  if (op === 'IDL' || op === 'NOT IDL') {
     document.getElementById('hierarchy').value = 'user.ext.eids';
     document.getElementById('type').value = 'string';
-  }
+    setVisible(false);
+  } else
+    setVisible(true);
 
 }
 
@@ -193,17 +202,15 @@ const getOperandOrdinal = () => {
                               </FormGroup>
                             </Col>
                           </Row>
-        
                           <Row>  
-                             <Col className="pl-md-1" md="4">
+                             <Col className="pl-md-1" md="3">
                               <FormGroup>
                                 <label>Operand Value</label>
                                 <Input type="input" id="operand" defaultValue={rule.operand}/>   
                               </FormGroup>
                             </Col> 
-                            </Row>
-                            <Row>
-                            <Col className="px-md-1" md="4">
+                            {visible && <>
+                            <Col className="px-md-1" md="3">
                               <FormGroup>
                               <label>Operand Type</label>
                                 <Input type="select" id="type"> 
@@ -211,7 +218,7 @@ const getOperandOrdinal = () => {
                                 </Input>
                               </FormGroup>
                               </Col>
-                              <Col className="px-md-1" md="4">
+                              <Col className="px-md-1" md="3">
                               <FormGroup>
                               <label>Operand Ordinal</label>
                                 <Input type="select" id="ordinal">   
@@ -219,8 +226,8 @@ const getOperandOrdinal = () => {
                                 </Input>
                               </FormGroup>
                             </Col>
+                            </>}
                           </Row>
-                    
                         </Form>
                       </CardBody>
                       <CardFooter>

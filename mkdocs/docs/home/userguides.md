@@ -325,6 +325,8 @@ the actions we have encountered over the past several years.
 - GREATER_THAN_EQUALS - Tests bid request scalar >= another scalar
 - MEMBER - Tests bid request scalar is a member of a set
 - NOT_MEMBER - Tests bid request scalar not a member of a set
+- IDL - Tests an array of Liveramp IDL eids against a Bloom filter for might contains value.
+- NOT IDL - Tests an array of Liveramp IDL eids against a Bloom filter for NOT contains value
 - INTERSECTS - Tests bid request array intersects another set and is not empty set.
 - NOT_INTERSECTS Tests bid request array intersected with another set is an empty set
 - DOMAIN - Tests bid request scalar is between 2 numbers (defined in an array)

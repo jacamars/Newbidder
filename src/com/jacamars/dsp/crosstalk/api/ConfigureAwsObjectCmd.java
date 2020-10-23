@@ -17,8 +17,6 @@ public class ConfigureAwsObjectCmd extends ApiCommand {
 	/** The results of the command */
 	public String updated;
 	
-	/** The command to execute */
-	public String command;
 	
 	/**
 	 * Default constructor
@@ -42,18 +40,12 @@ public class ConfigureAwsObjectCmd extends ApiCommand {
 	public void execute() {
 			super.execute();	
 			try {
-				
-				if (tokenData.isRtb4FreeSuperUser()) {
-					error = true;
-					message = "Not rtb4free super user";
-					return;
-				}
-				
+							
 				logger.debug("EXECUTING THE CONFIGURATION COMMAND: " + command);
 				ConfigureAwsObject sp = new ConfigureAwsObject("","",command);
 				sp.from = WebAccess.uuid + "-" + new Random().nextLong();
 				
-				var errored = Configuration.configureObject((Map) DbTools.mapper.readValue(command ,Map.class));
+				var errored = Configuration.configureObject(map);
 			     if (errored != null) {
 			    	 error = true;
 			         message = "AWS Object load failed: " + errored;

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jacamars.dsp.crosstalk.budget.CommandController;
@@ -232,6 +233,9 @@ public class ApiCommand implements Serializable {
      */
     public String token = null;
     
+    public String command = null;
+    public Map map = null;
+    
     /**
      * An object For serialization we use an object mapper
      */
@@ -330,6 +334,7 @@ public class ApiCommand implements Serializable {
         ApiCommand cmd = null;
         
         boolean requireLeader = false;
+        boolean requireBroadcast = false;
         
         switch (token) {
             case Ping:
@@ -375,8 +380,9 @@ public class ApiCommand implements Serializable {
                 break;
 
             case ConfigureAws:
+            	System.out.println("------>"+data);
                 cmd = mapper.readValue(data, ConfigureAwsObjectCmd.class);
-                requireLeader = true;
+                requireBroadcast = true;
                 break;
 
             case Future:
@@ -580,14 +586,18 @@ public class ApiCommand implements Serializable {
         
         ///////////// If this is not the leader, but leadership is required, then send it to the leader ///////////
         ApiCommand res = null;
-        if (requireLeader) {
-        	if (!RTBServer.isLeader())  {
-        		cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
-        	}
-        	else 
-        		cmd.execute();
+        if (requireBroadcast) {
+        	cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
         } else {
-        	cmd.execute();
+        	if (requireLeader) {
+        		if (!RTBServer.isLeader())  {
+        			cmd  = CommandController.getInstance().sendCommand(cmd, 45000);
+        		}
+        		else 
+        			cmd.execute();
+        	} else {
+        		cmd.execute();
+        	}
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (cmd instanceof FutureCmd) {
@@ -603,6 +613,12 @@ public class ApiCommand implements Serializable {
      * @throws Exception on JSON serialization errors.
      */
     public String toJson() throws Exception {
+        try {
+			return mapper.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return null;
     }
 

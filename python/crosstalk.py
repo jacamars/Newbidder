@@ -4,9 +4,11 @@ import pprint
 
 
 
-def ConfigureAwsObject(symbolName):
+def ConfigureAwsObject(obj):
     try:
-        r = requests.post(globalHost, data='{"type":"ConfigureAws#","symbol":"'+symbolName+'","token":"'+token+'"}')
+        str = json.dumps(obj);
+        print(str);
+        r = requests.post(globalHost, data='{"type":"ConfigureAws#","map":'+str+',"token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -26,7 +28,8 @@ def GetAccounting():
     try:
         r = requests.post(globalHost, data='{"type":"GetAccounting#","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -35,7 +38,8 @@ def ListSymbols():
     try:
         r = requests.post(globalHost, data='{"type":"ListBigData#","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -69,7 +73,8 @@ def ListMacros():
     try:
         r = requests.post(globalHost, data='{"type":"ListMacros#","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None

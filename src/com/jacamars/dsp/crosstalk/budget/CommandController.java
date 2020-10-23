@@ -73,10 +73,11 @@ public enum CommandController {
 class CommandListener implements MessageListener<ApiCommand> {
     public void onMessage(Message<ApiCommand> m) {
     	ApiCommand r = m.getMessageObject();
-    	CommandController.logger.info("Commands Received: {}",r);
     	
-    	if (!RTBServer.isLeader()) {
-    		return;
+    	try {
+    		CommandController.logger.info("Commands Received: {}",r.toJson());
+    	} catch (Exception error) {
+    		error.printStackTrace();
     	}
     	
     	r.execute();
