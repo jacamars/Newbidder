@@ -66,7 +66,7 @@ const Rules = (props) => {
       await vx.deleteRule(id);
       await vx.listRules();
       setRule(null);
-      redraw();
+      refresh();
    }
 
   const update = async(e) => {
