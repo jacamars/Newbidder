@@ -68,14 +68,9 @@ const addNewRule = (r) => {
   if (!rule.id)
     rule.id = 0;
 
-  var operand = document.getElementById("set-operand").value;
+  var operand = document.getElementById("operand").value;
   var type = document.getElementById("type").value;
   rule.operand_ordinal = document.getElementById("ordinal").value;
-  if (operand === '') {
-    operand = document.getElementById("operand").value;
-  } else {
-    type = 'string';
-  }
 
   rule.name = document.getElementById("name").value;
   rule.rtbspecification = document.getElementById("hierarchy").value;
@@ -100,6 +95,15 @@ const getOperator = () => {
         items.push(<option key={"exchanges-"+x}>{x}</option>);
     }
     return(items);
+}
+
+const opchange = (e) => {
+  var op = e.target.value;
+  if (op === 'IDL') {
+    document.getElementById('hierarchy').value = 'user.ext.eids';
+    document.getElementById('type').value = 'string';
+  }
+
 }
 
 const getOperandType = () => {
@@ -183,7 +187,7 @@ const getOperandOrdinal = () => {
                             <Col className="px-md-1" md="4">
                               <FormGroup>
                                 <label>Operator</label>
-                                <Input type="select" name="select" id="operator">
+                                <Input type="select" name="select" id="operator" onChange={(e)=>{opchange(e)}}>
                                     {getOperator()}
                                 </Input>     
                               </FormGroup>
@@ -197,12 +201,6 @@ const getOperandOrdinal = () => {
                                 <Input type="input" id="operand" defaultValue={rule.operand}/>   
                               </FormGroup>
                             </Col> 
-                            <Col className="pr-md-1" md="4">
-                              <FormGroup>
-                              <label>Use Set as Operand</label>
-                                <Input type="input" id="set-operand"/>   
-                              </FormGroup>
-                            </Col>
                             </Row>
                             <Row>
                             <Col className="px-md-1" md="4">

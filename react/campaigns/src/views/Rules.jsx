@@ -15,8 +15,9 @@ import {
   Col
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
-import LoginModal from '../LoginModal'
-import RuleEditor from './editors/RuleEditor.jsx'
+import LoginModal from '../LoginModal';
+import RuleEditor from './editors/RuleEditor.jsx';
+import RulesView from './RulesView.jsx';
 
 var undef;
 
@@ -50,33 +51,6 @@ const Rules = (props) => {
     setRule(r);
   }
 
-  const getRulesView = () => {
-    if (vx.rules === undef)
-      return(null);
-      
-    console.log("GetRulesView, rows = " + vx.rules.length);
-
-    return(
-       vx.rules.map((row, index) => (
-         <tr key={'rulesview-' + row}>
-           <td>{index}</td>
-           <td key={'rules-name-' + index} className="text-left">{row.name}</td>
-           {vx.user.sub_id === 'superuser' &&
-            <td key={'rules-cust-' + index} className="text-left">{row.customer_id}</td>
-           }
-           <td key={'rules-id-' + index} className="text-right">{row.id}</td>
-           <td key={'rules-hierarchy' + index} className="text-right">{row.hierarchy}</td>
-           <td key={'rules-edit-'+ index} className="text-center">
-             <Button color="success" size="sm" onClick={()=>viewRule(row.id)}>View</Button>
-             &nbsp;
-             <Button color="warning" size="sm" onClick={()=>editRule(row.id)}>Edit</Button>
-             &nbsp;
-             <Button color="danger" size="sm" onClick={()=>deleteRule(row.id)}>Delete</Button>
-           </td>
-         </tr>))
-     ); 
-   }
-
    const editRule = async(id) => {
       var r = await vx.getRule(id);
       setRule(r);
@@ -101,43 +75,21 @@ const Rules = (props) => {
       }
 
       setRule(null);
-      redraw();
+      refresh();
   }
 
   return (
     <div className="content">
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
-        <Row>
+        <Row id={"rules-"+count}>
             <Col xs="12">
             { rule == null && <>
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
-                <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Rules in DB</CardTitle>
-                        </Row>
-                    </CardHeader>
-                    <CardBody>
-                      <Table key={"bidders-table-"+count} size="sm">
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th className="text-center">Name</th>
-                            {vx.user.sub_id === 'superuser' &&
-                                <th className="text-center">Customer</th>
-                            }
-                            <th className="text-right">SQL-ID</th>
-                            <th className="text-right">Hierarchy</th>
-                            <th className="text-center">Actions</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                        { getRulesView() }
-                      </tbody>
-                    </Table>
-                  </CardBody>
-                </Card>
+              <RulesView key={"ruleview-"+count}
+                  refresh={refresh}
+                  editRule={editRule}
+                  deleteRule={deleteRule}
+                  viewRule={viewRule}
+                  makeNew={makeNew}/>
                 </>
                 }
                 { rule !== null &&
