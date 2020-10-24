@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 // reactstrap components
 import {
   FormGroup,
+  InputGroup,
   Input,
   Row,
   Col
@@ -29,7 +30,7 @@ const substituteRedirect = (text) => {
     var re = new RegExp("_REDIRECT_URL_");
     text = text.replace(re,cthru);
   }
-  return text;
+  return text;  
 }
 
 const mangle = () => {
@@ -75,25 +76,26 @@ const mangle = () => {
    </Col>
    </Row>
    <Row>
-    <Col className="px-md-1" sm={6}>
+    <Col className="px-md-1" md="6">
+
       <FormGroup>
-        <label>HTML Template</label>
+        <label for="htmltemlate">HTML Template</label>
         <Input
-          id="height"
+          id="htmltemplate"
           onChange={ (e) => props.callback(e,"htmltemplate")}
           defaultValue={props.creative.htmltemplate}
           spellCheck={false}
-          rows={8}
           type="textarea"
         />
       </FormGroup>
       </Col>
-      <Col className="px-md-1" md="6">
+
+    <Col className="px-md-1" md="6">
         <FormGroup>
           <label>Visualization</label>
           <DemoTag isVideo={false} adm={substituteRedirect(vx.macroSub(mangle()))} />
         </FormGroup>
-      </Col>
+    </Col>
    </Row>
    </>
   );

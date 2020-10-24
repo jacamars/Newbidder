@@ -85,9 +85,7 @@ const DealEditor = (props) => {
    return(
       props.creative.deals.map((deal, index) => (
         <Row>
-          <Col className="px-md-1" md="1">
 
-          </Col>
           <Col className="px-md-1" md="2">
             <FormGroup>
               <label>Deal ID</label>
@@ -126,7 +124,7 @@ const DealEditor = (props) => {
     <>
     <Col className="px-md-1" md="6">
     <ButtonGroup>
-      <label>Deals:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </label>
+      <label>Deals:&nbsp; &nbsp; &nbsp; </label>
       <Button color={colorize(rSelected === 1)} onClick={() => setDealSelection(1)} active={rSelected === 1}>No Deal</Button>
       <Button color={colorize(rSelected === 2)} onClick={() => setDealSelection(2)} active={rSelected === 2}>Private Only</Button>
       <Button color={colorize(rSelected === 3)} onClick={() => setDealSelection(3)} active={rSelected === 3}>Private Preferred</Button>

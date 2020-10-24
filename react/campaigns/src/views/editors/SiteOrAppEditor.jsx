@@ -43,7 +43,7 @@ const SiteOrAppEditor = (props) => {
     <Row>
     <Col className="px-md-1" md="6">
       <ButtonGroup>
-        <label>App/Site:</label>
+        <label>App/Site: &nbsp; &nbsp;</label>
         <Button color={colorize(rSelected === "app")} onClick={() => setSelection("app")} active={rSelected === "app"}>App</Button>
         <Button color={colorize(rSelected === "site")} onClick={() => setSelection("site")} active={rSelected === "site"}>Site</Button>
         <Button color={colorize(check())} onClick={() => setSelection('')} active={check()}>Both</Button>

@@ -37,7 +37,7 @@
     "react-week-scheduler": "^0.1.13",
     "react-widgets": "^4.6.0",
     "react-widgets-globalize": "^5.0.22",
-    "reactstrap": "8.4.1",
+    "reactstrap": "8.6.0",
     "resize-observer-polyfill": "^1.5.1",
     "use-state-with-callback": "^1.0.18"
   },
