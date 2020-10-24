@@ -119,8 +119,8 @@ const AdminNavbar = (props) => {
 
   const style = { 
     bgColor: "red"
-  }
-  ;
+  };
+  
     return (
       <>
         <Navbar 

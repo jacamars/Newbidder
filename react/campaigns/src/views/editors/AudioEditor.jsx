@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import MDEditor from '@uiw/react-md-editor';
 
 // reactstrap components
 import {
@@ -138,18 +139,21 @@ const setSizeType = (t) => {
     </Col>
     </Row>
    <Row>
-    <Col className="px-md-1" md="6">
+    <Col className="px-md-1" md="12">
       <FormGroup>
         <label>DAAST FILE</label>
-        <Input
-          id="DAAST"
-          spellCheck={false}
-          onChange={ (e) => props.callback(e,"htmltemplate")}
-          defaultValue={props.creative.htmltemplate}
-          type="textarea"
-        />
+        <MDEditor
+            id="outgoingfile"
+            value={props.creative.htmltemplate}
+            commands={[]}
+            height={400}
+            preview="edit"
+            onChange={(e)=>props.callback(e,"htmltemplate")}
+          />
       </FormGroup>
     </Col>
+    </Row>
+    <Row>
     <Col className="px-md-1" md="6">
         <FormGroup>
           <label>Visualization</label>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import MDEditor from '@uiw/react-md-editor';
 
 // reactstrap components
 import {
@@ -99,20 +100,22 @@ const VideoEditor = (props) => {
    </Col>
    </Row>
    <Row>
-    <Col className="px-md-1" md="6">
+    <Col className="px-md-1" md="12">
       <FormGroup>
         <label>Outgoing File</label>
-        <Input
-          id="outgoingfile"
-          onChange={ (e) => props.callback(e,"htmltemplate",props.index)}
-          defaultValue={props.creative.htmltemplate}
-          spellCheck={false}
-          rows={16}
-          type="textarea"
-        />
-      </FormGroup>
-      </Col>
-      <Col className="px-md-1" md="6">
+          <MDEditor
+            id="outgoingfile"
+            value={props.creative.htmltemplate}
+            commands={[]}
+            height={400}
+            preview="edit"
+            onChange={(e)=>props.callback(e,"htmltemplate")}
+          />
+          </FormGroup>
+        </Col>
+      </Row>
+      <Row>
+      <Col className="px-md-1" md="12">
         <FormGroup>
           <label>Visualization</label>
           <DemoTag isVideo={true} adm={props.creative.htmltemplate} />

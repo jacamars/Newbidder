@@ -189,7 +189,6 @@ const getSelectedRules = () => {
         return;
       }
 
-      x.htmltemplate = document.getElementById("outgoingfile").value;
       x.mime_type = document.getElementById("mime_type").value;
       x.vast_video_width = x.width;
       x.vast_video_height = x.height;
@@ -339,7 +338,7 @@ const getSelectedRules = () => {
   }
 
   const setHtml = (e,type) => {
-    creative[type]=e.target.value;
+    creative[type] = e;
     setCreative(creative);
     setCount(count+1);
   }

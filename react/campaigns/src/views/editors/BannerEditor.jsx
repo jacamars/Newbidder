@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
+import MDEditor from '@uiw/react-md-editor';
 
 // reactstrap components
 import {
@@ -80,13 +82,14 @@ const mangle = () => {
 
       <FormGroup>
         <label for="htmltemlate">HTML Template</label>
-        <Input
-          id="htmltemplate"
-          onChange={ (e) => props.callback(e,"htmltemplate")}
-          defaultValue={props.creative.htmltemplate}
-          spellCheck={false}
-          type="textarea"
+        <MDEditor
+            value={props.creative.htmltemplate}
+            commands={[]}
+            height={300}
+            preview="edit"
+            onChange={(e)=>props.callback(e,"htmltemplate")}
         />
+     
       </FormGroup>
       </Col>
 
