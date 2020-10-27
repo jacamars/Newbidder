@@ -2,15 +2,6 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
-  Badge,
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
-  Table,
   Row,
   Col
 } from "reactstrap";

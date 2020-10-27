@@ -17,8 +17,11 @@ import {
 import { useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
 import DecisionModal from "../DecisionModal";
+import LoadSymbolModal from "../LoadSymbolModal";
+
 
 var undef;
+var symbol = { s3: "", file:"", name: "", type: "", size:""};
 
 const Sets = (props) => {
 
@@ -31,6 +34,7 @@ const Sets = (props) => {
     const [macros, setMacros] = useState({});
     const [count, setCount] = useState(0);
     const [modal, setModal] = useState(false);
+    const [symbolModal, setSymbolModal] = useState(false);
     const [name, setName] = useState('');
     const [querySymbol, setQuerySymbol] = useState(false);
     const [queryHazelcast, setQueryHazelcast] = useState(false);
@@ -77,8 +81,13 @@ const Sets = (props) => {
     setModal(true);
   }
 
-  const makeNew = () => {
+  const makeNew = (s) => {
+    setSymbolModal(true);
+  }
 
+  const addSymbol = (s) => {
+    alert("SYMBOL: " + JSON.stringify(s,null,2));
+    setSymbolModal(false);
   }
 
   const query = (name) => {
@@ -166,6 +175,8 @@ const Sets = (props) => {
                      message="Only the db admin can undo this if you delete it!!!" 
                      name="DELETE"
                      callback={modalCallback} />}
+    { symbolModal &&
+      <LoadSymbolModal callback={addSymbol} symbol={symbol}/>}
     { querySymbol &&
       <DecisionModal title="Query Symbol" 
         message="Input key to query" 
@@ -181,7 +192,7 @@ const Sets = (props) => {
         <Row>
             <Col xs="12">
             <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('bigdata')}}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>Load</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={(e)=>makeNew()}>Load</Button>
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
