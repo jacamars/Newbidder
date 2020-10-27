@@ -37,7 +37,7 @@ public class DeleteSymbolCmd extends ApiCommand {
 		public void execute() {
 			super.execute();
 			try {
-				LookingGlass.symbols.remove(symbol, tokenData);
+				LookingGlass.symbols.remove(symbol);
 				return;
 			} catch (Exception err) {
 				error = true;
