@@ -10,19 +10,11 @@ what campaigns are loaded within each bidder.
 The API also allows you to dynamically change prices within campaign/creatives, load new campaigns, or delete campaigns. The API can also be used to find out the current  spending limits on campaigns, and you can 
 set new spending limits.
 
-The default port for Crosstalk-API is 8100.
-
-## ConfigureAwsObject
- 
-## RemoveSymbol
- 
-## GetAccounting
-
-## ListSymbols
+The default port for Crosstalk-API is 7379.
 
 ## GetToken
 
-This is the login to the system. You must obtain a token before you can issue most commands.
+This is the login to the system. You must obtain a token before you can issue most other commands.
 
 Example POST form:
 
@@ -39,6 +31,93 @@ Python example:
 ```
 
 The return token is remembered so that login information is not required on the subsequent calls.
+
+## SetHost
+
+If you need to change the host IP address of the connection to the selected bidder, issue this
+command before any other command is issued.
+
+Python form of the command is:
+
+>>>crosstalk.SetHost("bybidderipaddress");
+(200, 'http://bybidderipaddress:7379/api')
+
+## SetHostPort
+
+If you need to change the port (and host) use the SetHostPort command Issue it before any other commands. The python form of the
+command is:
+
+>>>crosstalk.SetHostPort("xxx:1234");
+(200, 'http://xxx:1234/api')
+>>> 
+
+
+## ConfigureAwsObject
+
+This command allows the rtb4free super user to add a new symbol from the S3 or Minio object
+store. The POST form of the command is:
+
+```
+{"type":"ConfigureAws#","map":mapObject,"token":"<token-you-got-earlier>"}
+```
+
+The mapObject is a dictionary form of the new symbol attributes, an example using Pyton;
+
+```
+>>>crosstalk.ConfigureAwsObject({
+    "s3" : "bloom/audience1/test-audience.txt",
+    "name" : "@AUDIENCE1",
+    "type" : "BLOOM",
+    "size": 6
+  });
+```
+
+The map  object uses the same format as the objects in the *payday.json* "list" object.
+
+Note this command is only available to the super user 'rtb4free' user.
+ 
+## RemoveSymbol
+
+This command removes a symbol added with ConfigureAwsObject. Note this command is only available to the super user 'rtb4free' user. The POST form of the command is:
+
+```
+{"type":"RemoveSymbol","symbol":"symbol-name,"token":"<token-you-got-earlier>"}
+```
+
+ 
+## GetAccounting
+
+This returns the summary budget accounting (Daily, Hourly, Total cost) and summary bids,clicks,pixels,wins since the RTB farm has been up. The POST form of the command is:
+
+```
+{"type":"GetAccounting#","token":"the-token-you-got-earlier"}
+```
+
+The Python form of the accounting, and example:
+
+```
+>>> crosstalk.GetAccounting();
+(200, 'OK')
+{
+    "accounting": {
+        "2.bids": 0.0, 
+        "2.clicks": 0.0, 
+        "2.pixels": 0.0, 
+        "2.total": 0.0, 
+        "2.wins": 0.0
+    }, 
+    "customer": "test", 
+    "error": false, 
+    "timestamp": 1603817841120, 
+    "token": "a8276f4f-c5ac-44c7-a4fe-1be450ff79e9", 
+    "type": "GetAccounting#"
+}
+>>>
+```
+
+If you logged in with customer_id of 'rtb4free' all campaigns will be reported otherwise just the campaigns of the logged in customer_id will be shown.
+
+## ListSymbols
 
 ## SQLGetUser
 
@@ -58,6 +137,7 @@ The Python form of the command and example return:
 ```
 
 Notice the user is returned as JSON but is embedded as a string.
+
 
 ## SQLListUsers
 
@@ -98,6 +178,7 @@ Python form and sample return:
 
 ```
 
+If you logged in with customer_id of 'rtb4free' all users will be refreshed, otherwise just the users of the logged in customer_id will be shown.
 
 ## ListMacros
 
@@ -160,7 +241,7 @@ The Refresh command, issued by the superuper will cause all campaigns to be relo
 Form of the command:
 
 ```
-{"type":"Refresh#","token":"the-token-you-got-earlier","customer":"the-customerid"}
+{"type":"Refresh#","token":"the-token-you-got-earlier"}
 ```
 
 Python form of the command and example return:
@@ -171,6 +252,67 @@ crosstalk.Refresh();
 >>> 
 
 ```
+
+If you logged in with customer_id of 'rtb4free' all campaigns will be refreshed, otherwise just the campaigns of the logged in customer_id will be refreshed.
+
+## SQLListRules
+
+To list all the rules, use SQLListRules, the POST form is:
+
+```
+{"type":"SQLListRules#","token":"the-token-you-got-earlier"}
+```
+
+Python form is:
+
+```
+>>> crosstalk.SQLListRules();
+(200, 'OK')
+{
+    "customer": "test", 
+    "error": false, 
+    "rules": [
+        {
+            "hierarchy": "user.ext.eids", 
+            "id": 3, 
+            "name": "Tester's Rule"
+        }
+    ], 
+    "timestamp": 1603816968835, 
+    "token": "126cbbf5-96d2-4011-af99-20ca2ff4b469", 
+    "type": "SQLListRules#"
+}
+>>>
+```
+
+If you logged in with customer_id of 'rtb4free' all campaigns will be refreshed, otherwise just the campaigns of the logged in customer_id will be refreshed.
+
+## SQLAddNewRule
+
+Adds a new rule to the system. the POST form of the command is:
+
+```
+{"type":"SQLAddNewRule#","token":"the-token-you-got-earlier","rule":"string-version-of-rule"}
+```
+
+Note the rule must be a string version of the JSON for the rule.
+
+Python form:
+
+```
+>>crosstalk.SQLAddNewRule("{\"id\":3,\"customer_id\":\"test\",\"name\":\"Tester's Rule\",\"hierarchy\":\"user.ext.eids\",\"operand\":\"@AUDIENCE10\",\"operand_type\":\"string\",\"operand_ordinal\":\"scalar\",\"value\":\"@AUDIENCE10\",\"op\":\"IDL\",\"notPresentOk\":true,\"bidRequestValues\":[\"user\",\"ext\",\"eids\"],\"rtbspecification\":\"user.ext.eids\"}");
+
+SQLAddNewRule returns: {
+  "error": false,
+  "timestamp": 1603817094363,
+  "token": "6d782ee6-9b8c-496e-9c82-3fd15c5ce691",
+  "customer": "test",
+  "type": "SQLAddNewRule#",
+  "rule": "{\"id\":3,\"customer_id\":\"test\",\"name\":\"Tester's Rule\",\"hierarchy\":\"user.ext.eids\",\"operand\":\"@AUDIENCE10\",\"operand_type\":\"string\",\"operand_ordinal\":\"scalar\",\"value\":\"@AUDIENCE10\",\"op\":\"IDL\",\"notPresentOk\":true,\"bidRequestValues\":[\"user\",\"ext\",\"eids\"],\"rtbspecification\":\"user.ext.eids\"}"
+}
+```
+The values must be in Javascript form, not python. Example use *true* instead of *True*.
+
 
 ## GetPrice
 

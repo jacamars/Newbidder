@@ -57,9 +57,11 @@ public class Shadow {
 			return entrySet();
 		
 		Set<Entry<String,Campaign>> entries = new HashSet<>();
-		
+
 		scampaigns.entrySet().forEach(entry->{
-			if (entry.getValue().customer_id.equals(customer_id))
+			Campaign c = entry.getValue();
+			System.out.println(c.toJson());
+			if (entry.getValue() != null  && entry.getValue().customer_id.equals(customer_id))
 				entries.add(entry);
 		});
 		return entries;

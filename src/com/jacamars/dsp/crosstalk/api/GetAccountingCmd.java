@@ -63,6 +63,7 @@ public class GetAccountingCmd extends ApiCommand {
 				return;
 			} catch (Exception err) {
 				error = true;
+				err.printStackTrace();
 				message = err.toString();
 			}
 			error = true;

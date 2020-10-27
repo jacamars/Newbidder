@@ -375,7 +375,7 @@ public class Campaign implements Comparable, Portable {
 	}
 	
 	void overwrite(Campaign camp) throws Exception {
-		customer_id = customer_id;
+		customer_id = camp.customer_id;
 		id = camp.id;
 		stringId = "" + camp.id;
 		isAdx = camp.isAdx;

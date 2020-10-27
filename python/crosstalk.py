@@ -112,6 +112,27 @@ def Refresh():
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
+    
+def SQLListRules():
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLListRules#","token":"'+token+'"}')
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+    
+def SQLAddNewRule(rule):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLAddNewRule#","token":"'+token+'","rule":"'+rule+'"}')
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+
 
 def GetPrice(camp,creat):
     try:
