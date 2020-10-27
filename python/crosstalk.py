@@ -60,11 +60,21 @@ def GetToken(c,u,p):
         print('Connection error')
         return 503, None
          
-def GetUser():
+def SQLGetUser():
     try:
-        r = requests.post(globalHost, data='{"type":"SqlGetUser#","token":"'+token+'"}')
+        r = requests.post(globalHost, data='{"type":"SQLGetUser#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+    
+def SQLListUsers():
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLListUsers#","token":"'+token+'"}')
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -529,7 +539,7 @@ def SetHostPort(hostPort):
 def PP(x):
     pp.pprint(x)
     
-token = '';
+token = ''
 globalHost = "http://localhost:7379/api"
 pp = pprint.PrettyPrinter(indent=4)
 

@@ -2,6 +2,7 @@ package com.jacamars.dsp.crosstalk.budget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +50,19 @@ public class Shadow {
 
 	public Set<Entry<String, Campaign>> entrySet() {
 		return scampaigns.entrySet();
+	}
+	
+	public Set<Entry<String, Campaign>> entrySet(String customer_id) {
+		if (customer_id.equals("rtb4free"))
+			return entrySet();
+		
+		Set<Entry<String,Campaign>> entries = new HashSet<>();
+		
+		scampaigns.entrySet().forEach(entry->{
+			if (entry.getValue().customer_id.equals(customer_id))
+				entries.add(entry);
+		});
+		return entries;
 	}
 
 	public int size() {

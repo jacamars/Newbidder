@@ -236,6 +236,9 @@ public class ApiCommand implements Serializable {
     public String command = null;
     public Map map = null;
     
+	/** The customer id of the accounting */
+	public String customer;
+	
     /**
      * An object For serialization we use an object mapper
      */
@@ -582,6 +585,7 @@ public class ApiCommand implements Serializable {
         		cmd.message = "Token expired";
         		return cmd;
         	}
+        	cmd.customer = cmd.tokenData.customer;
         }
         
         ///////////// If this is not the leader, but leadership is required, then send it to the leader ///////////

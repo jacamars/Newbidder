@@ -9,7 +9,7 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 
 /**
  * Web API command that tells crosstalk to scan its SQL tables for updates.
- * 
+ * Checked for Multitenant
  * @author Ben M. Faul
  *
  */
@@ -20,7 +20,7 @@ public class RefreshCmd extends ApiCommand {
 	
 	/** The campaigns to refresh, or if null, then all of them */
 	public List<String> campaigns;
-
+	
 	/**
 	 * Return the refreshed list of bidders/campaigns.
 	 * 
@@ -65,7 +65,7 @@ public class RefreshCmd extends ApiCommand {
 		// TBD Needs rewrite for multi tenant
 		try {	
 			if (async == null || !async)
-				updated = Crosstalk.getInstance().refresh();
+				updated = Crosstalk.getInstance().refresh(customer);
 			else {
 				final Long id = random.nextLong();
 				final ApiCommand theCommand = this;
@@ -73,7 +73,7 @@ public class RefreshCmd extends ApiCommand {
 				    @Override
 				    public void run(){
 				    	try {
-							updated = Crosstalk.getInstance().refresh();
+							updated = Crosstalk.getInstance().refresh(customer);
 						} catch (Exception e) {
 							error = true;
 							message = e.toString();

@@ -6,6 +6,7 @@
   "dependencies": {
     "@types/react": "^16.9.52",
     "@uiw/react-md-editor": "^1.14.5",
+    "@videojs/vhs-utils": "^2.2.1",
     "axios": "^0.19.2",
     "bootstrap": "^4.5.3",
     "chart.js": "^2.7.2",
@@ -60,6 +61,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "video.js": "^7.9.7"
+    "video.js": "^7.10.1"
   }
 }

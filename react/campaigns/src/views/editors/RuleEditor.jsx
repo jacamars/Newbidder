@@ -76,8 +76,13 @@ const addNewRule = (r) => {
     rule.id = 0;
 
   var operand = document.getElementById("operand").value;
-  var type = document.getElementById("type").value;
-  rule.operand_ordinal = document.getElementById("ordinal").value;
+  var type = 'string';
+  rule.operand_ordinal = 'scalar';
+
+  if (document.getElementById('type') !== null)
+    type = document.getElementById("type").value;
+  if (document.getElementById('ordinal') !== null)
+    rule.operand_ordinal = document.getElementById("ordinal").value;
 
   rule.name = document.getElementById("name").value;
   rule.rtbspecification = document.getElementById("hierarchy").value;
@@ -108,7 +113,7 @@ const opchange = (e) => {
   var op = e.target.value;
   if (op === 'IDL' || op === 'NOT IDL') {
     document.getElementById('hierarchy').value = 'user.ext.eids';
-    document.getElementById('type').value = 'string';
+    //document.getElementById('type').value = 'string';
     setVisible(false);
   } else
     setVisible(true);

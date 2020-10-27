@@ -369,13 +369,13 @@ public enum Crosstalk {
 		return nodes;
 	}
 
-	public ArrayNode createJson(String id) throws Exception {
+	public ArrayNode createJson(String customer) throws Exception {
 		Date now = new Date();
 		Timestamp update = new Timestamp(now.getTime());
 
 		Configuration config = Configuration.getInstance();
 
-		String select = "select * from campaigns where id = " + id;
+		String select = "select * from campaigns where customer_id = '" + customer + "'";
 		var conn = CrosstalkConfig.getInstance().getConnection();
 		var stmt = conn.createStatement();
 		var prep = conn.prepareStatement(select);
@@ -580,10 +580,48 @@ public enum Crosstalk {
 	 * the system. Load all bidders with all runnable campaigns.
 	 * 
 	 * @return List. The bidder list.
-	 * @throws Exception on SQL or 0MQ errors.
+	 * @throws Exception on SQL or Hazelcast errors.
 	 */
 	public List<String> refresh() throws Exception {
 		ArrayNode array = createJson(); // get a copy of the SQL database
+		List<String> list = new ArrayList<>();
+		List<CampaignBuilderWorker> workers = new ArrayList<>();
+
+		long time = System.currentTimeMillis();
+
+		if (array.size() == 0) {
+			return list;
+		}
+
+		ExecutorService executor = Executors.newFixedThreadPool(array.size());
+
+		logger.info("Sending {} periodic campaign updates, to {} members.", list.size(), workers.size());
+		for (JsonNode s : array) {
+			CampaignBuilderWorker w = new CampaignBuilderWorker(s);
+			executor.execute(w);
+			workers.add(w);
+		}
+
+		time = System.currentTimeMillis() - time;
+		time /= 1000;
+		logger.info("Periodic updates took {} seconds", time);
+		executor.shutdown();
+		while (!executor.isTerminated()) {
+
+		}
+
+		for (CampaignBuilderWorker w : workers) {
+			list.add(w.toString());
+		}
+
+		shadow.refresh();
+		
+		return list;
+
+	}
+	
+	public List<String> refresh(String customer) throws Exception {
+		ArrayNode array = createJson(customer); // get a copy of the SQL database
 		List<String> list = new ArrayList<>();
 		List<CampaignBuilderWorker> workers = new ArrayList<>();
 

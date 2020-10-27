@@ -15,6 +15,7 @@ import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 /**
  * Web API to list all campaigns known by crosstalk
+ * Checked for Multitenant
  * @author Ben M. Faul
  *
  */
@@ -22,6 +23,7 @@ public class GetAccountingCmd extends ApiCommand {
 
 	/** The list of campaigns */
 	public Map<String,Double> accounting;
+
 
 	/**
 	 * Default constructor
@@ -47,7 +49,7 @@ public class GetAccountingCmd extends ApiCommand {
 				
 				// TBD rewrite for multi tenant
 				accounting = new HashMap<>();
-				Crosstalk.shadow.entrySet().forEach(entry->{
+				Crosstalk.shadow.entrySet(customer).forEach(entry->{
 					String k = entry.getKey();
 					Map<String,Double> value = AccountingCache.getInstance().get(k);
 					set(k + ".bids", value);

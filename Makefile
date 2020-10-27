@@ -15,7 +15,7 @@ help:
 	@printf "\n"
 	
 react-campaigns:
-	rm react/campaigns/package.lock || true
+	rm react/campaigns/package-lock.json|| true
 	rm react/campaigns/yarn.lock || true
 	cd react/campaigns && npm update
 	cd react/campaigns && yarn install

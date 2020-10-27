@@ -320,7 +320,6 @@ const  ViewContext = () => {
        // get a token, if the tokken is valid, proceed
        var cmd = {
         token: jwt,
-        customer_id: cid,
         type: "SQLListUsers#"
       };
       var data = await execute(cmd);

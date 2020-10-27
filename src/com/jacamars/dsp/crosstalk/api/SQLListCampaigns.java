@@ -2,17 +2,18 @@ package com.jacamars.dsp.crosstalk.api;
 
 
 import java.sql.ResultSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
-import com.jacamars.dsp.rtb.common.Campaign;
+
 
 /**
  * Deletes a campaign
+ * Checked for Multi-tenant
  * @author Ben M. Faul
  *
  */
