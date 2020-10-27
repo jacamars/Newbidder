@@ -15,9 +15,9 @@ def ConfigureAwsObject(obj):
         print('Connection error')
         return 503, None
 
-def RemoveSymbol(symbolName):
+def DeleteSymbol(symbolName):
     try:
-        r = requests.post(globalHost, data='{"type":"RemoveSymbol#","symbol":"'+symbolName+'","token":"'+token+'"}')
+        r = requests.post(globalHost, data='{"type":"DeleteSymbol#","symbol":"'+symbolName+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
@@ -133,7 +133,16 @@ def SQLAddNewRule(rule):
         print('Connection error')
         return 503, None
 
-
+def SQLAddNewCampaign(campaign):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLAddNewCampaign#","token":"'+token+'","campaign":"'+campaign+'"}')
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+    
 def GetPrice(camp,creat):
     try:
         r = requests.post(globalHost, data='{"type":"GetPrice#","campaign":"' + camp + '","creative":"'+creat+'","token":"'+token+'"}')
@@ -183,7 +192,8 @@ def SQLListCampaigns():
     try:
         r = requests.post(globalHost, data='{"type":"SQLListCampaigns#","token":"'+token+'"}')
       	print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -192,7 +202,8 @@ def SQLListCreatives():
     try:
         r = requests.post(globalHost, data='{"type":"SQLListCreatives#","token":"'+token+'"}')
       	print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -210,7 +221,8 @@ def SQLGetCampaign(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -219,7 +231,8 @@ def SQLGetCreative(id,x):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetCreative#","id":' + id + ', "key":"' + x  +'","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -228,7 +241,8 @@ def SQLGetTarget(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetTarget#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -273,15 +287,6 @@ def SQLGetRule(id):
 def SQLDeleteRule(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLDeleteRule#","id":"' + id + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
-        print (r.text)
-    except requests.exceptions.RequestException as e:
-        print('Connection error')
-        return 503, None
-        
-def DeleteSymbol(name):
-    try:
-        r = requests.post(globalHost, data='{"type":"DeleteSymbol#","symbol":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

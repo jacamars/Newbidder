@@ -76,15 +76,23 @@ The map  object uses the same format as the objects in the *payday.json* "list" 
 
 Note this command is only available to the super user 'rtb4free' user.
  
-## RemoveSymbol
+## DeleteSymbol
 
 This command removes a symbol added with ConfigureAwsObject. Note this command is only available to the super user 'rtb4free' user. The POST form of the command is:
 
 ```
-{"type":"RemoveSymbol","symbol":"symbol-name,"token":"<token-you-got-earlier>"}
+{"type":"DeleteSymbol","symbol":"symbol-name,"token":"<token-you-got-earlier>"}
 ```
 
- 
+Python version:
+
+```
+>>> crosstalk.DeleteSymbol("@Audience1");
+(200, 'OK')
+{"error":false,"timestamp":1603829048094,"token":"bc6db49e-66c1-4590-9268-9931cec4a69f","customer":"test","type":"DeleteSymbol#","symbol":"@Audience1"}
+```
+Note this command is only available to the super user 'rtb4free' user
+
 ## GetAccounting
 
 This returns the summary budget accounting (Daily, Hourly, Total cost) and summary bids,clicks,pixels,wins since the RTB farm has been up. The POST form of the command is:
@@ -118,6 +126,61 @@ The Python form of the accounting, and example:
 If you logged in with customer_id of 'rtb4free' all campaigns will be reported otherwise just the campaigns of the logged in customer_id will be shown.
 
 ## ListSymbols
+
+This command will list all the symbols in the bidding system. The POST form of the command is:
+
+```
+{"type":"ListSymbols#","token":"the-token-you-got-earlier"}
+```
+
+The Python form of the command looks like the following:
+
+```
+>>> crosstalk.ListSymbols()
+(200, 'OK')
+{
+    "catalog": [
+        {
+            "name": "@ZIPCODES", 
+            "size": "42742", 
+            "type": "com.jacamars.dsp.rtb.blocks.LookingGlass"
+        }, 
+        {
+            "name": "@CIDR", 
+            "size": "223", 
+            "type": "com.jacamars.dsp.rtb.blocks.NavMap"
+        }, 
+        {
+            "name": "@ISO2-3", 
+            "size": "236", 
+            "type": "com.jacamars.dsp.rtb.tools.IsoTwo2Iso3"
+        }, 
+        {
+            "name": "@AUDIENCE1", 
+            "size": "6", 
+            "type": "com.jacamars.dsp.rtb.blocks.Bloom"
+        }, 
+        {
+            "name": "@ADXGEO", 
+            "size": "95033", 
+            "type": "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
+        }
+    ], 
+    "customer": "test", 
+    "error": false, 
+    "hazelcast": {
+        "bidcache": 0, 
+        "campaigns": 2, 
+        "frequency": 0, 
+        "miscCache": 1, 
+        "videocache": 0, 
+        "watch": 4
+    }, 
+    "timestamp": 1603829583496, 
+    "token": "6b9da793-1732-44fc-b60d-4fdbb07bf875", 
+    "type": "ListBigData#"
+}
+```
 
 ## SQLGetUser
 
@@ -313,22 +376,328 @@ SQLAddNewRule returns: {
 ```
 The values must be in Javascript form, not python. Example use *true* instead of *True*.
 
+## SQLAddNewCampaign
+
+This adds/updates a command. This is the POST form of the command:
+
+```
+{"token": "token-you-got-earlier",type": "SQLAddNewCampaign#",
+  "campaign": "{\"id\":2,\"stringId\":\"2\",\"customer_id\":\"test\",\"isAdx\":false,\"name\":\"Testers Campaign\",\"ad_domain\":\"default-domain\",\"attributes\":[],\"creatives\":[],\"forensiq\":false,\"spendrate\":16667,\"effectiveSpendRate\":0,\"status\":\"runnable\",\"activate_time\":1603815058772,\"expire_time\":1921943400000,\"budget\":{\"totalCost\":0,\"totalBudget\":0,\"dailyBudget\":0,\"hourlyBudget\":0,\"expire_time\":1921943400000,\"activate_time\":1603815058772,\"dailyCost\":0,\"hourlyCost\":0},\"banners\":[2],\"videos\":[],\"audios\":[],\"natives\":[],\"updated_at\":1603829734302,\"regions\":\"US\",\"target_id\":2,\"rules\":[],\"exchanges\":[],\"bcat\":[],\"capSpec\":\"null\",\"capExpire\":0,\"capCount\":0,\"capUnit\":\"seconds\",\"classId\":3,\"active\":true,\"factoryId\":2,\"expired\":false,\"crudeAccounting\":{\"wins\":0,\"adspend\":0,\"pixels\":0,\"bids\":0,\"clicks\":0},\"runnable\":true,\"daypartSchedule\":null,\"total_budget\":0,\"budget_limit_daily\":0,\"budget_limit_hourly\":0,\"capunit\":\"seconds\",\"capspec\":\"null\",\"capexpire\":0,\"capcount\":0,\"date\":[1603815058772,1921943400000]}
+}
+```
+
+Note, the campaign must be a string form of the JSON.
+
+The Python form of the command is:
+
+```
+>>>
+{
+  "token": "3f06a5f7-e3b9-4c40-9e15-c64bbe291ce5",
+  "type": "SQLAddNewCampaign#",
+  "campaign": "{\"id\":2,\"stringId\":\"2\",\"customer_id\":\"test\",\"isAdx\":false,\"name\":\"Testers Campaign\",\"ad_domain\":\"default-domain\",\"attributes\":[],\"creatives\":[],\"forensiq\":false,\"spendrate\":16667,\"effectiveSpendRate\":0,\"status\":\"runnable\",\"activate_time\":1603815058772,\"expire_time\":1921943400000,\"budget\":{\"totalCost\":0,\"totalBudget\":0,\"dailyBudget\":0,\"hourlyBudget\":0,\"expire_time\":1921943400000,\"activate_time\":1603815058772,\"dailyCost\":0,\"hourlyCost\":0},\"banners\":[2],\"videos\":[],\"audios\":[],\"natives\":[],\"updated_at\":1603829734302,\"regions\":\"US\",\"target_id\":2,\"rules\":[],\"exchanges\":[],\"bcat\":[],\"capSpec\":\"null\",\"capExpire\":0,\"capCount\":0,\"capUnit\":\"seconds\",\"classId\":3,\"active\":true,\"factoryId\":2,\"expired\":false,\"crudeAccounting\":{\"wins\":0,\"adspend\":0,\"pixels\":0,\"bids\":0,\"clicks\":0},\"runnable\":true,\"daypartSchedule\":null,\"total_budget\":0,\"budget_limit_daily\":0,\"budget_limit_hourly\":0,\"capunit\":\"seconds\",\"capspec\":\"null\",\"capexpire\":0,\"capcount\":0,\"date\":[1603815058772,1921943400000]}"
+}
+```
 
 ## GetPrice
 
 ## SetPrice
 
 ## SQLListCampaigns
+
+Command returns the list of campaigns in the database and their current status. POST form of the command:
+
+```
+{"type":"SQLListCampaigns#","token":"the-token-you-got-earlier"}
+```
+
+The Python form and example looks like:
+
+```
+>>> crosstalk.SQLListCampaigns();
+(200, 'OK')
+{
+    "campaigns": [
+        {
+            "id": 2, 
+            "name": "Testers Campaign", 
+            "status": "runnable"
+        }
+    ], 
+    "customer": "test", 
+    "error": false, 
+    "timestamp": 1603830664938, 
+    "token": "f96c3b8c-b142-4f95-925b-880a8fef096e", 
+    "type": "SQLListCampaigns#"
+}
+```
+
+If you logged in with customer_id of 'rtb4free' all campaigns will be listed, otherwise just the campaigns of the logged in customer_id will be listed.
  
 ## SQLListCreatives
 
+Command lists all the creatives in the database and their current status. POST form of the command:
+
+```
+{"type":"SQLListCampaigns#","token":"the-token-you-got-earlier"}
+```
+
+The Python form and example looks like:
+
+```
+>>> crosstalk.SQLListCreatives();
+(200, 'OK')
+{
+    "creatives": [
+        {
+            "end": 1921943520000, 
+            "id": 2, 
+            "name": "Tester's Banner", 
+            "start": 1603815152969, 
+            "type": "banner"
+        }
+    ], 
+    "customer": "test", 
+    "error": false, 
+    "timestamp": 1603830643941, 
+    "token": "f96c3b8c-b142-4f95-925b-880a8fef096e", 
+    "type": "SQLListCreatives#"
+}
+```
+
+If you logged in with customer_id of 'rtb4free' all creatives will be listed, otherwise just the creatives of the logged in customer_id will be listed.
+
 ## SQLGetNewCampaign
+
  
 ## SQLGetCampaign
 
+Get a campaign by the SQL ID number. POST form of the command is:
+
+```
+{"type":"SQLGetCampaigns#","token":"the-token-you-got-earlier","campaign":"id"}
+```
+
+Python form and example:
+
+```
+>>> crosstalk.SQLGetCampaign("2");
+(200, 'OK')
+{
+    "campaign": "{\n  \"id\" : 2,\n  \"stringId\" : \"2\",\n  \"customer_id\" : \"test\",\n  \"isAdx\" : false,\n  \"name\" : \"Testers Campaign\",\n  \"ad_domain\" : \"default-domain\",\n  \"attributes\" : [ ],\n  \"creatives\" : [ {\n    \"customer_id\" : \"test\",\n    \"forwardurl\" : \"xxx\",\n    \"id\" : 2,\n    \"imageurl\" : \"\",\n    \"impid\" : \"banner:2\",\n    \"deals\" : [ ],\n    \"attributes\" : [ {\n      \"id\" : 0,\n      \"name\" : \"contenttype\",\n      \"hierarchy\" : \"imp.0.banner.mimes\",\n      \"value\" : \"text/plain\",\n      \"op\" : \"MEMBER\",\n      \"notPresentOk\" : true,\n      \"bidRequestValues\" : [ \"imp\", \"0\", \"banner\", \"mimes\" ]\n    }, {\n      \"id\" : 0,\n      \"name\" : \"battr\",\n      \"hierarchy\" : \"imp.0.banner.battr\",\n      \"value\" : [ 4 ],\n      \"op\" : \"NOT_INTERSECTS\",\n      \"notPresentOk\" : true,\n      \"bidRequestValues\" : [ \"imp\", \"0\", \"banner\", \"battr\" ]\n    } ],\n    \"attr\" : [ 4 ],\n    \"ext_spec\" : [ \"categories:#:IAB1,IAB2,IAB3,IAB4\" ],\n    \"cur\" : \"USD\",\n    \"price\" : 2.0,\n    \"weight\" : 1,\n    \"categories\" : [ \"IAB1\", \"IAB2\", \"IAB3\", \"IAB4\" ],\n    \"name\" : \"Tester's Banner\",\n    \"adm_override\" : false,\n    \"status\" : \"runnable\",\n    \"rules\" : [ ],\n    \"budget\" : {\n      \"totalCost\" : 0,\n      \"totalBudget\" : 0,\n      \"dailyBudget\" : 0,\n      \"hourlyBudget\" : 0,\n      \"expire_time\" : 1921943520000,\n      \"activate_time\" : 1603815152969,\n      \"dailyCost\" : 0,\n      \"hourlyCost\" : 0\n    },\n    \"interval_start\" : 1603815152969,\n    \"interval_end\" : 1921943520000,\n    \"width\" : 0,\n    \"height\" : 0,\n    \"type\" : \"banner\",\n    \"isBanner\" : true,\n    \"isVideo\" : false,\n    \"isAudio\" : false,\n    \"isNative\" : false,\n    \"contenttype\" : \"text/plain\",\n    \"htmltemplate\" : \"xxx\",\n    \"vast_video_protocol\" : 2,\n    \"vast_video_linearity\" : 1,\n    \"table\" : \"banners\",\n    \"attributeType\" : \"banners\",\n    \"expired\" : false\n  } ],\n  \"forensiq\" : false,\n  \"spendrate\" : 16667,\n  \"effectiveSpendRate\" : 0,\n  \"status\" : \"runnable\",\n  \"activate_time\" : 1603815058772,\n  \"expire_time\" : 1921943400000,\n  \"budget\" : {\n    \"totalCost\" : 0,\n    \"totalBudget\" : 0,\n    \"dailyBudget\" : 0,\n    \"hourlyBudget\" : 0,\n    \"expire_time\" : 1921943400000,\n    \"activate_time\" : 1603815058772,\n    \"dailyCost\" : 0,\n    \"hourlyCost\" : 0\n  },\n  \"banners\" : [ 2 ],\n  \"videos\" : [ ],\n  \"audios\" : [ ],\n  \"natives\" : [ ],\n  \"updated_at\" : 1603829784441,\n  \"regions\" : \"US\",\n  \"target_id\" : 2,\n  \"rules\" : [ ],\n  \"day_parting_utc\" : \"null\",\n  \"exchanges\" : [ ],\n  \"bcat\" : [ ],\n  \"capSpec\" : \"null\",\n  \"capExpire\" : 0,\n  \"capCount\" : 0,\n  \"capUnit\" : \"seconds\",\n  \"classId\" : 3,\n  \"active\" : true,\n  \"factoryId\" : 2,\n  \"expired\" : false,\n  \"crudeAccounting\" : {\n    \"wins\" : 0,\n    \"adspend\" : 0,\n    \"pixels\" : 0,\n    \"bids\" : 0,\n    \"clicks\" : 0\n  },\n  \"runnable\" : true\n}", 
+    "customer": "test", 
+    "error": false, 
+    "id": 2, 
+    "timestamp": 1603831165094, 
+    "token": "17b20430-9811-44f0-9a65-27b3d26c2f6f", 
+    "type": "SQLGetCampaign#"
+}
+
+```
+
 ## SQLGetCreative
+
+Get a creative by the SQL ID number. POST form of the command is:
+
+```
+{"type":"SQLGetCreative#","token":"the-token-you-got-earlier","creative":"id","type","the-type"}
+```
+
+The type field can be "banner", "video", "audio", or "native"
+
+Python form and example:
  
+ 
+```
+>>> crosstalk.SQLGetCreative("2","banner");
+(200, 'OK')
+{
+    "customer": "test", 
+    "data": {
+        "adm_override": false, 
+        "attr": [
+            4
+        ], 
+        "attributeType": "banners", 
+        "attributes": [
+            {
+                "bidRequestValues": [
+                    "imp", 
+                    "0", 
+                    "banner", 
+                    "mimes"
+                ], 
+                "hierarchy": "imp.0.banner.mimes", 
+                "id": 0, 
+                "name": "contenttype", 
+                "notPresentOk": true, 
+                "op": "MEMBER", 
+                "value": "text/plain"
+            }, 
+            {
+                "bidRequestValues": [
+                    "imp", 
+                    "0", 
+                    "banner", 
+                    "battr"
+                ], 
+                "hierarchy": "imp.0.banner.battr", 
+                "id": 0, 
+                "name": "battr", 
+                "notPresentOk": true, 
+                "op": "NOT_INTERSECTS", 
+                "value": [
+                    4
+                ]
+            }
+        ], 
+        "budget": {
+            "activate_time": 1603815152969, 
+            "dailyBudget": 0, 
+            "dailyCost": 0, 
+            "expire_time": 1921943520000, 
+            "hourlyBudget": 0, 
+            "hourlyCost": 0, 
+            "totalBudget": 0, 
+            "totalCost": 0
+        }, 
+        "categories": [
+            "IAB1", 
+            "IAB2", 
+            "IAB3", 
+            "IAB4"
+        ], 
+        "contenttype": "text/plain", 
+        "cur": "USD", 
+        "customer_id": "test", 
+        "deals": [], 
+        "expired": false, 
+        "ext_spec": [
+            "categories:#:IAB1,IAB2,IAB3,IAB4"
+        ], 
+        "forwardurl": "xxx", 
+        "height": 0, 
+        "htmltemplate": "xxx", 
+        "id": 2, 
+        "imageurl": "", 
+        "impid": "banner:2", 
+        "interval_end": 1921943520000, 
+        "interval_start": 1603815152969, 
+        "isAudio": false, 
+        "isBanner": true, 
+        "isNative": false, 
+        "isVideo": false, 
+        "name": "Tester's Banner", 
+        "price": 2.0, 
+        "rules": [], 
+        "status": "runnable", 
+        "table": "banners", 
+        "type": "banner", 
+        "vast_video_linearity": 1, 
+        "vast_video_protocol": 2, 
+        "weight": 1, 
+        "width": 0
+    }, 
+    "error": false, 
+    "id": 2, 
+    "key": "banner", 
+    "timestamp": 1603831612136, 
+    "token": "b99e3dfc-14a9-4a0d-8ea1-ab0aeffa09d4", 
+    "type": "SQLGetCreative#"
+}
+
+```
+
 ## SQLGetTarget
+
+Get a target by the SQL ID number. POST form of the command is:
+
+```
+{"type":"SQLGetTarget#","token":"the-token-you-got-earlier","target":"id"}
+```
+
+The type field can be "banner", "video", "audio", or "native"
+
+Python form and example:
+ 
+ 
+```
+>>> crosstalk.SQLGetTarget("2");
+(200, 'OK')
+{
+    "customer": "test", 
+    "error": false, 
+    "id": 2, 
+    "target": {
+        "browser": "", 
+        "carrier": "", 
+        "connectionType": "", 
+        "country": "", 
+        "customer_id": "test", 
+        "domain_targetting": "null", 
+        "geo_latitude": 0.0, 
+        "geo_longitude": 0.0, 
+        "geo_range": 0.0, 
+        "iab_category": "IAB1,IAB2,IAB3", 
+        "iab_category_blklist": "", 
+        "id": 2, 
+        "list_of_domains": "", 
+        "listofdomains": [], 
+        "make": "", 
+        "model": "", 
+        "name": "Tester's Target", 
+        "nodes": [
+            {
+                "bidRequestValues": [], 
+                "hierarchy": "", 
+                "id": 0, 
+                "name": "ortest", 
+                "notPresentOk": true, 
+                "op": "EXISTS", 
+                "value": [
+                    {
+                        "bidRequestValues": [
+                            "site", 
+                            "cat"
+                        ], 
+                        "hierarchy": "site.cat", 
+                        "id": 0, 
+                        "name": "matching-categories", 
+                        "notPresentOk": false, 
+                        "op": "INTERSECTS", 
+                        "value": [
+                            "IAB1", 
+                            "IAB2", 
+                            "IAB3"
+                        ]
+                    }, 
+                    {
+                        "bidRequestValues": [
+                            "app", 
+                            "cat"
+                        ], 
+                        "hierarchy": "app.cat", 
+                        "id": 0, 
+                        "name": "matching-categories", 
+                        "notPresentOk": false, 
+                        "op": "INTERSECTS", 
+                        "value": [
+                            "IAB1", 
+                            "IAB2", 
+                            "IAB3"
+                        ]
+                    }
+                ]
+            }
+        ], 
+        "os": "", 
+        "os_version": ""
+    }, 
+    "timestamp": 1603831896025, 
+    "token": "70427f6d-506c-429c-ac91-30c17bcb0959", 
+    "type": "SQLGetTarget#"
+}
+```
                
 ## SQLGetNewCreative
  
@@ -339,8 +708,6 @@ The values must be in Javascript form, not python. Example use *true* instead of
 ## SQLGetRule
 
 ## SQLDeleteRule
- 
-## DeleteSymbol
 
 ## QuerySymbol
 

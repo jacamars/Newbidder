@@ -561,7 +561,7 @@ const  ViewContext = () => {
         campaign: e
       };
 
-      //console.log("==========>" + JSON.stringify(cmd,null,2));
+      console.log("==========>" + JSON.stringify(cmd,null,2));
       var result = await execute(cmd);
       if (!result)
         return;
