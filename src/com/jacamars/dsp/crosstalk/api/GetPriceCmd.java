@@ -62,7 +62,7 @@ public class GetPriceCmd extends ApiCommand {
 				return;
 			}
 
-			Creative cr = c.getCreative(this.creative);
+			Creative cr = c.getCreativeById(this.creative);
 			if (cr == null) {
 				error = true;
 				message = "No creative defined: " + creative + " in " + campaign;

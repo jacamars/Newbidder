@@ -546,6 +546,15 @@ public class Campaign implements Comparable, Portable {
 		}
 		return null;
 	}
+	
+	public Creative getCreativeById(String id) {
+		for (Creative c : creatives) {
+			if ((""+c.id).equals(id)) {
+				return c;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Creates a copy of this campaign

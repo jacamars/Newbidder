@@ -257,6 +257,72 @@ crosstalk.Refresh();
 
 If you logged in with customer_id of 'rtb4free' all campaigns will be refreshed, otherwise just the campaigns of the logged in customer_id will be refreshed.
 
+## GetPrice
+
+This command returns the *REALTIME* price for a campaign's creative, not what is stored in Postgres. POST form of command:
+
+```
+{"type":"GetPrice#","token":"the-token-you-got-earlier","campaign":"sqlid-of-campaign","creative": "sqlid-of-creative","type":"the-type-of-creative'}
+```
+
+Note type can be "banner", "video", "audio" or "native".
+
+Python form and example:
+
+```
+>>> crosstalk.GetPrice("1","1","banner");
+{
+    "campaign": "1", 
+    "creative": "1", 
+    "customer": "rtb4free", 
+    "deals": [], 
+    "error": false, 
+    "price": 1.0, 
+    "timestamp": 1603989827862, 
+    "token": "a8a73e47-06e4-4922-b224-5970ebd7494e", 
+    "type": "GetPrice#"
+}
+>>> 
+
+```
+
+## SetPrice
+
+Sets the *REALTIME* price for a campaign/creative/deal. It does not set the price on the SQL! POST command form:
+
+```
+{"type":"SetPrice#","campaign":"sqlid-of-campaign","creative":"sqlid-of-creative", "type": "type-of-creative", "deal":"deal-id","token":"token-you-got-earlier"}')
+```
+
+Note, the *deal* is required, if the creative has a deal, otherwise set to None.
+
+Note type can be "banner", "video", "audio" or "native".
+
+Python form and example:
+
+```
+
+```
+
+## QuerySymbol
+
+## MacroSub
+ 
+## GetValues
+
+## GetStatus
+
+## ListCreatives
+ 
+## GetCreative
+
+## GetCampaign
+ 
+## DeleteCampaign
+
+## GetReason
+
+
 ## SQLGetUser
 
 This command retreives the SQL database information about the logged in user. The POST form
@@ -398,10 +464,6 @@ The Python form of the command is:
   "campaign": "{\"id\":2,\"stringId\":\"2\",\"customer_id\":\"test\",\"isAdx\":false,\"name\":\"Testers Campaign\",\"ad_domain\":\"default-domain\",\"attributes\":[],\"creatives\":[],\"forensiq\":false,\"spendrate\":16667,\"effectiveSpendRate\":0,\"status\":\"runnable\",\"activate_time\":1603815058772,\"expire_time\":1921943400000,\"budget\":{\"totalCost\":0,\"totalBudget\":0,\"dailyBudget\":0,\"hourlyBudget\":0,\"expire_time\":1921943400000,\"activate_time\":1603815058772,\"dailyCost\":0,\"hourlyCost\":0},\"banners\":[2],\"videos\":[],\"audios\":[],\"natives\":[],\"updated_at\":1603829734302,\"regions\":\"US\",\"target_id\":2,\"rules\":[],\"exchanges\":[],\"bcat\":[],\"capSpec\":\"null\",\"capExpire\":0,\"capCount\":0,\"capUnit\":\"seconds\",\"classId\":3,\"active\":true,\"factoryId\":2,\"expired\":false,\"crudeAccounting\":{\"wins\":0,\"adspend\":0,\"pixels\":0,\"bids\":0,\"clicks\":0},\"runnable\":true,\"daypartSchedule\":null,\"total_budget\":0,\"budget_limit_daily\":0,\"budget_limit_hourly\":0,\"capunit\":\"seconds\",\"capspec\":\"null\",\"capexpire\":0,\"capcount\":0,\"date\":[1603815058772,1921943400000]}"
 }
 ```
-
-## GetPrice
-
-## SetPrice
 
 ## SQLListCampaigns
 
@@ -704,36 +766,84 @@ Python form and example:
 ## SQLGetNewTarget
 
 ## SQLGetNewRule
+
+Returns a new stub rule. Fill out the returned values and save. POST form:
+
+```
+{"type":"SQLGetNewRule#","name":"name-of-new-rule","token":"token-you-got-earlier"}
+```
+
+Python form and example:
+
+```
+>>> crosstalk.SQLGetNewRule("Hello World");
+(200, 'OK')
+{
+    "customer": "rtb4free", 
+    "data": {
+        "bidRequestValues": [], 
+        "id": 0, 
+        "name": "Hello World", 
+        "notPresentOk": true, 
+        "op": "EQUALS", 
+        "operand": "", 
+        "operand_ordinal": "", 
+        "operand_type": ""
+    }, 
+    "error": false, 
+    "name": "Hello World", 
+    "timestamp": 1604004086579, 
+    "token": "2270548b-43f9-4530-92fb-52b7e3bc8390", 
+    "type": "SQLGetNewRule#"
+}
+```
+
+
+The "data" attribute sets forth the new rule's stub pieces. Fill out the bits and call SQLAddNewRule to save the new rule to system. Leave the id field value as 0. 0 indicates new rule. Any other value means this is an edit of an existing rule.
   
 ## SQLGetRule
 
+Retrieves the rule definition for the defined sql id. Form of the cm
+```
+{"type":"SQLGetRule#","id":"sqlid-of-rule","token":"token-you-got-earlier"}
+```
+
+Python form and example:
+
+```
+>>> crosstalk.SQLGetRule("1");
+(200, 'OK')
+{
+    "customer": "rtb4free", 
+    "error": false, 
+    "id": 1, 
+    "rule": {
+        "bidRequestValues": [
+            "device", 
+            "ip"
+        ], 
+        "customer_id": "rtb4free", 
+        "hierarchy": "device.ip", 
+        "id": 1, 
+        "name": "Has IP Address", 
+        "notPresentOk": false, 
+        "op": "EXISTS", 
+        "operand": "0", 
+        "operand_ordinal": "scalar", 
+        "operand_type": "integer", 
+        "value": 0
+    }, 
+    "timestamp": 1604004243074, 
+    "token": "8917cc13-b6ca-4748-9b08-e6faf940bcc5", 
+    "type": "SQLGetRule#"
+}
+>>> 
+```
+
+Note, if you save the rule: bidrequestValues and value are ignored.
+
 ## SQLDeleteRule
 
-## QuerySymbol
+## SQLDeleteCampaign
 
-## MacroSub
-    
-## GetBudget(*arg):
-
-## SetBudget
- 
-## GetValues
-
-## GetStatus
-
-## ListCreatives
- 
-## GetCreative
-
-## GetCampaign
- 
-## DeleteCampaign
-
-## GetReason
- 
-## ListCampaigns
-
-## SetHost
- 
-## SetHostPort
  

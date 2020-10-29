@@ -57,6 +57,10 @@ public class SQLGetNewRuleCmd extends ApiCommand {
 			try {
 				data =  new Node();
 				data.name = name;
+				data.op = "EQUALS";
+				data.operand = "";
+				data.operand_ordinal = "";
+				data.operand_type =  "";
 				return;
 			} catch (Exception err) {
 				error = true;

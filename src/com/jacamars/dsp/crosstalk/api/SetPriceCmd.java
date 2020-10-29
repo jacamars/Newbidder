@@ -55,7 +55,7 @@ public class SetPriceCmd extends ApiCommand {
 
 		try {
 			c = Crosstalk.getInstance().getKnownCampaign(campaign);
-			if (c == null || tokenData.isAuthorized(c.customer_id)) {
+			if (c == null || !tokenData.isAuthorized(c.customer_id)) {
 				error = true;
 				message = "No campaign defined: " + campaign;
 				return;
@@ -67,7 +67,7 @@ public class SetPriceCmd extends ApiCommand {
 			return;
 		}
 
-		Creative cr = c.getCreative(this.creative);
+		Creative cr = c.getCreativeById(this.creative);
 		if (cr == null) {
 			error = true;
 			message = "No creative defined: " + creative + " in " + campaign;

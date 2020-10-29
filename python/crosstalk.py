@@ -147,25 +147,22 @@ def GetPrice(camp,creat):
     try:
         r = requests.post(globalHost, data='{"type":"GetPrice#","campaign":"' + camp + '","creative":"'+creat+'","token":"'+token+'"}')
         data = json.loads(r.text)
-        if data['error']:
-            return r.status_code, data['timestamp'], data['error'], data['message']
-        else:
-            return r.status_code, data['timestamp'], data['error'], data['price']
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
     
 def SetPrice(*arg):
     try:
-        if len(arg)==2:
-            campaign=arg[0];
-            creative=arg[1];
-            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'","token":"'+token+'"}')
-        if len(arg)==3:
-            campaign=arg[0];
-            creative=arg[1];
-            deal=arg[2];
-            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'", "deal":"'+deal+'","token":"'+token+'"}')
+        campaign=arg[0];
+        creative=arg[1];
+        deal=arg[2];
+        price=str(arg[3]);
+        r = None;
+        if deal == None:
+            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'","token":"'+token+'","price":'+price+'}')
+        else:
+            r = requests.post(globalHost, data='{"type":"SetPrice#","campaign":"' + campaign + '","creative":"'+creative+'", "deal":"'+deal+'","token":"'+token+'","price":'+price+'}')
         data = json.loads(r.text)
         if data['error']:
             return r.status_code, data['timestamp'], data['error'], data['message']
@@ -243,7 +240,7 @@ def SQLGetTarget(id):
         print (r.status_code, r.reason)
         data = json.loads(r.text)
         print json.dumps(data, indent=4, sort_keys=True)
-    except requests.exceptions.RequestException as e:
+    except requests.exceptins.RequestException as e:
         print('Connection error')
         return 503, None
                
@@ -270,7 +267,8 @@ def SQLGetNewRule(name):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetNewRule#","name":"' + name + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -279,7 +277,8 @@ def SQLGetRule(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetRule#","id":"' + id + '","token":"'+token+'"}')
       	print (r.status_code, r.reason)
-        print (r.text)
+        data = json.loads(r.text)
+        print json.dumps(data, indent=4, sort_keys=True)
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
