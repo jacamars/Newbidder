@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.jacamars.dsp.crosstalk.budget.Crosstalk;
@@ -24,7 +25,7 @@ public class ListBigDataCmd extends ApiCommand {
 
 	/** The list of campaigns */
 	public List<Map<String,String>> catalog;
-	public Map<String,Integer> hazelcast;
+	public TreeMap<String,Integer> hazelcast;
 
 	/**
 	 * Default constructor
@@ -51,15 +52,20 @@ public class ListBigDataCmd extends ApiCommand {
 			
 			try {
 				catalog = new ArrayList<>(); 
-				LookingGlass.symbols.forEach((key,value)-> {
+				
+				TreeMap<String,Object> map = new TreeMap(LookingGlass.symbols); // sort it
+				
+				map.forEach((key,value)-> {
 					String 	type = value.getClass().getName();
 					Map<String,String> m = new HashMap<>();
 					m.put("name", key);
 					m.put("type",type);
 					LookingGlass x = (LookingGlass)value;
+					m.put("file", x.fileName);
+					m.put("s3",x.s3);
 					m.put("size", "" + x.getMembers());
 					catalog.add(m);
-					hazelcast = BidCachePool.getStats();
+					hazelcast = new TreeMap<>(BidCachePool.getStats());
 				});
 				
 				return;

@@ -217,6 +217,28 @@ const  ViewContext = () => {
       return data.targets;
     }
 
+    const configureAwsObject = async(obj) => {
+  
+      if (obj.size === "")
+        obj.size = undef;
+      else
+        obj.size = Number(obj.size);
+
+      var cmd = {
+        token: jwt,
+        type: "ConfigureAws#",
+        map: obj
+      };
+      var data = await execute(cmd);
+
+      if (data === undef)
+        return;
+      
+      console.log("ConfigureAws returns: " + JSON.stringify(data,null,2));
+      setTargets(data.targets);
+      return data.targets;
+    }
+
     const getUser = async(username) => {
       // get a token, if the tokken is valid, proceed
 
@@ -469,7 +491,7 @@ const  ViewContext = () => {
       if (!data)
         return;
 
-     console.log("=====> kuarXewRUCWA returns: " + JSON.stringify(data,null,2));
+     console.log("=====> SQLListCreatives returns: " + JSON.stringify(data,null,2));
      setCreatives(data.creatives);
      return data.creatives;
     }
@@ -854,7 +876,7 @@ const  ViewContext = () => {
 
       ssp, changeSsp, uri, changeUri, url, changeUrl, bidtype, changeBidtype, bidvalue, changeBidvalue, bidobject, 
       bidresponse, changeBidresponse, nurl, changeNurl, xtime, changeXtime, setAdm, adm, changeAdm, winsent, 
-      changeWinsent, sendCallback,
+      changeWinsent, sendCallback, configureAwsObject,
 
       querySymbol, queryHazelcast,
 

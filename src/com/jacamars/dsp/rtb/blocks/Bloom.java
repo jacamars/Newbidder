@@ -35,6 +35,7 @@ public class Bloom extends LookingGlass {
 	 */
 	public Bloom(String name, String file) throws Exception {
 		File f = new File(file);
+		fileName = file;
 		long size = f.length();
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
 		symbols.put(name, this);
@@ -52,6 +53,7 @@ public class Bloom extends LookingGlass {
 	 */
 	public Bloom(String name, String fileName, long size) throws Exception {
 		File f = new File(fileName);
+		this.fileName = fileName;
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
 		symbols.put(name, this);
@@ -68,6 +70,7 @@ public class Bloom extends LookingGlass {
 	 * @throws Exception on S3 errors.
 	 */
 	public Bloom(String name, S3Object object, long size) throws Exception {
+		s3 = object.getBucketName() + "/" + object.getKey();
 		bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charset.forName("UTF-8")), size,fpp);
 		symbols.put(name, this);
 

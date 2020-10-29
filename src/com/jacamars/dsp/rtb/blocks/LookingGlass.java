@@ -22,6 +22,9 @@ public class LookingGlass {
 	// My map
 	protected Map myMap = new ConcurrentHashMap<String, String[]>();
 	
+	
+	public String fileName;
+	public String s3;
 	/**
 	 * Default constructor
 	 */
@@ -45,7 +48,7 @@ public class LookingGlass {
 	 */
 	public LookingGlass(String name, String file) throws Exception {
 		BufferedReader br = new BufferedReader(new FileReader(file));
-
+		fileName = file;
 		symbols.put(name, this);
 		String[] parts = null;	
 		String message = "Initialize Simple Map: " + file + " as " + name;
@@ -62,6 +65,7 @@ public class LookingGlass {
 	
 	public LookingGlass(String name, S3Object obj) throws Exception {
 		symbols.put(name, this);
+		s3 = obj.getBucketName() + "/" + obj.getKey();
 		InputStream objectData = obj.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
 

@@ -53,9 +53,6 @@ public enum CampaignCache  {
     /** The cache to contain the general context info on running campaigns*/
     static private volatile IMap<String, Campaign> cache;
 
-    /** The default backup count if you dont set it */
-    static public int backupCount = 3;
-
     /** The default value to read backups, is true */
     static public boolean readBackup = true;
 
@@ -69,7 +66,7 @@ public enum CampaignCache  {
         Config config = RTBServer.getSharedInstance().getConfig();
         cache =  RTBServer.getSharedInstance().getMap(NAME);
         config.getMapConfig(NAME)
-                .setAsyncBackupCount(backupCount)
+                .setAsyncBackupCount(Configuration.getInstance().backups)
                 .setReadBackupData(readBackup);
         
         /**

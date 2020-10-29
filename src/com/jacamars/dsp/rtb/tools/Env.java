@@ -82,6 +82,9 @@ public enum  Env {
 		while(address.contains("$MAPSTOREJDBC"))
 			address = GetEnvironmentVariable(address,"$MAPSTOREJDBC",null);
 		
+		while(address.contains("$BACKUPS"))
+			address = GetEnvironmentVariable(address,"$BACKUPS","1");
+		
 		while(address.contains("$BIDSWITCH_ID"))
 			address = GetEnvironmentVariable(address,"$BIDSWITCH_ID","bidswitch-id");
 		

@@ -82,9 +82,6 @@ public enum Crosstalk {
 	/** The cache to contain the general context info on runing campaigns */
 	public static volatile IMap<String, Campaign> deletedCampaigns;
 
-	/** The default backup count if you dont set it */
-	static public int backupCount = 3;
-
 	/** The default value to read backups, is true */
 	static public boolean readBackup = true;
 
@@ -132,12 +129,12 @@ public enum Crosstalk {
 		
 		Config config = RTBServer.getSharedInstance().getConfig();
 		deletedCampaigns = RTBServer.getSharedInstance().getMap(DELETED_CAMPAIGNS_KEY);
-		config.getMapConfig(DELETED_CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		config.getMapConfig(DELETED_CAMPAIGNS_KEY).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 
 		shadow = new Shadow();
 
 		
-		config.getMapConfig(CAMPAIGNS_KEY).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+		config.getMapConfig(CAMPAIGNS_KEY).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 		
 		signaler = new ZPublisher(RTBServer.getSharedInstance(), "hazelcast://topic=rtbcommands");
 		signals = new Subscriber(RTBServer.getSharedInstance(), new Controller(), "hazelcast://topic=rtbcommands");

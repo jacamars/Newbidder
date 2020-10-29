@@ -1,6 +1,6 @@
 import React  from "react";
 
-var undef;
+export var undef;
 
 export const blackStyle = {
     color: 'black'
@@ -227,10 +227,22 @@ export const attrOptions = (e) => {
         <option value="15" selected={e.indexOf(15) > -1}>Has audio on/off button</option>
         <option value="16" selected={e.indexOf(16) > -1}>Ad provides a skip button</option>
         <option value="17" selected={e.indexOf(17) > -1}>Adobe Flash</option>
-
-
         </>
 
+    );
+}
+
+export const lookingGlassOptions = (e) => {
+    return(
+        <>
+        <option value="ADXGEOCODES" selected={e.toLowerCase().indexOf("adxgeocodes") > -1}>ADXGEOCODES</option>
+        <option value="BLOOM" selected={e.toLowerCase().indexOf("bloom") > -1}>BLOOM</option>
+        <option value="CIDR" selected={e.toLowerCase().indexOf("cidr") > -1}>CIDR</option>
+        <option value="CUCKOO" selected={e.toLowerCase().indexOf("cuckoo") > -1}>CUCKOO</option>
+        <option value="ISO2" selected={e.toLowerCase().indexOf("iso2") > -1}>ISO2</option>
+        <option value="MEMBERSHIP" selected={e.toLowerCase().indexOf("membership") > -1}>MEMBERSHIP</option>
+        <option value="RANGE" selected={e.toLowerCase().indexOf("range") > -1}>RANGE</option>
+        </>
     );
 }
 

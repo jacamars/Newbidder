@@ -40,7 +40,7 @@ public class ProportionalRandomCollection extends LookingGlass implements Serial
      */
     public ProportionalRandomCollection(String name, String file) throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(file));
-        ;
+        fileName = file;
         String message = "Initialize ProportionalRandomCollection: " + file + " as " + name;
         makeFilter(br);
         symbols.put(name, this);
@@ -56,6 +56,7 @@ public class ProportionalRandomCollection extends LookingGlass implements Serial
      */
     public ProportionalRandomCollection(String name, S3Object object) throws Exception {
         InputStream objectData = object.getObjectContent();
+        s3 = object.getBucketName() + "/" + object.getKey();
         String message = "Initialize ProportionalRandomCollection: " + object.getBucketName() + " as " + name;
         BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
         makeFilter(br);

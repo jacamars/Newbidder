@@ -7,6 +7,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
+import com.jacamars.dsp.rtb.common.Configuration;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +27,6 @@ public enum FreqSetCache  {
     /** The default expiration time if you add a key */
     static public long expire = 900;
 
-    /** The default backup count if you dont set it */
-    static public int backupCount = 3;
-
     /** The default value to read backups, is true */
     static public boolean readBackup = true;
 
@@ -41,7 +39,7 @@ public enum FreqSetCache  {
         Config config = RTBServer.getSharedInstance().getConfig();
         cache =  RTBServer.getSharedInstance().getMap(NAME);
         config.getMapConfig(NAME)
-                .setAsyncBackupCount(backupCount)
+                .setAsyncBackupCount(Configuration.getInstance().backups)
                 .setReadBackupData(readBackup);
         return INSTANCE;
     }

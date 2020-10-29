@@ -2,7 +2,8 @@
   "GDPR_MODE": "$GDPR_MODE",
   "hazelcast": {
   	"mapstoredriver": "org.postgresql.Driver",
-  	"mapstorejdbc": "$JDBC"
+  	"mapstorejdbc": "$JDBC",
+  	"backupCount": "$BACKUPS"
   },
   "crosstalk": {
   	"sql": {
@@ -297,11 +298,11 @@
   }, {
     "s3" : "geo/adxgeo.csv",
     "name" : "@ADXGEO",
-    "type" : "com.jacamars.dsp.rtb.exchanges.adx.AdxGeoCodes"
+    "type" : "ADXGEOCODES"
   }, {
     "s3" : "geo/zip_codes_states.csv",
     "name" : "@ZIPCODES",
-    "type" : "com.jacamars.dsp.rtb.tools.LookingGlass"
+    "type" : "LOOKINGGLASS"
   },{
     "s3" : "bloom/audience1/test-audience.txt",
     "name" : "@AUDIENCE1",

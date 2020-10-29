@@ -26,6 +26,7 @@ public class SimpleSet extends LookingGlass {
 	 */
 	public SimpleSet(String name, String file) throws Exception {
 		symbols.put(name,set);
+		fileName  = file;
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		message = "Initialize Simple Membership: " + file + " as " + name;
 
@@ -40,6 +41,7 @@ public class SimpleSet extends LookingGlass {
 	 */
 	public SimpleSet(String name, S3Object object) throws Exception {
 		symbols.put(name, this);
+		s3 = object.getBucketName() + "/" + object.getKey();
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));
 		message = "Initialize Simple Membership: " + object.getBucketName() + " as " + name;

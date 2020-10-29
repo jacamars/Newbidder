@@ -33,7 +33,7 @@ public class IsoTwo2Iso3 extends LookingGlass {
 	 */
 	public IsoTwo2Iso3(String name, String file) throws Exception {
 		super();
-		
+		fileName = file;
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String[] parts;
 		for (String line; (line = br.readLine()) != null;) {
@@ -48,6 +48,7 @@ public class IsoTwo2Iso3 extends LookingGlass {
 	public IsoTwo2Iso3(String name, S3Object object) throws Exception {
 		super();
 		
+		s3 = object.getBucketName() + "/" + object.getKey();
 		String file = object.getBucketName();
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));

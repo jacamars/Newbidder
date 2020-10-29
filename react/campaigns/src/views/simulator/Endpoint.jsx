@@ -29,12 +29,6 @@ const Endpoint = (props) => {
         <option selected={exchange.name===props.ssp} key={"exchange-select" + index}>{exchange.name}</option>
     );
 
-    let estyle = {
-        overflow: 'scroll'
-    }
-
-    let composite = props.url + props.uri
-
     return (
         <Card  text="white" style={{ width: '100%' }}>
         <CardHeader>

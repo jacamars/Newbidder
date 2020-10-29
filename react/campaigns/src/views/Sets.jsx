@@ -17,11 +17,10 @@ import {
 import { useViewContext } from "../ViewContext";
 import LoginModal from '../LoginModal'
 import DecisionModal from "../DecisionModal";
-import LoadSymbolModal from "../LoadSymbolModal";
+import LoadSymbol from "../LoadSymbol";
+import {undef, lookingGlassOptions } from "../Utils";
 
-
-var undef;
-var symbol = { s3: "", file:"", name: "", type: "", size:""};
+var symbol = { s3: "", filename:"", name: "", type: "", size:""};
 
 const Sets = (props) => {
 
@@ -34,10 +33,11 @@ const Sets = (props) => {
     const [macros, setMacros] = useState({});
     const [count, setCount] = useState(0);
     const [modal, setModal] = useState(false);
-    const [symbolModal, setSymbolModal] = useState(false);
+  
     const [name, setName] = useState('');
     const [querySymbol, setQuerySymbol] = useState(false);
     const [queryHazelcast, setQueryHazelcast] = useState(false);
+    const [object, setObject] = useState(undef);
     const vx = useViewContext();
   
     const redraw = () => {
@@ -81,15 +81,6 @@ const Sets = (props) => {
     setModal(true);
   }
 
-  const makeNew = (s) => {
-    setSymbolModal(true);
-  }
-
-  const addSymbol = (s) => {
-    alert("SYMBOL: " + JSON.stringify(s,null,2));
-    setSymbolModal(false);
-  }
-
   const query = (name) => {
     setName(name);
     setQuerySymbol(true);
@@ -119,6 +110,31 @@ const Sets = (props) => {
     alert(reply);
   }
 
+  const reload = async (name) => {
+    var d = await vx.listSymbols();
+    for (var j = 0; j< d.catalog.length; j++) {
+      var row = d.catalog[j];
+      if (name === row.name) {
+        setObject(row);
+        return;
+      }
+    }
+  }
+
+  const makeNew = () => {
+    var d = setObject({name: "@NewObject", file: "", s3: "", type: "SET", size: ""});
+  }
+
+  const makeNewSymbol = async (t) =>{
+    if (t) {
+      await vx.configureAwsObject(object);
+    }
+    setObject(undef);
+    var d = await vx.listSymbols()
+    setBigdata(d.catalog);
+    redraw();
+  }
+
 
   const getSetsView = () => {
     return(
@@ -130,6 +146,7 @@ const Sets = (props) => {
            <td key={'sets-size-' + index} className="text-right">{row.size}</td>
            <td key={'sets-actions-' + index} className="text-center">
             <Button color="info" size='sm' onClick={()=>query(row.name)}>Query</Button>
+            &nbsp; &nbsp; &nbsp;<Button color="warn" size="sm" onClick={()=>reload(row.name)}>Reload</Button>
             &nbsp; &nbsp; &nbsp;<Button color="danger" size="sm" onClick={()=>showModal(row.name)}>Delete</Button></td>
          </tr>))
      ); 
@@ -175,8 +192,8 @@ const Sets = (props) => {
                      message="Only the db admin can undo this if you delete it!!!" 
                      name="DELETE"
                      callback={modalCallback} />}
-    { symbolModal &&
-      <LoadSymbolModal callback={addSymbol} symbol={symbol}/>}
+    { object !== undef &&
+      <LoadSymbol callback={makeNewSymbol} symbol={object}/>}
     { querySymbol &&
       <DecisionModal title="Query Symbol" 
         message="Input key to query" 

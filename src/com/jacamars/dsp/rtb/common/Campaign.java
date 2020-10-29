@@ -758,11 +758,11 @@ public class Campaign implements Comparable, Portable {
 			budget.dailyCost.getAndAdd(x);
 			budget.hourlyCost.getAndAdd(x);
 		
-			logger.info("****** BUDGET TEST: Testing budgets at {} CAMPAIGN:{}, id: {}", Crosstalk.getInstance().getHour(),name, id);
+			logger.debug("****** BUDGET TEST: Testing budgets at {} CAMPAIGN:{}, id: {}", Crosstalk.getInstance().getHour(),name, id);
 			
 			boolean z = Crosstalk.getInstance().hourChanged(currentHour);
-			logger.info("!!!!!!!!!!! HOURCHANGED: {}",z);
-			logger.info("Total cost: {}, daily cost: {}, hourly cost: {}", budget.totalCost.getDoubleValue(),
+			logger.debug("!!!!!!!!!!! HOURCHANGED: {}",z);
+			logger.debug("Total cost: {}, daily cost: {}, hourly cost: {}", budget.totalCost.getDoubleValue(),
 					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
 
 			if (x != 0.0 || Crosstalk.getInstance().timeChanged(currentDay,currentHour)) {
@@ -774,11 +774,11 @@ public class Campaign implements Comparable, Portable {
 				CampaignCache.getInstance().addCampaign(this);
 			
 				if (Crosstalk.getInstance().hourChanged(currentHour)) {
-					logger.info("Hour changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getHour(),stringId);
+					logger.debug("Hour changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getHour(),stringId);
 					budget.hourlyCost.set(0.0);
 				}
 				if (Crosstalk.getInstance().dayChanged(currentDay)) {
-					logger.info("Day changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getDay(),stringId);
+					logger.debug("Day changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getDay(),stringId);
 					budget.dailyCost.set(0.0);
 				}
 				

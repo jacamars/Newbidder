@@ -42,6 +42,7 @@ public class Membership extends LookingGlass {
 	 */
 	public Membership(String name, String file) throws Exception {
 		symbols.put(name, this);
+		fileName = file;
 		this.name = name;
 		myMap = null;
 		this.file = file;
@@ -58,6 +59,7 @@ public class Membership extends LookingGlass {
 	 */
 	public Membership(String name, S3Object object) throws Exception {
 		this.name = name;
+		s3 = object.getBucketName() + "/" + object.getKey();
 		myMap = null;
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br=new BufferedReader(new InputStreamReader(objectData));

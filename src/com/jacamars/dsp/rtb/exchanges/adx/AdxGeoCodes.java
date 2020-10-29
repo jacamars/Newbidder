@@ -16,6 +16,7 @@ public class AdxGeoCodes extends LookingGlass {
 	
 	public AdxGeoCodes(String name, String file) throws Exception {
 		super();
+		fileName = file;
 		BufferedReader br = new BufferedReader(new FileReader(file));
 
 		String[] parts = null;
@@ -29,6 +30,7 @@ public class AdxGeoCodes extends LookingGlass {
 	}
 	
 	public AdxGeoCodes(String name, S3Object object) throws Exception {
+		s3 = object.getBucketName() + "/" + object.getKey();
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
 		String[] parts = null;

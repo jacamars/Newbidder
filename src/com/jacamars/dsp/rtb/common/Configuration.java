@@ -101,6 +101,9 @@ public class Configuration {
 	
 	/** Mapstore jdbc string */
 	public String mapstorejdbc = null;
+	
+	/** Backup count */
+	public Integer backups = 1;
 
 	/** Default index page */
 	public static String indexPage = "/index.html";
@@ -452,6 +455,7 @@ public class Configuration {
 			Map<String,String> hazel = (Map)m.get("hazelcast");
 			mapstoredriver = hazel.get("mapstoredriver");
 			mapstorejdbc = hazel.get("mapstorejdbc");
+			backups = Integer.valueOf(hazel.get("backupCount"));
 		}
         //////////////////////////////////////////////////////////////////////////////////////////////
 		/**

@@ -81,7 +81,7 @@ Note this command is only available to the super user 'rtb4free' user.
 This command removes a symbol added with ConfigureAwsObject. Note this command is only available to the super user 'rtb4free' user. The POST form of the command is:
 
 ```
-{"type":"DeleteSymbol","symbol":"symbol-name,"token":"<token-you-got-earlier>"}
+{"type":"DeleteSymbol#","symbol":"symbol-name,"token":"<token-you-got-earlier>"}
 ```
 
 Python version:
@@ -182,67 +182,6 @@ The Python form of the command looks like the following:
 }
 ```
 
-## SQLGetUser
-
-This command retreives the SQL database information about the logged in user. The POST form
-of the command is:
-
-```
-{"type":"SQLGetUser#","token":"the-token-you-got-earlier"}
-```
-
-The Python form of the command and example return:
-
-```
->>> crosstalk.GetUser();
-(200, 'OK')
-{"error":false,"timestamp":1603751001729,"token":"1747de92-98d8-4271-b8f8-a374f019363a","type":"SQLGetUser#","user":"{\"id\":1,\"customer_id\":\"rtb4free\",\"sub_id\":\"superuser\",\"username\":\"ben.faul@rtb4free.com\",\"password\":\"zulu\",\"company\":\"Jacamars, Inc\",\"email\":\"ben.faul@rtb4free.com\",\"telephone\":\"310-467-0646\",\"firstname\":\"Ben\",\"lastname\":\"Faul\",\"address\":\"3820 Del Amo Blvd #226\",\"citystate\":\"Torrance, CA.\",\"country\":\"USA\",\"postalcode\":\"90503\",\"about\":\"Chief cook and dish-washer.\",\"picture\":\"https://i.kym-cdn.com/entries/icons/original/000/004/006/YUNO.jpg\",\"title\":\"Head Peon\",\"description\":\"Will sthis stuff ever get done???\"}"}
-```
-
-Notice the user is returned as JSON but is embedded as a string.
-
-
-## SQLListUsers
-
-This command, issued by super users, will list all the users in the system of that customer_id, both username and password. The super user for 'rtb4free' will list *all* users regardless of 
-customer_id. The POST form of the command is:
-
-```
-{"type":"SQLListUsers#","token":"the-token-you-got-earlier"}
-```
-
-Python form and sample return:
-
-```
->>> crosstalk.SQLListUsers();
-(200, 'OK')
-{
-    "error": false, 
-    "timestamp": 1603751535818, 
-    "token": "2d73a71e-dfcb-4385-9625-b6b278de6f0c", 
-    "type": "SQLListUsers#", 
-    "users": [
-        {
-            "customer_id": "rtb4free", 
-            "id": 1, 
-            "password": "zulu", 
-            "sub_id": "superuser", 
-            "username": "ben.faul@rtb4free.com"
-        }, 
-        {
-            "customer_id": "test", 
-            "id": 2, 
-            "password": "test", 
-            "sub_id": "superuser", 
-            "username": "test.test@test.com"
-        }
-    ]
-}
-
-```
-
-If you logged in with customer_id of 'rtb4free' all users will be refreshed, otherwise just the users of the logged in customer_id will be shown.
-
 ## ListMacros
 
 This command will list all the macros defined in the system. The POST form of the command is:
@@ -317,6 +256,67 @@ crosstalk.Refresh();
 ```
 
 If you logged in with customer_id of 'rtb4free' all campaigns will be refreshed, otherwise just the campaigns of the logged in customer_id will be refreshed.
+
+## SQLGetUser
+
+This command retreives the SQL database information about the logged in user. The POST form
+of the command is:
+
+```
+{"type":"SQLGetUser#","token":"the-token-you-got-earlier"}
+```
+
+The Python form of the command and example return:
+
+```
+>>> crosstalk.GetUser();
+(200, 'OK')
+{"error":false,"timestamp":1603751001729,"token":"1747de92-98d8-4271-b8f8-a374f019363a","type":"SQLGetUser#","user":"{\"id\":1,\"customer_id\":\"rtb4free\",\"sub_id\":\"superuser\",\"username\":\"ben.faul@rtb4free.com\",\"password\":\"zulu\",\"company\":\"Jacamars, Inc\",\"email\":\"ben.faul@rtb4free.com\",\"telephone\":\"310-467-0646\",\"firstname\":\"Ben\",\"lastname\":\"Faul\",\"address\":\"3820 Del Amo Blvd #226\",\"citystate\":\"Torrance, CA.\",\"country\":\"USA\",\"postalcode\":\"90503\",\"about\":\"Chief cook and dish-washer.\",\"picture\":\"https://i.kym-cdn.com/entries/icons/original/000/004/006/YUNO.jpg\",\"title\":\"Head Peon\",\"description\":\"Will sthis stuff ever get done???\"}"}
+```
+
+Notice the user is returned as JSON but is embedded as a string.
+
+
+## SQLListUsers
+
+This command, issued by super users, will list all the users in the system of that customer_id, both username and password. The super user for 'rtb4free' will list *all* users regardless of 
+customer_id. The POST form of the command is:
+
+```
+{"type":"SQLListUsers#","token":"the-token-you-got-earlier"}
+```
+
+Python form and sample return:
+
+```
+>>> crosstalk.SQLListUsers();
+(200, 'OK')
+{
+    "error": false, 
+    "timestamp": 1603751535818, 
+    "token": "2d73a71e-dfcb-4385-9625-b6b278de6f0c", 
+    "type": "SQLListUsers#", 
+    "users": [
+        {
+            "customer_id": "rtb4free", 
+            "id": 1, 
+            "password": "zulu", 
+            "sub_id": "superuser", 
+            "username": "ben.faul@rtb4free.com"
+        }, 
+        {
+            "customer_id": "test", 
+            "id": 2, 
+            "password": "test", 
+            "sub_id": "superuser", 
+            "username": "test.test@test.com"
+        }
+    ]
+}
+
+```
+
+If you logged in with customer_id of 'rtb4free' all users will be refreshed, otherwise just the users of the logged in customer_id will be shown.
 
 ## SQLListRules
 

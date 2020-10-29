@@ -1411,7 +1411,7 @@ public class Creative implements Serializable {
 			Double x = AccountingCache.getInstance().get("" + cid.id, type + ":" + id);
 			// Double x = BudgetController.getInstance().getCampaignTotalSpend(this);
 
-			logger.info("*** BUDGET TEST: Checking creative budgets: {}/{}/{}", cid, impid, getType());
+			logger.debug("*** BUDGET TEST: Checking creative budgets: {}/{}/{}", cid, impid, getType());
 			if (x > 0 || Crosstalk.getInstance().timeChanged(currentDay, currentHour)) {
 
 				budget.totalCost.getAndAdd(x);
@@ -1419,12 +1419,12 @@ public class Creative implements Serializable {
 				budget.hourlyCost.getAndAdd(x);
 
 				if (Crosstalk.getInstance().hourChanged(currentHour)) {
-					logger.info("Hour changed, creative budget set to 0.0 @{} for {}/{}/{}",
+					logger.debug("Hour changed, creative budget set to 0.0 @{} for {}/{}/{}",
 							Crosstalk.getInstance().getHour(), cid, impid, getType());
 					budget.hourlyCost.set(0.0);
 				}
 				if (Crosstalk.getInstance().dayChanged(currentDay)) {
-					logger.info("Day changed, creative budget set to 0.0 @{} for {}/{}/{}",
+					logger.debug("Day changed, creative budget set to 0.0 @{} for {}/{}/{}",
 							Crosstalk.getInstance().getDay(), cid, impid, getType());
 					budget.dailyCost.set(0.0);
 				}
@@ -1437,7 +1437,7 @@ public class Creative implements Serializable {
 				currentDay = Crosstalk.getInstance().getDay();
 			}
 
-			logger.info("Total cost: {} hourly cost: {}, daily_cost: {}", budget.totalCost.getDoubleValue(),
+			logger.debug("Total cost: {} hourly cost: {}, daily_cost: {}", budget.totalCost.getDoubleValue(),
 					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
 
 		} catch (Exception error) {

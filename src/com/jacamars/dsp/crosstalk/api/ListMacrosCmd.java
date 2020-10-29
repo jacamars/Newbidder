@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -23,7 +24,7 @@ import com.hazelcast.core.HazelcastInstance;
 public class ListMacrosCmd extends ApiCommand implements Serializable {
 
 	/** The JSON node that represents the SQL of this campaign */
-	public Map<String,String> macros;
+	public TreeMap<String,String> macros;
 	
 	/**
 	 * Default constructor
@@ -48,7 +49,7 @@ public class ListMacrosCmd extends ApiCommand implements Serializable {
 			try {
 				
 				// TBD Needs rewrite for multi tenant
-				macros = Configuration.getInstance().getEnvironment();			
+				macros = new TreeMap(Configuration.getInstance().getEnvironment());			
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

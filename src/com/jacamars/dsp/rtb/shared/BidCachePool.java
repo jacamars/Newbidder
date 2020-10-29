@@ -68,9 +68,6 @@ public enum BidCachePool {
 	/** The cache of miscellaneous stuff that needs to be shared */
 	static private volatile IMap<String, RecordedMisc> miscCache;
 
-	/** The default backup count if you dont set it */
-	static public int backupCount = 3;
-
 	/** The default value to read backups, is true */
 	static public boolean readBackup = true;
 
@@ -87,7 +84,7 @@ public enum BidCachePool {
 			
 			String name = "BIDCACHE";
 			bidCache = inst.getMap(name);
-			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			config.getMapConfig(name).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 			/* bidCache.addEntryListener(new EntryEvictedListener<String, RecordedBid>() {
 				@Override
 				public void entryEvicted(EntryEvent<String, RecordedBid> event) {
@@ -114,7 +111,7 @@ public enum BidCachePool {
 			
 			name = "TOKENCACHE";
 			tokenCache = inst.getMap(name);
-			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			config.getMapConfig(name).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 			tokenCache.addEntryListener(new EntryEvictedListener<String, TokenData>() {
 				@Override
 				public void entryEvicted(EntryEvent<String, TokenData> event) {
@@ -125,12 +122,12 @@ public enum BidCachePool {
 			
 			name = "MEMBER";
 			memberCache = inst.getMap(name);
-			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			config.getMapConfig(name).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 		
 
 			name = "VIDEO";
 			videoCache = inst.getMap(name);
-			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			config.getMapConfig(name).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 			videoCache.addEntryListener(new EntryEvictedListener<String, RecordedVideo>() {
 				@Override
 				public void entryEvicted(EntryEvent<String, RecordedVideo> event) {
@@ -155,7 +152,7 @@ public enum BidCachePool {
 
 			name = "MISC";
 			miscCache = inst.getMap(name);
-			config.getMapConfig(name).setAsyncBackupCount(backupCount).setReadBackupData(readBackup);
+			config.getMapConfig(name).setAsyncBackupCount(Configuration.getInstance().backups).setReadBackupData(readBackup);
 			miscCache.addEntryListener(new EntryEvictedListener<String, RecordedMisc>() {
 				@Override
 				public void entryEvicted(EntryEvent<String, RecordedMisc> event) {

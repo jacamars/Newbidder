@@ -39,6 +39,7 @@ public class NavMap extends LookingGlass implements Set {
 	 */
 	public NavMap(String name, String file, String type) throws Exception {
 		this.name = name;
+		fileName = file;
 		symbols.put(name, this);
 		if (type.equalsIgnoreCase("cidr")) {
 			BufferedReader br = new BufferedReader(new FileReader(file));
@@ -62,6 +63,7 @@ public class NavMap extends LookingGlass implements Set {
 	 */
 	public NavMap(String name, S3Object object, String type) throws Exception {
 		this.name = name;
+		s3 = object.getBucketName() + "/" + object.getKey();
 		String file = object.getBucketName();
 		InputStream objectData = object.getObjectContent();
 		BufferedReader br = new BufferedReader(new InputStreamReader(objectData));
