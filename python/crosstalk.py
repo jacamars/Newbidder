@@ -29,7 +29,7 @@ def GetAccounting():
         r = requests.post(globalHost, data='{"type":"GetAccounting#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -39,7 +39,7 @@ def ListSymbols():
         r = requests.post(globalHost, data='{"type":"ListBigData#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -74,7 +74,7 @@ def SQLListUsers():
         r = requests.post(globalHost, data='{"type":"SQLListUsers#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -84,7 +84,7 @@ def ListMacros():
         r = requests.post(globalHost, data='{"type":"ListMacros#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -118,7 +118,7 @@ def SQLListRules():
         r = requests.post(globalHost, data='{"type":"SQLListRules#","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -128,7 +128,7 @@ def SQLAddNewRule(rule):
         r = requests.post(globalHost, data='{"type":"SQLAddNewRule#","token":"'+token+'","rule":"'+rule+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -138,7 +138,7 @@ def SQLAddNewCampaign(campaign):
         r = requests.post(globalHost, data='{"type":"SQLAddNewCampaign#","token":"'+token+'","campaign":"'+campaign+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -147,7 +147,7 @@ def GetPrice(camp,creat):
     try:
         r = requests.post(globalHost, data='{"type":"GetPrice#","campaign":"' + camp + '","creative":"'+creat+'","token":"'+token+'"}')
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -188,9 +188,9 @@ def SetWeights(camp,weights):
 def SQLListCampaigns():
     try:
         r = requests.post(globalHost, data='{"type":"SQLListCampaigns#","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -198,9 +198,9 @@ def SQLListCampaigns():
 def SQLListCreatives():
     try:
         r = requests.post(globalHost, data='{"type":"SQLListCreatives#","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -208,8 +208,9 @@ def SQLListCreatives():
 def SQLGetNewCampaign(camp):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetNewCampaign#","campaign":"' + camp + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
-        print (r.text)
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -219,7 +220,7 @@ def SQLGetCampaign(id):
         r = requests.post(globalHost, data='{"type":"SQLGetCampaign#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -229,7 +230,7 @@ def SQLGetCreative(id,x):
         r = requests.post(globalHost, data='{"type":"SQLGetCreative#","id":' + id + ', "key":"' + x  +'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -239,16 +240,17 @@ def SQLGetTarget(id):
         r = requests.post(globalHost, data='{"type":"SQLGetTarget#","id":"' + id + '","token":"'+token+'"}')
         print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptins.RequestException as e:
         print('Connection error')
         return 503, None
                
-def SQLGetNewCreative(name):
+def SQLGetNewCreative(name,type):
     try:
-        r = requests.post(globalHost, data='{"type":"SQLGetNewCreative#","name":"' + name + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
-        print (r.text)
+        r = requests.post(globalHost, data='{"type":"SQLGetNewCreative#","name":"' + name + '","ctype":"'+type+'","token":"'+token+'"}')
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -256,8 +258,9 @@ def SQLGetNewCreative(name):
 def SQLGetNewTarget(name):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetNewTarget#","name":"' + name + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
-        print (r.text)
+        print (r.status_code, r.reason)
+        data = json.loads(r.text)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -266,9 +269,9 @@ def SQLGetNewTarget(name):
 def SQLGetNewRule(name):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetNewRule#","name":"' + name + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -276,9 +279,9 @@ def SQLGetNewRule(name):
 def SQLGetRule(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLGetRule#","id":"' + id + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         data = json.loads(r.text)
-        print json.dumps(data, indent=4, sort_keys=True)
+        print (json.dumps(data, indent=4, sort_keys=True))
     except requests.exceptions.RequestException as e:
         print('Connection error')
         return 503, None
@@ -286,7 +289,16 @@ def SQLGetRule(id):
 def SQLDeleteRule(id):
     try:
         r = requests.post(globalHost, data='{"type":"SQLDeleteRule#","id":"' + id + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
+        print (r.text)
+    except requests.exceptions.RequestException as e:
+        print('Connection error')
+        return 503, None
+
+def SQLDeleteCreative(id):
+    try:
+        r = requests.post(globalHost, data='{"type":"SQLDeleteCreative#","id":"' + id + '","token":"'+token+'"}')
+        print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
         print('Connection error')
@@ -295,7 +307,7 @@ def SQLDeleteRule(id):
 def QuerySymbol(name,value):
     try:
         r = requests.post(globalHost, data='{"type":"QuerySymbol#","symbol":"' + name + '", "value":"' + value + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
         print('Connection error')
@@ -316,7 +328,7 @@ def GetWeights(camp):
 def MacroSub(data):
     try:
         r = requests.post(globalHost, data='{"type":"MacroSub#","data":"' + data + '","token":"'+token+'"}')
-      	print (r.status_code, r.reason)
+        print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
         print('Connection error')
@@ -328,7 +340,7 @@ def GetBudget(*arg):
             r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","token":"'+token+'"}')
         if len(arg)==2:
             r = requests.post(globalHost, data='{"type":"GetBudget#","campaign":"' + arg[0] + '","creative":"' + arg[1] + '","token":"'+token+'"}')
-        print (r.status_code, r.reason)
+            print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:
         print('Connection error')
@@ -424,9 +436,9 @@ def GetCampaign(camp):
         print('Connection error')
         return 503, None
 
-def DeleteCampaign(camp):
+def SQLDeleteCampaign(camp):
     try:
-        r = requests.post(globalHost, data='{"type":"Delete#","campaign":"'+camp+'","token":"'+token+'"}')
+        r = requests.post(globalHost, data='{"type":"SQLDeleteCampaign#","id":"'+id+'","token":"'+token+'"}')
         print (r.status_code, r.reason)
         print (r.text)
     except requests.exceptions.RequestException as e:

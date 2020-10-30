@@ -531,6 +531,65 @@ If you logged in with customer_id of 'rtb4free' all creatives will be listed, ot
 
 ## SQLGetNewCampaign
 
+Returns a stub campaign. Post form:
+
+```
+{"type":"SQLGetNewCampaign#","token":"the-token-you-got-earlier","campaign":"name-of-campaign"}
+```
+
+Python example:
+
+```
+>>> crosstalk.SQLGetNewCampaign("HELLO");
+200 OK
+{
+    "campaign": "HELLO",
+    "customer": "rtb4free",
+    "data": {
+        "active": false,
+        "ad_domain": "default-domain",
+        "attributes": [],
+        "bcat": [],
+        "budget": {
+            "activate_time": 0,
+            "dailyBudget": 0,
+            "dailyCost": 0,
+            "expire_time": 0,
+            "hourlyBudget": 0,
+            "hourlyCost": 0,
+            "totalBudget": 0,
+            "totalCost": 0
+        },
+        "classId": 3,
+        "creatives": [],
+        "crudeAccounting": {
+            "adspend": 0,
+            "bids": 0,
+            "clicks": 0,
+            "pixels": 0,
+            "wins": 0
+        },
+        "effectiveSpendRate": 0,
+        "exchanges": [],
+        "expired": true,
+        "factoryId": 2,
+        "forensiq": false,
+        "id": 0,
+        "isAdx": false,
+        "rules": [],
+        "runnable": false,
+        "spendrate": 16667,
+        "status": "offline",
+        "target_id": 0,
+        "updated_at": 0
+    },
+    "error": false,
+    "timestamp": 1604101651156,
+    "token": "d9c0ec30-a6f1-49f4-b617-3c1f4cb66305",
+    "type": "SQLGetNewCampaign#"
+}
+>>>
+```
  
 ## SQLGetCampaign
 
@@ -762,9 +821,111 @@ Python form and example:
 ```
                
 ## SQLGetNewCreative
+
+Returns the stub of a new creative. POST form of the command:
+
+```
+{"type":"SQLGetNewCreative#","token":"the-token-you-got-earlier","name":"name-to-be","ctype":"type-of-creative"}
+```
+
+The *ctype* can be "banner", "video", "audio" or "native".
+
+Python example:
+
+```
+>>> crosstalk.SQLGetNewCreative("Hello","banner");
+200 OK
+{
+    "ctype": "banner",
+    "customer": "rtb4free",
+    "data": {
+        "adm_override": false,
+        "attributeType": "banners",
+        "attributes": [],
+        "budget": {
+            "activate_time": 0,
+            "dailyBudget": 0,
+            "dailyCost": 0,
+            "expire_time": 0,
+            "hourlyBudget": 0,
+            "hourlyCost": 0,
+            "totalBudget": 0,
+            "totalCost": 0
+        },
+        "contenttype": "",
+        "cur": "USD",
+        "deals": [],
+        "expired": true,
+        "height": 0,
+        "htmltemplate": "",
+        "id": 0,
+        "interval_end": 0,
+        "isAudio": false,
+        "isBanner": true,
+        "isNative": false,
+        "isVideo": false,
+        "name": "Hello",
+        "price": 0.01,
+        "rules": [],
+        "status": "runnable",
+        "type": "banner",
+        "vast_video_linearity": 1,
+        "vast_video_protocol": 2,
+        "weight": 1,
+        "width": 0
+    },
+    "error": false,
+    "name": "Hello",
+    "timestamp": 1604101038018,
+    "token": "e306b5f1-5e8d-4a98-877e-4167da5db955",
+    "type": "SQLGetNewCreative#"
+}
+>>>
+```
  
 ## SQLGetNewTarget
 
+Gets a new stub target. POST Form of the command:
+
+
+```
+{"type":"SQLGetNewTarget#","token":"the-token-you-got-earlier","name":"name-to-be"}
+```
+
+Python version:
+
+```
+>>> crosstalk.SQLGetNewTarget("Hello");
+200 OK
+{
+    "customer": "rtb4free",
+    "data": {
+        "browser": "",
+        "carrier": "",
+        "connectionType": "",
+        "country": "",
+        "geo_latitude": 0.0,
+        "geo_longitude": 0.0,
+        "geo_range": 0.0,
+        "iab_category": "",
+        "iab_category_blklist": "",
+        "id": 0,
+        "listofdomains": [],
+        "make": "",
+        "model": "",
+        "name": "Hello",
+        "nodes": [],
+        "os": "",
+        "os_version": ""
+    },
+    "error": false,
+    "name": "Hello",
+    "timestamp": 1604101292208,
+    "token": "27d8bd41-76d1-49e2-b675-b3a35a8641fd",
+    "type": "SQLGetNewTarget#"
+}
+>>>
+```
 ## SQLGetNewRule
 
 Returns a new stub rule. Fill out the returned values and save. POST form:
@@ -844,6 +1005,46 @@ Note, if you save the rule: bidrequestValues and value are ignored.
 
 ## SQLDeleteRule
 
+Deletes a Rule by its SQL ID. POST form of the command:
+
+```
+{"type":"SQLDeleteRule#","id":"sqlid-of-cAMPAIGN","token":"token-you-got-earlier"}
+```
+
+Python example of command:
+
+```
+>>> crosstalk.SQLDeleteRule("1");
+```
+
 ## SQLDeleteCampaign
+
+Deletes a campaign by its SQL ID. POST form of the command:
+
+```
+{"type":"SQLDeleteCampaign#","id":"sqlid-of-campaign","token":"token-you-got-earlier"}
+```
+
+Python example of command:
+
+```
+>>> crosstalk.SQLDeleteCampaign("1");
+```
+
+## SQLDeleteCreative
+
+Deletes a creative by its SQL ID. POST form of the command:
+
+```
+{"type":"SQLDeleteCampaign#","id":"sqlid-of-creative","key":"type-of-creative","token":"token-you-got-earlier"}
+```
+
+The value of *key* can be "banner", "video", "audio" or "native".
+
+
+Python example of command:
+
+```
+>>> crosstalk.SQLDeleteCampaign("1", "banner");
 
  
