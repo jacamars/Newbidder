@@ -255,6 +255,11 @@ public class Configuration {
 	public static final int STRATEGY_HEURISTIC = 0;
 	public static final int STRATEGY_MAX_CONNECTIONS = 1;
 
+	/**
+     * Hazelcast network config
+     **/
+    public Map hzConfig;
+    
 	/** Pause on Startup */
 	public volatile boolean pauseOnStart = false;
 	/** a copy of the config verbosity object */
@@ -577,6 +582,11 @@ public class Configuration {
 		}
 		if (m.get("adminSSL") != null) {
 			adminSSL = (Boolean) m.get("adminSSL");
+		}
+		
+        // Hazelcast Network Configuration
+		if (m.get("hzConfig") != null) {
+			hzConfig = (Map) m.get("hzConfig");
 		}
 
 		String strategy = (String) m.get("strategy");
