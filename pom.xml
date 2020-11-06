@@ -6,6 +6,21 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>RTB4FREE</name>
 	<description>RTB 2.8 DSP</description>
+	
+	<profiles>
+		<profile>
+			<id>allow-snapshots</id>
+			<activation><activeByDefault>true</activeByDefault></activation>
+			<repositories>
+				<repository>
+					<id>snapshots-repo</id>
+					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+					<releases><enabled>false</enabled></releases>
+					<snapshots><enabled>true</enabled></snapshots>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
 
 	<properties>
 		<maven.plugin.version>2.19.1</maven.plugin.version>
@@ -25,6 +40,7 @@
 		<postgres.version>9.1-901-1.jdbc4</postgres.version>
 		<hazelcast.version>4.0.3</hazelcast.version>
 		<hazelcast-client.version>3.12.9</hazelcast-client.version>
+		<hazelcast-kubernetes.version>2.1</hazelcast-kubernetes.version>
 		<javax.persistence.version>1.0.2</javax.persistence.version>
 		<http.client.version>4.5.3</http.client.version>
 		<openrtb.core.version>1.5.1</openrtb.core.version>
@@ -213,6 +229,12 @@
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 			<version>${javax.persistence.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
+			<version>${hazelcast-kubernetes.version}</version>
 		</dependency>
 
 
