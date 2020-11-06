@@ -49,6 +49,8 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.jacamars.dsp.rtb.tools.ChattyErrors;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.jacamars.dsp.crosstalk.budget.AtomicBigDecimal;
@@ -355,8 +357,34 @@ public class RTBServer implements Runnable {
 	public static HazelcastInstance getSharedInstance() {
 		if (hz == null) {
 			Config config = new Config();
-			// config.setProperty("hazelcast.logging.type", "slf4j");
+			
+			NetworkConfig networkConfig = config.getNetworkConfig();
+            JoinConfig join = networkConfig.getJoin();
 
+            Map hzConfig = Configuration.getInstance().hzConfig;
+            if (hzConfig != null) {
+                String clusterName = (String) hzConfig.get("clusterName");
+                config.setClusterName(clusterName);
+                String networkType = (String) hzConfig.get("networkType");
+                ArrayList<Map<String,String>> props =  (ArrayList)hzConfig.get("properties");
+                if ("kubernetes".equals(networkType)) {
+                    join.getMulticastConfig().setEnabled(false);
+                    join.getKubernetesConfig().setEnabled(true);
+                    Iterator<Map<String,String>> kvIterator = props.iterator();
+                    while(kvIterator.hasNext()){
+                        Map<String,String> kv = kvIterator.next();
+                        String key = kv.get("key");
+                        String value = kv.get("value");
+                        boolean noLoad = "false".equalsIgnoreCase(kv.get("load"));
+                        System.out.println("key=>" + key + " value=>" + value + " noLoad=>" +  noLoad);
+                        if(!noLoad) {
+                            join.getKubernetesConfig().setProperty(key, value);
+                        }
+                    }
+
+                }
+            }
+			
 			Echo.registerWithHazelCast(config);
 			Campaign.registerWithHazelCast(config);
 			AtomicBigDecimal.registerWithHazelCast(config);
