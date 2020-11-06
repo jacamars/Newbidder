@@ -40,7 +40,6 @@ public class Endpoint extends AbstractHandler
     String content;
 
     public Endpoint() throws Exception {
-        content = new String(Files.readAllBytes(Paths.get("SampleResponses/OpenRTB")), StandardCharsets.UTF_8);
 
     }
 
@@ -51,26 +50,24 @@ public class Endpoint extends AbstractHandler
                         HttpServletResponse response ) throws IOException,
             ServletException
     {
-        InputStream body = request.getInputStream();
-        BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
+        sb.append("target: ");
         sb.append(target);
-        sb.append(": ");
-        br = new BufferedReader(new InputStreamReader(body));
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
+        sb.append("\n");
+        sb.append("Local Address: ");
+        sb.append(request.getServerName());
+        sb.append("\n");
         System.out.println(sb.toString());
+        
 
         // Declare response encoding and types
-        response.setContentType("application/json; charset=utf-8");
+        response.setContentType("text/plain;");
 
         // Declare response status code
         response.setStatus(HttpServletResponse.SC_OK);
 
         // Write back response
-        response.getWriter().println(content);
+        response.getWriter().println(sb.toString());
 
         // Inform jetty that this request has now been handled
         baseRequest.setHandled(true);
@@ -78,10 +75,7 @@ public class Endpoint extends AbstractHandler
 
     public static void main( String[] args ) throws Exception
     {
-        int port = 9090;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        }
+        int port = 8080;
         System.out.println("Endpint is starting on port: " + port);
         Server server = new Server(port);
         server.setHandler(new Endpoint());
