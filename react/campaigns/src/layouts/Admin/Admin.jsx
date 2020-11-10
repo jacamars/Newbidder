@@ -90,7 +90,7 @@ const Admin = (props) => {
             routes={routes}
             bgColor={backgroundColor}
             logo={{
-              outterLink: "https://www.creative-tim.com/",
+              outterLink: "#",
               text: "RTB4FREE",
               imgSrc: logo
             }}

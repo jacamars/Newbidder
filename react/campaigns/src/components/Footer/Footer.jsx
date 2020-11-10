@@ -22,9 +22,19 @@ import PropTypes from "prop-types";
 
 // reactstrap components
 import { Container, Row, Nav, NavItem, NavLink } from "reactstrap";
+import { useViewContext } from "../../ViewContext";
 
-class Footer extends React.Component {
-  render() {
+var undef;
+
+const Footer = () =>  {
+  const vx = useViewContext();
+  const getName = () => {
+    if (vx.user.username === undef) {
+      return '[]';
+    }
+    return "[ " + vx.user.username + "(" + vx.user.company + ") ]";
+  }
+
     return (
       <footer className="footer">
         <Container fluid>
@@ -37,6 +47,9 @@ class Footer extends React.Component {
             </NavItem>
             <NavItem>
               <NavLink href="http://rtb4free.com/blog_link.html">Blog</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink>{getName()}</NavLink>
             </NavItem>
           </Nav>
           <div className="copyright">
@@ -54,7 +67,6 @@ class Footer extends React.Component {
         </Container>
       </footer>
     );
-  }
 }
 
 export default Footer;

@@ -103,6 +103,7 @@ const  addNewCampaign = async () => {
     var cnames = [...document.getElementById("creatives").options]
                      .filter((x) => x.selected)
                      .map((x)=>x.value);
+
     x.banners = [];
     x.videos = [];
     x.audios = [];
@@ -161,7 +162,7 @@ const  addNewCampaign = async () => {
       }
     }
 
-    //alert(JSON.stringify(x,null,2));
+    alert(JSON.stringify(x,null,2));
 
     props.callback(x);
 
