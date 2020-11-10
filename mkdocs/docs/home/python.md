@@ -465,6 +465,10 @@ The Python form of the command is:
 }
 ```
 
+## SQLAddNewCreative
+
+Command adds a new creative, or replaces a creative in the Postgres database. (*WARNING* If you replace a creative that already exists, you must issue a REFRESH command to ensure the campaign is propagated, or issue an SQLAddNewCampaign to make sure)
+
 ## SQLListCampaigns
 
 Command returns the list of campaigns in the database and their current status. POST form of the command:

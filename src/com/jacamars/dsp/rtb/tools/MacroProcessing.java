@@ -305,6 +305,10 @@ public class MacroProcessing {
 		for (int i = 0; i < list.size(); i++) {
 			value = null;
 			String item = list.get(i);
+			
+			if (item.equals("%7Bexchange%7D")) {
+				System.err.println(Thread.currentThread().getStackTrace());
+			}
 
 			switch (item) {
 			case "{cachebuster}":

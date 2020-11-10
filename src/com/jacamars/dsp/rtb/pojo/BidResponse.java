@@ -760,6 +760,13 @@ public class BidResponse {
 		this.cost = price; // pass this along so the bid response object
 									// has a copy of the price
 		macroSubs(response);
+		
+		if (response.indexOf("%7Bexchange%7D") > -1) {
+			System.err.println("STACK TRACE ALERT");
+			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			    System.err.println("\t"+ste);
+			}
+		}
 	}
 	
 	/**
