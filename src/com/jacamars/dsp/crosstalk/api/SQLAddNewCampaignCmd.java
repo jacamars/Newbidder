@@ -53,8 +53,6 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 			try {
 				ObjectNode node = mapper.readValue(campaign,ObjectNode.class);
 				
-				//System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
-				
 				node.put("customer_id", tokenData.customer);
 				
 				Campaign x = Crosstalk.getInstance().shadow.get(node.get("id").asText());

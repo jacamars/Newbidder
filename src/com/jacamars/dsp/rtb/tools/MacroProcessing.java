@@ -307,7 +307,10 @@ public class MacroProcessing {
 			String item = list.get(i);
 			
 			if (item.equals("%7Bexchange%7D")) {
-				System.err.println(Thread.currentThread().getStackTrace());
+				System.err.println("STACK TRACE ALERT");
+				for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+				    System.err.println("\t"+ste);
+				}
 			}
 
 			switch (item) {

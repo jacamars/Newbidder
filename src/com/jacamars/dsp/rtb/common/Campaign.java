@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.config.Config;
 
@@ -1048,13 +1049,20 @@ public class Campaign implements Comparable, Portable {
 			}
 		}
 
-		if (myNode.get("exchanges") != null && myNode.get("exchanges").asText().length() != 0) {
+		if (myNode.get("exchanges") instanceof TextNode) {
 			exchanges.clear();
-
-			String str = getMyNode().get("exchanges").asText(null);
-			if (str != null) {
-				Targeting.getList(exchanges, str);
+			String [] x = myNode.get("exchanges").asText().split(",");
+			for (String s : x) {
+				exchanges.add(s.trim());
 			}
+		} else {
+		if (myNode.get("exchanges") != null && myNode.get("exchanges").size() != 0) {
+			exchanges.clear();
+			ArrayNode an = (ArrayNode)myNode.get("exchanges");
+			for (int i=0;i<an.size();i++) {
+				exchanges.add(an.get(i).asText());
+			}
+		}
 		}
 
 		Object x = myNode.get(DAILY_BUDGET);

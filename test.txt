@@ -1,10 +1,63 @@
-<img src="{pixel_url}&exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&price={AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}&lat={lat}&lon={lon}&make={make}&mode={model}&pub={pub}&site_name={site_name}&ua{ua}&deal_id={deal_id}" height="1" width="1" style="display:none;"/>
-<a href="{redirect_url}&exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&bid_id={bid_id}&site_domain={site_domain}?&price={AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}&lat={lat}&lon={lon}&make={make}&mode={model}&pub={pub}&site_name={site_name}&ua{ua}&deal_id={deal_id}&url=https://happyapples.com/product/tajin-apple/" target="_blank">
-<img src="https://surf-creative-assets.s3.amazonaws.com/00018/HappyApples-Tajin300x250-5.jpg" width="300" height="250" /></a>
+====>{"id":2,"stringId":"2","customer_id":"test","isAdx":false,"name":"Testers Campaign","ad_domain":"default-domain","attributes":[],"creatives":[],"forensiq":false,"spendrate":16667,"effectiveSpendRate":0,"status":"runnable","activate_time":1603815058772,"expire_time":1921943400000,"budget":{"totalCost":0,"totalBudget":0,"dailyBudget":0,"hourlyBudget":0,"expire_time":1921943400000,"activate_time":1603815058772,"dailyCost":0,"hourlyCost":0},"banners":[2],"videos":[],"audios":[],"natives":[],"updated_at":1605035711208,"regions":"US","target_id":2,"rules":[],"exchanges":["Nexage","Admedia"],"bcat":[],"capSpec":"null","capExpire":0,"capCount":0,"capUnit":"seconds","classId":3,"active":true,"factoryId":2,"expired":false,"crudeAccounting":{"wins":0,"adspend":0,"pixels":0,"bids":0,"clicks":0},"runnable":true,"daypartSchedule":null,"total_budget":0,"budget_limit_daily":0,"budget_limit_hourly":0,"capunit":"seconds","capspec":"null","capexpire":0,"capcount":0,"date":[1603815058772,1921943400000]}
 
-
-
-
-
-
-<img src="{pixel_url}&exchange={exchange}
+{
+  "id" : 2,
+  "stringId" : "2",
+  "customer_id" : "test",
+  "isAdx" : false,
+  "name" : "Testers Campaign",
+  "ad_domain" : "default-domain",
+  "attributes" : [ ],
+  "creatives" : [ ],
+  "forensiq" : false,
+  "spendrate" : 16667,
+  "effectiveSpendRate" : 0,
+  "status" : "runnable",
+  "activate_time" : 1603815058772,
+  "expire_time" : 1921943400000,
+  "budget" : {
+    "totalCost" : 0,
+    "totalBudget" : 0,
+    "dailyBudget" : 0,
+    "hourlyBudget" : 0,
+    "expire_time" : 1921943400000,
+    "activate_time" : 1603815058772,
+    "dailyCost" : 0,
+    "hourlyCost" : 0
+  },
+  "banners" : [ 2 ],
+  "videos" : [ ],
+  "audios" : [ ],
+  "natives" : [ ],
+  "updated_at" : 1605035711208,
+  "regions" : "US",
+  "target_id" : 2,
+  "rules" : [ ],
+  "exchanges" : [ "Nexage", "Admedia" ],
+  "bcat" : [ ],
+  "capSpec" : "null",
+  "capExpire" : 0,
+  "capCount" : 0,
+  "capUnit" : "seconds",
+  "classId" : 3,
+  "active" : true,
+  "factoryId" : 2,
+  "expired" : false,
+  "crudeAccounting" : {
+    "wins" : 0,
+    "adspend" : 0,
+    "pixels" : 0,
+    "bids" : 0,
+    "clicks" : 0
+  },
+  "runnable" : true,
+  "daypartSchedule" : null,
+  "total_budget" : 0,
+  "budget_limit_daily" : 0,
+  "budget_limit_hourly" : 0,
+  "capunit" : "seconds",
+  "capspec" : "null",
+  "capexpire" : 0,
+  "capcount" : 0,
+  "date" : [ 1603815058772, 1921943400000 ]
+}
