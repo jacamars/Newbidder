@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.hazelcast.map.IMap;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Preshuffle;
 import com.jacamars.dsp.rtb.shared.CampaignCache;
 
 public class Shadow {
@@ -35,6 +36,7 @@ public class Shadow {
 			campaigns.remove(key);
 			scampaigns.remove(key);
 		}
+		Preshuffle.getInstance().compile();
 	}
 
 	public Campaign get(String key) {
@@ -42,6 +44,12 @@ public class Shadow {
 	}
 
 	public void add(Campaign camp) {
+		try {
+			camp.encodeCreatives();       // this is a HACK
+		} catch (Exception err) {
+			err.printStackTrace();
+		}
+		
 		synchronized (lock) {
 			campaigns.put("" + camp.id, camp);
 			scampaigns.put("" + camp.id, camp);
@@ -78,6 +86,7 @@ public class Shadow {
 	public void clear() {
 		scampaigns.clear();
 		campaigns.clear();
+		Preshuffle.getInstance().compile();
 	}
 	
 	public List<Campaign> getCampaigns() {

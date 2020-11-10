@@ -336,6 +336,7 @@ public class Campaign implements Comparable, Portable {
 		processCreatives();
 		process();
 		doTargets();
+		
 	}
 
 	/**
@@ -402,7 +403,8 @@ public class Campaign implements Comparable, Portable {
 		category = camp.category;
 		currentHour = camp.currentHour;
 		currentDay = camp.currentDay;
-
+		myNode = camp.myNode;
+		
 		encodeCreatives();
 		encodeAttributes();
 	}
@@ -1171,7 +1173,8 @@ public class Campaign implements Comparable, Portable {
 			park(c);
 		}
 
-		updated_at = myNode.get("updated_at").asLong();
+		if (myNode.get("updated_at") instanceof MissingNode != false)
+			updated_at = myNode.get("updated_at").asLong();
 
 		return change;
 	}

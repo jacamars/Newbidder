@@ -880,7 +880,8 @@ public class Node implements Serializable {
 			if (!(operator == EXISTS || operator == NOT_EXISTS)) {
 				if (notPresentOk)
 					return true;
-				return false;
+				else
+					return false;
 			}
 		}
 

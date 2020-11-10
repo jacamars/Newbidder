@@ -1221,6 +1221,7 @@ public class Creative implements Serializable {
 		}
 
 		// assign the fixed nodes
+		fixedNodes.clear();
 		fixedNodes.add(new FixedNodeStatus());
 		fixedNodes.add(new FixedNodeNonStandard());
 		fixedNodes.add(new FixedNodeDoSize());
@@ -1327,6 +1328,7 @@ public class Creative implements Serializable {
 		double xprice = price;
 		String impid = this.impid;
 
+		//System.out.println("HERE: " + adId + "/" + impid + ": " + fixedNodes.size());
 		Node n = null;
 		/**
 		 * Attributes that are specific to the creative (additional to the campaign

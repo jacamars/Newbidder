@@ -113,6 +113,8 @@ public class CampaignSelector {
 		int kount = 0;
 
 		List<Campaign> list = Preshuffle.getInstance().getPreShuffledCampaignList();
+		
+		// System.out.println("======>"+ list.size());
 
 		if (list == null) {
 			logger.error("No preshuffled campaigns lists");
