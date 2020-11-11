@@ -60,7 +60,7 @@ const mangle = () => {
         <label>Image Url</label>
         <Input
           id="height"
-          onChange={ (e) => props.callback(e,"imageurl")}
+          onChange={ (e) => props.callback(e.target.value,"imageurl")}
           defaultValue={props.creative.imageurl}
           type="text"
         />
