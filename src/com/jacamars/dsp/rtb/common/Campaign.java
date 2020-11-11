@@ -1141,7 +1141,9 @@ public class Campaign implements Comparable, Portable {
 	public void processCreatives() throws Exception {
 		creatives = new ArrayList<>();
 		try {
-			banners.stream().forEach(id -> creatives.add(Creative.getInstance(id, "banner", customer_id)));
+			banners.stream().forEach(
+					id -> creatives.add(Creative.getInstance(id, "banner", customer_id))
+			);
 			videos.stream().forEach(id -> creatives.add(Creative.getInstance(id, "video", customer_id)));
 			audios.stream().forEach(id -> creatives.add(Creative.getInstance(id, "audio", customer_id)));
 			natives.stream().forEach(id -> creatives.add(Creative.getInstance(id, "native", customer_id)));

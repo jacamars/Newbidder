@@ -282,19 +282,22 @@ public class Creative implements Serializable {
 
 	public static Creative getInstance(int id, String key, String customer_id) {
 		String select = "";
+		String cid = "";
+		if (!customer_id.equals("rtb4free")) 
+			cid = " AND customer_id='" + customer_id + "'";
 		try {
 			switch (key.toLowerCase()) {
 			case "banner":
-				select = "select * from banners where id=" + id + " AND customer_id='" + customer_id + "'";
+				select = "select * from banners where id=" + id + cid;
 				break;
 			case "video":
-				select = "select * from banner_videos where id=" + id + " AND customer_id='" + customer_id + "'";
+				select = "select * from banner_videos where id=" + id + cid;
 				break;
 			case "audio":
-				select = "select * from banner_audios where id=" + id + " AND customer_id='" + customer_id + "'";
+				select = "select * from banner_audios where id=" + id + cid;
 				break;
 			case "native":
-				select = "select * from banner_natives where id=" + id + " AND customer_id='" + customer_id + "'";
+				select = "select * from banner_natives where id=" + id + cid;
 				break;
 			default:
 				throw new RuntimeException("Can't instantiate unknown type: " + key);
