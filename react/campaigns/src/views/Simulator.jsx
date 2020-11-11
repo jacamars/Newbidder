@@ -177,7 +177,7 @@ const Simulator = (props) =>  {
   }
 
 
-  const sendBid = async  (event, id) => {
+  const sendBid = async  (id) => {
 
     wClearHandler();
     
@@ -190,6 +190,11 @@ const Simulator = (props) =>  {
     const endpoint = document.getElementById('endpoint').value;
 
     var bid = vars.bid
+    if (id !== undef) {
+      bid = JSON.parse(bid)
+      bid.id = "123";
+      bid = JSON.stringify(bid);
+   } else
     bid = JSON.stringify(JSON.parse(bid))
     console.log("THE BID IS: " + bid);
 
@@ -202,6 +207,7 @@ const Simulator = (props) =>  {
  
     var rtt =  performance.now();
     var xtime;
+    var reason;
     
     try {
       const response = await axiosInstance.post(endpoint,bid);
@@ -209,8 +215,17 @@ const Simulator = (props) =>  {
       xtime = "xtime: " + response.headers['x-time'];
       vars.xtime = rtt + ", " + xtime;
       vx.changeXtime(rtt + ", " + xtime)
+      var reason = "";
+      if (response.headers["x-reason"] !== undef) {
+        reason = vars.reason = response.headers["x-reason"];
+        console.log("=====>'"+reason+"'");
+        if (reason.indexOf("\n") > 1) {
+          alert("Has multiples");
+        }
+      }
       if (response.status !== 200) {
-        alert("NOBID: Response was: " + response.status + ", rtt: " + (performance.now()-rtt) + ", xtime: " + xtime);
+        alert("NOBID: Response was: " + response.status + ", rtt: " + (performance.now()-rtt) + ", xtime: " + xtime +
+          "\n" + reason);
         return;
       }
       //console.log("RESPONSE: " + JSON.stringify(response.data));

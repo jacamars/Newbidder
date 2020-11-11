@@ -50,11 +50,18 @@ public class CampaignSelector {
 	// Executor for handling creative attributes.
 	static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
+	StringBuffer err;
 	/**
 	 * Empty private constructor.
 	 */
 	private CampaignSelector() {
 
+	}
+	
+	public String getErr() {
+		if (err == null)
+			return null;
+		return err.toString();
 	}
 
 	/**
@@ -87,22 +94,28 @@ public class CampaignSelector {
 		boolean xtest = false;
 		if (br.id.equals("123")) {
 			xtest = true;
-		}
+			err = new StringBuffer();
+		} else
+			err = null;
 
 		// Don't proces if there was an error forming the original bid request.
 		if (br.notABidRequest())
 			return null;
 
 		if (RTBServer.throttleTime > Configuration.getInstance().throttle) {
-			if (xtest)
+			if (xtest) {
 				logger.info("RTBServer.throttleTime {} > maximum allowed: {}", RTBServer.throttleTime,
 						Configuration.getInstance().throttle);
+				err.append("The bider is throttled");
+			}
 			return null;
 		}
 
 		if (Configuration.getInstance().getCampaignsList().size() == 0) {
-			if (xtest)
+			if (xtest) {
 				logger.info("No campaigns are loaded");
+				err.append("No campaigns are loaded");
+			}
 			return null;
 		}
 
@@ -118,6 +131,8 @@ public class CampaignSelector {
 
 		if (list == null) {
 			logger.error("No preshuffled campaigns lists");
+			if (err != null)
+				err.append("No presuffled campaigns list exists");
 			return null;
 		}
 
@@ -169,8 +184,13 @@ public class CampaignSelector {
 		xtime = System.currentTimeMillis() - xtime;
 
 		if (candidates.size() == 0) {
-			if (xtest)
+			if (xtest) {
 				logger.info("*** No bid candidates ***");
+				workers.forEach(w->{
+					err.append(w.getErr());
+					err.append("|\n");
+				});
+			}
 			return null;
 		}
 
@@ -197,6 +217,13 @@ public class CampaignSelector {
 		if (RTBServer.frequencyGoverner != null)
 			RTBServer.frequencyGoverner.add(winner.camp.name, br);
 
+		if (xtest) {
+			workers.forEach(w->{
+				err.append(w.getErr());
+				err.append("\n");
+			});
+		}
+		
 		return winner;
 	}
 
@@ -220,12 +247,14 @@ class SelectionWorker implements Runnable {
 	MutableBoolean flag;
 	CountDownLatch latch;
 	boolean test;
+	StringBuffer err;
 
 	public SelectionWorker(int start, int stop, final List<Campaign> list, final BidRequest br,
 			final boolean exchangeIsAdx, MutableBoolean flag, boolean test, CountDownLatch latch) {
 
 		if (test) {
 			logger.info("WORKER: {} - {}", start, stop);
+			err = new StringBuffer();
 		}
 
 		this.test = test;
@@ -241,6 +270,12 @@ class SelectionWorker implements Runnable {
 		this.flag = flag;
 		this.latch = latch;
 
+	}
+	
+	public String getErr() {
+		if (err == null)
+			return null;
+		return err.toString();
 	}
 
 	public void run() {
@@ -299,6 +334,8 @@ class SelectionWorker implements Runnable {
 								}
 							}
 						}
+						if (err != null)
+							err.append(p.getErr());
 					}
 
 					if (!this.test && (System.currentTimeMillis() - time) > 50) {

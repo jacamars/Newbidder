@@ -71,6 +71,7 @@ public class CampaignProcessor implements Runnable {
 	/** The logging object */
 	static final Logger logger = LoggerFactory.getLogger(CampaignProcessor.class);
 
+	StringBuilder err;
 	/**
 	 * Constructor.
 	 * 
@@ -89,6 +90,12 @@ public class CampaignProcessor implements Runnable {
 		if (latch != null)
 			start();
 	}
+	
+	public String getErr() {
+		if (err == null)
+			return null;
+		return err.toString();
+	}
 
 	public void start() {
 //		me = new Thread(this);
@@ -99,7 +106,7 @@ public class CampaignProcessor implements Runnable {
 		try {
 			boolean printNoBidReason = Configuration.getInstance().printNoBidReason;
 			int logLevel = 5;
-			StringBuilder err = new StringBuilder();
+			err = new StringBuilder();
 			if (printNoBidReason || br.id.equals("123")) {
 				if (br.id.equals("123")) {
 					printNoBidReason = true;
@@ -219,12 +226,10 @@ public class CampaignProcessor implements Runnable {
 						e.printStackTrace();
 					}
 				done = true;
-				if (err != null)
-					err.setLength(0);
 				return;
 			}
 
-			if (printNoBidReason) {
+			/*if (printNoBidReason) {
 				String str = "";
 				for (int i = 0; i < selected.size(); i++) {
 					SelectedCreative cr = selected.get(i);
@@ -235,7 +240,8 @@ public class CampaignProcessor implements Runnable {
 						error.printStackTrace();
 					}
 				}
-			}
+				err.append(str);
+			}*/
 
 			//for (SelectedCreative cr : selected) {
 			//	cr.capSpec = capSpecs.get(cr.creative.impid);

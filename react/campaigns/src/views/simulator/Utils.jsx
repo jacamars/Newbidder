@@ -2,7 +2,6 @@ import React from "react";
 
 export const SampleBanner = {
   "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
-	"Xid": "123",
 	"at": 2,
 	"imp": [{
 		"id": "1",
@@ -248,7 +247,6 @@ export const SampleAudio = {
 };
 
 export const SampleNative = {
-  "Xid": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
   "id": "123",
   "at": 2,
   "imp": [

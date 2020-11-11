@@ -1120,6 +1120,7 @@ class Handler extends AbstractHandler {
 		response.addHeader("Access-Control-Allow-Origin", "*");
 		response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 		response.addHeader("Access-Control-Expose-Headers", "X-TIME");
+		response.addHeader("Access-Control-Expose-Headers", "X-REASON");
 
 		InputStream body = request.getInputStream();
 		String type = request.getContentType();
@@ -1280,6 +1281,12 @@ class Handler extends AbstractHandler {
 						Controller.getInstance().sendNobid(new NobidResponse(br.id, br.getExchange()));
 					} else {
 						bresp = CampaignSelector.getInstance().getMaxConnections(br);
+						 if (CampaignSelector.getInstance().getErr() != null) {
+							 var reason = CampaignSelector.getInstance().getErr();
+							 
+							 System.out.println("REASON:"+reason);
+							 response.setHeader("X-REASON",reason);
+	                     }
 						if (bresp == null) {
 							code = RTBServer.NOBID_CODE;
 							json = br.returnNoBid("No matching campaign");
@@ -1310,7 +1317,6 @@ class Handler extends AbstractHandler {
 
 					response.setContentType(br.returnContentType()); // "application/json;charset=utf-8");
 					if (code == 204) {
-						response.setHeader("X-REASON", json);
 						if (Configuration.getInstance().printNoBidReason)
 							System.out.println("No bid: " + json);
 						response.setStatus(br.returnNoBidCode());

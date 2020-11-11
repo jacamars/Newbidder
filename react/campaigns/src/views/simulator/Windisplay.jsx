@@ -30,6 +30,10 @@ const Windisplay = (props) => {
         setShowPixelFire(true);
     }
 
+    const showReason = () => {
+        alert(props.vars.reason);
+    }
+
     return (
         <div>
             {show ? (
@@ -41,6 +45,10 @@ const Windisplay = (props) => {
                        <Col xs="1">
                             <Button color="success" onClick={(e) => sendWinNotice()} size="sm">Send Win</Button>
                        </Col>
+                       { props.vars.reason &&
+                        <Col xs="1">
+                            <Button color="success" onClick={(e) => showReason()} size="sm">Show Reason</Button>
+                       </Col> }
                        { showPixelFire &&
                           <Col xs="1">
                             <Button color="warning" onClick={props.sendPixel} size="sm">Fire Pixel</Button>

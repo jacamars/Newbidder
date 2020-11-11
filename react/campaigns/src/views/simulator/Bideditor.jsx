@@ -69,11 +69,14 @@ const Bideditor = (props) => {
                             {bidTypes}
                         </select>
                     </Col>
-                    <Col xs="1">
-                <Button color="danger" onClick={props.sendBid} size="sm">Send Bid</Button>
+                <Col xs="1">
+                    <Button color="danger" onClick={(e)=>props.sendBid()} size="sm">Bid</Button>
                 </Col>
                 <Col xs="1">
-                <Button color="success" onClick={props.clearHandler} size="sm">Clear</Button>
+                    <Button color="warning" onClick={(e)=>props.sendBid('123')} size="sm">Test</Button>
+                </Col>
+                <Col xs="2">
+                    <Button color="success" onClick={props.clearHandler} size="sm">Clear</Button>
                 </Col>
                 </Row>
 
