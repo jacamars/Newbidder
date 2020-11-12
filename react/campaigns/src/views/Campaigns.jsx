@@ -144,6 +144,63 @@ var undef;
     return RED;
   }
 
+  const importClipboard = async () => {
+  
+    var data = localStorage.getItem("import");
+    console.log("DATA IS: " + data);
+    var source = JSON.parse(data);
+    alert("Source has: " + source.campaign.banners.length);
+    localStorage.removeItem("import");
+    redraw();
+  }
+
+
+  const exportCampaign = async (id) => {
+    var campaign  = await vx.getDbCampaign(id);
+    var rules = campaign.rules;
+    var banners = campaign.banners;
+    var videos = campaign.videos;
+    var audios = campaign.audios;
+    var natives = campaign.natives;
+
+    var exp = {};
+    exp.campaign = campaign;
+    exp.rules = {};
+    exp.banners = {};
+    exp.videos = {};
+    exp.audios = {};
+    exp.natives = {};
+
+    for (var i = 0; i < rules.length; i++) {
+      var rule = rules[i];
+      exp.rules[rule.id.toString()] = await vx.getRule(rule.id);
+    }
+
+    for (var i = 0; i < banners.length; i++) {
+      var banner = banners[i];
+      exp.banners[banner.toString()] = await vx.getCreative(banner,"banner");
+    }
+
+    for (var i = 0; i < audios.length; i++) {
+      var audio = audios[i];
+      exp.audios[audio.toString()] = await vx.getCreative(audio,"audio");
+    }
+
+    for (var i = 0; i < videos.length; i++) {
+      var video = videos[i];
+      exp.videos[video.toString()] = await vx.getCreative(video,"video");
+    }
+
+    for (var i = 0; i < natives.length; i++) {
+      var native = natives[i];
+      exp.natives[native.toString()] = await vx.getCreative(native,"native");
+    }
+
+    localStorage.setItem("import",JSON.stringify(exp,null,2));
+    navigator.clipboard.writeText(JSON.stringify(exp,null,2));
+    alert("Copied to Local Storage!");
+  }
+
   const delta = async (index) => {
     var row = vx.campaigns[index];
     var x = await vx.getDbCampaign(row.id);
@@ -179,6 +236,7 @@ var undef;
           <td key={'campaignsview-edit-'+ index} className="text-center">
             <Button color="success" size="sm" onClick={()=>editCampaign(row.id,true)}>View</Button>{' '}
             <Button color="warning" size="sm" onClick={()=>editCampaign(row.id,false)}>Edit</Button>{' '}
+            <Button color="info" size="sm" onClick={()=>exportCampaign(row.id)}>Export</Button>{' '}
             {!checkRunning(row.name)
             ? <Button color="info" size='sm' onClick={()=>report(row.id)}>Report</Button>
             : <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</>}
@@ -230,6 +288,8 @@ var undef;
             { campaign == null && <>
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
+            { localStorage.getItem("import") !== null  &&
+              <Button size="sm" className="btn-fill" color="danger" onClick={importClipboard}>Import</Button>}
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
