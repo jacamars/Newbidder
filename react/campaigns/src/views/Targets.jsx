@@ -78,8 +78,14 @@ var undef;
   const getTargetsView = () => {
     console.log("GetTargetsView, rows = " + vx.targets.length);
 
+    var targets = vx.targets;
+    targets.sort(function(a, b) {
+     a = a.customer_id + a.name;
+     b = b.customer_id + b.name;
+     return (a > b) - (a < b);
+    });
     return(
-       vx.targets.map((row, index) => (
+       targets.map((row, index) => (
          <tr key={'targetsview-' + row}>
            <td>{index}</td>
            <td key={'targets-name-' + index} className="text-left">{row.name}</td>

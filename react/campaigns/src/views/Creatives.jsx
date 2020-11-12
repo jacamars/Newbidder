@@ -241,9 +241,21 @@ var undef;
     setTimeout(refresh,2000);
   }
 
+  const sortedCreatives = () => {
+    var creatives = vx.creatives;;
+    creatives.sort(function(a, b) {
+     a = a.customer_id + a.name;
+     b = b.customer_id + b.name;
+     return (a > b) - (a < b);
+    });
+    return creatives;
+  }
+
   const getBannersView = () => {
+
+
     return(
-      vx.creatives.filter((e) => e.type === "banner").map((row, index) => (
+      sortedCreatives().filter((e) => e.type === "banner").map((row, index) => (
         <tr key={'banner-' + row}>
           <td>{index}</td>
           <td key={'banner-name-' + index} className="text-left">{row.name}</td>
@@ -264,7 +276,7 @@ var undef;
 
   const getVideosView = () => {
     return(
-      vx.creatives.filter((e) => e.type === "video").map((row, index) => (
+      sortedCreatives().filter((e) => e.type === "video").map((row, index) => (
         <tr key={'video-' + row}>
           <td>{index}</td>
           <td key={'video-name-' + index} className="text-left">{row.name}</td>
@@ -285,7 +297,7 @@ var undef;
 
 const getAudiosView = () => {
   return(
-    vx.creatives.filter((e) => e.type === "audio").map((row, index) => (
+    sortedCreatives().filter((e) => e.type === "audio").map((row, index) => (
       <tr key={'audio-' + row}>
         <td>{index}</td>
         <td key={'audio-name-' + index} className="text-left">{row.name}</td>
@@ -306,7 +318,7 @@ const getAudiosView = () => {
 
 const getNativesView = () => {
   return(
-    vx.creatives.filter((e) => e.type === "native").map((row, index) => (
+    sortedCreatives().filter((e) => e.type === "native").map((row, index) => (
       <tr key={'native-' + row}>
         <td>{index}</td>
         <td key={'native-name-' + index} className="text-left">{row.name}</td>

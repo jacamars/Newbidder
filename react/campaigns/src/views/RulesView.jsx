@@ -26,10 +26,15 @@ const RulesView = (props) => {
         if (vx.rules === undef)
           return(null);
           
-        console.log("GetRulesView, rows = " + vx.rules.length);
     
+        var rules = vx.rules;
+        rules.sort(function(a, b) {
+         a = a.customer_id + a.name;
+         b = b.customer_id + b.name;
+         return (a > b) - (a < b);
+        });
         return(
-           vx.rules.map((row, index) => (
+           rules.map((row, index) => (
              <tr key={'rulesview-' + row}>
                <td>{index}</td>
                <td key={'rules-name-' + index} className="text-left">{row.name}</td>

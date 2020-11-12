@@ -205,6 +205,9 @@ var undef;
   const delta = async (index) => {
     var row = vx.campaigns[index];
     var x = await vx.getDbCampaign(row.id);
+    if (x === undef) 
+      return;
+    
     if (row.status === "runnable") {
         x.status = "offline";
     } else {
@@ -219,8 +222,14 @@ var undef;
 
   const getCampaignsView = () => {
 
+   var campaigns = vx.campaigns;
+   campaigns.sort(function(a, b) {
+    a = a.customer_id + a.name;
+    b = b.customer_id + b.name;
+    return (a > b) - (a < b);
+   });
    return(
-      vx.campaigns.map((row, index) => (
+      campaigns.map((row, index) => (
         <tr key={'campaignsview-' + index} style={getStyle(row.status,row.name)}>
           <td>{index}</td>
           <td key={'campaignsview-name-' + index} className="text-left">{row.name}</td>
@@ -277,7 +286,7 @@ var undef;
   /////////////////////////////////////////////////////////////////////////////////////
 
   //             <Button size="sm" className="btn-fill" color="danger" onClick={importClipboard}>Import</Button>
-  
+
   return (
     <div className="content">
     { modal &&
