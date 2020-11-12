@@ -177,7 +177,7 @@ const getSelectedExchangeOptions = () => {
     items.push();
     for (var i=0;i<ssp.length;i++) {
       var x = ssp[i];
-      if (campaign.exchanges.indexOf(x) != -1)
+      if (campaign.exchanges.indexOf(x.toLowerCase()) != -1)
         items.push(<option key={"exchanges-"+x} value={x.toLowerCase()} selected>{x}</option>);
       else
         items.push(<option key={"exchanges-"+x} value={x.toLowerCase()}>{x}</option>);
