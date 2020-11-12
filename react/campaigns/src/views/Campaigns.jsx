@@ -13,6 +13,7 @@ import {
   CardTitle,
   Table,
   Row,
+  Spinner,
   Col
 } from "reactstrap";
 import { useViewContext } from "../ViewContext";
@@ -38,6 +39,7 @@ var undef;
 
   const [count, setCount] = useState(0);
   const [campaign, setCampaign] = useState(null);
+  const [spinner, setSpinner] = useState(undef);
   const vx = useViewContext();
 
   const redraw = () => {
@@ -49,6 +51,7 @@ var undef;
   };
 
   const refresh = async() => {
+      setSpinner(undef);
       loadDataOnce();
       redraw();
   }
@@ -141,10 +144,22 @@ var undef;
     return RED;
   }
 
+  const delta = async (index) => {
+    var row = vx.campaigns[index];
+    var x = await vx.getDbCampaign(row.id);
+    if (row.status === "runnable") {
+        x.status = "offline";
+    } else {
+        x.status = "runnable";
+    }
+    vx.addNewCampaign(JSON.stringify(x));
+    setSpinner(index);
+    setTimeout(refresh,3000);
+    redraw();
+  }
+
 
   const getCampaignsView = () => {
-
-    console.log("GetCampaigsView, rows = " + vx.campaigns.length);
 
    return(
       vx.campaigns.map((row, index) => (
@@ -157,7 +172,9 @@ var undef;
           }
 
           <td key={'campaignsview-id-' + index} className="text-right">{row.id}</td>
-          <td key={'campaignsview-status-' + index} className="text-right">{row.status}</td>
+          <td key={'campaignsview-status-' + index} className="text-center">
+            <Button color="link" size="sm" onClick={()=>delta(index)}>{row.status}</Button>
+          </td>
           <td key={'campaignsview-running-'+ index} className="text-right">{""+checkRunning(row.name)}</td>
           <td key={'campaignsview-edit-'+ index} className="text-center">
             <Button color="success" size="sm" onClick={()=>editCampaign(row.id,true)}>View</Button>{' '}
@@ -229,7 +246,7 @@ var undef;
                                 <th className="text-right">Customer</th>
                             }
                             <th className="text-right">SQL-ID</th>
-                            <th className="text-right">Runnable</th>
+                            <th className="text-center">Status</th>
                             <th className="text-right">Is Running</th>
                             <th className="text-center">Actions</th>
                           </tr>
