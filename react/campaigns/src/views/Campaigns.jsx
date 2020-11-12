@@ -199,6 +199,7 @@ var undef;
     localStorage.setItem("import",JSON.stringify(exp,null,2));
     navigator.clipboard.writeText(JSON.stringify(exp,null,2));
     alert("Copied to Local Storage!");
+    refresh();
   }
 
   const delta = async (index) => {
@@ -275,6 +276,8 @@ var undef;
   }
   /////////////////////////////////////////////////////////////////////////////////////
 
+  //             <Button size="sm" className="btn-fill" color="danger" onClick={importClipboard}>Import</Button>
+  
   return (
     <div className="content">
     { modal &&
@@ -288,8 +291,7 @@ var undef;
             { campaign == null && <>
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
-            { localStorage.getItem("import") !== null  &&
-              <Button size="sm" className="btn-fill" color="danger" onClick={importClipboard}>Import</Button>}
+
                 <Card className="card-chart">
                     <CardHeader>
                         <Row>
