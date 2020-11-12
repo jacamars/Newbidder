@@ -457,11 +457,17 @@ public class Configuration {
 		
 		//////////////////// LOAD HAZELCAST PARAMETERS THEN INITIALIZE HAZELCAST ////////////////////
 		if (m.get("hazelcast") != null) {
-			Map<String,String> hazel = (Map)m.get("hazelcast");
-			mapstoredriver = hazel.get("mapstoredriver");
-			mapstorejdbc = hazel.get("mapstorejdbc");
-			backups = Integer.valueOf(hazel.get("backupCount"));
-		}
+			Map<String,Object> hazel = (Map)m.get("hazelcast");
+			mapstoredriver = (String)hazel.get("mapstoredriver");
+			mapstorejdbc = (String)hazel.get("mapstorejdbc");
+			backups = Integer.valueOf((String)hazel.get("backupCount"));
+			
+	        // Hazelcast Network Configuration
+			if (hazel.get("hzConfig") != null) {
+				hzConfig = (Map) hazel.get("hzConfig");
+			}
+		}	
+		
         //////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 * Create forensiq, anura or organizational trap in mmdb
@@ -582,11 +588,6 @@ public class Configuration {
 		}
 		if (m.get("adminSSL") != null) {
 			adminSSL = (Boolean) m.get("adminSSL");
-		}
-		
-        // Hazelcast Network Configuration
-		if (m.get("hzConfig") != null) {
-			hzConfig = (Map) m.get("hzConfig");
 		}
 
 		String strategy = (String) m.get("strategy");
