@@ -287,24 +287,24 @@
     "bid" : "/rtb/bids/bidswitch=com.jacamars.dsp.rtb.exchanges.bidswitch.Bidswitch&!usesEncodedAdm"
   }],
   "lists" : [ {
-    "s3" : "geo/adxgeo.csv",
+    "s3" : "rtb4free-big-data/geo/adxgeo.csv",
     "lazyload": true,
     "name" : "@ISO2-3",
     "type" : "ISO2"
   }, {
-    "s3" : "cidr/METHBOT.txt",
+    "s3" : "rtb4free-big-data/cidr/METHBOT.txt",
     "name" : "@CIDR",
     "type" : "CIDR"
   }, {
-    "s3" : "geo/adxgeo.csv",
+    "s3" : "rtb4free-big-data/geo/adxgeo.csv",
     "name" : "@ADXGEO",
     "type" : "ADXGEOCODES"
   }, {
-    "s3" : "geo/zip_codes_states.csv",
+    "s3" : "rtb4free-big-data/geo/zip_codes_states.csv",
     "name" : "@ZIPCODES",
     "type" : "LOOKINGGLASS"
   },{
-    "s3" : "bloom/audience1/test-audience.txt",
+    "s3" : "rtb4free-big-data/bloom/audience1/test-audience.txt",
     "name" : "@AUDIENCE1",
     "type" : "BLOOM",
     "size": 6
