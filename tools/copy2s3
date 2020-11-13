@@ -2,7 +2,7 @@
 #
 # This runs the RTB4FREE server
 #
-java -Xmx4096m \
+java -Dlog4j.configuration="file:log4j.properties" -Xmx4096m \
 	 --add-modules java.se \
 	 --add-exports java.base/jdk.internal.ref=ALL-UNNAMED \
 	 --add-opens java.base/java.lang=ALL-UNNAMED \
