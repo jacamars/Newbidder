@@ -209,5 +209,74 @@ crosstalk.ListSymbols();
 >>> 
 ```
 
+##Using a Debugger
+
+To work with the bidder using the Eclipse development environment is pretty easy. There are a 
+couple of steps to take first.
+
+### Start Kafka+Minio+Postgres+Zookeeper
+
+Execute the docker-compose for this:
+
+```
+	$docker-compose -f justkafka.yml up -d
+```
+
+### Use Minio or S3
+
+For object store, decide to use Minio or S3, this will determine what your Debug/Run parameters will look like.
+
+### Using Minio
+
+
+Modify the makefile to change all occurrances of "rtb4free-bigdata" to "rtb4free-bigdata-<youname>".
+
+Modify Campaigns/payday.json to change all occurances of rtb4free-bigdata" to "rtb4free-bigdata-<youname>".
+
+Copy all the file based objects with the minio target to Make:
+
+```
+	$make minio
+```
+
+Login to https://localhost:9000 to view the value in minio.
+
+### Using S3
+
+Modify the makefile to change all occurances of "rtb4free-bigdata" to "rtb4free-bigdata-<youname>".
+
+Make a bucket in S3 named  ```rtb4free-bigdata-<yourname>```
+
+Copy all the file based objects to S3 using make. You need your aws-access key, aws-secret key, and the region where
+your bucket is. 
+
+```
+	make localS3 aws-access-key=youraccesskey aws-secret-key=yoursecretkey aws-region=theregion
+```
+
+### Set Up Debug Environment
+
+On the main tab of Eclipse Run/Run Configurations set it up to look like this:
+
+![image](../images/eclipse-main.png)
+
+
+- On the environment tab of Eclipse Run/Run Configurations set the following variables (this is for Minio)
+
+![image](../images/eclipse-env.png)
+
+	To use S3, remove S3ENDPOINT variable and change the keys to your S3 keys.
+	
+- On the Arguments tab set up as follows:
+
+![image](../images/eclipse-arg.png)
+
+The vm arguments are truncated on the view above, paste this into that window:
+	
+```
+-Dlog4j.configuration="file:log4j.properties" 
+--add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
+```
+
 
 
