@@ -1524,7 +1524,7 @@ public class Campaign implements Comparable, Portable {
 				+ "created_at," + "exchanges," + "regions," + "target_id," + "rules," + "banners," + "videos,"
 				+ "audios," + "natives," + "day_parting_utc," + "capspec," + "capcount," + "capexpire," + "capunit,"
 				+ "customer_id," + "spendrate) VALUES("
-				+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
 		p = conn.prepareStatement(sql);
 

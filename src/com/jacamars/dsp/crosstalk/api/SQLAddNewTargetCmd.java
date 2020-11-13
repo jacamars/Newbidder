@@ -32,6 +32,7 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 	
 	ResultSet rs = null;
 	public String target;
+	int id;
 
 	/**
 	 * Default constructor
@@ -60,7 +61,13 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 				Targeting n = new Targeting(x);
 	
 				PreparedStatement st = Targeting.toSql(n, CrosstalkConfig.getInstance().getConnection());
-				st.executeUpdate();
+				st.execute();
+				if (n.id == 0) {
+					ResultSet updated = st.getResultSet();
+					if (updated.next()) {
+						id = updated.getInt("id");
+					}
+				}
 				st.close();
 				
 				n.updateAttachedCampaigns();

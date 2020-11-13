@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Input, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Input, TextArea, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import {uuidv4} from "./Utils"
 
 const DecisionModal = (props) => {
   const [modal, setModal] = useState(true);
-  const [inputValue, setInputValue] = useState(uuidv4);
+  const [inputValue, setInputValue] = useState();
 
   const toggle = (t) => {
     setModal(!modal);
@@ -30,7 +30,7 @@ const DecisionModal = (props) => {
            {(props.input) && 
               <Input
                 style={estyle}
-                type="text"
+                type="textarea"
                 id={"modal-input"}
                 defaultValue={inputValue}
                 onChange={(e) => addToInput(e)}/>

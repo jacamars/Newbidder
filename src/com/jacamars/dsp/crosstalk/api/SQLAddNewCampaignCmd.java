@@ -29,6 +29,8 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 public class SQLAddNewCampaignCmd extends ApiCommand {
 	
 	ResultSet rs = null;
+	
+	public int id;
 
 	/**
 	 * Default constructor
@@ -67,6 +69,12 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 	
 				PreparedStatement st = Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection());
 				st.executeUpdate();
+				if (c.id == 0) {
+					ResultSet updated = st.getResultSet();
+					if (updated.next()) {
+						id = updated.getInt("id");
+					}
+				}
 				st.close();
 				
 			//	Crosstalk.getInstance().scan(); 

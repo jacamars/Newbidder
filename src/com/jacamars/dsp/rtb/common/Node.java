@@ -377,7 +377,7 @@ public class Node implements Serializable {
 		 +"name,"
 		 +"customer_id,"
 		 +"description) VALUES("
-		 +"?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		 +"?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 		
 		p = conn.prepareStatement(sql);
 		

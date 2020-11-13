@@ -29,6 +29,7 @@ import com.jacamars.dsp.crosstalk.budget.Crosstalk;
 public class SQLAddNewCreativeCmd extends ApiCommand {
 	
 	ResultSet rs = null;
+	public int id;
 
 	/**
 	 * Default constructor
@@ -57,7 +58,7 @@ public class SQLAddNewCreativeCmd extends ApiCommand {
 				String stype = node.get("type").asText();
 				Creative c = new Creative(node);
 				c.compile();
-				c.saveToDatabase();
+				id = c.saveToDatabase();
 				if (c.id != 0) {
 					Campaign.touchCampaignsWithCreative(c.getAttributeType(),c.id);
 				}

@@ -591,7 +591,7 @@ const  ViewContext = () => {
      // console.log("SQLAddNewCampaign returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
-      return result.data;
+      return result.id;
     }
 
     const addNewCreative = async(e) => {
@@ -610,7 +610,7 @@ const  ViewContext = () => {
       console.log("SQLAddNewCreative returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
-      return result.data;
+      return result.id;
     }
 
 
@@ -629,7 +629,7 @@ const  ViewContext = () => {
       console.log("SQLAddNewRule returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
-      return result.data;
+      return result.id;
     }
 
     const addNewTarget = async(e) => {
@@ -647,7 +647,7 @@ const  ViewContext = () => {
       console.log("SQLAddNewTarget returns: " + JSON.stringify(result,null,2));
       if (result === undef)
         return;
-      return result.data;
+      return result.id;
     }
 
 

@@ -30,6 +30,7 @@ public class SQLAddNewRuleCmd extends ApiCommand {
 	
 	ResultSet rs = null;
 	public String rule;
+	public int id;
 
 	/**
 	 * Default constructor
@@ -58,10 +59,15 @@ public class SQLAddNewRuleCmd extends ApiCommand {
 				
 				Node n = new Node(x);
 				PreparedStatement st = Node.toSql(n, CrosstalkConfig.getInstance().getConnection());
-				st.executeUpdate();
-				st.close();
 				
-				
+				st.execute();
+				if (n.id == 0) {
+					ResultSet updated = st.getResultSet();
+					if (updated.next()) {
+						id = updated.getInt("id");
+					}
+				}
+				st.close();				
 				return;
 			} catch (Exception err) {
 				err.printStackTrace();

@@ -39,7 +39,7 @@ var undef;
 
   const [count, setCount] = useState(0);
   const [campaign, setCampaign] = useState(null);
-  const [spinner, setSpinner] = useState(undef);
+  const [browse, setBrowse] = useState(false);
   const vx = useViewContext();
 
   const redraw = () => {
@@ -51,7 +51,6 @@ var undef;
   };
 
   const refresh = async() => {
-      setSpinner(undef);
       loadDataOnce();
       redraw();
   }
@@ -114,10 +113,6 @@ var undef;
     return false;
   }
 
-  const startCampaign = (id) => {
-
-  }
-
   const RED = {
     backgroundColor: 'red'
   }
@@ -142,16 +137,6 @@ var undef;
     if (checkRunning(name))
       return GREEN;
     return RED;
-  }
-
-  const importClipboard = async () => {
-  
-    var data = localStorage.getItem("import");
-    console.log("DATA IS: " + data);
-    var source = JSON.parse(data);
-    alert("Source has: " + source.campaign.banners.length);
-    localStorage.removeItem("import");
-    redraw();
   }
 
 
@@ -214,9 +199,40 @@ var undef;
         x.status = "runnable";
     }
     vx.addNewCampaign(JSON.stringify(x));
-    setSpinner(index);
+
     setTimeout(refresh,3000);
     redraw();
+  }
+
+
+  const importFile = () => {
+    setBrowse(true);
+  }
+
+  const completeImport = async (mode,data) => {
+    if (mode) {     // Ok, let's fill it all in.
+      var v = "";
+      try {
+        v = JSON.parse(data);
+        var campaign = v.campaign;
+        var rules = campaign.rules;
+        var banners = campaign.banners;
+        var videos = campaign.videos;
+        var audios = campaign.audios;
+        var natives = campaign.natives;
+        
+        for (var i=0;i<banners.length;i++) {
+          var id = banners[i];
+          var banner = v.banners[id.toString()];
+          banner.id = 0;
+          var rc = await vx.addNewCreative(banner,"banners");
+          alert(rc);
+        }
+      } catch (e) {
+
+      } 
+    }
+    setBrowse(false);
   }
 
 
@@ -300,6 +316,14 @@ var undef;
             { campaign == null && <>
             <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
             <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
+            <Button size="sm" className="btn-fill" color="danger" onClick={importFile}>Import</Button>
+            { browse &&
+                <DecisionModal title="Import Foreign Campaign" 
+                     message="Paste your definitions here" 
+                     name="IMPORT"
+                     input={true}
+                     inputValue=""
+                     callback={completeImport} />}
 
                 <Card className="card-chart">
                     <CardHeader>

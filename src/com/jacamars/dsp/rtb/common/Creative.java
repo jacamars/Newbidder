@@ -353,7 +353,7 @@ public class Creative implements Serializable {
 
 		if (c.isBanner) {
 			sql += "imageurl," + "width," + "height," + "contenttype," + "htmltemplate," + "position) VALUES ("
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?) RETURNING id;";
 			p = conn.prepareStatement(sql);
 
 			p.setString(i++, c.imageurl);
@@ -369,7 +369,7 @@ public class Creative implements Serializable {
 			sql += "mime_type," + "vast_video_bitrate," + "vast_video_duration," + "vast_video_height,"
 					+ "vast_video_width," + "vast_video_protocol," + "vast_video_linearity," + "htmltemplate) VALUES ("
 
-					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+					+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?) RETURNING id";
 			p = conn.prepareStatement(sql);
 
 			if (c.mime_type != null)
@@ -404,7 +404,7 @@ public class Creative implements Serializable {
 
 		} else if (c.isAudio) {
 			sql += "audio_bitrate, audio_duration, audio_start_delay, htmltemplate, audio_protocol, audio_api) VALUES (";
-			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?)";
+			sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,  ?,?,?,?,?,?,?) RETURNING id;";
 			p = conn.prepareStatement(sql);
 
 			if (c.audio_bitrate != null)
@@ -433,7 +433,7 @@ public class Creative implements Serializable {
 		} else if (c.isNative) {
 			sql += "native_assets,native_link,native_js_tracker,native_trk_urls,native_context,native_contextsubtype,native_plcmttype,native_plcmtct"
 
-					+ ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?)";
+					+ ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,   ?,?,?,?,?,?,?,?) RETURNING id;";
 
 			System.out.println(sql);
 			p = conn.prepareStatement(sql);
@@ -928,10 +928,18 @@ public class Creative implements Serializable {
 		return c;
 	}
 
-	public void saveToDatabase() throws Exception {
+	public int saveToDatabase() throws Exception {
 		PreparedStatement st = toSql(this, CrosstalkConfig.getInstance().getConnection());
-		st.executeUpdate();
+		st.execute();
+		
+		ResultSet updated = st.getResultSet();
+		if (id == 0) {
+			if (updated.next()) {
+				id = updated.getInt("id");
+			}
+		}
 		st.close();
+		return id;
 	}
 
 	/**
@@ -1956,8 +1964,11 @@ public class Creative implements Serializable {
 		if (isBanner) {
 			imageurl = node.get("imageurl").asText(null);
 		}
-
-		bid_ecpm.set(node.get("bid_ecpm").asDouble());
+		
+		if (node.get("price") == null)
+			bid_ecpm.set(node.get("bid_ecpm").asDouble());
+		else 
+			bid_ecpm.set(node.get("price").asDouble());
 
 		if (isBanner) {
 			if (node.get("width") != null)
