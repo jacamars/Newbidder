@@ -268,7 +268,7 @@ var undef;
             &nbsp;
             <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'banner')}>Edit</Button>
             &nbsp;
-            <Button color="danger" size="sm" onClick={()=>showModal(row.id,'banner')}>Delete</Button>
+            <Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id,'banner')}>Delete</Button>
           </td>
         </tr>))
     ); 
@@ -289,7 +289,7 @@ var undef;
             &nbsp;
             <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'video')}>Edit</Button>
             &nbsp;
-            <Button color="danger" size="sm" onClick={()=>showModal(row.id,'video')}>Delete</Button>
+            <Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id,'video')}>Delete</Button>
           </td>
         </tr>))
     ); 
@@ -310,7 +310,7 @@ const getAudiosView = () => {
           &nbsp;
           <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'audio')}>Edit</Button>
           &nbsp;
-          <Button color="danger" size="sm" onClick={()=>showModal(row.id,'audio')}>Delete</Button>
+          <Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id,'audio')}>Delete</Button>
         </td>
       </tr>))
   ); 
@@ -331,7 +331,7 @@ const getNativesView = () => {
           &nbsp;
           <Button color="warning" size="sm" onClick={()=>editCreative('EDIT',row.id,'native')}>Edit</Button>
           &nbsp;
-          <Button color="danger" size="sm" onClick={()=>showModal(row.id,'native')}>Delete</Button>
+          <Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id,'native')}>Delete</Button>
         </td>
       </tr>))
   );
@@ -353,7 +353,11 @@ const getNativesView = () => {
      setModal(!modal);
  
    }
-   const showModal = (x,y) => {
+   const showModal = (e,x,y) => {
+    if (e.ctrlKey) {
+      deleteCreative(x,y);
+      return;
+    }
      setId(x);
      setType(y);
      setModal(true);

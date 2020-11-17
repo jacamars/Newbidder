@@ -95,7 +95,7 @@ var undef;
            <td key={'targets-id-' + index} className="text-right">{row.id}</td>
            <td className="text-center"><Button color="success" size="sm" onClick={()=>editTarget(row.id)}>Edit</Button>
            &nbsp;
-           <Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button></td>
+           <Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id)}>Delete</Button></td>
          </tr>))
      ); 
   }
@@ -110,7 +110,11 @@ var undef;
       setModal(!modal);
   
     }
-    const showModal = (x) => {
+    const showModal = (e,x) => {
+      if (e.ctrlKey) {
+        deleteTarget(x);
+        return;
+      }
       setId(x);
       setModal(true);
     }

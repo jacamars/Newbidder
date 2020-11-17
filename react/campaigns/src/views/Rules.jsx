@@ -14,6 +14,7 @@ var undef;
 
 const Rules = (props) => {
   useEffect(() => {
+    refresh();
   }, []);
 
 

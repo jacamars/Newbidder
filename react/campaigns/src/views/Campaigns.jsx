@@ -245,18 +245,17 @@ var undef;
         var natives = v.natives;
 
         v.oldTarget.id = 0;
+        v.oldTarget.name = "*** Imported *** " + v.oldTarget.name;
         var target = await vx.addNewTarget(v.oldTarget);
-        alert("New Target: " + target);
         campaign.target_id = target;
 
         var oldie;
         for (const [key, value] of Object.entries(rules)) {
-          alert("KEY: " + key + ", VALUE = " + JSON.stringify(value,null,2));
           var on = value.id;
           value.id = 0;
+          value.name  = "*** Imported *** " + value.name;
           value.rtbspecification = value.hierarchy; // screwed up key in db
           var nr = await vx.addNewRule(value);
-          alert("New Rule id: " + nr);
           
           oldie = campaign.rules.indexOf(on);
           if (oldie > -1) {
@@ -301,6 +300,7 @@ var undef;
         for (const [key, banner] of Object.entries(banners)) {
           banner.id = 0;
           banner.customer_id = vx.customer_id;
+          banner.name = "*** Imported *** " + banner.name;
           var rc = await vx.addNewCreative(banner,"banners");
           campaign.banners.push(rc);
         }
@@ -308,6 +308,7 @@ var undef;
         campaign.videos = [];
         for (const [key, video] of Object.entries(videos)) {
           video.id = 0;
+          video.name = "*** Imported *** " + video.name;
           var rc = await vx.addNewCreative(video,"videos");
           campaign.videos.push(rc);
         }
@@ -315,6 +316,7 @@ var undef;
         campaign.audios = [];
         for (const [key, audio] of Object.entries(audios)) {
           audio.id = 0;
+          audio.name = "*** Imported *** " + audio.name;
           var rc = await vx.addNewCreative(audio,"audios");
           campaign.audios.push(rc);
         }
@@ -322,19 +324,21 @@ var undef;
         campaign.natives = [];
         for (const [key, native] of Object.entries(natives)) {
           native.id = 0;
+          native.name = "*** Imported *** " + native.name;
           var rc = await vx.addNewCreative(native,"natives");
           campaign.natives.push(rc);
         }
 
+        campaign.name = "*** Imported *** " + campaign.name;
         campaign.id = 0;
         campaign.customer_id = vx.customer_id;
         rc = await vx.addNewCampaign(JSON.stringify(campaign));
-        alert("NEW CAMPAIGN ID: " + rc);
       } catch (e) {
           alert("ERROR: " + e);
       } 
     }
     setBrowse(false);
+    refresh();
   }
 
 
@@ -368,7 +372,7 @@ var undef;
             {!checkRunning(row.name)
             ? <Button color="info" size='sm' onClick={()=>report(row.id)}>Report</Button>
             : <>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</>}
-            &nbsp; &nbsp; &nbsp;<Button color="danger" size="sm" onClick={()=>showModal(row.id)}>Delete</Button>
+            &nbsp; &nbsp; &nbsp;<Button color="danger" size="sm" onClick={(e)=>showModal(e,row.id)}>Delete</Button>
             </td>
         </tr>))
     ); 
@@ -397,7 +401,13 @@ var undef;
     setModal(!modal);
 
   }
-  const showModal = (x) => {
+  const showModal = (e,x) => {
+    if (e.ctrlKey) {
+      deleteCampaign(id);
+      setId(0);
+      return;
+
+    }
     setId(x);
     setModal(true);
   }
