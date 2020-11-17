@@ -32,7 +32,7 @@ public class SQLAddNewTargetCmd extends ApiCommand {
 	
 	ResultSet rs = null;
 	public String target;
-	int id;
+	public int id;
 
 	/**
 	 * Default constructor
