@@ -155,30 +155,53 @@ var undef;
     exp.videos = {};
     exp.audios = {};
     exp.natives = {};
+    exp.oldTarget = await vx.getTarget(campaign.target_id);
 
     for (var i = 0; i < rules.length; i++) {
       var rule = rules[i];
       exp.rules[rule.id.toString()] = await vx.getRule(rule.id);
     }
 
+    var cr;
     for (var i = 0; i < banners.length; i++) {
       var banner = banners[i];
-      exp.banners[banner.toString()] = await vx.getCreative(banner,"banner");
+      cr = await vx.getCreative(banner,"banner");
+      exp.banners[banner.toString()] = cr;
+      for(var j = 0; j<cr.rules.length;j++) {
+        if (exp.rules[(cr.rules[i].toString())] === undef)
+          exp.rules[(cr.rules[i].toString())] =  await vx.getRule(cr.rules[i]);
+      }
+
     }
 
     for (var i = 0; i < audios.length; i++) {
       var audio = audios[i];
-      exp.audios[audio.toString()] = await vx.getCreative(audio,"audio");
+      cr = await vx.getCreative(audio,"audio");
+      exp.audios[audio.toString()] = cr;
+      for(var j = 0; j<cr.rules.length;j++) {
+        if (exp.rules[(cr.rules[i].toString())] === undef)
+          exp.rules[(cr.rules[i].toString())] =  await vx.getRule(cr.rules[i]);
+      }
     }
 
     for (var i = 0; i < videos.length; i++) {
       var video = videos[i];
-      exp.videos[video.toString()] = await vx.getCreative(video,"video");
+      cr = await vx.getCreative(video,"video");
+      exp.videos[video.toString()] = cr;
+      for(var j = 0; j<cr.rules.length;j++) {
+        if (exp.rules[(cr.rules[i].toString())] === undef)
+          exp.rules[(cr.rules[i].toString())] =  await vx.getRule(cr.rules[i]);
+      }
     }
 
     for (var i = 0; i < natives.length; i++) {
       var native = natives[i];
-      exp.natives[native.toString()] = await vx.getCreative(native,"native");
+      cr = await vx.getCreative(native,"native");
+      exp.natives[native.toString()] = cr;
+      for(var j = 0; j<cr.rules.length;j++) {
+        if (exp.rules[(cr.rules[i].toString())] === undef)
+          exp.rules[(cr.rules[i].toString())] =  await vx.getRule(cr.rules[i]);
+      }
     }
 
     localStorage.setItem("import",JSON.stringify(exp,null,2));
@@ -215,21 +238,100 @@ var undef;
       try {
         v = JSON.parse(data);
         var campaign = v.campaign;
-        var rules = campaign.rules;
-        var banners = campaign.banners;
-        var videos = campaign.videos;
-        var audios = campaign.audios;
-        var natives = campaign.natives;
-        
-        for (var i=0;i<banners.length;i++) {
-          var id = banners[i];
-          var banner = v.banners[id.toString()];
-          banner.id = 0;
-          var rc = await vx.addNewCreative(banner,"banners");
-          alert(rc);
-        }
-      } catch (e) {
+        var rules = v.rules;
+        var banners = v.banners;
+        var videos = v.videos;
+        var audios = v.audios;
+        var natives = v.natives;
 
+        v.oldTarget.id = 0;
+        var target = await vx.addNewTarget(v.oldTarget);
+        alert("New Target: " + target);
+        campaign.target_id = target;
+
+        var oldie;
+        for (const [key, value] of Object.entries(rules)) {
+          alert("KEY: " + key + ", VALUE = " + JSON.stringify(value,null,2));
+          var on = value.id;
+          value.id = 0;
+          value.rtbspecification = value.hierarchy; // screwed up key in db
+          var nr = await vx.addNewRule(value);
+          alert("New Rule id: " + nr);
+          
+          oldie = campaign.rules.indexOf(on);
+          if (oldie > -1) {
+            campaign.rules.splice(oldie,1);
+            campaign.rules.push(nr);
+          }
+          for (var i=0;i<banners.length;i++) {
+            var banner = banners[i];
+            oldie = banner.rules.indexOf(on);
+            if (oldie > -1) {
+              banner.rules.splice(oldie,1);
+              banner.rules.push(nr);
+            }
+          }
+          for (var i=0;i<videos.length;i++) {
+            var video = video[i];
+            oldie = video.rules.indexOf(on);
+            if (oldie > -1) {
+              video.rules.splice(oldie,1);
+              video.rules.push(nr);
+            }
+          }
+          for (var i=0;i<audios.length;i++) {
+            var audio = audios[i];
+            oldie = audio.rules.indexOf(on);
+            if (oldie > -1) {
+              audio.rules.splice(oldie,1);
+              audio.rules.push(nr);
+            }
+          }
+          for (var i=0;i<natives.length;i++) {
+            var native = natives[i];
+            oldie = native.rules.indexOf(on);
+            if (oldie > -1) {
+              native.rules.splice(oldie,1);
+              native.rules.push(nr);
+            }
+          }
+        }
+        
+        campaign.banners = [];
+        for (const [key, banner] of Object.entries(banners)) {
+          banner.id = 0;
+          banner.customer_id = vx.customer_id;
+          var rc = await vx.addNewCreative(banner,"banners");
+          campaign.banners.push(rc);
+        }
+
+        campaign.videos = [];
+        for (const [key, video] of Object.entries(videos)) {
+          video.id = 0;
+          var rc = await vx.addNewCreative(video,"videos");
+          campaign.videos.push(rc);
+        }
+
+        campaign.audios = [];
+        for (const [key, audio] of Object.entries(audios)) {
+          audio.id = 0;
+          var rc = await vx.addNewCreative(audio,"audios");
+          campaign.audios.push(rc);
+        }
+
+        campaign.natives = [];
+        for (const [key, native] of Object.entries(natives)) {
+          native.id = 0;
+          var rc = await vx.addNewCreative(native,"natives");
+          campaign.natives.push(rc);
+        }
+
+        campaign.id = 0;
+        campaign.customer_id = vx.customer_id;
+        rc = await vx.addNewCampaign(JSON.stringify(campaign));
+        alert("NEW CAMPAIGN ID: " + rc);
+      } catch (e) {
+          alert("ERROR: " + e);
       } 
     }
     setBrowse(false);
