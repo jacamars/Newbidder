@@ -41,17 +41,17 @@ var routes = [
     layout: "/admin"
   },
   {
-    path: "/targets",
-    name: "Targets",
-    icon: "tim-icons icon-check-2",
-    component: Targets,
-    layout: "/admin"
-  },
-  {
     path: "/creatives",
     name: "Creatives",
     icon: "tim-icons icon-video-66",
     component: Creatives,
+    layout: "/admin"
+  },
+  {
+    path: "/targets",
+    name: "Targets",
+    icon: "tim-icons icon-check-2",
+    component: Targets,
     layout: "/admin"
   },
   {
