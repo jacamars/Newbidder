@@ -23,6 +23,7 @@ import Targets from     "./views/Targets.jsx"
 import Creatives from   "./views/Creatives.jsx"
 import Rules from       "./views/Rules.jsx"
 import Sets from        "./views/Sets.jsx"
+import LeafMap from     "./views/LeafMap.jsx"
 
 
 var routes = [

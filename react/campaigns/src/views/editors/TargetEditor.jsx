@@ -28,6 +28,7 @@ import { useViewContext } from "../../ViewContext";
 
 import "react-datepicker/dist/react-datepicker.css";
 import {deviceTypes, fromCommaList, blackStyle, whiteStyle} from "../../Utils.js"
+import LeafMap from "../LeafMap.jsx"
 
 var undef;
 
@@ -35,6 +36,7 @@ const TargetEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [target, setTarget] = useState(props.target);
+  const [showMap, setShowMap] = useState(false);
   const vx = useViewContext();
 
   const nameChangedHandler = (event) => {
@@ -186,6 +188,17 @@ const getWBList = (s) => {
       return(<div>Update</div>);
   }
 
+  const mapper = () => {
+    setShowMap(true)
+  }
+
+  const completeMap = (save,pos) => {
+    setShowMap(false);
+  }
+
+      if (showMap)
+        return(<LeafMap callback={completeMap}/>);
+      else
         return (
             <>
               <div className="content">
@@ -272,6 +285,9 @@ const getWBList = (s) => {
                               <label>Geo Range</label>
                                 <Input type="input" id="range" defaultValue={target.geo_range}/>   
                               </FormGroup>
+                            </Col>
+                            <Col className="px-md-1" md="2">
+                            <Button size="sm" className="btn-fill" color="success" onClick={mapper}>Map</Button>
                             </Col>
                           </Row>
                           <Row>
