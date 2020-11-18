@@ -2,26 +2,11 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
-  Alert,
-  Badge,
   Button,
   ButtonGroup,
-  ButtonToolbar,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  CardText,
 
-  CardTitle,
-  Form,
   FormGroup,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Table,
-  Label,
   Row,
   Col
 } from "reactstrap";

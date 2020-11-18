@@ -61,9 +61,7 @@ public class Targeting {
 	public String country = "";
 
 
-	public double geo_latitude = 0;
-	public double geo_longitude = 0;
-	public double geo_range = 0;
+	public List<Double> geo = new ArrayList<>();
 
 	public List<Node> nodes = new ArrayList<Node>();
 
@@ -174,13 +172,14 @@ public class Targeting {
 			make = myNode.get("make").asText();
 		if (myNode.get("model") != null)
 			model = myNode.get("model").asText();
-		if (myNode.get("geo_latitude") != null)
-			geo_latitude = myNode.get("geo_latitude").asDouble();
-		if (myNode.get("geo_longitude") != null)
-			geo_longitude = myNode.get("geo_longitude").asDouble();
-		if (myNode.get("geo_range") != null)
-			geo_range = myNode.get("geo_range").asDouble();
-
+		if (myNode.get("geo") != null) {
+			ArrayNode an = (ArrayNode)myNode.get("geo");
+			geo = new ArrayList<>();
+			for (int i=0; i<an.size();i++) {
+				geo.add(an.get(i).doubleValue());
+			}
+		}
+	
 		// connectionTYpe is needed here
 
 		// td = Test.getValue(geo_latitude,"geo_range",rs);
@@ -464,15 +463,17 @@ public class Targeting {
 			nodes.add(n);
 		}
 
-		if (geo_latitude != 0.0 && geo_longitude != 0 && geo_range != 0) {
-			Map<String, Double> m = new HashMap<String, Double>();
-			m.put("lat", geo_latitude);
-			m.put("lon", geo_longitude);
-			m.put("range", geo_range);
-			List<Map<String, Double>> list = new ArrayList<Map<String, Double>>();
-			list.add(m);
-			n = new Node("LATLON", "device.geo", Node.INRANGE, list);
-			nodes.add(n);
+		if (geo.size() > 0) {
+			for (int i=0;i<geo.size();i+=3) {
+				Map<String, Double> m = new HashMap<String, Double>();
+				m.put("lat", geo.get(i));
+				m.put("lon", geo.get(i+1));
+				m.put("range", geo.get(i+2));
+				List<Map<String, Double>> list = new ArrayList<Map<String, Double>>();
+				list.add(m);
+				n = new Node("LATLON:"+i, "device.geo", Node.INRANGE, list);
+				nodes.add(n);
+			}
 		}
 
 		/**
@@ -536,9 +537,7 @@ public class Targeting {
 		String sql = "INSERT INTO targets (" 
 				+"list_of_domains,"
 				+"domain_targetting,"
-				+"geo_latitude,"
-				+"geo_longitude,"
-				+"geo_range,"
+				+"geo"
 				+"country,"
 				+"carrier,"
 				+"os,"
@@ -550,7 +549,7 @@ public class Targeting {
 				+"created_at,"
 				+"customer_id,"
 				+"name) VALUES ("
-				+"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+				+"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 		
 		p = conn.prepareStatement(sql);
 		
@@ -562,54 +561,45 @@ public class Targeting {
 		if (c.domain_targetting == null)
 			p.setNull(2,Types.VARCHAR);
 		p.setString(2, c.domain_targetting);
-		if (c.geo_latitude == 0)
-			p.setNull(3,Types.DOUBLE);
+		if (c.geo == null || c.geo.size() == 0) 
+			p.setNull(3,Types.ARRAY);
 		else
-			p.setDouble(3,c.geo_latitude);
-		if (c.geo_longitude == 0)
-			p.setNull(4,Types.DOUBLE);
-		else
-			p.setDouble(4,c.geo_longitude);
-		if (c.geo_range == 0)
-			p.setNull(5,Types.DOUBLE);
-		else
-		p.setDouble(5,c.geo_range);
-		
+			p.setArray(3, conn.createArrayOf("double", c.geo.toArray()));	
 		if (c.country == null)
-			p.setNull(6, Types.VARCHAR);
+			p.setNull(4, Types.VARCHAR);
 		else
-			p.setString(6,c.country);
+			p.setString(4,c.country);
 		if (c.carrier == null)
+			p.setNull(5, Types.VARCHAR);
+		else
+			p.setString(5,c.carrier);
+		if (c.os == null)
+			p.setNull(6, Types.VARCHAR);
+		else		
+			p.setString(6,c.os);
+		if (c.make == null)
 			p.setNull(7, Types.VARCHAR);
 		else
-			p.setString(7,c.carrier);
-		if (c.os == null)
+			p.setString(7,c.make);
+		if (c.model == null)
 			p.setNull(8, Types.VARCHAR);
-		else		
-			p.setString(8,c.os);
-		if (c.make == null)
+		else
+			p.setString(8,c.model);
+		if (c.devicetypes.size() == 0)
 			p.setNull(9, Types.VARCHAR);
 		else
-			p.setString(9,c.make);
-		if (c.model == null)
+			p.setString(9, c.devicetypes_str);
+		if (c.iab_category == null)
 			p.setNull(10, Types.VARCHAR);
 		else
-			p.setString(10,c.model);
-		if (c.devicetypes.size() == 0)
+			p.setString(10,c.iab_category);
+		if (c.iab_category_blklist == null)
 			p.setNull(11, Types.VARCHAR);
 		else
-			p.setString(11, c.devicetypes_str);
-		if (c.iab_category == null)
-			p.setNull(12, Types.VARCHAR);
-		else
-			p.setString(12,c.iab_category);
-		if (c.iab_category_blklist == null)
-			p.setNull(13, Types.VARCHAR);
-		else
-			p.setString(13,c.iab_category_blklist);
-		p.setTimestamp(14,new Timestamp(System.currentTimeMillis()));
-		p.setString(15, c.customer_id);
-		p.setString(16, c.name);
+			p.setString(11,c.iab_category_blklist);
+		p.setTimestamp(12,new Timestamp(System.currentTimeMillis()));
+		p.setString(13, c.customer_id);
+		p.setString(14, c.name);
 		
 		return p;
 	}
@@ -619,9 +609,7 @@ public class Targeting {
 		String sql = "UPDATE targets SET " 
 		  +"list_of_domains=?,"
 		  +"domain_targetting=?,"
-		  +"geo_latitude=?,"
-		  +"geo_longitude=?,"
-		  +"geo_range=?,"
+		  +"geo=?,"
 		  +"country=?,"
 		  +"carrier=?,"
 		  +"os=?,"
@@ -643,54 +631,45 @@ public class Targeting {
 		if (c.domain_targetting == null)
 			p.setNull(2,Types.VARCHAR);
 		p.setString(2, c.domain_targetting);
-		if (c.geo_latitude == 0)
-			p.setNull(3,Types.DOUBLE);
+		if (c.geo == null || c.geo.size() == 0)
+			p.setNull(3,Types.ARRAY);
 		else
-			p.setDouble(3,c.geo_latitude);
-		if (c.geo_longitude == 0)
-			p.setNull(4,Types.DOUBLE);
-		else
-			p.setDouble(4,c.geo_longitude);
-		if (c.geo_range == 0)
-			p.setNull(5,Types.DOUBLE);
-		else
-		p.setDouble(5,c.geo_range);
-		
+			p.setArray(3, conn.createArrayOf("decimal", c.geo.toArray()));		
 		if (c.country == null)
-			p.setNull(6, Types.VARCHAR);
+			p.setNull(4, Types.VARCHAR);
 		else
-			p.setString(6,c.country);
+			p.setString(4,c.country);
 		if (c.carrier == null)
+			p.setNull(5, Types.VARCHAR);
+		else
+			p.setString(5,c.carrier);
+		if (c.os == null)
+			p.setNull(6, Types.VARCHAR);
+		else		
+			p.setString(6,c.os);
+		if (c.make == null)
 			p.setNull(7, Types.VARCHAR);
 		else
-			p.setString(7,c.carrier);
-		if (c.os == null)
+			p.setString(7,c.make);
+		if (c.model == null)
 			p.setNull(8, Types.VARCHAR);
-		else		
-			p.setString(8,c.os);
-		if (c.make == null)
+		else
+			p.setString(8,c.model);
+		if (c.devicetypes.size() == 0)
 			p.setNull(9, Types.VARCHAR);
 		else
-			p.setString(9,c.make);
-		if (c.model == null)
+			p.setString(9,c.devicetypes_str);
+		if (c.iab_category == null)
 			p.setNull(10, Types.VARCHAR);
 		else
-			p.setString(10,c.model);
-		if (c.devicetypes.size() == 0)
+			p.setString(10,c.iab_category);
+		if (c.iab_category_blklist == null)
 			p.setNull(11, Types.VARCHAR);
 		else
-			p.setString(11,c.devicetypes_str);
-		if (c.iab_category == null)
-			p.setNull(12, Types.VARCHAR);
-		else
-			p.setString(12,c.iab_category);
-		if (c.iab_category_blklist == null)
-			p.setNull(13, Types.VARCHAR);
-		else
-			p.setString(13,c.iab_category_blklist);
-		p.setTimestamp(14,new Timestamp(System.currentTimeMillis()));
-		p.setString(15, c.name);
-		p.setInt(16, c.id);
+			p.setString(11,c.iab_category_blklist);
+		p.setTimestamp(12,new Timestamp(System.currentTimeMillis()));
+		p.setString(13, c.name);
+		p.setInt(14, c.id);
 		
 		return p;
 	}

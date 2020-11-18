@@ -43,7 +43,6 @@ var map;
 const LeafMap = (props) => {
 
   const vx = useViewContext();
-  const xmap = useMap()
   const [positions, setPositions] = useState([]);
 
   const handlePositions = (rows) => {
@@ -86,7 +85,7 @@ const LeafMap = (props) => {
 
 
   const handleZoom = (e) => {
-    alert('Current zoom level -> ' +  map.getCenter());
+   // alert('Current zoom level -> ' +  map.getCenter());
   };
 
 

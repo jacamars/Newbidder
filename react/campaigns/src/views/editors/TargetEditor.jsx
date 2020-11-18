@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import {
+  Alert,
   Badge,
   Button,
   ButtonGroup,
@@ -27,6 +28,7 @@ import {
 import { useViewContext } from "../../ViewContext";
 
 import "react-datepicker/dist/react-datepicker.css";
+import GeoEditor from "./GeoEditor.jsx";
 import {deviceTypes, fromCommaList, blackStyle, whiteStyle} from "../../Utils.js"
 import LeafMap from "../LeafMap.jsx"
 
@@ -36,7 +38,6 @@ const TargetEditor = (props) => {
 
   const [count, setCount] = useState(0);
   const [target, setTarget] = useState(props.target);
-  const [showMap, setShowMap] = useState(false);
   const vx = useViewContext();
 
   const nameChangedHandler = (event) => {
@@ -123,26 +124,12 @@ const getWBList = (s) => {
       target.domain_targetting = null;
 
     var country = document.getElementById("country").value;
-    var lat = document.getElementById("lat").value;
-    var lon = document.getElementById("lon").value;
-    var range = document.getElementById("range").value;
+
     if (country === "" || country === "null")
       target.country = undef;
     else
       target.country = country;
-    if (lat === "" || lat === "0")
-      target.geo_latitude = undef;
-    else
-      target.geo_latitude = Number(lat);
-    if (lon === "" || lon === "0")
-      target.geo_longitude = undef;
-    else
-      target.geo_longitude = Number(lon);
-    if (range === "" || range === "0")
-      target.geo_range = undef;
-    else
-      target.geo_range = Number(range);
-     
+
     var car = document.getElementById("carrier").value;
     var os = document.getElementById("os").value;
     var make = document.getElementById("makes").value;
@@ -188,17 +175,11 @@ const getWBList = (s) => {
       return(<div>Update</div>);
   }
 
-  const mapper = () => {
-    setShowMap(true)
+  const setGeo = (geo) => {
+    target.geo = geo;
+    setTarget(target);
+    redraw();
   }
-
-  const completeMap = (save,pos) => {
-    setShowMap(false);
-  }
-
-      if (showMap)
-        return(<LeafMap callback={completeMap}/>);
-      else
         return (
             <>
               <div className="content">
@@ -268,26 +249,13 @@ const getWBList = (s) => {
                                       defaultValue={fromCommaList(target.country)}/>
                                 </FormGroup>
                             </Col> 
-                            <Col className="pr-md-1" md="4">
-                              <FormGroup>
-                              <label>Geo Latitude</label>
-                                <Input type="input" id="lat" defaultValue={target.geo_latitude}/>   
-                              </FormGroup>
-                            </Col>
-                            <Col className="px-md-1" md="2">
-                              <FormGroup>
-                              <label>Geo Longitude</label>
-                                <Input type="input"  id="lon" defaultValue={target.geo_longitude}/>   
-                              </FormGroup>
-                              </Col>
-                              <Col className="px-md-1" md="2">
-                              <FormGroup>
-                              <label>Geo Range</label>
-                                <Input type="input" id="range" defaultValue={target.geo_range}/>   
-                              </FormGroup>
-                            </Col>
-                            <Col className="px-md-1" md="2">
-                            <Button size="sm" className="btn-fill" color="success" onClick={mapper}>Map</Button>
+                            <Col className="pr-md-1" md="8">
+                                <FormGroup>
+                                  <label>Geographical Boundaries</label>
+                                  <Alert color="warning">
+                                    <GeoEditor key={"geoeditor-"+count} geo={target.geo} setGeo={setGeo} />
+                                  </Alert>
+                                </FormGroup>
                             </Col>
                           </Row>
                           <Row>

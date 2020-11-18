@@ -116,6 +116,8 @@ public class JdbcTools {
 							an.add(new LongNode((Long)x));
 						} else if (x instanceof String) {
 							an.add(new TextNode((String)x));
+						} else if (x instanceof BigDecimal) {
+							an.add(new DoubleNode(((BigDecimal)x).doubleValue()));
 						}
 					}
 					child.set(column_name,an);
