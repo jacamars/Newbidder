@@ -426,23 +426,24 @@ var undef;
         <Row id={"running-"+count}>
             <Col xs="12">
             { campaign == null && <>
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={importFile}>Import</Button>
-            { browse &&
-                <DecisionModal title="Import Foreign Campaign" 
-                     message="Paste your definitions here" 
-                     name="IMPORT"
-                     input={true}
-                     inputValue=""
-                     callback={completeImport} />}
-
-                <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Campaigns in DB</CardTitle>
-                        </Row>
-                    </CardHeader>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Campaigns
+                        </strong>
+                        { browse &&
+                        <DecisionModal title="Import Foreign Campaign"
+                                       message="Paste your definitions here"
+                                       name="IMPORT"
+                                       input={true}
+                                       inputValue=""
+                                       callback={completeImport} />}
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="success" onClick={makeNew}>New</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="danger" onClick={importFile}>Import</Button>
+                    </div>
+                </div>
+                 <Card className="card-chart">
                     <CardBody>
                       <Table key={"bidders-table-"+count} size="sm">
                         <thead>

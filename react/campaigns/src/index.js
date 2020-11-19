@@ -31,6 +31,8 @@ import { useViewContext } from './ViewContext'
 
 const hist = createBrowserHistory();
 
+document.body.classList.add("white-content");
+
 
 ReactDOM.render(
   <Router history={hist}>

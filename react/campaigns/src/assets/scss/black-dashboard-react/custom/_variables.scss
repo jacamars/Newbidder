@@ -22,6 +22,7 @@ $gray-600: #6c757d !default;   // Line footer color
 $gray-700: #525f7f !default;   // Line p color
 $gray-800: #32325d !default;   // Line heading color
 $gray-900: #212529 !default;
+$black:    #30363d !default;   // Surfside Black
 $link-disabled:              #666666 !default;
 $transparent-bg:             transparent !default;
 $light-bg:                   #f5f6fa !default;
@@ -90,7 +91,8 @@ $colors: map-merge((
   "gray":       $gray-600,
   "light":      $gray-400,
   "lighter":    $gray-200,
-  "gray-dark":  $gray-800
+  "gray-dark":  $gray-800,
+  "black":      $black
 ), $colors);
 
 $default-color-opacity:      rgba(182, 182, 182, .6) !default;
@@ -103,7 +105,7 @@ $success:       #00f2c3 !default;
 $info:          #1d8cf8 !default;
 $warning:       #ff8d72 !default;
 $danger:        #fd5d93 !default;
-$black:         #222a42 !default;
+$black:         #30363d !default;
 
 
 // gradient

@@ -58,14 +58,16 @@ const RulesView = (props) => {
     return(
     <Row>
     <Col xs="12">
-    <Button size="sm" className="btn-fill" color="success" onClick={props.refresh}>Refresh</Button>
-    <Button size="sm" className="btn-fill" color="danger" onClick={props.makeNew}>New</Button>
+        <div className="row mb-3">
+            <div className="col-xl-12 col-lg-12" >
+                <strong className="h3">
+                    Rules
+                </strong>
+                <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={props.refresh}>Refresh</Button>
+                <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={props.makeNew}>New</Button>
+            </div>
+        </div>
         <Card className="card-chart">
-            <CardHeader>
-                <Row>
-                    <CardTitle tag="h2">Rules in DB</CardTitle>
-                </Row>
-            </CardHeader>
             <CardBody>
               <Table size="sm">
                 <thead>

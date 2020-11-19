@@ -375,14 +375,16 @@ const getNativesView = () => {
     { creative === null && <>
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewBanner}>New</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Banners
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="success" onClick={makeNewBanner}>New</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Banners</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"banners-table-"+count} size="sm">
                         <thead>
@@ -407,14 +409,16 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewVideo}>New</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Videos
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="success" onClick={makeNewVideo}>New</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Videos</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"banners-table-"+count} size="sm">
                         <thead>
@@ -439,14 +443,16 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewAudio}>New</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Audio
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="success" onClick={makeNewAudio}>New</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Audio</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"banners-table-"+count} size="sm">
                         <thead>
@@ -471,14 +477,16 @@ const getNativesView = () => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={refresh}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNewNative}>New</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Native
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="success" onClick={makeNewNative}>New</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Native</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"banners-table-"+count} size="sm">
                         <thead>

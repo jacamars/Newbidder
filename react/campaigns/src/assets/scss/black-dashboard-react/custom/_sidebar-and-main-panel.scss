@@ -18,6 +18,7 @@
 }
 .sidebar,
 .off-canvas-sidebar{
+  //@include linear-gradient($primary-states, $primary);
   @include linear-gradient($primary-states, $primary);
   height: calc(100vh - 90px);
   width: 230px;
@@ -347,6 +348,9 @@
   }
   &[data="green"]{
     @include linear-gradient($success-states, $success);
+  }
+  &[data="black"]{
+    @include linear-gradient($black, black);
   }
 
   .user{

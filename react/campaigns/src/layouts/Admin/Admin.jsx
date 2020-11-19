@@ -88,7 +88,7 @@ const Admin = (props) => {
           <Sidebar
             {...props}
             routes={routes}
-            bgColor={backgroundColor}
+            bgColor="black"
             logo={{
               outterLink: "#",
               text: "RTB4FREE",
@@ -114,10 +114,6 @@ const Admin = (props) => {
             )}
           </div>
         </div>
-        <FixedPlugin
-          bgColor={backgroundColor}
-          handleBgClick={handleBgClick}
-        />
       </>
     );
 }

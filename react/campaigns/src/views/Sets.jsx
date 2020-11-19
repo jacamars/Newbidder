@@ -208,14 +208,16 @@ const Sets = (props) => {
         callback={queryHazelCallback} />}
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('bigdata')}}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={(e)=>makeNew()}>Load</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Sets/Navmap/Cidr/Bloom-Filters
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={(e)=>{refresh('bigdata')}}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={(e)=>makeNew()}>Load</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Sets/Navmap/Cidr/Bloom-Filters in DB</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"sets-table-"+count} size="sm">
                         <thead>
@@ -238,13 +240,15 @@ const Sets = (props) => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('hazel')}}>Refresh</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            In-Memory Data Grid
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={(e)=>{refresh('hazel')}}>Refresh</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">In Memory Data  Grid</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"sets-table-"+count} size="sm">
                         <thead>
@@ -266,13 +270,15 @@ const Sets = (props) => {
 
         <Row>
             <Col xs="12">
-            <Button size="sm" className="btn-fill" color="success" onClick={(e)=>{refresh('macros')}}>Refresh</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Macros
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={(e)=>{refresh('macros')}}>Refresh</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Macros</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"sets-table-"+count} size="sm">
                         <thead>

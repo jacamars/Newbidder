@@ -164,33 +164,33 @@ const AdminNavbar = (props) => {
             </button>
             <Collapse navbar isOpen={modalState.collapseOpen}>
               <Nav className="ml-auto" navbar>
-                <InputGroup className="search-bar">
-                  <Button
-                    color="link"
-                    data-target="#searchModal"
-                    data-toggle="modal"
-                    id="search-button"
-                    onClick={toggleModalSearch}
-                  >
-                    <i className="tim-icons icon-zoom-split" />
-                    <span className="d-lg-none d-md-block">Search</span>
-                  </Button>
-                </InputGroup>
-                <UncontrolledDropdown nav>
-                  <DropdownToggle
-                    caret
-                    color="default"
-                    data-toggle="dropdown"
-                    nav
-                  >
-                    <div className="notification d-none d-lg-block d-xl-block" />
-                    <i className="tim-icons icon-sound-wave" />
-                    <p className="d-lg-none">Notifications</p>
-                  </DropdownToggle>
-                  <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    {setEventsView()}
-                  </DropdownMenu>
-                </UncontrolledDropdown>
+                {/*<InputGroup className="search-bar">*/}
+                {/*  <Button*/}
+                {/*    color="link"*/}
+                {/*    data-target="#searchModal"*/}
+                {/*    data-toggle="modal"*/}
+                {/*    id="search-button"*/}
+                {/*    onClick={toggleModalSearch}*/}
+                {/*  >*/}
+                {/*    <i className="tim-icons icon-zoom-split" />*/}
+                {/*    <span className="d-lg-none d-md-block">Search</span>*/}
+                {/*  </Button>*/}
+                {/*</InputGroup>*/}
+                {/*<UncontrolledDropdown nav>*/}
+                {/*  <DropdownToggle*/}
+                {/*    caret*/}
+                {/*    color="default"*/}
+                {/*    data-toggle="dropdown"*/}
+                {/*    nav*/}
+                {/*  >*/}
+                {/*    <div className="notification d-none d-lg-block d-xl-block" />*/}
+                {/*    <i className="tim-icons icon-sound-wave" />*/}
+                {/*    <p className="d-lg-none">Notifications</p>*/}
+                {/*  </DropdownToggle>*/}
+                {/*  <DropdownMenu className="dropdown-navbar" right tag="ul">*/}
+                {/*    {setEventsView()}*/}
+                {/*  </DropdownMenu>*/}
+                {/*</UncontrolledDropdown>*/}
                 <UncontrolledDropdown nav>
                   <DropdownToggle
                     caret

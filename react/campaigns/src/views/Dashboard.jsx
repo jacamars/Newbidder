@@ -81,13 +81,20 @@ var undef;
     { !vx.isLoggedIn && <LoginModal callback={setInstances} />}
         <Row>
             <Col xs="12">
-            <Button size="sm" color="error" onClick={refresh}>Refresh</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Instances
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={refresh}>Refresh</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Instances</CardTitle>
-                        </Row>
-                    </CardHeader>
+                    {/*<CardHeader>*/}
+                    {/*    <Row>*/}
+                    {/*        <CardTitle tag="h2">Instances</CardTitle>*/}
+                    {/*    </Row>*/}
+                    {/*</CardHeader>*/}
                     <CardBody>
                       <Table key={"bidders-table-"+count} size="sm">
                         <thead>
@@ -109,12 +116,14 @@ var undef;
                     </Table>
                   </CardBody>
                 </Card>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Running Campaigns
+                        </strong>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Running Campaigns</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"camps-table-"+count}size="sm">
                         <thead>

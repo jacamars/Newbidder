@@ -131,14 +131,16 @@ var undef;
         <Row>
             <Col xs="12">
             { target == null && <>
-            <Button size="sm" className="btn-fill" color="success" onClick={redraw}>Refresh</Button>
-            <Button size="sm" className="btn-fill" color="danger" onClick={makeNew}>New</Button>
+                <div className="row mb-3">
+                    <div className="col-xl-12 col-lg-12" >
+                        <strong className="h3">
+                            Targets
+                        </strong>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={redraw}>Refresh</Button>
+                        <Button size="sm" style={{float: 'right'}} className="btn-fill" color="error" onClick={makeNew}>New</Button>
+                    </div>
+                </div>
                 <Card className="card-chart">
-                    <CardHeader>
-                        <Row>
-                            <CardTitle tag="h2">Targets in DB</CardTitle>
-                        </Row>
-                    </CardHeader>
                     <CardBody>
                       <Table key={"bidders-table-"+count} size="sm">
                         <thead>
