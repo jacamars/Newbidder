@@ -1,0 +1,43 @@
+/// <reference types="long" />
+import * as Long from 'long';
+import { DataInput } from '../Data';
+import { Portable } from '../Serializable';
+import { ClassDefinition, FieldType } from './ClassDefinition';
+import { PortableReader, PortableSerializer } from './PortableSerializer';
+export declare class DefaultPortableReader implements PortableReader {
+    protected serializer: PortableSerializer;
+    protected input: DataInput;
+    protected classDefinition: ClassDefinition;
+    private offset;
+    private finalPos;
+    private raw;
+    constructor(serializer: PortableSerializer, input: DataInput, classDefinition: ClassDefinition);
+    getVersion(): number;
+    hasField(fieldName: string): boolean;
+    getFieldNames(): string[];
+    getFieldType(fieldName: string): FieldType;
+    readInt(fieldName: string): number;
+    readLong(fieldName: string): Long;
+    readUTF(fieldName: string): string;
+    readBoolean(fieldName: string): boolean;
+    readByte(fieldName: string): number;
+    readChar(fieldName: string): string;
+    readDouble(fieldName: string): number;
+    readFloat(fieldName: string): number;
+    readShort(fieldName: string): number;
+    readPortable(fieldName: string): Portable;
+    readByteArray(fieldName: string): number[];
+    readBooleanArray(fieldName: string): boolean[];
+    readCharArray(fieldName: string): string[];
+    readIntArray(fieldName: string): number[];
+    readLongArray(fieldName: string): Long[];
+    readDoubleArray(fieldName: string): number[];
+    readFloatArray(fieldName: string): number[];
+    readShortArray(fieldName: string): number[];
+    readUTFArray(fieldName: string): string[];
+    readPortableArray(fieldName: string): Portable[];
+    getRawDataInput(): DataInput;
+    end(): void;
+    private positionByFieldDefinition(field);
+    private positionByField(fieldName, fieldType);
+}

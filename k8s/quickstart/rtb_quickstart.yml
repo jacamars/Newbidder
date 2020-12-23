@@ -1,0 +1,108 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rtb4free
+  labels:
+    app: rtb-bidder
+spec:
+  serviceName: rtb4free
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: rtb-bidder
+  template:
+    metadata:
+      labels:
+        app: rtb-bidder
+    spec:
+      containers:
+      - image: jacamars/newbidder
+        name: bidder
+        command: 
+        - /bin/bash 
+        args:
+        - "-c"
+        - "./rtb4free Campaigns/payday.json"
+        ports:
+        - containerPort: 8080
+          name: port8080
+          protocol: TCP
+        - containerPort: 5701
+          name: port5701
+          protocol: TCP
+        - containerPort: 7000
+          name: port7000
+          protocol: TCP
+        env:
+        - name: BROKERLIST
+          value: "kafka-service:9092"
+        - name: EXTERNAL 
+          value: "http://localhost:8080"
+        - name: JDBC
+          value: "jdbc:postgresql://postgres-service:5432/postgres?user=postgres&password=postgres"
+        - name: ELASTIC_HOST 
+          value: "quickstart-es-http"
+        - name: ELASTIC_USER 
+          value: "elastic"
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: quickstart-es-elastic-user
+              key: elastic
+        - name: ELASTIC_PORT 
+          value: "9200"
+        - name: ELASTIC_SSL_ENABLED
+          value: "false"
+        - name: ELASTIC_CA_PATH
+          value: "/tmp/es_certs/es_http/tls.crt"
+        volumeMounts:
+        - name: es-cacert
+          mountPath: /tmp/es_certs
+        #readinessProbe:
+        #  tcpSocket:
+        #    port: 8080
+        #  initialDelaySeconds: 30
+        #  periodSeconds: 10
+        #livenessProbe:
+        #  tcpSocket:
+        #    port: 8080
+        #  initialDelaySeconds: 30
+        #  periodSeconds: 10
+      volumes:
+      - name: es-cacert
+        secret:
+          secretName: quickstart-es-http-ca-internal
+          items:
+          - key: tls.crt
+            path: es_http/tls.crt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rtb-bidder-service
+spec:
+  type: NodePort
+  selector:
+    app: rtb-bidder
+  ports:
+    - protocol: TCP
+      port: 8080
+      nodePort: 30080
+      name: port8080
+    - protocol: TCP
+      port: 8155
+      nodePort: 30155
+      name: port8155
+    - protocol: TCP
+      port: 7379
+      nodePort: 30379
+      name: port7379
+    - protocol: TCP
+      port: 5701
+      nodePort: 30701
+      name: port5701
+
+
+
+

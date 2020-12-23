@@ -1,0 +1,5 @@
+{rtb_pixel}{rtb_click}<img src='{external}/images/23104_original.jpg'></rtb_click>
+
+http://localhost:8080/images/320x50.jpg
+
+insert into users (customer_id, sub_id, username, password) values('test','superuser','test.test@test.com','test');

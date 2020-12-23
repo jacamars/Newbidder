@@ -1,0 +1,931 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-pipeline
+  labels: 
+    app: rtb-logstash-config
+data:
+    logstash.conf: |
+        input {
+                kafka {
+                codec => "json"
+                topics => ["status","requests","reasons","bids","wins","clicks","pixels","video","postbackevents","logs","fraud"]
+                bootstrap_servers => "${KAFKA_HOST}"
+                group_id => "logstash1"
+                consumer_threads => 1
+                decorate_events => true
+            }
+        }
+        filter {
+            mutate {
+                add_field => { "topic" => "%{[@metadata][kafka][topic]}" }
+                add_field => { "consumer_group" => "%{[@metadata][kafka][consumer_group]}" }
+            }    
+            # remove for es v7 compatability
+            mutate {
+                remove_field => [ "type" ]
+            }
+            if [topic] == "requests" {
+                date {
+                    match => ["[ext][timestamp]","UNIX_MS"]
+                }
+                if [device][geo][lat] and [device][geo][lon] {
+                    mutate {
+                        add_field => {
+                            "[device][geo][location]" => "%{[device][geo][lat]},%{[device][geo][lon]}"
+                        }
+                    }
+                }
+            }
+            else if [topic] == "bids" {
+                if !("" in [oidStr]) {
+                    drop { }
+                }
+                date {
+                    match => ["timestamp","UNIX_MS"]
+                }
+                if [cost] {
+                    mutate {
+                        convert => {
+                            "cost" => "float"
+                        }
+                    }
+                }
+                if [lat] and [lon] {
+                    mutate {
+                        add_field => {
+                            "location" => "%{lat},%{lon}"
+                        }
+                    }
+                }
+            }
+            else if [topic] == "wins" {
+                if !("" in [hash]) {
+                    drop { }
+                }
+                date {
+                    match => ["timestamp","UNIX_MS"]
+                }
+                if [price] {
+                    mutate {
+                        convert => {
+                            "price" => "float"
+                        }
+                    }
+                }
+                if [lat] and [lon] {
+                    mutate {
+                        add_field => {
+                            "location" => "%{lat},%{lon}"
+                        }
+                    }
+                }
+                mutate {
+                    rename => {
+                        "adId" => "adid"
+                        "cridId" => "crid" 
+                    }
+                }
+            }
+            else if [topic] == "pixels" or [topic] == "clicks" {
+                if !("" in [bid_id]) {
+                    drop { }
+                }
+                date {
+                    match => ["timestamp","UNIX_MS"]
+                }
+                grok {
+                    match => { "payload" => "/site_domain=(?<site_domain>[\w\.\-]+)/?"}
+                }
+                grok {
+                    match => { "payload" => "/ip=(?<ip>[\d\.]+)/?"}
+                }
+                grok {
+                    match => { "payload" => "/app_name=(?<app_name>.+)"}
+                }
+                if [price] {
+                    mutate {
+                        convert => {
+                            "price" => "float"
+                        }
+                    }
+                }
+                if [lat] and [lon] {
+                    mutate {
+                        add_field => {
+                            "location" => "%{lat},%{lon}"
+                        }
+                    }
+                }
+                mutate {
+                    rename => {
+                        "ad_id" => "adid" 
+                        "creative_id" => "crid" 
+                    }
+                }
+            }
+            else if [topic] == "status" {
+                date {
+                    match => ["timestamp","UNIX_MS"]
+                }
+            }
+            else if [topic] == "reasons" {
+                date {
+                    match => ["[timestamp]","UNIX_MS"]
+                }
+                mutate {
+                    rename => {
+                        "campaign" => "adid"
+                        "creative" => "crid"
+                    }
+                }
+            }
+            else if [topic] == "logs" {
+                mutate {
+                    replace => { "topic" => "rtblogs" }
+                }
+            }
+            else if [topic] == "fraud" {
+                date {
+                    match => ["[timestamp]","UNIX_MS"]
+                }
+            }
+        }
+        output {
+            # Explicitly define topics to allow auto index template loading
+            if [topic]=="status" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "status-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/status.json"
+                    template_name => "status"
+                    template_overwrite => false
+                }
+            } else if [topic]=="rtblogs" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "rtblogs-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/rtblogs.json"
+                    template_name => "rtblogs"
+                    template_overwrite => false
+                }
+            } else if [topic]=="wins" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "wins-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/wins.json"
+                    template_name => "wins"
+                    template_overwrite => false
+                }
+            } else if [topic]=="pixels" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "pixels-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/pixels.json"
+                    template_name => "pixels"
+                    template_overwrite => false
+                }
+            } else if [topic]=="bids" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "bids-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/bids.json"
+                    template_name => "bids"
+                    template_overwrite => false
+                }
+            } else if [topic]=="requests" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "requests-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/requests.json"
+                    template_name => "requests"
+                    template_overwrite => false
+                }
+            } else if [topic]=="reasons" {
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "reasons-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                    template => "/usr/share/logstash/rtb_index_templates/reasons.json"
+                    template_name => "reasons"
+                    template_overwrite => false
+                }
+            } else {
+                # This let's undefined topics to be ingested.
+                # May want to delete this
+                elasticsearch {
+                    hosts => ["${ELASTICSEARCH_URL}"]
+                    index => "%{[topic]}-%{+YYYY.MM.dd}"
+                    user => "${ELASTIC_USER}"
+                    password => "${ELASTIC_PASSWORD}"
+                    ssl => true
+                    ssl_certificate_verification => true
+                    cacert => "/usr/share/logstash/es-cluster_certs/es_http/tls.crt"
+                }
+            }
+        }
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-index-templates
+  labels: 
+    app: rtb-logstash-index-templates
+data:
+    status.json: |
+        {
+            "index_patterns": [
+                "status-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                {
+                    "strings": {
+                    "match_mapping_type": "string",
+                    "mapping": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                    }
+                }
+                ],
+                "properties": {
+                "clicks": {
+                    "type": "long"
+                },
+                "freedisk": {
+                    "type": "double"
+                },
+                "avgnobidtime": {
+                    "type": "double"
+                },
+                "wins": {
+                    "type": "long"
+                },
+                "total-errors": {
+                    "type": "long"
+                },
+                "cpu": {
+                    "type": "double"
+                },
+                "timestamp": {
+                    "type": "long"
+                },
+                "stopped": {
+                    "type": "boolean"
+                },
+                "openfiles": {
+                    "type": "long"
+                },
+                "percmemused": {
+                    "type": "double"
+                },
+                "handled": {
+                    "type": "long"
+                },
+                "pixels": {
+                    "type": "long"
+                },
+                "qps": {
+                    "type": "double"
+                },
+                "campaigns": {
+                    "type": "long"
+                },
+                "requests": {
+                    "type": "long"
+                },
+                "avgbidtime": {
+                    "type": "double"
+                },
+                "fraud": {
+                    "type": "long"
+                },
+                "bids": {
+                    "type": "long"
+                },
+                "threads": {
+                    "type": "long"
+                },
+                "memused": {
+                    "type": "double"
+                },
+                "nobid": {
+                    "type": "long"
+                },
+                "exchanges": {
+                    "properties": {
+                    "qps": {
+                        "type": "double"
+                    },
+                    "errors": {
+                        "type": "long"
+                    },
+                    "name": {
+                        "type": "keyword"
+                    },
+                    "requests": {
+                        "type": "long"
+                    },
+                    "wins": {
+                        "type": "long"
+                    },
+                    "bids": {
+                        "type": "long"
+                    }
+                    }
+                }
+                }
+            }
+        }
+    rtblogs.json: |
+        {
+            "index_patterns": [
+                "rtblogs-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                ],
+                "properties": {
+                    "message": {
+                        "type": "text"
+                    }
+                }
+            }
+        }
+    reasons.json: |
+        {
+            "index_patterns": [
+                "reasons-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                    "number_of_shards": "1",
+                    "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                ],
+                "properties": {
+                    "reasoncount": {
+                        "type": "long"
+                    },
+                    "reason": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    wins.json: |
+        {
+            "index_patterns": [
+                "wins-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                ],
+                "properties": {
+                    "lon": {
+                        "type": "double"
+                    },
+                    "lat": {
+                        "type": "double"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    },
+                    "domain": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "cost": {
+                        "type": "double"
+                    },
+                    "forward": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "price": {
+                        "type": "double"
+                    }
+                }
+            }
+        }
+    pixels.json: |
+        {
+            "index_patterns": [
+                "pixels-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                "number_of_shards": "1",
+                "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                {
+                    "strings": {
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                }
+                ],
+                "properties": {
+                    "y": {
+                        "type": "long"
+                    },
+                    "x": {
+                        "type": "long"
+                    },
+                    "timestamp": {
+                        "type": "date"
+                    },
+                    "price": {
+                        "type": "long"
+                    },
+                    "lon": {
+                        "type": "double"
+                    },
+                    "lat": {
+                        "type": "double"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    },
+                    "payload": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    bids.json: |
+        {
+            "index_patterns": [
+                "bids-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                    "number_of_shards": "1",
+                    "number_of_replicas": "1"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type":  "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                ],
+                "properties": {
+                    "cost": {
+                        "type": "float"
+                    },
+                    "forwardUrl": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "height": {
+                        "type": "long"
+                    },
+                    "imageUrl": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "lat": {
+                        "type": "float"
+                    },
+                    "location": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "lon": {
+                        "type": "float"
+                    },
+                    "noBid": {
+                        "type": "boolean"
+                    },
+                    "nurl": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "responseBuffer": {
+                        "type": "text"
+                    },
+                    "serialClass": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "timestamp": {
+                        "type": "long"
+                    },
+                    "width": {
+                        "type": "long"
+                    },
+                    "xtime": {
+                        "type": "long"
+                    }
+                }
+            }
+        }
+    requests.json: |
+        {
+            "index_patterns": [
+                "requests-*"
+            ],
+            "aliases": {},
+            "settings": {
+                "index": {
+                    "number_of_shards": "1",
+                    "number_of_replicas": "0"
+                }
+            },
+            "mappings": {
+                "dynamic_templates": [
+                    {
+                        "strings": {
+                            "match_mapping_type": "string",
+                            "mapping": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    }
+                ],
+                "properties": {
+                    "ext": {
+                        "properties": {
+                            "carriername": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "site": {
+                        "properties": {
+                            "ref": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                    }
+                            },
+                            "domain": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "name": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "publisher": {
+                                "properties": {
+                                    "name": {
+                                        "type": "text",
+                                        "fields": {
+                                            "keyword": {
+                                                "type": "keyword",
+                                                "ignore_above": 256
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "keywords": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "page": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "search": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "user": {
+                        "properties": {
+                            "keywords": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "geo": {
+                                "type": "object"
+                            },
+                            "yob": {
+                                "type": "long"
+                            }
+                        }
+                    },
+                    "device": {
+                        "properties": {
+                            "ip": {
+                                "type": "ip"
+                            },
+                            "geo": {
+                                "properties": {
+                                    "lat": {
+                                        "type": "double"
+                                    },
+                                    "lon": {
+                                        "type": "double"
+                                    },
+                                    "location": {
+                                        "type": "geo_point"
+                                    }
+                                }
+                            },
+                            "ua": {
+                                "type": "text",
+                                "fields": {
+                                    "keyword": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  labels: 
+    app: rtb-logstash
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+        app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash  
+    spec:
+      containers:
+      - image: docker.elastic.co/logstash/logstash:7.8.0
+        name: logstash1
+        env:
+        - name: KAFKA_HOST
+          value: "kafka-service:9092"
+        - name: ELASTICSEARCH_URL
+          value: "https://es-cluster-es-http:9200"
+        - name: XPACK_MONITORING_ELASTICSEARCH_HOSTS
+          value: "https://es-cluster-es-http:9200"
+        - name: XPACK_MONITORING_ENABLED
+          value: "false"
+        - name: ELASTIC_USER
+          value: "elastic"
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: es-cluster-es-elastic-user
+              key: elastic
+        volumeMounts:
+        - name: logstash-pipeline-config
+          mountPath: /usr/share/logstash/pipeline/
+        - name: logstash-index-templates
+          mountPath: /usr/share/logstash/rtb_index_templates/
+        - name: es-cacert
+          mountPath: /usr/share/logstash/es-cluster_certs
+ #       readinessProbe:
+ #         httpGet:
+ #           path: /
+ #           port: 9600
+ #         initialDelaySeconds: 60
+ #         timeoutSeconds: 5
+ #       livenessProbe:
+ #         httpGet:
+ #           path: /
+ #           port: 9600
+ #         initialDelaySeconds: 60
+ #         timeoutSeconds: 30
+      volumes:
+      - name: logstash-pipeline-config
+        configMap:
+          name: logstash-pipeline
+          items:
+          - key: logstash.conf
+            path: logstash.conf
+      - name: logstash-index-templates
+        configMap:
+          name: logstash-index-templates
+          items:
+          - key: status.json
+            path: status.json
+          - key: rtblogs.json
+            path: rtblogs.json
+          - key: wins.json
+            path: wins.json
+          - key: bids.json
+            path: bids.json
+          - key: pixels.json
+            path: pixels.json
+          - key: requests.json
+            path: requests.json
+          - key: reasons.json
+            path: reasons.json
+                    
+      - name: es-cacert
+        secret:
+          secretName: es-cluster-es-http-ca-internal
+          items:
+          - key: tls.crt
+            path: es_http/tls.crt
+
+
+
+
+
+
+
+
+

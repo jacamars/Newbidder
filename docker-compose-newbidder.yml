@@ -1,0 +1,95 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
+# Does contain zookeeper and kafka.
+#
+version: "3"
+
+services:
+  zookeeper:
+    image: "zookeeper"
+    ports:
+     - "2181:2181"
+
+  kafka:
+    image: "ches/kafka"
+    environment:
+      ZOOKEEPER_IP: "zookeeper"
+    ports:
+      - "9092:9092"
+    restart: always
+    depends_on:
+      - zookeeper
+
+  sqldb:
+    image: "postgres"
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - "5432:5432"
+    volumes:
+      - /tmp/data:/var/lib/postgresql/data
+      
+  bidder1:
+    image: jacamars/newbidder
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
+      S3BUCKET: ""
+      S3REGION: "us-east-1"
+      S3ENDPOINT: "${S3ENDPOINT}"
+      AWSACCESSKEY: "{$AWSACCESSKEY}"
+      AWSSECRETKEY: "${AWSSECRETKEY}"
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    ports:
+      - "8081:8080"
+      - "8156:8155"
+      - "5702:5701"
+      - "7380:7379"
+    depends_on:
+      - kafka
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
+
+  bidder2:
+    image: jacamars/newbidder
+    environment:
+      BROKERLIST: "kafka:9092"
+      EXTERNAL: "http://localhost:8080"
+      JDBC: "jdbc:postgresql://sqldb/postgres?user=postgres&password=postgres"
+      S3BUCKET: ""
+      S3REGION: "us-east-1"
+      S3ENDPOINT: "${S3ENDPOINT}"
+      AWSACCESSKEY: "{$AWSACCESSKEY}"
+      AWSSECRETKEY: "${AWSSECRETKEY}"
+      GOOGLE_EKEY: ""
+      GOOGLE_IKEY: ""
+      OPENX_EKEY: ""
+      OPENX_IKEY: ""
+      ADX_EKEY:   ""
+      ADX_IKEY:   ""
+    ports:
+      - "8082:8090"
+      - "8157:8155"
+      - "5703:5701"
+      - "7381:7379"
+    depends_on:
+      - kafka
+    command: bash -c "./wait-for-it.sh kafka:9092 -t 120 && ./wait-for-it.sh sqldb:5432 && sleep 1; ./rtb4free s3://config/payday.json"
+    
+  minio:
+    image: minio/minio
+    ports:
+      - '9000:9000'
+    environment:
+      - MINIO_ACCESS_KEY="{AWSACCESSKEY}"
+      - MINIO_SECRET_KEY="{AWSSECRETKEY}"
+    volumes:
+      - /tmp/s3:/data
+    command: server /data
+
+

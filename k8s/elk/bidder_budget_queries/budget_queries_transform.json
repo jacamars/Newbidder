@@ -1,0 +1,582 @@
+# budget queries for transform indices
+
+GET budget_total/_search
+{
+  "size": 1000
+}
+
+# response
+{
+  "took" : 0,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 2,
+      "relation" : "eq"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "budget_total",
+        "_type" : "_doc",
+        "_id" : "MTIxAMtwc-YtGCceUrCpohduLQAAAAAA",
+        "_score" : 1.0,
+        "_source" : {
+          "adtype" : "2.0",
+          "adid" : "1",
+          "cost" : {
+            "avg" : 2.0,
+            "min" : 2.0,
+            "max" : 2.0,
+            "sum" : 2.0
+          },
+          "crid" : "1",
+          "price" : {
+            "avg" : 1.23,
+            "min" : 1.23,
+            "max" : 1.23,
+            "sum" : 1.23
+          },
+          "timestamp" : {
+            "cardinality" : 1.0
+          }
+        }
+      },
+      {
+        "_index" : "budget_total",
+        "_type" : "_doc",
+        "_id" : "MWIxFZeh8Xcp71r42OnDcNDCLgAAAAAA",
+        "_score" : 1.0,
+        "_source" : {
+          "adtype" : "banner",
+          "adid" : "1",
+          "cost" : {
+            "avg" : 1.0,
+            "min" : 1.0,
+            "max" : 1.0,
+            "sum" : 73422.0
+          },
+          "crid" : "1",
+          "price" : {
+            "avg" : 0.85,
+            "min" : 0.85,
+            "max" : 0.85,
+            "sum" : 62408.7
+          },
+          "timestamp" : {
+            "cardinality" : 73925.0
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+###################################################
+GET budget_daily/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "size": 0,
+  "aggs": {
+    "campaign": {
+      "terms": {
+        "field": "adid",
+        "size": 100
+      },
+      "aggs": {
+        "adtype": {
+          "terms": {
+            "field": "adtype",
+            "size": 10
+          },
+          "aggs": {
+            "creative": {
+              "terms": {
+                "field": "crid",
+                "size": 100
+              },
+              "aggs": {
+                "last": {
+                  "top_hits": {
+                    "size": 1,
+                    "sort": [
+                      {
+                        "@timestamp": {
+                          "order": "desc"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#### RESPONSE
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 5,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "campaign" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "1",
+          "doc_count" : 5,
+          "adtype" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "banner",
+                "doc_count" : 3,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 3,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 3,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_daily",
+                              "_type" : "_doc",
+                              "_id" : "ADFiMXdp7_LnD50YuvaB1NtEQQkAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "banner",
+                                "adid" : "1",
+                                "@timestamp" : 1594339200000,
+                                "cost" : {
+                                  "avg" : 1.0,
+                                  "min" : 1.0,
+                                  "max" : 1.0,
+                                  "sum" : 3710.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 0.85,
+                                  "min" : 0.85,
+                                  "max" : 0.85,
+                                  "sum" : 3153.5
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 3736.0
+                                }
+                              },
+                              "sort" : [
+                                1594339200000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "2.0",
+                "doc_count" : 1,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 1,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 1,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_daily",
+                              "_type" : "_doc",
+                              "_id" : "ADEyMRefa-JPUrTc-6arCaB2ugMAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "2.0",
+                                "adid" : "1",
+                                "@timestamp" : 1594339200000,
+                                "cost" : {
+                                  "avg" : 2.0,
+                                  "min" : 2.0,
+                                  "max" : 2.0,
+                                  "sum" : 2.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 1.23,
+                                  "min" : 1.23,
+                                  "max" : 1.23,
+                                  "sum" : 1.23
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 1.0
+                                }
+                              },
+                              "sort" : [
+                                1594339200000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "video",
+                "doc_count" : 1,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 1,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 1,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_daily",
+                              "_type" : "_doc",
+                              "_id" : "ADF2MdTMsk9qH9buJYRgnyNQykwAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "video",
+                                "adid" : "1",
+                                "@timestamp" : 1594339200000,
+                                "cost" : {
+                                  "avg" : 2.0,
+                                  "min" : 2.0,
+                                  "max" : 2.0,
+                                  "sum" : 4.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 1.23,
+                                  "min" : 1.23,
+                                  "max" : 1.23,
+                                  "sum" : 2.46
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 2.0
+                                }
+                              },
+                              "sort" : [
+                                1594339200000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+
+################################################
+GET budget_hourly/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "size": 0,
+  "aggs": {
+    "campaign": {
+      "terms": {
+        "field": "adid",
+        "size": 100
+      },
+      "aggs": {
+        "adtype": {
+          "terms": {
+            "field": "adtype",
+            "size": 10
+          },
+          "aggs": {
+            "creative": {
+              "terms": {
+                "field": "crid",
+                "size": 100
+              },
+              "aggs": {
+                "last": {
+                  "top_hits": {
+                    "size": 1,
+                    "sort": [
+                      {
+                        "@timestamp": {
+                          "order": "desc"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#### RESPONSE
+{
+  "took" : 5,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 29,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "campaign" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "1",
+          "doc_count" : 29,
+          "adtype" : {
+            "doc_count_error_upper_bound" : 0,
+            "sum_other_doc_count" : 0,
+            "buckets" : [
+              {
+                "key" : "banner",
+                "doc_count" : 27,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 27,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 27,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_hourly",
+                              "_type" : "_doc",
+                              "_id" : "ADFiMSDJyOJsYjYjHV6wDapc8OcAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "banner",
+                                "adid" : "1",
+                                "@timestamp" : 1594404000000,
+                                "cost" : {
+                                  "avg" : 1.0,
+                                  "min" : 1.0,
+                                  "max" : 1.0,
+                                  "sum" : 1324.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 0.8499999999999999,
+                                  "min" : 0.85,
+                                  "max" : 0.85,
+                                  "sum" : 1125.3999999999999
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 1324.0
+                                }
+                              },
+                              "sort" : [
+                                1594404000000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "2.0",
+                "doc_count" : 1,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 1,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 1,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_hourly",
+                              "_type" : "_doc",
+                              "_id" : "ADEyMfWzbVJ-q_n0dVfFq9Qjn6QAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "2.0",
+                                "adid" : "1",
+                                "@timestamp" : 1594404000000,
+                                "cost" : {
+                                  "avg" : 2.0,
+                                  "min" : 2.0,
+                                  "max" : 2.0,
+                                  "sum" : 2.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 1.23,
+                                  "min" : 1.23,
+                                  "max" : 1.23,
+                                  "sum" : 1.23
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 1.0
+                                }
+                              },
+                              "sort" : [
+                                1594404000000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "key" : "video",
+                "doc_count" : 1,
+                "creative" : {
+                  "doc_count_error_upper_bound" : 0,
+                  "sum_other_doc_count" : 0,
+                  "buckets" : [
+                    {
+                      "key" : "1",
+                      "doc_count" : 1,
+                      "last" : {
+                        "hits" : {
+                          "total" : {
+                            "value" : 1,
+                            "relation" : "eq"
+                          },
+                          "max_score" : null,
+                          "hits" : [
+                            {
+                              "_index" : "budget_hourly",
+                              "_type" : "_doc",
+                              "_id" : "ADF2MX3T84RCv9dAEnmJn6NOL5IAAAAA",
+                              "_score" : null,
+                              "_source" : {
+                                "adtype" : "video",
+                                "adid" : "1",
+                                "@timestamp" : 1594411200000,
+                                "cost" : {
+                                  "avg" : 2.0,
+                                  "min" : 2.0,
+                                  "max" : 2.0,
+                                  "sum" : 4.0
+                                },
+                                "crid" : "1",
+                                "price" : {
+                                  "avg" : 1.23,
+                                  "min" : 1.23,
+                                  "max" : 1.23,
+                                  "sum" : 2.46
+                                },
+                                "timestamp" : {
+                                  "cardinality" : 2.0
+                                }
+                              },
+                              "sort" : [
+                                1594411200000
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

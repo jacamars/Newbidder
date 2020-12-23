@@ -1,0 +1,20 @@
+export declare class ReplicatedMapMessageType {
+    static REPLICATEDMAP_PUT: number;
+    static REPLICATEDMAP_SIZE: number;
+    static REPLICATEDMAP_ISEMPTY: number;
+    static REPLICATEDMAP_CONTAINSKEY: number;
+    static REPLICATEDMAP_CONTAINSVALUE: number;
+    static REPLICATEDMAP_GET: number;
+    static REPLICATEDMAP_REMOVE: number;
+    static REPLICATEDMAP_PUTALL: number;
+    static REPLICATEDMAP_CLEAR: number;
+    static REPLICATEDMAP_ADDENTRYLISTENERTOKEYWITHPREDICATE: number;
+    static REPLICATEDMAP_ADDENTRYLISTENERWITHPREDICATE: number;
+    static REPLICATEDMAP_ADDENTRYLISTENERTOKEY: number;
+    static REPLICATEDMAP_ADDENTRYLISTENER: number;
+    static REPLICATEDMAP_REMOVEENTRYLISTENER: number;
+    static REPLICATEDMAP_KEYSET: number;
+    static REPLICATEDMAP_VALUES: number;
+    static REPLICATEDMAP_ENTRYSET: number;
+    static REPLICATEDMAP_ADDNEARCACHEENTRYLISTENER: number;
+}

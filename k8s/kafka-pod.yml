@@ -1,0 +1,57 @@
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kafka-zk
+  labels: 
+    app: rtb-kafka
+spec:
+  containers:
+  - image: zookeeper
+    name: zookeeper
+    readinessProbe:
+      tcpSocket:
+        port: 2181
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 2181
+      initialDelaySeconds: 15
+      periodSeconds: 20
+  - image: ches/kafka
+    name: kafka
+    env:
+    - name: ZOOKEEPER_IP
+      value: "localhost"
+    ports:
+    - containerPort: 9092
+      name: port9092
+      protocol: TCP
+    readinessProbe:
+      tcpSocket:
+        port: 9092
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 9092
+      initialDelaySeconds: 15
+      periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+spec:
+  selector:
+    app: rtb-kafka
+  ports:
+    - protocol: TCP
+      port: 9092
+      targetPort: 9092
+
+
+
+

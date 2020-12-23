@@ -1,0 +1,22 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including crosstalk, elk, mysql or campaign manager)
+# Does contain zookeeper and kafka.
+#
+version: "3"
+
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - '9000:9000'
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - /tmp/s3:/data
+    command: server /data
+
+
+#networks:
+#  rtb_net:
+#    external: true

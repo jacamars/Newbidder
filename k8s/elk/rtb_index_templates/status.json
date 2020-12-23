@@ -1,0 +1,113 @@
+PUT _template/status
+{
+  "index_patterns": [
+    "status-*"
+  ],
+  "aliases": {},
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "strings": {
+          "match_mapping_type": "string",
+          "mapping": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    ],
+    "properties": {
+      "clicks": {
+        "type": "long"
+      },
+      "freedisk": {
+        "type": "double"
+      },
+      "avgnobidtime": {
+        "type": "double"
+      },
+      "wins": {
+        "type": "long"
+      },
+      "total-errors": {
+        "type": "long"
+      },
+      "cpu": {
+        "type": "double"
+      },
+      "timestamp": {
+        "type": "long"
+      },
+      "stopped": {
+        "type": "boolean"
+      },
+      "openfiles": {
+        "type": "long"
+      },
+      "percmemused": {
+        "type": "double"
+      },
+      "handled": {
+        "type": "long"
+      },
+      "pixels": {
+        "type": "long"
+      },
+      "qps": {
+        "type": "double"
+      },
+      "campaigns": {
+        "type": "long"
+      },
+      "requests": {
+        "type": "long"
+      },
+      "avgbidtime": {
+        "type": "double"
+      },
+      "fraud": {
+        "type": "long"
+      },
+      "bids": {
+        "type": "long"
+      },
+      "threads": {
+        "type": "long"
+      },
+      "memused": {
+        "type": "double"
+      },
+      "nobid": {
+        "type": "long"
+      },
+      "exchanges": {
+        "properties": {
+          "qps": {
+            "type": "double"
+          },
+          "errors": {
+            "type": "long"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "requests": {
+            "type": "long"
+          },
+          "wins": {
+            "type": "long"
+          },
+          "bids": {
+            "type": "long"
+          }
+        }
+      }
+    }
+  }
+}

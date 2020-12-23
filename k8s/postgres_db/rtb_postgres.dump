@@ -1,0 +1,1092 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.3 (Debian 12.3-1.pgdg100+1)
+-- Dumped by pg_dump version 12.3 (Debian 12.3-1.pgdg100+1)
+
+
+DROP TABLE banners;
+DROP TABLE banner_videos;
+DROP TABLE campaigns;
+DROP TABLE targets;
+DROP TABLE users;
+
+
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: banner_audios; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banner_audios (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    type text NOT NULL,
+    campaign_id integer,
+    interval_start timestamp without time zone NOT NULL,
+    interval_end timestamp without time zone,
+    total_budget numeric,
+    bid_ecpm numeric(15,6) DEFAULT NULL::numeric,
+    cur text,
+    total_cost numeric(15,6) DEFAULT NULL::numeric,
+    htmltemplate text,
+    bids integer,
+    clicks integer,
+    pixels integer,
+    wins integer,
+    daily_budget numeric(15,6) DEFAULT NULL::numeric,
+    hourly_budget numeric(15,6) DEFAULT NULL::numeric,
+    daily_cost numeric(15,6) DEFAULT NULL::numeric,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255) DEFAULT NULL::character varying,
+    hourly_cost numeric(15,6) DEFAULT NULL::numeric,
+    deals character varying(255) DEFAULT NULL::character varying,
+    audio_duration integer,
+    audio_bitrate integer,
+    audio_protocol integer,
+    audio_api integer,
+    rules integer[],
+    interstitial integer,
+    width_range character varying(255) DEFAULT NULL::character varying,
+    height_range character varying(255) DEFAULT NULL::character varying,
+    width_height_list character varying(255) DEFAULT NULL::character varying,
+    ext_spec text[],
+    attr integer[]
+);
+
+
+ALTER TABLE public.banner_audios OWNER TO postgres;
+
+--
+-- Name: banner_audios_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.banner_audios_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.banner_audios_id_seq OWNER TO postgres;
+
+--
+-- Name: banner_audios_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.banner_audios_id_seq OWNED BY public.banner_audios.id;
+
+
+--
+-- Name: banner_natives; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banner_natives (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    type text NOT NULL,
+    campaign_id integer,
+    interval_start timestamp without time zone NOT NULL,
+    interval_end timestamp without time zone,
+    total_budget numeric,
+    bid_ecpm numeric(15,6) DEFAULT NULL::numeric,
+    cur text,
+    total_cost numeric(15,6) DEFAULT NULL::numeric,
+    htmltemplate text,
+    bids integer,
+    clicks integer,
+    pixels integer,
+    wins integer,
+    daily_budget numeric(15,6) DEFAULT NULL::numeric,
+    hourly_budget numeric(15,6) DEFAULT NULL::numeric,
+    daily_cost numeric(15,6) DEFAULT NULL::numeric,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255) DEFAULT NULL::character varying,
+    hourly_cost numeric(15,6) DEFAULT NULL::numeric,
+    deals character varying(255) DEFAULT NULL::character varying,
+    rules integer[],
+    interstitial integer,
+    width_range character varying(255) DEFAULT NULL::character varying,
+    height_range character varying(255) DEFAULT NULL::character varying,
+    width_height_list character varying(255) DEFAULT NULL::character varying,
+    native_assets text[],
+    native_link text,
+    native_trk_urls text[],
+    native_js_tracker text,
+    native_context integer,
+    native_contextsubtype integer,
+    native_plcmttype integer,
+    native_plcmtct integer,
+    ext_spec text[],
+    attr integer[]
+);
+
+
+ALTER TABLE public.banner_natives OWNER TO postgres;
+
+--
+-- Name: banner_natives_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.banner_natives_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.banner_natives_id_seq OWNER TO postgres;
+
+--
+-- Name: banner_natives_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.banner_natives_id_seq OWNED BY public.banner_natives.id;
+
+
+--
+-- Name: banner_videos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banner_videos (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    type text NOT NULL,
+    campaign_id integer,
+    interval_start timestamp without time zone,
+    interval_end timestamp without time zone,
+    total_budget numeric(15,6) DEFAULT NULL::numeric,
+    vast_video_width integer,
+    vast_video_height integer,
+    vast_video_linearity integer,
+    bid_ecpm numeric,
+    cur text,
+    vast_video_linerarity integer,
+    vast_video_duration integer,
+    vast_video_type text,
+    vast_video_protocol integer,
+    vast_video_outgoing_file text,
+    bids integer,
+    clicks integer,
+    pixels integer,
+    wins integer,
+    total_cost numeric DEFAULT 0.000000,
+    daily_cost numeric,
+    daily_budget numeric,
+    frequency_spec text,
+    frequency_expire integer,
+    frequency_count integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    hourly_budget numeric,
+    name character varying(256) DEFAULT NULL::character varying,
+    target_id integer,
+    hourly_cost numeric,
+    vast_video_bitrate integer,
+    mime_type character varying(255) DEFAULT NULL::character varying,
+    deals character varying(255) DEFAULT NULL::character varying,
+    width_range character varying(255) DEFAULT NULL::character varying,
+    height_range character varying(255) DEFAULT NULL::character varying,
+    width_height_list character varying(255) DEFAULT NULL::character varying,
+    rules integer[],
+    interstitial integer,
+    htmltemplate text,
+    ext_spec text[],
+    attr integer[]
+);
+
+
+ALTER TABLE public.banner_videos OWNER TO postgres;
+
+--
+-- Name: banner_videos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.banner_videos_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.banner_videos_id_seq OWNER TO postgres;
+
+--
+-- Name: banner_videos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.banner_videos_id_seq OWNED BY public.banner_videos.id;
+
+
+--
+-- Name: banner_videos_rtb_standards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banner_videos_rtb_standards (
+    banner_video_id integer,
+    rtb_standard_id integer
+);
+
+
+ALTER TABLE public.banner_videos_rtb_standards OWNER TO postgres;
+
+--
+-- Name: banners; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banners (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    type text NOT NULL,
+    interval_start timestamp without time zone NOT NULL,
+    interval_end timestamp without time zone,
+    total_budget numeric,
+    width integer,
+    height integer,
+    bid_ecpm numeric(15,6) DEFAULT NULL::numeric,
+    cur text,
+    total_cost numeric(15,6) DEFAULT NULL::numeric,
+    contenttype character varying(1024) DEFAULT NULL::character varying,
+    imageurl character varying(1024) DEFAULT NULL::character varying,
+    htmltemplate text,
+    bids integer,
+    clicks integer,
+    pixels integer,
+    wins integer,
+    daily_budget numeric(15,6) DEFAULT NULL::numeric,
+    hourly_budget numeric(15,6) DEFAULT NULL::numeric,
+    daily_cost numeric(15,6) DEFAULT NULL::numeric,
+    target_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255) DEFAULT NULL::character varying,
+    frequency_spec character varying(255) DEFAULT NULL::character varying,
+    frequency_expire integer,
+    frequency_count integer,
+    hourly_cost numeric(15,6) DEFAULT NULL::numeric,
+    deals character varying(255) DEFAULT NULL::character varying,
+    width_range character varying(255) DEFAULT NULL::character varying,
+    height_range character varying(255) DEFAULT NULL::character varying,
+    width_height_list character varying(255) DEFAULT NULL::character varying,
+    rules integer[],
+    "position" text,
+    interstitial integer,
+    ext_spec text[],
+    attr integer[]
+);
+
+
+ALTER TABLE public.banners OWNER TO postgres;
+
+--
+-- Name: banners_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.banners_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.banners_id_seq OWNER TO postgres;
+
+--
+-- Name: banners_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.banners_id_seq OWNED BY public.banners.id;
+
+
+--
+-- Name: banners_rtb_standards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.banners_rtb_standards (
+    banner_id integer,
+    rtb_standard_id integer
+);
+
+
+ALTER TABLE public.banners_rtb_standards OWNER TO postgres;
+
+--
+-- Name: campaigns; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.campaigns (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    activate_time timestamp without time zone,
+    expire_time timestamp without time zone,
+    cost numeric(15,6) DEFAULT NULL::numeric,
+    ad_domain character varying(1024) DEFAULT NULL::character varying,
+    clicks integer,
+    pixels integer,
+    wins integer,
+    bids integer,
+    name character varying(1024) DEFAULT NULL::character varying,
+    status character varying(1024) DEFAULT NULL::character varying,
+    conversion_type character varying(1024) DEFAULT NULL::character varying,
+    budget_limit_daily numeric(15,6) DEFAULT NULL::numeric,
+    budget_limit_hourly numeric(15,6) DEFAULT NULL::numeric,
+    total_budget numeric(15,6) DEFAULT NULL::numeric,
+    bid numeric(15,6) DEFAULT NULL::numeric,
+    shard text,
+    forensiq text,
+    daily_cost numeric(15,6) DEFAULT NULL::numeric,
+    updated_at timestamp without time zone,
+    deleted_at timestamp without time zone,
+    created_at timestamp without time zone,
+    hourly_cost numeric(15,6) DEFAULT NULL::numeric,
+    exchanges character varying(255) DEFAULT NULL::character varying,
+    regions character varying(255) DEFAULT NULL::character varying,
+    target_id integer,
+    rules integer[],
+    spendrate integer,
+    banners integer[],
+    videos integer[],
+    audios integer[],
+    natives integer[],
+    day_parting_utc text,
+    capspec text,
+    capcount integer,
+    capexpire integer,
+    capunit text
+);
+
+
+ALTER TABLE public.campaigns OWNER TO postgres;
+
+--
+-- Name: campaigns_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.campaigns_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.campaigns_id_seq OWNER TO postgres;
+
+--
+-- Name: campaigns_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.campaigns_id_seq OWNED BY public.campaigns.id;
+
+
+--
+-- Name: campaigns_rtb_standards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.campaigns_rtb_standards (
+    campaign_id integer,
+    rtb_standard_id integer
+);
+
+
+ALTER TABLE public.campaigns_rtb_standards OWNER TO postgres;
+
+--
+-- Name: companies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.companies (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    customer_name text NOT NULL,
+    email text NOT NULL,
+    telephone text NOT NULL,
+    firstname text NOT NULL,
+    lastname text NOT NULL,
+    address text NOT NULL,
+    citystate text NOT NULL,
+    country text NOT NULL,
+    postalcode text NOT NULL,
+    description text,
+    budget double precision DEFAULT 0
+);
+
+
+ALTER TABLE public.companies OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.companies_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.companies_id_seq OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.companies_id_seq OWNED BY public.companies.id;
+
+
+--
+-- Name: exchange_attributes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.exchange_attributes (
+    id integer NOT NULL,
+    banner_id integer,
+    banner_video_id integer,
+    name character varying(255) DEFAULT NULL::character varying,
+    value character varying(255) DEFAULT NULL::character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    exchange character varying(255) DEFAULT NULL::character varying
+);
+
+
+ALTER TABLE public.exchange_attributes OWNER TO postgres;
+
+--
+-- Name: exchange_attributes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.exchange_attributes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.exchange_attributes_id_seq OWNER TO postgres;
+
+--
+-- Name: exchange_attributes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.exchange_attributes_id_seq OWNED BY public.exchange_attributes.id;
+
+
+--
+-- Name: misc; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.misc (
+    id text NOT NULL,
+    value text NOT NULL,
+    endtime bigint NOT NULL
+);
+
+
+ALTER TABLE public.misc OWNER TO postgres;
+
+--
+-- Name: recordedbids; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.recordedbids (
+    id text NOT NULL,
+    capkey text NOT NULL,
+    captimeout bigint NOT NULL,
+    captimeunit text NOT NULL,
+    price text NOT NULL,
+    adtype text NOT NULL,
+    frequencycap text NOT NULL,
+    endtime bigint NOT NULL
+);
+
+
+ALTER TABLE public.recordedbids OWNER TO postgres;
+
+--
+-- Name: rtb_standards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.rtb_standards (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    rtbspecification character varying(1024) DEFAULT NULL::character varying,
+    operator character varying(1024) DEFAULT NULL::character varying,
+    operand character varying(1024) DEFAULT NULL::character varying,
+    operand_type character varying(16) DEFAULT NULL::character varying,
+    operand_ordinal character varying(16) DEFAULT NULL::character varying,
+    rtb_required integer,
+    name character varying(255) DEFAULT NULL::character varying,
+    description character varying(255) DEFAULT NULL::character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    operand_list_id integer
+);
+
+
+ALTER TABLE public.rtb_standards OWNER TO postgres;
+
+--
+-- Name: rtb_standards_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.rtb_standards_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.rtb_standards_id_seq OWNER TO postgres;
+
+--
+-- Name: rtb_standards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.rtb_standards_id_seq OWNED BY public.rtb_standards.id;
+
+
+--
+-- Name: targets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.targets (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    activate_time timestamp without time zone,
+    expire_time timestamp without time zone,
+    list_of_domains text,
+    domain_targetting text,
+    geo_latitude numeric,
+    geo_longitude numeric,
+    geo_range numeric,
+    country text,
+    geo_region text,
+    carrier text,
+    os text,
+    make text,
+    model text,
+    devicetype text,
+    iab_category text,
+    iab_category_blklist text,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone,
+    name text,
+    domains_list_id text
+);
+
+
+ALTER TABLE public.targets OWNER TO postgres;
+
+--
+-- Name: targets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.targets_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.targets_id_seq OWNER TO postgres;
+
+--
+-- Name: targets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.targets_id_seq OWNED BY public.targets.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    customer_id text NOT NULL,
+    sub_id text,
+    username text NOT NULL,
+    password text NOT NULL,
+    company text,
+    email text,
+    telephone text,
+    firstname text NOT NULL,
+    lastname text NOT NULL,
+    address text NOT NULL,
+    citystate text NOT NULL,
+    country text NOT NULL,
+    postalcode text NOT NULL,
+    about text,
+    picture text,
+    title text,
+    description text
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: video; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.video (
+    id text NOT NULL,
+    name text,
+    endtime bigint NOT NULL
+);
+
+
+ALTER TABLE public.video OWNER TO postgres;
+
+--
+-- Name: banner_audios id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_audios ALTER COLUMN id SET DEFAULT nextval('public.banner_audios_id_seq'::regclass);
+
+
+--
+-- Name: banner_natives id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_natives ALTER COLUMN id SET DEFAULT nextval('public.banner_natives_id_seq'::regclass);
+
+
+--
+-- Name: banner_videos id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_videos ALTER COLUMN id SET DEFAULT nextval('public.banner_videos_id_seq'::regclass);
+
+
+--
+-- Name: banners id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banners ALTER COLUMN id SET DEFAULT nextval('public.banners_id_seq'::regclass);
+
+
+--
+-- Name: campaigns id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaigns ALTER COLUMN id SET DEFAULT nextval('public.campaigns_id_seq'::regclass);
+
+
+--
+-- Name: companies id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies ALTER COLUMN id SET DEFAULT nextval('public.companies_id_seq'::regclass);
+
+
+--
+-- Name: exchange_attributes id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exchange_attributes ALTER COLUMN id SET DEFAULT nextval('public.exchange_attributes_id_seq'::regclass);
+
+
+--
+-- Name: rtb_standards id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.rtb_standards ALTER COLUMN id SET DEFAULT nextval('public.rtb_standards_id_seq'::regclass);
+
+
+--
+-- Name: targets id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.targets ALTER COLUMN id SET DEFAULT nextval('public.targets_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: banner_audios; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banner_audios (id, customer_id, sub_id, type, campaign_id, interval_start, interval_end, total_budget, bid_ecpm, cur, total_cost, htmltemplate, bids, clicks, pixels, wins, daily_budget, hourly_budget, daily_cost, created_at, updated_at, name, hourly_cost, deals, audio_duration, audio_bitrate, audio_protocol, audio_api, rules, interstitial, width_range, height_range, width_height_list, ext_spec, attr) FROM stdin;
+\.
+
+
+--
+-- Data for Name: banner_natives; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banner_natives (id, customer_id, sub_id, type, campaign_id, interval_start, interval_end, total_budget, bid_ecpm, cur, total_cost, htmltemplate, bids, clicks, pixels, wins, daily_budget, hourly_budget, daily_cost, created_at, updated_at, name, hourly_cost, deals, rules, interstitial, width_range, height_range, width_height_list, native_assets, native_link, native_trk_urls, native_js_tracker, native_context, native_contextsubtype, native_plcmttype, native_plcmtct, ext_spec, attr) FROM stdin;
+\.
+
+
+--
+-- Data for Name: banner_videos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banner_videos (id, customer_id, sub_id, type, campaign_id, interval_start, interval_end, total_budget, vast_video_width, vast_video_height, vast_video_linearity, bid_ecpm, cur, vast_video_linerarity, vast_video_duration, vast_video_type, vast_video_protocol, vast_video_outgoing_file, bids, clicks, pixels, wins, total_cost, daily_cost, daily_budget, frequency_spec, frequency_expire, frequency_count, created_at, updated_at, hourly_budget, name, target_id, hourly_cost, vast_video_bitrate, mime_type, deals, width_range, height_range, width_height_list, rules, interstitial, htmltemplate, ext_spec, attr) FROM stdin;
+1	rtb4free	\N	video	\N	2020-07-10 18:06:11.107	2030-08-09 18:06:00	0.000000	0	0	1	2	USD	\N	50	\N	1	\N	\N	\N	\N	\N	0	0	0	\N	\N	\N	2020-07-10 18:13:54.897	2020-07-10 18:13:54.897	0	video_1	\N	0	5000000	video/mp4	\N	\N	\N	\N	{}	0	<VAST xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:noNamespaceSchemaLocation="vast.xsd"><Ad id="270" ><InLine><AdSystem version="2.0">ONION</AdSystem><AdTitle>In-Stream Video</AdTitle><Description>Cottonelle Video Skin 7/15</Description><Impression><![CDATA[https://ad.doubleclick.net/ad/N3186.3804.ONIONINC/B8043482.3;sz=1x1;pc=[TPAS_ID];ord=%%CACHEBUSTER%%?]]></Impression>?<Impression><![CDATA[http://influxer.onion.com/influx.gif?site=onionads&event=impression&content_id=270&path=/vast/270.xml]]></Impression>?<Impression><![CDATA[http://ra.onion.com/video-ad.gif?video_ad=270&event=impression]]></Impression><Impression><![CDATA[{pixel_url}/exchange={exchange}/ad_id={ad_id}/creative_id={creative_id}/price=${AUCTION_PRICE}/lat={lat}/lon={lon}/bid_id={bid_id}]]></Impression>?<Creatives><Creative sequence="1" AdID="270"><Linear><Duration>00:01:05</Duration><TrackingEvents><Tracking event="start"><![CDATA[ http://influxer.onion.com/influx.gif?site=onionads&event=start&content_id=270&path=/vast/270.xml]]></Tracking><Tracking event="start"><![CDATA[ http://ra.onion.com/video-ad.gif?video_ad=270&event=start]]></Tracking><Tracking event="firstQuartile"><![CDATA[ http://influxer.onion.com/influx.gif?site=onionads&event=firstQuartile&content_id=270&path=/vast/270.xml ]]></Tracking><Tracking event="firstQuartile"><![CDATA[ http://ra.onion.com/video-ad.gif?video_ad=270&event=firstQuartile ]]></Tracking><Tracking event="midpoint"><![CDATA[ http://influxer.onion.com/influx.gif?site=onionads&event=midpoint&content_id=270&path=/vast/270.xml ]]></Tracking><Tracking event="midpoint"><![CDATA[ http://ra.onion.com/video-ad.gif?video_ad=270&event=midpoint ]]></Tracking><Tracking event="thirdQuartile"><![CDATA[ http://influxer.onion.com/influx.gif?site=onionads&event=thirdQuartile&content_id=270&path=/vast/270.xml ]]></Tracking><Tracking event="thirdQuartile"><![CDATA[ http://ra.onion.com/video-ad.gif?video_ad=270&event=thirdQuartile ]]></Tracking><Tracking event="complete"><![CDATA[ http://influxer.onion.com/influx.gif?site=onionads&event=complete&content_id=270&path=/vast/270.xml ]]></Tracking><Tracking event="complete"><![CDATA[ http://ra.onion.com/video-ad.gif?video_ad=270&event=complete ]]></Tracking></TrackingEvents><VideoClicks><ClickThrough><![CDATA[https://ad.doubleclick.net/clk;281053485;107792520;e;pc=[TPAS_ID]]]></ClickThrough></VideoClicks><MediaFiles><MediaFile delivery="progressive" type="video/webm" bitrate="340" width="640" height=""><![CDATA[http://v.theonion.com/onionwebtech/videoads/525/sd.webm]]></MediaFile><MediaFile delivery="progressive" type="video/mp4" bitrate="474" width="640" height=""><![CDATA[http://v.theonion.com/onionwebtech/videoads/525/sd.mp4]]></MediaFile><MediaFile delivery="progressive" type="application/x-mpegurl" bitrate="None" width="None" height=""><![CDATA[http://v.theonion.com/onionwebtech/videoads/525/hls_playlist.m3u8]]></MediaFile></MediaFiles></Linear></Creative></Creatives></InLine>	\N	{}
+\.
+
+
+--
+-- Data for Name: banner_videos_rtb_standards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banner_videos_rtb_standards (banner_video_id, rtb_standard_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: banners; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banners (id, customer_id, sub_id, type, interval_start, interval_end, total_budget, width, height, bid_ecpm, cur, total_cost, contenttype, imageurl, htmltemplate, bids, clicks, pixels, wins, daily_budget, hourly_budget, daily_cost, target_id, created_at, updated_at, name, frequency_spec, frequency_expire, frequency_count, hourly_cost, deals, width_range, height_range, width_height_list, rules, "position", interstitial, ext_spec, attr) FROM stdin;
+1	rtb4free	\N	banner	2020-06-22 23:38:35.955	2030-07-22 23:38:00	0	0	0	1.000000	USD	0.000000	image/jpg	http://localhost:8080/images/320x50.jpg?adid={ad_id}&bidid={bid_id}	<img src="{pixel_url}/exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&price=${AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}" height="1" width="1" style="display:none;"/><a href="{clickurl}{redirect_url}/exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&bid_id={bid_id}&site_domain={site_domain}?url=http://rtb4free.com/contact.html" target="_blank"><img src="$EXTERNAL/images/320x50.jpg" width="300" height="250" /></a>	\N	\N	\N	\N	0.000000	0.000000	0.000000	\N	2020-06-22 23:42:47.862	2020-06-22 23:42:47.862	banner_1_	\N	\N	\N	0.000000	\N	\N	\N	\N	{}	\N	0	{site_or_app:#:site,clickthrough_url:#:http://rtb4free.com}	{}
+2	rtb4free	\N	banner	2020-07-10 20:16:11.23	2030-08-09 20:16:00	0	0	0	2.000000	USD	0.000000	image/jpg	http://localhost:8080/images/320x50.jpg?adid={ad_id}&bidid={bid_id}	<img src="{pixel_url}/exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&price=${AUCTION_PRICE}&bid_id={bid_id}&site_domain={site_domain}" height="1" width="1" style="display:none;"/><a href="{clickurl}{redirect_url}/exchange={exchange}&ad_id={ad_id}&creative_id={creative_id}&bid_id={bid_id}&site_domain={site_domain}?url=http://rtb4free.com/contact.html" target="_blank"><img src="$EXTERNAL/images/320x50.jpg" width="300" height="250" /></a>	\N	\N	\N	\N	0.000000	0.000000	0.000000	\N	2020-07-10 20:17:47.657	2020-07-10 20:17:47.657	banner_2	\N	\N	\N	0.000000	\N	\N	\N	\N	{}	\N	0	{site_or_app:#:site,clickthrough_url:#:http://www.rtb4free.com}	{}
+\.
+
+
+--
+-- Data for Name: banners_rtb_standards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.banners_rtb_standards (banner_id, rtb_standard_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: campaigns; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.campaigns (id, customer_id, sub_id, activate_time, expire_time, cost, ad_domain, clicks, pixels, wins, bids, name, status, conversion_type, budget_limit_daily, budget_limit_hourly, total_budget, bid, shard, forensiq, daily_cost, updated_at, deleted_at, created_at, hourly_cost, exchanges, regions, target_id, rules, spendrate, banners, videos, audios, natives, day_parting_utc, capspec, capcount, capexpire, capunit) FROM stdin;
+1	rtb4free	\N	2020-06-22 23:43:40.086	2030-07-22 23:43:00	0.000000	rtb4free.com	\N	\N	\N	\N	Campaign_1	runnable	\N	\N	\N	\N	\N	\N	false	\N	2020-07-10 18:15:50.15	\N	2020-06-22 23:44:34.165	\N	\N	US	1	{}	0	{1}	{1}	{}	{}	\N	null	0	0	seconds
+\.
+
+
+--
+-- Data for Name: campaigns_rtb_standards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.campaigns_rtb_standards (campaign_id, rtb_standard_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.companies (id, customer_id, customer_name, email, telephone, firstname, lastname, address, citystate, country, postalcode, description, budget) FROM stdin;
+1	rtb4free	Jacamars Inc	ben.faul@rtb4free.com	555-555-5555	Ben	Faul	3820 Del Amo Blvd #226	Torrance, CA	USA	90503	\N	0
+2	test	The Test Corp.	test.test@test.com	666-666-66666	Test	Test	3820 Del Amo Blvd #226	Torrance, CA	USA	90503	\N	0
+\.
+
+
+--
+-- Data for Name: exchange_attributes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.exchange_attributes (id, banner_id, banner_video_id, name, value, created_at, updated_at, exchange) FROM stdin;
+\.
+
+
+--
+-- Data for Name: misc; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.misc (id, value, endtime) FROM stdin;
+accountingsystem	"accountingsystem"	1594481596728
+timebase	1594083625865	1594083685865
+\.
+
+
+--
+-- Data for Name: recordedbids; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.recordedbids (id, capkey, captimeout, captimeunit, price, adtype, frequencycap, endtime) FROM stdin;
+\.
+
+
+--
+-- Data for Name: rtb_standards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.rtb_standards (id, customer_id, sub_id, rtbspecification, operator, operand, operand_type, operand_ordinal, rtb_required, name, description, created_at, updated_at, operand_list_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: targets; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.targets (id, customer_id, sub_id, activate_time, expire_time, list_of_domains, domain_targetting, geo_latitude, geo_longitude, geo_range, country, geo_region, carrier, os, make, model, devicetype, iab_category, iab_category_blklist, created_at, updated_at, name, domains_list_id) FROM stdin;
+1	rtb4free	\N	\N	\N		null	\N	\N	\N	USA	\N					\N			2020-06-22 23:43:34.738	\N	Target USA	\N
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, customer_id, sub_id, username, password, company, email, telephone, firstname, lastname, address, citystate, country, postalcode, about, picture, title, description) FROM stdin;
+1	rtb4free	superuser	ben.faul@rtb4free.com	zulu	Jacamars, Inc	ben.faul@rtb4free.com	310-467-0646	Ben	Faul	3820 Del Amo Blvd #226	Torrance, CA.	USA	90503	Chief cook and dish-washer.	https://i.kym-cdn.com/entries/icons/original/000/004/006/YUNO.jpg	Head Peon	Will sthis stuff ever get done???
+2	test	superuser	test.test@test.com	test	Jacamars, Inc	test.test@test.com	666-666-6666	Test	Test	3820 Del Amo Blvd #226	Torrance, CA.	USA	90503	Test	https://i.kym-cdn.com/entries/icons/original/000/004/006/YUNO.jpg	Head Tester	Is this stuff tested???
+\.
+
+
+--
+-- Data for Name: video; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.video (id, name, endtime) FROM stdin;
+\.
+
+
+--
+-- Name: banner_audios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.banner_audios_id_seq', 1, false);
+
+
+--
+-- Name: banner_natives_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.banner_natives_id_seq', 1, false);
+
+
+--
+-- Name: banner_videos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.banner_videos_id_seq', 1, true);
+
+
+--
+-- Name: banners_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.banners_id_seq', 2, true);
+
+
+--
+-- Name: campaigns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.campaigns_id_seq', 1, true);
+
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.companies_id_seq', 2, true);
+
+
+--
+-- Name: exchange_attributes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.exchange_attributes_id_seq', 1, false);
+
+
+--
+-- Name: rtb_standards_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.rtb_standards_id_seq', 1, false);
+
+
+--
+-- Name: targets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.targets_id_seq', 1, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+
+
+--
+-- Name: banner_audios banner_audios_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_audios
+    ADD CONSTRAINT banner_audios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: banner_natives banner_natives_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_natives
+    ADD CONSTRAINT banner_natives_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: banner_videos banner_videos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banner_videos
+    ADD CONSTRAINT banner_videos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: banners banners_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.banners
+    ADD CONSTRAINT banners_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: campaigns campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaigns
+    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: companies companies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: exchange_attributes exchange_attributes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exchange_attributes
+    ADD CONSTRAINT exchange_attributes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: misc misc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.misc
+    ADD CONSTRAINT misc_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: recordedbids recordedbids_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.recordedbids
+    ADD CONSTRAINT recordedbids_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rtb_standards rtb_standards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.rtb_standards
+    ADD CONSTRAINT rtb_standards_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: targets targets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.targets
+    ADD CONSTRAINT targets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: video video_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.video
+    ADD CONSTRAINT video_pkey PRIMARY KEY (id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

@@ -1,0 +1,93 @@
+*.pydevproject
+.metadata
+.gradle
+build/
+bin/
+tmp/
+logs/
+target/
+postgres/
+*.log
+temp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.passwords
+
+# Eclipse Core
+.project
+
+# 0Spike
+*.db
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# TeXlipse plugin
+.texlipse
+
+# Old RTB4FREE database files
+database.json*
+
+# STS (Spring Tool Suite)
+.springBeans
+bin/
+reports/
+html/
+
+local/
+www/temp/test*
+hs_err*
+
+*.iml
+.idea/
+.settings/
+
+version.txt
+
+.env
+.env.local
+.env.docker
+
+.vscode/
+node_modules/
+build
+.DS_Store
+*.tgz
+my-app*
+template/src/__tests__/__snapshots__/
+lerna-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/.changelog
+.npm/
+yarn.lock
+package-lock.json
+www/exchange/
+www/control/
+mkdocs/site/
+www/docs/
+www/campaigns/

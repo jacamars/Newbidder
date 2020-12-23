@@ -1,0 +1,3 @@
+#!/bin/sh
+destination=${1-localhost:5432} 
+pg_restore --dbname=postgresql://postgres:postgres@$destination --clean --verbose database.backup
