@@ -176,7 +176,7 @@ public enum Crosstalk {
 
 		List<String> specs = Arrays.asList(
 				"sql/create/banner_videos.sql", 
-				"sql/create/banners_rtb_standards.sql",
+				"sql/create/banners.sql",
 				"sql/create/campaigns.sql",
 				"sql/create/rtb_standards.sql", 
 				"sql/create/targets.sql",
