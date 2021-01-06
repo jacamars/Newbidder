@@ -25,7 +25,7 @@
 	<properties>
 		<maven.plugin.version>2.19.1</maven.plugin.version>
 		<slf4j.api.version>1.7.25</slf4j.api.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<graalvm.version>19.1.0</graalvm.version>
 		<zookeeper.version>3.5.6</zookeeper.version>
 		<kafka.version>0.10.2.2</kafka.version>
