@@ -25,7 +25,7 @@
 	<properties>
 		<maven.plugin.version>2.19.1</maven.plugin.version>
 		<slf4j.api.version>1.7.25</slf4j.api.version>
-		<junit.version>4.12</junit.version>
+		<junit.version>4.13.1</junit.version>
 		<graalvm.version>19.1.0</graalvm.version>
 		<zookeeper.version>3.5.6</zookeeper.version>
 		<kafka.version>0.10.2.2</kafka.version>
@@ -49,7 +49,7 @@
 		<aws.sdk.version>1.11.880</aws.sdk.version>
 		<antlr.runtime.version>4.7</antlr.runtime.version>
 		<elastic.rest.version>7.6.1</elastic.rest.version>
-		<jetty.server.version>9.4.18.v20190429</jetty.server.version>
+		<jetty.server.version>9.4.35.v20201120</jetty.server.version>
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 	</properties>
