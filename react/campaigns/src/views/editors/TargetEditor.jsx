@@ -230,7 +230,7 @@ const getWBList = (s) => {
                             </Col>
                             <Col className="px-md-1" md="3">
                               <FormGroup>
-                                <label>Ad Id</label>
+                                <label>Target Name</label>
                                 <Input
                                   id="name"
                                   defaultValue={target.name}
