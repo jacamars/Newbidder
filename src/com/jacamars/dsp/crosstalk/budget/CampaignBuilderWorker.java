@@ -44,7 +44,7 @@ public class CampaignBuilderWorker implements Runnable {
 				c = new Campaign(node);
 			}
 			c.runUsingElk();
-			if (c.isActive())
+			if (c.isActive() && c.isRunnable())
 				Crosstalk.getInstance().shadow.add(c);
 			else
 				Crosstalk.getInstance().shadow.remove(c);

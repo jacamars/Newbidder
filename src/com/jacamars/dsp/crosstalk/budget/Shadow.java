@@ -51,8 +51,13 @@ public class Shadow {
 		} */
 		
 		synchronized (lock) {
-			campaigns.put("" + camp.id, camp);
-			scampaigns.put("" + camp.id, camp);
+			try {
+				if (camp.isActive() && camp.isRunnable())
+					scampaigns.put("" + camp.id, camp);
+				campaigns.put("" + camp.id, camp);
+			} catch (Exception error) {
+				error.printStackTrace();
+			}
 		}
 	}
 
