@@ -69,6 +69,7 @@ public class Smaato extends BidRequest {
 	@Override
 	public boolean parseSpecial() {
 		setExchange( "smaato" );
+		usesEncodedAdm = false;
 		return true;
 	}
 	

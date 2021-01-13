@@ -1,4 +1,3 @@
-
 FROM debian:buster-slim
 
 RUN set -eux; \
@@ -141,7 +140,6 @@ COPY www/index.html /www
 COPY www/css/ css/
 COPY www/fonts/ fonts/
 COPY www/assets/ assets/
-copy www/campaigns campaigns/
 
 COPY log4j.properties /
 COPY SampleBids /SampleBids
