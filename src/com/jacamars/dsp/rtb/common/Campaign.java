@@ -2,7 +2,6 @@ package com.jacamars.dsp.rtb.common;
 
 import java.io.IOException;
 
-
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -203,15 +202,15 @@ public class Campaign implements Comparable, Portable {
 	/** cap time unit **/
 	public String capUnit;;
 	//////////////////////////////////////////////////////////////////////
-	
+
 	//////////////////////////////////////////////////////////////////////
 	//
 	// Hour and day tracking
-	
+
 	public Integer currentHour;
 	public Integer currentDay;
-	
-	transient volatile  boolean encoded = false;
+
+	public transient volatile boolean encoded = false;
 
 	/**
 	 * Return the in-memory accounting
@@ -273,7 +272,7 @@ public class Campaign implements Comparable, Portable {
 
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Campaign c = new Campaign(y);
-		//c.processCreatives();
+		// c.processCreatives();
 
 		if (td != null && td.isAuthorized(c.customer_id) == false)
 			return null;
@@ -312,7 +311,7 @@ public class Campaign implements Comparable, Portable {
 		else
 			updated_at = System.currentTimeMillis();
 		setup(false);
-		//processCreatives();
+		// processCreatives();
 		process();
 		doTargets();
 	}
@@ -348,7 +347,7 @@ public class Campaign implements Comparable, Portable {
 		processCreatives();
 		process();
 		doTargets();
-		
+
 	}
 
 	/**
@@ -384,10 +383,9 @@ public class Campaign implements Comparable, Portable {
 		if (camp.category != null)
 			this.category = camp.category;
 
-		encodeCreatives();
 		encodeAttributes();
 	}
-	
+
 	void overwrite(Campaign camp) throws Exception {
 		customer_id = camp.customer_id;
 		id = camp.id;
@@ -416,8 +414,7 @@ public class Campaign implements Comparable, Portable {
 		currentHour = camp.currentHour;
 		currentDay = camp.currentDay;
 		myNode = camp.myNode;
-		
-		encodeCreatives();
+
 		encodeAttributes();
 	}
 
@@ -512,42 +509,6 @@ public class Campaign implements Comparable, Portable {
 	}
 
 	/**
-	 * Return the lucene query string for the named creative.
-	 * 
-	 * @param crid String. The creative id.
-	 * @return String. The lucene string for this query.
-	 */
-	@JsonIgnore
-	public String getLucene(String crid) {
-		Creative c = this.getCreative(crid);
-		if (c == null)
-			return null;
-
-		String pre = "((-_exists_: imp.bidfloor) OR imp.bidfloor :<=" + c.price + ") AND ";
-		if (c.isNative()) {
-
-		} else if (c.isVideo()) {
-			pre += "imp.video.w: " + c.w + " AND imp.video.h: " + c.h + " AND imp.video.maxduration:< "
-					+ c.videoDuration;
-			pre += " AND imp.video.mimes: *" + c.mime_type + "* AND imp.video.protocols: *" + c.videoProtocol + "*";
-		} else {
-			pre += "imp.banner.w: " + c.w + " AND imp.banner.h: " + c.h;
-		}
-
-		String str = getLucene();
-		String rest = getLuceneFromAttrs(c.attributes);
-
-		if (str == null || str.length() == 0) {
-			return pre + " AND " + rest;
-		}
-
-		if (rest == null || rest.length() == 0)
-			return pre + " AND " + str;
-
-		return pre + " AND " + str + " AND " + rest;
-	}
-
-	/**
 	 * Get a creative of this campaign.
 	 * 
 	 * @param crid: String. The creative id.
@@ -561,10 +522,10 @@ public class Campaign implements Comparable, Portable {
 		}
 		return null;
 	}
-	
+
 	public Creative getCreativeById(String id) {
 		for (Creative c : creatives) {
-			if ((""+c.id).equals(id)) {
+			if (("" + c.id).equals(id)) {
 				return c;
 			}
 		}
@@ -596,20 +557,17 @@ public class Campaign implements Comparable, Portable {
 		this.attributes.addAll(nodes);
 	}
 
-	/**
-	 * Enclose the URL fields. GSON doesn't pick the 2 encoded fields up, so you
-	 * have to make sure you encode them. This is an important step, the WIN
-	 * processing will get mangled if this is not called before the campaign is
-	 * used. Configuration.getInstance().addCampaign() will call this for you.
-	 */
-	public void encodeCreatives() throws Exception {
-
-		if (encoded)      //don't call this multiple times, causes extra \" in the adm
-			return;
-		encoded = true;
-		for (Creative c : creatives) {
-			c.encodeUrl();
-			c.encodeAttributes();
+	public void encodeIfNeeded() {
+		try {
+			if (encoded)
+				return;
+			encoded = true;
+			for (Creative c : creatives) {
+				c.encodeUrl();
+				c.encodeAttributes();
+			}
+		} catch (Exception error) {
+			error.printStackTrace();
 		}
 	}
 
@@ -748,9 +706,9 @@ public class Campaign implements Comparable, Portable {
 	public void readPortable(PortableReader reader) throws IOException {
 		String json = reader.readUTF("json");
 		Campaign camp = DbTools.mapper.readValue(json, Campaign.class);
-		
+
 		try {
-			overwrite(camp);	
+			overwrite(camp);
 			// System.out.println("\n\n" + toJson() + "\n\n");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -768,7 +726,7 @@ public class Campaign implements Comparable, Portable {
 		myNode = node;
 		updated_at = node.get("updated_at").asLong();
 		setup(reader);
-		//processCreatives();
+		// processCreatives();
 		process();
 		doTargets();
 	}
@@ -776,48 +734,50 @@ public class Campaign implements Comparable, Portable {
 	////////////////////////////
 
 	public void runUsingElk() {
-		
+
 		try {
-			
-			Double x = AccountingCache.getInstance().getCampaignTotal(""+id);
-			
+
+			Double x = AccountingCache.getInstance().getCampaignTotal("" + id);
+
 			budget.totalCost.getAndAdd(x);
 			budget.dailyCost.getAndAdd(x);
 			budget.hourlyCost.getAndAdd(x);
-		
-			logger.debug("****** BUDGET TEST: Testing budgets at {} CAMPAIGN:{}, id: {}", Crosstalk.getInstance().getHour(),name, id);
-			
+
+			logger.debug("****** BUDGET TEST: Testing budgets at {} CAMPAIGN:{}, id: {}",
+					Crosstalk.getInstance().getHour(), name, id);
+
 			boolean z = Crosstalk.getInstance().hourChanged(currentHour);
-			logger.debug("!!!!!!!!!!! HOURCHANGED: {}",z);
+			logger.debug("!!!!!!!!!!! HOURCHANGED: {}", z);
 			logger.debug("Total cost: {}, daily cost: {}, hourly cost: {}", budget.totalCost.getDoubleValue(),
 					budget.dailyCost.getDoubleValue(), budget.hourlyCost.getDoubleValue());
 
-			if (x != 0.0 || Crosstalk.getInstance().timeChanged(currentDay,currentHour)) {
+			if (x != 0.0 || Crosstalk.getInstance().timeChanged(currentDay, currentHour)) {
 				for (Creative c : creatives) {
 					c.runUsingElk(this);
 				}
-		
-				AccountingCache.getInstance().reset(""+id);
+
+				AccountingCache.getInstance().reset("" + id);
 				CampaignCache.getInstance().addCampaign(this);
-			
+
 				if (Crosstalk.getInstance().hourChanged(currentHour)) {
-					logger.debug("Hour changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getHour(),stringId);
+					logger.debug("Hour changed, campaign budget set to 0.0 @{} for {}",
+							Crosstalk.getInstance().getHour(), stringId);
 					budget.hourlyCost.set(0.0);
 				}
 				if (Crosstalk.getInstance().dayChanged(currentDay)) {
-					logger.debug("Day changed, campaign budget set to 0.0 @{} for {}",Crosstalk.getInstance().getDay(),stringId);
+					logger.debug("Day changed, campaign budget set to 0.0 @{} for {}", Crosstalk.getInstance().getDay(),
+							stringId);
 					budget.dailyCost.set(0.0);
 				}
-				
+
 				Crosstalk.getInstance().updateCampaignTotal(stringId, budget.totalCost.getDoubleValue());
 				Crosstalk.getInstance().updateCampaignTotalDaily(stringId, budget.dailyCost.getDoubleValue());
 				Crosstalk.getInstance().updateCampaignTotalHourly(stringId, budget.hourlyCost.getDoubleValue());
-				
-				
+
 				currentHour = Crosstalk.getInstance().getHour();
 				currentDay = Crosstalk.getInstance().getDay();
 			}
-			
+
 		} catch (Exception error) {
 			var msg = "BUDGETING is not accessible, no accounting data is possible for: " + name;
 			ChattyErrors.printErrorEveryHour(logger, msg);
@@ -909,14 +869,13 @@ public class Campaign implements Comparable, Portable {
 	public boolean compareTo(Campaign t) {
 		return false;
 	}
-	
+
 	public boolean checkCampaignBudgetsTotal() {
 		try {
 
 			if (budget != null && budget.totalBudget.doubleValue() != 0) {
 				double bdget = budget.totalBudget.doubleValue();
 				double spend = budget.totalCost.doubleValue();
-			
 
 				logger.debug("TOTAL {} budget: {} vs spend: {}", id, bdget, spend);
 				if (spend >= bdget) {
@@ -929,7 +888,7 @@ public class Campaign implements Comparable, Portable {
 		}
 		return false;
 	}
-	
+
 	public boolean checkCampaignBudgetsDaily() {
 
 		try {
@@ -957,7 +916,7 @@ public class Campaign implements Comparable, Portable {
 			if (budget != null && budget.hourlyBudget.doubleValue() != 0) {
 				double spend;
 				double bdget;
-				
+
 				bdget = budget.hourlyBudget.getDoubleValue();
 				spend = budget.hourlyCost.getDoubleValue();
 				logger.debug("HOURLY {} budget: {} vs spend: {}", id, bdget, spend);
@@ -975,7 +934,7 @@ public class Campaign implements Comparable, Portable {
 
 	public boolean checkCampaignBudgets() {
 		try {
-			
+
 			if (budget != null) {
 				if (checkCampaignBudgetsTotal())
 					return true;
@@ -984,7 +943,7 @@ public class Campaign implements Comparable, Portable {
 				if (checkCampaignBudgetsHourly())
 					return true;
 			}
-		
+
 		} catch (Exception error) {
 			error.printStackTrace();
 			return true;
@@ -1033,9 +992,9 @@ public class Campaign implements Comparable, Portable {
 		budget.totalCost = new AtomicBigDecimal(myNode.get("cost"));
 		budget.dailyCost = new AtomicBigDecimal(myNode.get("daily_cost"));
 		budget.hourlyCost = new AtomicBigDecimal(myNode.get("hourly_cost"));
-			
+
 		budget.totalBudget = new AtomicBigDecimal(myNode.get(TOTAL_BUDGET));
-		
+
 		if (myNode.get(EXPIRE_TIME) != null)
 			expire_time = budget.expire_time = myNode.get(EXPIRE_TIME).asLong();
 		if (myNode.get(ACTIVATE_TIME) != null)
@@ -1068,18 +1027,18 @@ public class Campaign implements Comparable, Portable {
 
 		if (myNode.get("exchanges") instanceof TextNode) {
 			exchanges.clear();
-			String [] x = myNode.get("exchanges").asText().split(",");
+			String[] x = myNode.get("exchanges").asText().split(",");
 			for (String s : x) {
 				exchanges.add(s.trim());
 			}
 		} else {
-		if (myNode.get("exchanges") != null && myNode.get("exchanges").size() != 0) {
-			exchanges.clear();
-			ArrayNode an = (ArrayNode)myNode.get("exchanges");
-			for (int i=0;i<an.size();i++) {
-				exchanges.add(an.get(i).asText());
+			if (myNode.get("exchanges") != null && myNode.get("exchanges").size() != 0) {
+				exchanges.clear();
+				ArrayNode an = (ArrayNode) myNode.get("exchanges");
+				for (int i = 0; i < an.size(); i++) {
+					exchanges.add(an.get(i).asText());
+				}
 			}
-		}
 		}
 
 		Object x = myNode.get(DAILY_BUDGET);
@@ -1156,9 +1115,7 @@ public class Campaign implements Comparable, Portable {
 	public void processCreatives() throws Exception {
 		creatives = new ArrayList<>();
 		try {
-			banners.stream().forEach(
-					id -> creatives.add(Creative.getInstance(id, "banner", customer_id))
-			);
+			banners.stream().forEach(id -> creatives.add(Creative.getInstance(id, "banner", customer_id)));
 			videos.stream().forEach(id -> creatives.add(Creative.getInstance(id, "video", customer_id)));
 			audios.stream().forEach(id -> creatives.add(Creative.getInstance(id, "audio", customer_id)));
 			natives.stream().forEach(id -> creatives.add(Creative.getInstance(id, "native", customer_id)));
@@ -1280,7 +1237,6 @@ public class Campaign implements Comparable, Portable {
 		});
 
 	}
-	
 
 	/**
 	 * Report why the campaign is not runnable.
@@ -1374,9 +1330,9 @@ public class Campaign implements Comparable, Portable {
 		ResultSet rs = st.executeQuery();
 		if (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id,null);
+			Campaign c = Campaign.getInstance(id, null);
 			Campaign.toSql(c, CrosstalkConfig.getInstance().getConnection()).execute();
-			c.encodeCreatives();
+			c.encoded = false;
 			CampaignBuilderWorker w = new CampaignBuilderWorker(c);
 			w.run();
 		}
@@ -1410,7 +1366,7 @@ public class Campaign implements Comparable, Portable {
 	}
 
 	public static void removeCreativeFromCampaigns(int id, String key, TokenData td) throws Exception {
-		switch(key) {
+		switch (key) {
 		case "banner":
 			removeSpecificTypeCreativeFromCampaigns("banners", id, td);
 			break;
@@ -1435,7 +1391,7 @@ public class Campaign implements Comparable, Portable {
 		ResultSet rs = st.executeQuery();
 		while (rs.next()) {
 			int cid = rs.getInt("id");
-			Campaign c = Campaign.getInstance(id,td);
+			Campaign c = Campaign.getInstance(id, td);
 			if (td.isAuthorized(c.customer_id)) {
 				int index = -1;
 				switch (table) {
@@ -1451,7 +1407,7 @@ public class Campaign implements Comparable, Portable {
 					break;
 				case "banner_audios":
 					index = c.audios.indexOf(id);
-					if (c.audios  != null)
+					if (c.audios != null)
 						c.audios.remove(index);
 					break;
 				case "banner_natives":
@@ -1496,14 +1452,14 @@ public class Campaign implements Comparable, Portable {
 
 		st.close();
 	}
-	
+
 	public void saveToDatabase() throws Exception {
 		PreparedStatement st = null;
-		if (id == 0) 
-			st = doNew(this,CrosstalkConfig.getInstance().getConnection());
+		if (id == 0)
+			st = doNew(this, CrosstalkConfig.getInstance().getConnection());
 		else
-			st = doUpdate(this,CrosstalkConfig.getInstance().getConnection());
-			
+			st = doUpdate(this, CrosstalkConfig.getInstance().getConnection());
+
 		st.execute();
 	}
 
@@ -1635,11 +1591,11 @@ public class Campaign implements Comparable, Portable {
 			rulesArray = conn.createArrayOf("int", c.rules.toArray());
 		}
 
-		String sql = "UPDATE campaigns SET " + "activate_time=?," + "expire_time=?," + "ad_domain=?,"
-				+ "name=?," + "status=?," + "budget_limit_daily=?," + "budget_limit_hourly=?," + "total_budget=?,"
-				+ "forensiq=?," + "updated_at=?," + "exchanges=?," + "regions=?," + "target_id=?," + "rules=?,"
-				+ "banners=?," + "videos=?," + "audios=?," + "natives=?," + "day_parting_utc=?," + "capspec=?,"
-				+ "capcount=?," + "capexpire=?," + "capunit=?," + "spendrate=? WHERE id=?";
+		String sql = "UPDATE campaigns SET " + "activate_time=?," + "expire_time=?," + "ad_domain=?," + "name=?,"
+				+ "status=?," + "budget_limit_daily=?," + "budget_limit_hourly=?," + "total_budget=?," + "forensiq=?,"
+				+ "updated_at=?," + "exchanges=?," + "regions=?," + "target_id=?," + "rules=?," + "banners=?,"
+				+ "videos=?," + "audios=?," + "natives=?," + "day_parting_utc=?," + "capspec=?," + "capcount=?,"
+				+ "capexpire=?," + "capunit=?," + "spendrate=? WHERE id=?";
 
 		p = conn.prepareStatement(sql);
 
@@ -1745,23 +1701,22 @@ public class Campaign implements Comparable, Portable {
 
 	public Creative getCreative(String id, String type) {
 		int xid = Integer.valueOf(id);
-		for (Creative c: creatives) {
+		for (Creative c : creatives) {
 			if (c.id == xid && c.type.equals(type))
 				return c;
 		}
 		return null;
 	}
-	
+
 	public void reloadBudgetFromDb() throws Exception {
 		String select = "select cost, hourly_cost, daily_cost from campaigns where id=?";
-		PreparedStatement st = CrosstalkConfig.getInstance().getConnection()
-				.prepareStatement(select);
+		PreparedStatement st = CrosstalkConfig.getInstance().getConnection().prepareStatement(select);
 		st.setInt(1, id);
 		ResultSet rs = st.executeQuery();
 		if (rs.next()) {
 			budget.totalCost = new AtomicBigDecimal(rs.getDouble("cost"));
 			budget.dailyCost = new AtomicBigDecimal(rs.getDouble("daily_cost"));
-			budget.hourlyCost = new AtomicBigDecimal(rs.getDouble("hourly_cost"));		
+			budget.hourlyCost = new AtomicBigDecimal(rs.getDouble("hourly_cost"));
 		}
 
 		st.close();

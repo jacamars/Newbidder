@@ -1728,7 +1728,6 @@ public class Configuration {
 		if (c == null)
 			return;
 
-		c.encodeCreatives();
 		c.encodeAttributes();
 		while(shadow == null)
 			Thread.sleep(1000);;

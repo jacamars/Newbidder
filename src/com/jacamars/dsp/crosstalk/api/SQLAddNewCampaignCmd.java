@@ -92,7 +92,7 @@ public class SQLAddNewCampaignCmd extends ApiCommand {
 				if (c.id != 0 && updates > 0) {
 					c.saveToDatabase();
 				}	
-				c.encodeCreatives();
+				c.encoded = false;
 								
 				Connection conn = CrosstalkConfig.getInstance().getConnection();
 						

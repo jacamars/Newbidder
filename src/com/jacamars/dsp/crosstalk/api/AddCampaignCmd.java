@@ -56,7 +56,6 @@ public class AddCampaignCmd extends ApiCommand {
 				if (!campaign.startsWith("{")) {
 					ArrayNode node = createJson(campaign);
 					Campaign c =  new Campaign(node.get(0));
-					c.encodeCreatives();
 					campaign = c.toJson();
 				}
 				updated = Crosstalk.getInstance().add(campaign);
