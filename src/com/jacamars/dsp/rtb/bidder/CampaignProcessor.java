@@ -154,8 +154,10 @@ public class CampaignProcessor implements Runnable {
 					if (n.test(br,null,null,null,null,null,null) == false) {
 						if (n.hierarchy == null || n.hierarchy.length()==0) {
 							probe.process(br.getExchange(), camp.name, Probe.GLOBAL, Probe.SITE_OR_APP_DOMAIN);
+							err.append(Probe.SITE_OR_APP_DOMAIN);
 						} else {
 							probe.process(br.getExchange(), camp.name, Probe.GLOBAL, n.hierarchy);
+							err.append(Probe.WRONG_EXCHANGE);
 						}
 
 						if (printNoBidReason)
@@ -171,7 +173,7 @@ public class CampaignProcessor implements Runnable {
 				logger.error("Campaign: {}, Node {} error, hierarchy: {}, error: {}",camp.name, n.name,n.hierarchy,error.toString());
 				System.out.println(br.toString());
 				error.printStackTrace();
-
+				err.append(error.toString());
 				selected = null;
 				done = true;
 				if (latch != null)
