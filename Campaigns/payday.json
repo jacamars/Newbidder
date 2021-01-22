@@ -241,11 +241,11 @@
   }, {
     "name" : "smaato-builtin",
     "id" : "seat1",
-    "bid" : "/rtb/bids/smaato-builtin=com.jacamars.dsp.rtb.exchanges.Smaato"
+    "bid" : "/rtb/bids/smaato-builtin=com.jacamars.dsp.rtb.exchanges.Smaato&!usesEncodedAdm"
   }, {
     "name" : "smaato",
     "id" : "seat1",
-    "bid" : "/rtb/bids/smaato=com.jacamars.dsp.rtb.exchanges.Smaato"
+    "bid" : "/rtb/bids/smaato=com.jacamars.dsp.rtb.exchanges.Smaato&!usesEncodedAdm"
   }, {
     "name" : "epomx",
     "id" : "seat1",
