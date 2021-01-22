@@ -761,12 +761,13 @@ public class BidResponse {
 									// has a copy of the price
 		macroSubs(response);
 		
-		if (response.indexOf("%7Bexchange%7D") > -1) {
+	/*	if (response.indexOf("%7Bexchange%7D") > -1) {
+			System.err.println("RESPONSE: " + response);
 			System.err.println("STACK TRACE ALERT");
 			for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 			    System.err.println("\t"+ste);
 			}
-		}
+		} */
 	}
 	
 	/**
