@@ -213,7 +213,7 @@ public enum Crosstalk {
 	/**
 	 * Add a single campaign back into the system (usually from the API.
 	 * 
-	 * @param campaign String. The campaign id.
+	 * @param json String. The json definition of the command.
 	 * @return String. The response to send back.
 	 * @throws Exception on SQL errors.
 	 */
@@ -334,7 +334,7 @@ public enum Crosstalk {
 	/**
 	 * Update a command, note retrieves the campaign from the SQL database,
 	 * 
-	 * @param campaign String.
+	 * @param json String. The json representation of the campain.
 	 * @return String. The message on return.
 	 * @throws Exception on SQL errors.
 	 */
