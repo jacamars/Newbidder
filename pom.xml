@@ -39,7 +39,6 @@
 		<commons.io.version>2.5</commons.io.version>
 		<postgres.version>9.1-901-1.jdbc4</postgres.version>
 		<hazelcast.version>4.0.3</hazelcast.version>
-		<hazelcast-client.version>3.12.9</hazelcast-client.version>
 		<hazelcast-kubernetes.version>2.1</hazelcast-kubernetes.version>
 		<javax.persistence.version>1.0.2</javax.persistence.version>
 		<http.client.version>4.5.3</http.client.version>
@@ -137,12 +136,6 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
