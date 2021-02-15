@@ -1208,7 +1208,9 @@ public class Configuration {
 		logger.info("Configuring {} for {}",className,name);
 		try {
 			Class<?> c = Class.forName(className);
-			BidRequest br = (BidRequest) c.newInstance();
+
+			BidRequest br = (BidRequest)  (Class.forName(className)).getDeclaredConstructor().newInstance();
+			//BidRequest br = (BidRequest) c.newInstance();
 			if (br == null) {
 				throw new Exception("Could not make new instance of: " + className);
 			}
