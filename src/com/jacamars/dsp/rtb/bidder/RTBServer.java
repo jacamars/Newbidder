@@ -803,9 +803,15 @@ public class RTBServer implements Runnable {
 			try {
 				while (true) {
 					Controller.getInstance().setMemberStatus();
-					Controller.getInstance().reportNoBidReasons();
 
-					CampaignProcessor.probe.reset();
+					try {
+						Controller.getInstance().reportNoBidReasons();
+						CampaignProcessor.probe.reset();
+					} catch (Exception error) {
+						logger.warn("Error in the probe processing: {}",
+								error.getMessage());
+						error.printStackTrace();
+					}
 
 					int count = BidCachePool.getInstance(getSharedInstance()).getMembersSize();
 					if (biddersCount != count) {

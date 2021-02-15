@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -31,11 +32,11 @@ public class CreativeProbe {
 
     public CreativeProbe(String creative) {
         this.creative = creative;
-        probes = new HashMap();
+        probes = new ConcurrentHashMap<>();
     }
 
     public void reset() {
-        probes = new HashMap();
+        probes = new ConcurrentHashMap();
         total = new LongAdder();
         bid = new LongAdder();
 
