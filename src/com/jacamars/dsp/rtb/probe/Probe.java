@@ -3,6 +3,7 @@ package com.jacamars.dsp.rtb.probe;
 import com.jacamars.dsp.rtb.tools.DbTools;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -76,7 +77,7 @@ public class Probe {
 	LongAdder total = new LongAdder();
 
 	public Probe() {
-		probes = new HashMap();
+		probes = new ConcurrentHashMap<>();
 	}
 
 	public ExchangeProbe add(String exchange) {
