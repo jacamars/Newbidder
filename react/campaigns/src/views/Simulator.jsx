@@ -4,7 +4,7 @@ import http from 'http';
 import Endpoint from './simulator/Endpoint';
 import Bideditor from './simulator/Bideditor';
 import Windisplay from './simulator/Windisplay';
-import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative } from './simulator/Utils';
+import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative, Clipboard } from './simulator/Utils';
 import { SSL_OP_LEGACY_SERVER_CONNECT } from 'constants';
 import { useViewContext } from "../ViewContext";
 
@@ -22,6 +22,7 @@ const Simulator = (props) =>  {
   const vx = useViewContext();
 
   const [count, setCount] = useState(0);
+  const [useClipboard, setUseClipboard] = useState(false);
 
   useEffect(() => {
     wClearHandler();
@@ -73,7 +74,8 @@ const Simulator = (props) =>  {
       { name: "Banner", file: SampleBanner },
       { name: "Video", file: SampleVideo },
       { name: "Audio", file: SampleAudio },
-      { name: "Native", file: SampleNative }
+      { name: "Native", file: SampleNative },
+      { name: "Clipboard", file: Clipboard }
     ],
     json: vx.bidobject, //SampleBanner,
     uri: vx.uri,
@@ -85,7 +87,8 @@ const Simulator = (props) =>  {
     winSent: vx.winsent,
     selectedBidType: vx.bidtype,
     xtime: vx.xtime,
-    jsonError: false
+    jsonError: false,
+    clipboard: false
   });
 
   const exchangeChangedHandler = (event, id) => {
@@ -113,7 +116,17 @@ const Simulator = (props) =>  {
     setCount(count + 1);
   }
 
-  const bidTypeChangedHandler = (event, id) => {
+  const fromClipboard = (e) => {
+    vars.json = e;
+    try {
+      vars.bid = JSON.stringify(e,null,2);
+    } catch(err) {
+      vars.bid = e;
+    }
+    setVars(vars);
+  }
+
+  const bidTypeChangedHandler = async (event, id) => {
     const name = event.target.value;
 
     if (name === "Video") {
@@ -127,15 +140,20 @@ const Simulator = (props) =>  {
       var bt = vars.bidTypes[i]
       if (bt.name === name) {
         file = bt.file;
+        if (bt.name === "Clipboard") {
+          vars.json = '';
+          vars.clipboard = true;
+        } else {
+         vars.json = copy(file);
+         vars.clipboard = false;
+         vars.bid = JSON.stringify(vars.json, null, 2);
+        }
         vx.changeBidtype(bt.name);
         vx.changeBidresponse(cannedResponse);
       }
     }
     vars.response = cannedResponse;
     vars.selectedBidType = name;
-    vars.json = copy(file);
-    vars.bid = JSON.stringify(file, null, 2);
-
 
     vars.nurl = '';
     vars.adm = '';
@@ -194,6 +212,7 @@ const Simulator = (props) =>  {
     const endpoint = document.getElementById('endpoint').value;
 
     var bid = vars.bid
+
     if (id !== undef) {
       bid = JSON.parse(bid)
       bid.id = "123";
@@ -357,7 +376,7 @@ const sendPixel = async () => {
             <div className="content">
               <Endpoint key={"ep-"+count} vars={vars} ssp={ssp} rootHandler={rootHandler} exchangeHandler={exchangeChangedHandler} />
               <Bideditor vars={vars} bidTypeChangedHandler={bidTypeChangedHandler}   clearHandler={wClearHandler} 
-                jsonChangedHandler={jsonChangedHandler} sendBid={sendBid} restore={restore} />
+                jsonChangedHandler={jsonChangedHandler} sendBid={sendBid} restore={restore} fromClipboard={fromClipboard} />
               <Windisplay vars={vars} sendPixel={sendPixel} sendWinNotice={sendWinNotice} />
             </div>
         </>

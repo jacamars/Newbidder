@@ -36,6 +36,10 @@ var undef;
     await vx.getBidders();
     await vx.getAccounting();
     var x = await vx.getValues();
+    if (x === undefined) {
+      vx.accounting.loggeIn(false);
+      return;
+    }
     setValues(x.values);
     x = await vx.getBudget();
     setBudget(x.values);

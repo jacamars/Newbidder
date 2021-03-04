@@ -98,15 +98,13 @@ const completeMap = (pos) => {
     setGeo(pos);
   } else {
     var str = "";
-    if (pos.length > 3) {
       rule.operand = [];
       for (var i=0; i<pos.length-1;i++) {
         str += pos[i].toString() + ",";
       }
-      str += pos[pos.length-1].toString();
-      rule.operand = str;
-      setRule(rule);
-    }
+    str += pos[pos.length-1].toString();
+    rule.operand = str;
+    setRule(rule);
   }
 }
 
@@ -126,12 +124,14 @@ const getOldGeoValues = () => {
 const addNewRule = () => {
   if (!rule.id)
     rule.id = 0;
-
   rule.value = undef;
   if ( document.getElementById("operand") === null)  {
-    rule.operand = rule.operand.value;
-    rule.operand_type = "double"
-    rule.operand_ordinal = "array";
+    if (rule.operand === undefined) {
+      rule.operand = "0,0,0"
+    } else {
+      rule.operand_type = "double"
+      rule.operand_ordinal = "array";
+    }
   }
   else {
     rule.operand = document.getElementById("operand").value;

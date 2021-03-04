@@ -1,5 +1,7 @@
 import React from "react";
 
+export const Clipboard = "fromClipBoard";
+
 export const SampleBanner = {
   "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
 	"at": 2,

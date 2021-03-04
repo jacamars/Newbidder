@@ -11,6 +11,7 @@ import {
     Collapse
  } from 'reactstrap';
  import { useViewContext } from "../../ViewContext";
+ import MDEditor from '@uiw/react-md-editor';
 
 
 const Bideditor = (props) => {
@@ -82,6 +83,7 @@ const Bideditor = (props) => {
 
                 <Row >
                     <Col xs="5">
+                        { props.vars.clipboard === false ?
                         <ReactJson
                             id='json_bid'
                             name="bidrequest"
@@ -97,6 +99,15 @@ const Bideditor = (props) => {
                             height='266px'
                             width='95%'
                         />
+                        :
+                        <MDEditor
+                        value={""}
+                        commands={[]}
+                        height={300}
+                        preview="edit"
+                        onChange={(e)=>props.fromClipboard(e)}
+                      />
+                        }
                     </Col>
                     <Col xs="7">
                         <ReactJson
