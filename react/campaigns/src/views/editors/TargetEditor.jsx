@@ -278,7 +278,7 @@ const getWBList = (s) => {
                                   <label>Geographical Boundaries</label>
                                   <Alert color="warning">
                                     <GeoEditor key={"geoeditor-"+count} rule={false} callback={updateGeo}
-                                                geo={geo} setZoom={setZoom} zoom={zoom} center={center} setCenter={setCenter}/>
+                                                geo={props.target.geo} setZoom={setZoom} zoom={zoom} center={center} setCenter={setCenter}/>
                                   </Alert>
                                 </FormGroup>
                             </Col>
