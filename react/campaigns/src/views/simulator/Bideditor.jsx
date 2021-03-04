@@ -100,13 +100,14 @@ const Bideditor = (props) => {
                             width='95%'
                         />
                         :
-                        <MDEditor
-                        value={""}
-                        commands={[]}
-                        height={300}
-                        preview="edit"
-                        onChange={(e)=>props.fromClipboard(e)}
-                      />
+                        <textarea 
+                        style={textAreaStyle}
+                        defaultValue={props.vars.json} 
+                        onChange={(e)=>props.fromClipboard(e.target.value)}
+                        placeholder="Your bid request"
+                        spellCheck={false}
+                        rows="14" cols="65"  />
+                      
                         }
                     </Col>
                     <Col xs="7">
