@@ -176,8 +176,12 @@ public class Targeting {
 			ArrayNode an = (ArrayNode)myNode.get("geo");
 			if (an.size() != 0) {
 				geo = new ArrayList<>();
-				for (int i=0; i<an.size();i++) {
-					geo.add(an.get(i).doubleValue());
+				for (int i=0; i<an.size();i+=3) {
+					if (an.get(i).doubleValue() != 0) {
+						geo.add(an.get(i).doubleValue());
+						geo.add(an.get(i+1).doubleValue());
+						geo.add(an.get(i+2).doubleValue());
+					}
 				}
 			}
 		}

@@ -56,7 +56,7 @@ const GeoEditor = (props) => {
     if (props.geo !== undef)
       geo = props.geo;
 
-    if (geo.length > 0 && geo[geo.length-3] !== 0) {
+    if (geo.length == 0 || geo[geo.length-3] !== 0) {
       geo.push(0); 
       geo.push(0);
       geo.push(0);
