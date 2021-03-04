@@ -1160,6 +1160,7 @@ public class Campaign implements Comparable, Portable {
 	protected void doTargets() throws Exception {
 		if (target_id != 0) {
 			try {
+			targeting = Targeting.getInstance(target_id, null);
 			} catch (Exception err) {
 				logger.warn("Campaign id: " + id + " references unknown target id: " + target_id);
 				status = "offline";
