@@ -98,7 +98,7 @@ public class Targeting {
 		if (y == null)
 			throw new Exception("Missing target id: " + id + " in database");
 		var t = new Targeting(y);
-		if (td.isAuthorized(t.customer_id))
+		if (td == null || td.isAuthorized(t.customer_id))
 			return t;
 		return null;
 	}
@@ -139,14 +139,14 @@ public class Targeting {
 		}
 
 		if (myNode.get("domain_targetting") != null)
-			domain_targetting = myNode.get("domain_targetting").asText();
+			domain_targetting = myNode.get("domain_targetting").asText().trim();
 		
 		if (myNode.get("carrier") != null)
-			carrier = myNode.get("carrier").asText();
+			carrier = myNode.get("carrier").asText().trim();
 		if (myNode.get("country") != null)
-			country = myNode.get("country").asText();
+			country = myNode.get("country").asText().trim();
 		if (myNode.get("os") != null)
-			os = myNode.get("os").asText();
+			os = myNode.get("os").asText().trim();
 
 		if (myNode.get(LIST_OF_PAGES) != null) {
 			String test = myNode.get(LIST_OF_PAGES).asText(null);
@@ -169,9 +169,9 @@ public class Targeting {
 		}
 
 		if (myNode.get("make") != null)
-			make = myNode.get("make").asText();
+			make = myNode.get("make").asText().trim();
 		if (myNode.get("model") != null)
-			model = myNode.get("model").asText();
+			model = myNode.get("model").asText().trim();
 		if (myNode.get("geo") != null) {
 			ArrayNode an = (ArrayNode)myNode.get("geo");
 			if (an.size() != 0) {
