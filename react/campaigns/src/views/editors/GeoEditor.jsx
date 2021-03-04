@@ -56,9 +56,11 @@ const GeoEditor = (props) => {
     if (props.geo !== undef)
       geo = props.geo;
 
-    geo.push(0); 
-    geo.push(0);
-    geo.push(0);
+    if (geo.length > 0 && geo[geo.length-3] !== 0) {
+      geo.push(0); 
+      geo.push(0);
+      geo.push(0);
+    }
     setShowControl(true);
   }
 
