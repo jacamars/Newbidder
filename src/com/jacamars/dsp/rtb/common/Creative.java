@@ -1346,6 +1346,7 @@ public class Creative implements Serializable {
 	public SelectedCreative process(BidRequest br, String adId, StringBuilder errorString, Probe probe)
 			throws Exception {
 
+		List<Deal> list = new ArrayList();
 		/**
 		 * Fixed nodes do not access deals or the br impressions
 		 */
@@ -1354,7 +1355,7 @@ public class Creative implements Serializable {
 			var imp = br.getImpression(i);
 			for (int j = 0; j < fixedNodes.size(); j++) {
 				var node = fixedNodes.get(j);
-				if (!node.test(br, this, adId, imp, errorString, probe, null))
+				if (!node.test(br, this, adId, imp, errorString, probe, list))
 					return null;
 			}
 
@@ -1369,7 +1370,7 @@ public class Creative implements Serializable {
 
 		for (int i = 0; i < n; i++) {
 			imp = br.getImpression(i);
-			SelectedCreative cr = xproc(br, adId, imp, errorString, probe);
+			SelectedCreative cr = xproc(br, adId, imp, errorString, probe, deals);
 			if (cr != null) {
 				cr.setImpression(imp);
 				return cr;
@@ -1378,7 +1379,7 @@ public class Creative implements Serializable {
 		return null;
 	}
 
-	public SelectedCreative xproc(BidRequest br, String adId, Impression imp, StringBuilder errorString, Probe probe)
+	public SelectedCreative xproc(BidRequest br, String adId, Impression imp, StringBuilder errorString, Probe probe, List<Deal> deals)
 			throws Exception {
 		// List<Deal> newDeals = null;
 		String dealId = null;
@@ -1392,7 +1393,7 @@ public class Creative implements Serializable {
 		 */
 		try {
 			Deal deal = null;
-			List<Deal> deals = new ArrayList<Deal>();
+			///List<Deal> deals = new ArrayList<Deal>();
 			for (int i = 0; i < attributes.size(); i++) {
 				n = attributes.get(i);
 				if (n.test(br, this, adId, imp, errorString, probe, deals) == false) {
