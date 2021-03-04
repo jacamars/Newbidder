@@ -22,7 +22,6 @@ const Simulator = (props) =>  {
   const vx = useViewContext();
 
   const [count, setCount] = useState(0);
-  const [useClipboard, setUseClipboard] = useState(false);
 
   useEffect(() => {
     wClearHandler();
@@ -75,7 +74,7 @@ const Simulator = (props) =>  {
       { name: "Video", file: SampleVideo },
       { name: "Audio", file: SampleAudio },
       { name: "Native", file: SampleNative },
-      { name: "Clipboard", file: Clipboard }
+      { name: "Freestyle", file: Clipboard }
     ],
     json: vx.bidobject, //SampleBanner,
     uri: vx.uri,
@@ -117,9 +116,9 @@ const Simulator = (props) =>  {
   }
 
   const fromClipboard = (e) => {
-    vars.json = e;
     try {
-      vars.bid = JSON.stringify(e,null,2);
+      vars.json = JSON.parse(e);
+      vars.bid = JSON.stringify(vars.json,null,2);
     } catch(err) {
       vars.bid = e;
     }
@@ -140,7 +139,7 @@ const Simulator = (props) =>  {
       var bt = vars.bidTypes[i]
       if (bt.name === name) {
         file = bt.file;
-        if (bt.name === "Clipboard") {
+        if (bt.name === "Freestyle") {
           vars.json = '';
           vars.clipboard = true;
         } else {
@@ -202,7 +201,7 @@ const Simulator = (props) =>  {
   const sendBid = async  (id) => {
 
     wClearHandler();
-    
+  
     console.log("SENDING A BID");
     if (vars.jsonError && vars.jsonError !== false) {
        alert("Can't send, error at line " + vars.jsonError.line + "\n" +
