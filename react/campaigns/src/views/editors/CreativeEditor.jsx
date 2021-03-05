@@ -320,6 +320,10 @@ const getSelectedRules = () => {
 
   const changeDeal = (index) => {
     var price = document.getElementById("deal-price-"+index).value;
+    if (price !== "" && Number(price) === 0) {
+      alert("Warning, can't set price to 0!");
+      return;
+    }
     var id = document.getElementById("deal-id-"+index).value;
     creative.deals[index].price = Number(price);
     creative.deals[index].id = id;
