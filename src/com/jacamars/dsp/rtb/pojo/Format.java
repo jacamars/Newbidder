@@ -21,6 +21,10 @@ public class Format {
     public static Format findFit(Impression imp, Creative cr) {
         if (imp.format == null || imp.format.size() == 0)
             return null;
+        
+        if (cr.w == null && cr.dimensions == null) {
+        	return imp.format.get(0);
+        }
 
         if (cr.w != null) {
             for (int i=0;i<imp.format.size();i++) {
