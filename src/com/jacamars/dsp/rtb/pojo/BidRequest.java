@@ -23,6 +23,7 @@ import com.jacamars.dsp.rtb.exchanges.adx.AdxBidRequest;
 import com.jacamars.dsp.rtb.fraud.FraudLog;
 import com.jacamars.dsp.rtb.geo.Solution;
 import com.jacamars.dsp.rtb.tools.AmalgamatedKey;
+import com.jacamars.dsp.rtb.tools.DbTools;
 import com.jacamars.dsp.rtb.tools.GeoPatch;
 import com.jacamars.dsp.rtb.tools.HexDump;
 import com.jacamars.dsp.rtb.tools.IsoTwo2Iso3;
@@ -184,7 +185,7 @@ public class BidRequest {
 					} else {
 						if (node.operator != Node.OR) {
 							startBidder();
-							throw new Exception("Malformed OR processing in campaign " + c.name);
+							logger.error("Malformed OR processing in campaign {}, node: {}", c.name, DbTools.mapper.writeValueAsString(node));
 						}
 						List<Node> nodes = (List<Node>) node.value;
 						for (int nc = 0; nc < nodes.size(); nc++) {
