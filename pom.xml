@@ -37,7 +37,7 @@
 		<jackson.version>2.12.1</jackson.version>
 		<javax.servlet.version>4.0.0</javax.servlet.version>
 		<commons.pool2.version>2.5.0</commons.pool2.version>
-		<commons.io.version>2.5</commons.io.version>
+		<commons.io.version>2.7</commons.io.version>
 		<postgres.version>9.1-901-1.jdbc4</postgres.version>
 		<hazelcast.version>4.0.3</hazelcast.version>
 		<hazelcast-kubernetes.version>2.1</hazelcast-kubernetes.version>
