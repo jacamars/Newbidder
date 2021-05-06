@@ -23,7 +23,6 @@
 	</profiles>
 
 	<properties>
-		<java.version>11</java.version>
 		<maven.plugin.version>2.19.1</maven.plugin.version>
 		<slf4j.api.version>1.7.25</slf4j.api.version>
 		<junit.version>4.13.1</junit.version>
@@ -52,6 +51,9 @@
 		<jetty.server.version>9.4.35.v20201120</jetty.server.version>
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
+
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -312,29 +314,6 @@
 					<forkCount>1</forkCount>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<release>${java.version}</release>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Premain-Class>org.github.jamm.MemoryMeter</Premain-Class>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-
 
 		</plugins>
 	</build>
