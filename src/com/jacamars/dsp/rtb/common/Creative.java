@@ -1919,9 +1919,9 @@ public class Creative implements Serializable {
 		rules.forEach(id -> {
 			try {
 				attributes.add(Node.getInstance(id));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception error) {
+				logger.error("Failed to load rule: ?, error: ?",id,error.getMessage());
+				error.printStackTrace();
 			}
 		});
 
