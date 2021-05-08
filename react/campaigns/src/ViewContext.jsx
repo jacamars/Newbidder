@@ -18,7 +18,7 @@ const  ViewContext = () => {
 
     const [ssp, setSsp] = useState('Nexage')
     const [uri, setUri] = useState('/rtb/bids/nexage');
-    const [url, setUrl] = useState('http://' + location.hostname + ':8080');
+    const [url, setUrl] = useState('http://' + window.location.hostname + ':8080');
     const [bidtype, setBidtype] = useState('Banner');
     const [bidvalue, setBidvalue] = useState(JSON.stringify(SampleBanner,null,2));
     const [bidobject, setBidobject] = useState(SampleBanner);
@@ -64,7 +64,7 @@ const  ViewContext = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [name,setName] = useState('');
     const [password,setPassword] = useState('');
-    const [server, setServer] = useState('localhost:7379');
+    const [server, setServer] = useState(window.location.hostname + ':7379');
     const [members, setMembers] = useState([]);
     const [accounting, setAccounting] = useState({});
     const [runningCampaigns, setRunningCampaigns] = useState([])

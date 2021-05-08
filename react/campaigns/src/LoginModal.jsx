@@ -27,7 +27,7 @@ const LoginModal = (props) => {
   const [customer, setCustomer] = useState('');
   const [name, setName] = useState('rtb4free');
   const [password, setPassword] = useState('');
-  const [server, setServer] = useState(location.hostname+':7379');
+  const [server, setServer] = useState(window.location.hostname+':7379');
   const [remembered, setRemembered] = useState(false);
 
   const changeCustomer = (event) => {
