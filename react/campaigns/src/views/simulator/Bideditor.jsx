@@ -7,11 +7,9 @@ import {
     Card,
     CardHeader,
     Row,
-    Col,
-    Collapse
+    Col
  } from 'reactstrap';
  import { useViewContext } from "../../ViewContext";
- import MDEditor from '@uiw/react-md-editor';
 
 
 const Bideditor = (props) => {
