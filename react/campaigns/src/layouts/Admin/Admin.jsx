@@ -20,6 +20,8 @@ import { Route, Switch } from "react-router-dom";
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
 
+import LoginModal from '../../LoginModal'
+
 // core components
 import AdminNavbar from "../../components/Navbars/AdminNavbar.jsx";
 import Footer from      "../../components/Footer/Footer.jsx";
@@ -48,6 +50,11 @@ const Admin = (props) => {
     setSidebarOpened(!sidebarOpened);
   };
 
+  const setInstances = async() => {
+
+  };
+
+  const imgMandel = require("../../images/mandel.gif");
 
   const getRoutes = routes => {
     return routes.map((prop, key) => {
@@ -82,6 +89,7 @@ const Admin = (props) => {
     return "Brand";
   };
 
+  if (vx.loggedIn) {
     return (
       <>
         <div className="wrapper">
@@ -116,6 +124,21 @@ const Admin = (props) => {
         </div>
       </>
     );
+  } else {
+    return (
+      <>
+      <div
+        class="bg_image"
+        style={{
+          backgroundImage: `url(${imgMandel})`,
+          backgroundSize: "cover",
+          height: "100vh",
+          color: "#f5f5f5"
+        }}></div>
+      <LoginModal callback={setInstances}></LoginModal>
+     </>
+    );
+  }
 }
 
 export default Admin;
