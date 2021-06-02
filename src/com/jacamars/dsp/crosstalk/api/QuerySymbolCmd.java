@@ -1,6 +1,5 @@
 package com.jacamars.dsp.crosstalk.api;
 
-import com.github.mgunlogson.cuckoofilter4j.CuckooFilter;
 import com.google.common.hash.BloomFilter;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.Membership;
@@ -76,9 +75,6 @@ public class QuerySymbolCmd extends ApiCommand {
 				nano = System.nanoTime();
 				if (x instanceof BloomFilter) {
 					BloomFilter f = (BloomFilter) x;
-					rets = f.mightContain(value);
-				} else if (x instanceof CuckooFilter) {
-					CuckooFilter f = (CuckooFilter) x;
 					rets = f.mightContain(value);
 				} else if (x instanceof Membership) {
 					Membership f = (Membership) x;

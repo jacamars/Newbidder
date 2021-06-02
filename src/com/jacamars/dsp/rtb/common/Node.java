@@ -1,6 +1,7 @@
 package com.jacamars.dsp.rtb.common;
 
 import java.io.Serializable;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,7 +33,6 @@ import com.google.common.hash.BloomFilter;
 import com.jacamars.dsp.crosstalk.budget.CrosstalkConfig;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 import com.jacamars.dsp.rtb.blocks.Bloom;
-import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.NavMap;
 import com.jacamars.dsp.rtb.blocks.SimpleSet;
@@ -992,13 +992,6 @@ public class Node implements Serializable {
 					} else if (x instanceof SimpleSet) {
 						SimpleSet set = (SimpleSet) x;
 						t = set.getSet().contains(svalue);
-					} else if (x instanceof Cuckoo) {
-						Cuckoo cuckoo = (Cuckoo) x;
-						Object mem = cuckoo.query(svalue);
-						if (mem == null)
-							t = true;
-						else
-							t = false;
 					}
 					
 					else {

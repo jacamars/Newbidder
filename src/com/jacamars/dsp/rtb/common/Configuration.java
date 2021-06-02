@@ -1,6 +1,8 @@
 package com.jacamars.dsp.rtb.common;
 
+
 import java.io.BufferedReader;
+
 
 
 import java.io.File;
@@ -49,7 +51,6 @@ import com.jacamars.dsp.rtb.bidder.DeadmanSwitch;
 import com.jacamars.dsp.rtb.bidder.RTBServer;
 
 import com.jacamars.dsp.rtb.blocks.Bloom;
-import com.jacamars.dsp.rtb.blocks.Cuckoo;
 import com.jacamars.dsp.rtb.blocks.LookingGlass;
 import com.jacamars.dsp.rtb.blocks.Membership;
 import com.jacamars.dsp.rtb.blocks.NavMap;
@@ -1334,9 +1335,6 @@ public class Configuration {
 				} else if (type.toLowerCase().contains("bloom")) {
 					Number records = (Number)m.get("size");
 					new Bloom(name, fileName, records.longValue());
-				} else if (type.toLowerCase().contains("cuckoo")) {
-					Number records = (Number)m.get("size");
-					new Cuckoo(name, fileName, records.longValue());
 				} else if (type.toLowerCase().contains("membershp")) {
 					new Membership(name, fileName);
 				} else {
@@ -1370,9 +1368,6 @@ public class Configuration {
 				} else if (type.toLowerCase().contains("bloom")) {
 					Number records = (Number)m.get("size");
 					new Bloom(name, s3o, records.longValue());
-				} else if (type.toLowerCase().contains("cuckoo")) {
-					Number records = (Number)m.get("size");
-					new Cuckoo(name, s3o, records.longValue());
 				} else if (type.toLowerCase().contains("membershp")) {
 						new Membership(type, s3o);
 				} else {

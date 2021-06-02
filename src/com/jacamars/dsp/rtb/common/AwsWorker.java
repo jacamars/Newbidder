@@ -46,11 +46,6 @@ public class AwsWorker implements Runnable {
                     Bloom b = new Bloom(name, object, size);
                     message = "Initialize Bloom Filter: " + name + " from S3, members = " + b.getMembers();
                     break;
-
-                case "cuckoo":
-                    Cuckoo c = new Cuckoo(name, object, size);
-                    message = "Initialize Cuckoo Filter: " + name + " from S3, entries = " + c.getMembers();
-                    break;
                 case "multiset":
                     SimpleMultiset ms = new SimpleMultiset(name, object);
                     message = "Initialize Multiset " + name + " from S3, entries = " + ms.getMembers();

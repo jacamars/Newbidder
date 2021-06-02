@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "http://rtb4free.com/campaigns",
   "dependencies": {
-    "@types/react": "^16.14.4",
+    "@types/react": "^16.14.8",
     "@uiw/react-md-editor": "^1.14.7",
     "axios": ">=0.21.1",
     "bootstrap": "^4.6.0",
@@ -23,13 +23,13 @@
     "prop-types": "^15.6.2",
     "react": "^16.14.0",
     "react-addons-create-fragment": "^15.6.2",
-    "react-chartjs-2": "^2.11.1",
-    "react-datepicker": "^3.6.0",
+    "react-chartjs-2": "^2.11.2",
+    "react-datepicker": "^3.8.0",
     "react-dom": "^16.14.0",
     "react-html-parser": "^2.0.2",
-    "react-json-view": "^1.21.1",
+    "react-json-view": "^1.21.3",
     "react-jsoneditor": "^0.2.22",
-    "react-leaflet": "^3.1.0",
+    "react-leaflet": "^3.2.0",
     "react-notification-alert": "0.0.8",
     "react-paypal-button-v2": "^2.6.3",
     "react-player": "^1.15.3",
@@ -60,6 +60,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "video.js": "^7.11.4"
+    "video.js": "^7.12.3"
   }
 }
