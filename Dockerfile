@@ -126,7 +126,7 @@ RUN mkdir SampleBids
 RUN mkdir Campaigns
 run mkdir query
 
-COPY target/*with-dependencies.jar /target
+COPY target/RTB5-0.0.1-SNAPSHOT.jar /target
 
 COPY wait-for-it.sh /
 RUN chmod +x wait-for-it.sh
