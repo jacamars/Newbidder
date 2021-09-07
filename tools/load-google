@@ -2,4 +2,4 @@
 #
 # This loads the Database cache
 #
-java -cp target/RTB5-0.0.1-SNAPSHOT.jar com.jacamars.dsp.rtb.tools.LoadGoogle $1 $2 $3 $4 $5 $6 $7 $8
+java -cp target/RTB5-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.jacamars.dsp.rtb.tools.LoadGoogle $1 $2 $3 $4 $5 $6 $7 $8

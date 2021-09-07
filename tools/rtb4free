@@ -11,4 +11,4 @@ java -Dlog4j.configuration="file:log4j.properties" \
 	 --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
 	 --add-opens java.management/sun.management=ALL-UNNAMED \
 	 --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED \
-	 -cp target/RTB5-0.0.1-SNAPSHOT.jar com.jacamars.dsp.rtb.bidder.RTBServer $1 $2 $3 $4
+	 -cp target/RTB5-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.jacamars.dsp.rtb.bidder.RTBServer $1 $2 $3 $4
