@@ -17,7 +17,7 @@ help:
 react-campaigns:
 	rm react/campaigns/package-lock.json|| true
 	rm react/campaigns/yarn.lock || true
-	cd react/campaigns && npm update
+	cd react/campaigns && npm update --force
 	cd react/campaigns && yarn install
 	cd react/campaigns && npm run-script build
 	rm -r www/campaigns || true
@@ -64,9 +64,11 @@ push:
 	docker push jacamars/newbidder
 
 backup-db:
+	mkdir -p /tmp/data
 	pg_dump -F c -b -v --dbname=postgresql://postgres:postgres@localhost:5432 > database.backup
 
 restore-db:
+	mkdir -p /tmp/data
 	pg_restore --dbname=postgresql://postgres:postgres@localhost:5432 --verbose database.backup
 	
 clean:
