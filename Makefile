@@ -1,10 +1,11 @@
-.PHONY: clean local docker react react-campaigns backup-db restore-db minio realS3
+.PHONY: clean local docker react react-campaigns backup-db restore-db minio realS3 firsttime
 
 build: application
 
 help:
 	@printf "\n"
 	@printf "make application		Builds the entire application\n"
+	@printf "make firsttime                 Starts the containers for a full test system using docker-compose\n"
 	@printf "make campaigns			Builds the react campaigns application\n"
 	@printf "make docs			Builds the documentation\n"
 	@printf "make docker			Creates a jacamars/newbidder docker image\n"
@@ -14,6 +15,9 @@ help:
 	@printf "make realS3			Makes a real s3 setup\n"
 	@printf "\n"
 	
+firsttime:
+	./firsttime.sh
+
 react-campaigns:
 	rm react/campaigns/package-lock.json|| true
 	rm react/campaigns/yarn.lock || true
@@ -58,7 +62,7 @@ realS3:
 
 docker:
 	docker build -t jacamars/newbidder .
-	docker push jacamars/newbidder
+	# docker push jacamars/newbidder
 	
 push:
 	docker push jacamars/newbidder
