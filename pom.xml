@@ -52,8 +52,8 @@
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 
-		<maven.compiler.source>1.11</maven.compiler.source>
-		<maven.compiler.target>1.11</maven.compiler.target>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<dependencies>
