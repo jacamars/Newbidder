@@ -391,10 +391,8 @@ public class Configuration {
 														// directory in www so
 														// preview campaign will
 														// work
-		
-		setupS3OrMinio();
-		
 		logger.info("PATH AT THIS POINT: {}", path);
+		setupS3OrMinio();
 		
 		var str = getConfig(path);
 		Map<?, ?> m = DbTools.mapper.readValue(str, Map.class);
