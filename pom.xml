@@ -29,7 +29,7 @@
 		<graalvm.version>19.1.0</graalvm.version>
 		<zookeeper.version>3.5.6</zookeeper.version>
 		<kafka.version>0.10.2.2</kafka.version>
-		<google.protobuf.version>3.3.1</google.protobuf.version>
+		<google.protobuf.version>3.16.1</google.protobuf.version>
 		<mapdb.version>3.0.5</mapdb.version>
 		<jamm.version>RELEASE</jamm.version>
 		<redis.version>2.9.0</redis.version>
