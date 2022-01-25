@@ -32,7 +32,6 @@ public class WinObject {
 	static final Logger logger = LoggerFactory.getLogger(WinObject.class);
 	/** URL decoder used with digesting encoded url fields */
 	transient static ObjectMapper mapper = new ObjectMapper();
-	static transient URLDecoder decoder = new URLDecoder();
 
 	public String hash, cost, lat, lon, adId, pubId, image, forward, price, cridId, adm, adtype, domain, bidtype;
 	
@@ -137,8 +136,8 @@ public class WinObject {
 
 		try {
 			if (image != null)
-				image = decoder.decode(image, "UTF-8");
-			forward = decoder.decode(forward, "UTF-8");
+				image = URLDecoder.decode(image, "UTF-8");
+			forward = URLDecoder.decode(forward, "UTF-8");
 		} catch (Exception e) {
 			//Ignore this exception. Log level debug is enough
 			logger.debug("Error encountered in decoding win url: '{}' was {}", target, e);

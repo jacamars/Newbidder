@@ -58,7 +58,7 @@ COPY www/fonts/ fonts/
 COPY www/assets/ assets/
 copy www/campaigns campaigns/
 
-COPY log4j.properties /
+COPY log4j2.properties /
 COPY SampleBids /SampleBids
 
 EXPOSE 8080 5701

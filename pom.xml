@@ -45,15 +45,17 @@
 		<openrtb.core.version>1.5.1</openrtb.core.version>
 		<grok.version>0.1.9</grok.version>
 		<maxmind.version>2.12.0</maxmind.version>
-		<aws.sdk.version>1.11.880</aws.sdk.version>
+		<aws.sdk.version>1.12.101</aws.sdk.version>
 		<antlr.runtime.version>4.7</antlr.runtime.version>
 		<elastic.rest.version>7.6.1</elastic.rest.version>
 		<jetty.server.version>9.4.41.v20210516</jetty.server.version>
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
+		<org.apache.logging.log4j.version>2.16.0</org.apache.logging.log4j.version>
+
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
 
 	<dependencies>
@@ -65,11 +67,22 @@
 			<type>maven-plugin</type>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.api.version}</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${org.apache.logging.log4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${org.apache.logging.log4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${org.apache.logging.log4j.version}</version>
 		</dependency>
 
 		<dependency>

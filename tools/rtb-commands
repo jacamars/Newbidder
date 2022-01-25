@@ -2,7 +2,7 @@
 #
 # This loads the Database cache
 #
-java -Dlog4j.configuration="file:log4j-nolog.properties" \
+java -Dlog4j.configurationFile="file:log4j-nolog.properties" \
 	 -Dhazelcast.loggig.type=none \
 	 -Xmx4096m \
 	 --add-modules java.se \

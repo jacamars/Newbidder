@@ -2,9 +2,7 @@ package com.jacamars.dsp.rtb.jmq;
 
 
 import com.amazonaws.services.kinesis.model.*;
-
-
-
+import com.amazonaws.services.kinesis.model.Record;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.topic.ITopic;

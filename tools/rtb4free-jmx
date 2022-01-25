@@ -4,5 +4,5 @@
 #
 java -Xmx4g \
 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=7000 \
--Dlog4j.configuration="file:log4j.properties" \
+-Dlog4j.configurationFile="file:log4j2.properties" \
 -cp target/RTB5-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.jacamars.dsp.rtb.bidder.RTBServer -s xrtb $1 $2 $3
