@@ -46,7 +46,7 @@ public class VideoCacheStore implements MapStore<String, RecordedVideo> {
     }
     
     public static void evict(String key) {
-    	if (bcs != null)
+    	if (bcs == null)
     		bcs = new VideoCacheStore();
     	bcs.delete(key);;
     }
