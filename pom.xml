@@ -52,7 +52,7 @@
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 
-		<org.apache.logging.log4j.version>2.16.0</org.apache.logging.log4j.version>
+		<org.apache.logging.log4j.version>2.17.1</org.apache.logging.log4j.version>
 
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
