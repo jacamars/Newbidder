@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,6 +25,8 @@ public class NavMap extends LookingGlass implements Set {
 
 	// The name of the object
 	String name;
+	
+	CIDRUtils cidr;
 
 	/**
 	 * Older form of constructor where you are told what kind it is cidr or not
@@ -86,6 +89,10 @@ public class NavMap extends LookingGlass implements Set {
 	 *             on I/O errors.
 	 */
 	void doCidr(BufferedReader br) throws Exception {
+		
+		cidr = new CIDRUtils(new ArrayList<String>());
+		
+		
 		long start;
 		long end;
 		String messagel;
@@ -95,12 +102,7 @@ public class NavMap extends LookingGlass implements Set {
 		k = 0;
 		for (String line; (line = br.readLine()) != null;) {
 			if (!(line.startsWith("#") || line.length() < 10)) {
-				CIDRUtils cidr = new CIDRUtils(line);
-				start = cidr.getStartAddress();
-				end = cidr.getEndAddress();
-				r = new XRange(end, k);
-				k++;
-				tree.put(start, r);
+				cidr.add(line.trim());
 			}
 		}
 	}
@@ -123,34 +125,14 @@ public class NavMap extends LookingGlass implements Set {
 	}
 
 	public static long ipToLong(String ipAddress) {
-
-		String[] ipAddressInArray = ipAddress.split("\\.");
-
-		long result = 0;
-		for (int i = 0; i < ipAddressInArray.length; i++) {
-
-			int power = 3 - i;
-			int ip = Integer.parseInt(ipAddressInArray[i]);
-			result += ip * Math.pow(256, power);
-
-		}
-
-		return result;
+		return CIDRUtils.getLongAddress(ipAddress);
 	}
 
-	public static String longToIp(long ip) {
+	public static String longToIp(long ip) throws Exception {
 		if (ip > 4294967295L || ip < 0) {
 			throw new IllegalArgumentException("invalid ip");
 		}
-		StringBuilder ipAddress = new StringBuilder();
-		for (int i = 3; i >= 0; i--) {
-			int shift = i * 8;
-			ipAddress.append((ip & (0xff << shift)) >> shift);
-			if (i > 0) {
-				ipAddress.append(".");
-			}
-		}
-		return ipAddress.toString();
+		return CIDRUtils.longToString(ip);
 	}
 
 	void doRanges(BufferedReader br) throws Exception {
@@ -172,8 +154,8 @@ public class NavMap extends LookingGlass implements Set {
 				parts = line.split("-");
 				if (parts[0].length() > 0) {
 
-					start = ipToLong(parts[0]);
-					end = ipToLong(parts[1]);
+					start = CIDRUtils.getLongAddress(parts[0]);
+					end = CIDRUtils.getLongAddress(parts[1]);
 
 					if (oldstart == 0) {
 						oldstart = start;
@@ -223,22 +205,25 @@ public class NavMap extends LookingGlass implements Set {
 	@Override
 	public boolean contains(Object key) {
 		// System.out.println("Looking for: " + key);
-		long address = 0;
-		if (key instanceof Long)
-			address = (long) key;
-		else
+		String value = null;
+		boolean p = false;
+		if (key instanceof String str) {
+			value = str;
+		} else {
 			try {
-				InetAddress inetAddress = InetAddress.getByName((String) key);
-				ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
-				buffer.put(inetAddress.getAddress());
-				buffer.position(0);
-				address = buffer.getLong();
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				value = CIDRUtils.longToString((Long)key);
+			} catch (Exception error) {
+				return false;
 			}
-	//	System.out.println("X = " + address);
-		return search(address);
+		}
+		
+		try {
+			p = cidr.isInRange(value);
+		} catch (Exception err) {
+			err.printStackTrace();
+		}
+		return p;
+		
 	}
 
 	@Override
