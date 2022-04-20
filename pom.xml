@@ -33,7 +33,7 @@
 		<mapdb.version>3.0.5</mapdb.version>
 		<jamm.version>RELEASE</jamm.version>
 		<redis.version>2.9.0</redis.version>
-		<jackson.version>2.13.2</jackson.version>
+		<jackson.version>2.13.2.1</jackson.version>
 		<javax.servlet.version>4.0.0</javax.servlet.version>
 		<commons.pool2.version>2.5.0</commons.pool2.version>
 		<commons.io.version>2.7</commons.io.version>
