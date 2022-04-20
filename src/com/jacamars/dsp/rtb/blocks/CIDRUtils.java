@@ -47,12 +47,21 @@ public class CIDRUtils {
 		range = lower.toSequentialRange(upper);
     }
     
+    /**
+     * Create a CIDR map using low and high addresses
+     * @param low String. The lower address in the range
+     * @param up String. The upper address in the range.
+     */
     public CIDRUtils(String low, String up) {
     	lower = new IPAddressString(low).getAddress();
     	upper = new IPAddressString(up).getAddress();
     	range = lower.toSequentialRange(upper);
     }
     
+    /**
+     * Create a a CIDR object from a list of cidr addresses.
+     * @param cidrs List<String>. The list of addresses in CIDR format.
+     */
     public CIDRUtils(List<String> cidrs) {
     	trie = new IPv4AddressTrie();
     	
@@ -62,31 +71,42 @@ public class CIDRUtils {
     		
     }
     
+    /**
+     * Add a CIDR to the tree.
+     * @param addr String. The cidr address
+     * @return CIDRUtils. This.
+     */
     public CIDRUtils add(String addr) {
+    	if (trie == null)
+    		trie = new IPv4AddressTrie();
     	trie.add(new IPAddressString(addr).getAddress().toIPv4());
     	return this;
     }
     
+    /**
+     * Return the start address of the CIDR, unless it is a tree
+     * @return long. The lower address as a long.
+     */
     public long getStartAddress() {
     	return lower.getValue().longValue();
      
     }
     
+    /**
+     * Return the end address of the CIDR.
+     * @return
+     */
     public long getEndAddress() {
     	return upper.getValue().longValue();
     }
 
 
-  
-    public String getNetworkAddress() {
-
-    	return lower.toInetAddress().getHostAddress();
-    }
-
-    public String getBroadcastAddress() {
-    	return lower.toInetAddress().getHostAddress();
-    }
-
+    /**
+     * Determine if this address is in the CIDR range.
+     * @param ipAddress String. The ip address to check.
+     * @return boolean. Returns true if in range, otherwise returns false.
+     * @throws Exception on badly formed ip address.
+     */
     public boolean isInRange(String ipAddress) throws Exception {	
     	
     	if (trie != null) {
@@ -105,11 +125,22 @@ public class CIDRUtils {
     }
     
 
+    /**
+     * Given a string ip address, return the long equivalent.
+     * @param ipAddress String. The ip address to convert to long.
+     * @return long. The long version of the string ip address.
+     */
     public static long getLongAddress(String ipAddress) {
     	var addr = new IPAddressString(ipAddress).getAddress();
     	return addr.getValue().longValue();
     }
     
+    /**
+     * Given an ip address in long form, return the string dotted decimal equivalent.
+     * @param ipAddress long. The long address.
+     * @return String. The ip address in dotted decimal doem.
+     * @throws Exception if not an ip address.
+     */
     public static String longToString(long ipAddress) throws Exception {
     	var i = InetAddress.getByName(String.valueOf(ipAddress));
     	String ip = i.getHostAddress();
