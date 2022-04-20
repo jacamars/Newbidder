@@ -124,10 +124,21 @@ public class NavMap extends LookingGlass implements Set {
 		}
 	}
 
+	/**
+	 * Convert an ip address to a long.
+	 * @param ipAddress String. The ip address to convert.
+	 * @return long. The long version of the address.
+	 */
 	public static long ipToLong(String ipAddress) {
 		return CIDRUtils.getLongAddress(ipAddress);
 	}
 
+	/**
+	 * Convert a long address to dotted decimal form.
+	 * @param ip Long. The ip address as a long.
+	 * @return String. The returned dotted decimal doem.
+	 * @throws Exception on invalid ip address.
+	 */
 	public static String longToIp(long ip) throws Exception {
 		if (ip > 4294967295L || ip < 0) {
 			throw new IllegalArgumentException("invalid ip");
@@ -135,6 +146,11 @@ public class NavMap extends LookingGlass implements Set {
 		return CIDRUtils.longToString(ip);
 	}
 
+	/**
+	 * Load the tree with ranges in the form addrLow - addrHigh.
+	 * @param br BufferedReader. The read object, each line terminated by crlf.
+	 * @throws Exception on file i/o errors.
+	 */
 	void doRanges(BufferedReader br) throws Exception {
 		long oldstart = 0;
 		long oldend = 0;
