@@ -52,6 +52,7 @@
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 		<ipaddress.version>5.3.4</ipaddress.version>
+		<nashorn.version>15.3</nashorn.version>
 
 		<org.apache.logging.log4j.version>2.17.1</org.apache.logging.log4j.version>
 
@@ -90,6 +91,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core -->
+		<dependency>
+    		<groupId>org.openjdk.nashorn</groupId>
+    		<artifactId>nashorn-core</artifactId>
+    		<version>${nashorn.version}</version>
 		</dependency>
 		
 		<dependency>
