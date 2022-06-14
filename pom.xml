@@ -37,7 +37,7 @@
 		<javax.servlet.version>4.0.0</javax.servlet.version>
 		<commons.pool2.version>2.5.0</commons.pool2.version>
 		<commons.io.version>2.7</commons.io.version>
-		<postgres.version>9.1-901-1.jdbc4</postgres.version>
+		<postgresql.version>42.4.0</postgresql.version>
 		<hazelcast.version>4.0.3</hazelcast.version>
 		<hazelcast-kubernetes.version>2.1</hazelcast-kubernetes.version>
 		<javax.persistence.version>1.0.2</javax.persistence.version>
@@ -227,12 +227,11 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/postgresql/postgresql -->
 		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${postgres.version}</version>
-		</dependency>
+    		<groupId>org.postgresql</groupId>
+    		<artifactId>postgresql</artifactId>
+    		<version>${postgresql.version}</version>
+</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast -->
