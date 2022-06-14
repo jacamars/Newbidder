@@ -15,7 +15,7 @@ var undef;
 const Windisplay = (props) => {
 
     const [showPixelFire, setShowPixelFire] = useState(false);
-    
+    const [nurl, setNurl] = useState(props.vars.nurl);
     const textAreaStyle = {
         fontSize: 12
     };
@@ -32,6 +32,11 @@ const Windisplay = (props) => {
 
     const showReason = () => {
         alert(props.vars.reason);
+    }
+
+    const changeNurl = (event, id) => {
+        setNurl(event.target.value);
+        props.vars.nurl = event.target.value;
     }
 
     return (
@@ -65,6 +70,7 @@ const Windisplay = (props) => {
                         <Input
                                 value={props.vars.nurl}
                                 style={textAreaStyle}
+                                onChange={changeNurl}
                                 id='winurl' />
                     </Row>
                         <Row>

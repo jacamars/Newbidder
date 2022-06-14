@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState }   from 'react';
 
 import {
     Card,
@@ -8,13 +8,15 @@ import {
     Input,
     InputGroup,
     InputGroupAddon,
-    InputGroupText
+    InputGroupText,
+
  } from 'reactstrap';
  import { useViewContext } from "../../ViewContext";
 
 const Endpoint = (props) => {
-
     const vx = useViewContext();
+    
+    const [url, setUrl] = useState(props.vars.url);
 
     const style = {
         backgroundColor: 'yellow',
@@ -24,6 +26,13 @@ const Endpoint = (props) => {
         cursor: 'pointer'
 
     }
+
+    const  updaterRoot = (event, id) => {
+        setUrl(event.target.value);
+        props.vars.url = event.target.value;
+    }
+
+    // {props.rootHandler}
 
     const optionItems = props.vars.exchanges.map((exchange,index) =>
         <option selected={exchange.name===props.ssp} key={"exchange-select" + index}>{exchange.name}</option>
@@ -36,11 +45,11 @@ const Endpoint = (props) => {
         </CardHeader>
         <Row>
             <Col xs="3">
-                <InputGroup>
+                <InputGroup >
                     <InputGroupAddon addonType="prepend">
                         <InputGroupText>Root</InputGroupText>
                     </InputGroupAddon>
-                    <Input value={props.vars.url} onChange={props.rootHandler} />
+                    <Input value={url} onChange= {updaterRoot}   />
                 </InputGroup>
             </Col>
             <Col xs="2">
@@ -55,7 +64,7 @@ const Endpoint = (props) => {
                     </InputGroupAddon>
                     <Input
                         value={props.vars.url + props.vars.uri}
-                        onChange={props.rootHandler}
+                        onChange= {updaterRoot}
                         id='endpoint' />
                 </InputGroup>
             </Col>
