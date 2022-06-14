@@ -2,6 +2,117 @@ import React from "react";
 
 export const Clipboard = "fromClipBoard";
 
+export const SampleBannerAzerion = {
+    "source": {
+      "ext": {
+        "schain": {
+          "ver": "1.0",
+          "nodes": [
+            {
+              "asi": "advertisingsystem.net",
+              "rid": "00000000-0000-0000-0000-000000000000",
+              "hp": 1,
+              "sid": "0000"
+            },
+            {
+              "rid": "00000000-0000-0000-0000-000000000000",
+              "hp": 1,
+              "asi": "improvedigital.com",
+              "sid": "986"
+            }
+          ],
+          "complete": 1
+        }
+      },
+      "fd": 0,
+      "tid": "0000000000000000"
+    },
+    "user": {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "ext": {
+        "eids": [
+          {
+            "source": "liveramp.com",
+            "uids": [
+              {
+                "id": "1111111"
+              }
+            ]
+          }
+        ],
+        "improve_consent": 1,
+        "consent": "BORC-NgORC-NgAPABAENBT-AAAAel7_______9______9uz_Gv_v_f__33e8__9v_l_7_-___u_-33d4-_1vX99yfm1-7ftr1tp386ues2LDqKQ"
+      }
+    },
+    "id": "00000000-0000-0000-0000-000000000000",
+    "device": {
+      "ip": "00.00.000.00",
+      "geo": {
+        "type": 2,
+        "city": "SampleCity",
+        "country": "NL",
+        "region": "SampleRegion"
+      },
+      "os": "OSX",
+      "model": "Mac",
+      "osv": "OSX_10.13",
+      "carrier": "SampleCarrier",
+      "devicetype": 2,
+      "connectiontype": 0,
+      "dnt": 0,
+      "make": "Apple",
+      "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/00.0.0000.000 Safari/000.00",
+      "language": "nl"
+    },
+    "tmax": 120,
+    "at": 1,
+    "site": {
+      "id": "123456",
+      "domain": "SampleDomain",
+      "page": "SampleSitePage",
+      "publisher": {
+        "id": "671"
+      },
+      "name": "SampleSiteName"
+    },
+    "regs": {
+      "coppa": 0,
+      "ext": {
+        "gdpr": 1
+      }
+    },
+    "imp": [
+      {
+        "tagid": "12345678",
+        "ext": {},
+        "id": "1",
+        "banner": {
+          "h": 600,
+          "format": [
+            {
+              "w": 300,
+              "h": 600
+            },
+            {
+              "w": 336,
+              "h": 280
+            },
+            {
+              "w": 300,
+              "h": 250
+            }
+          ],
+          "w": 300,
+          "pos": 0
+        },
+        "secure": 0,
+        "bidfloor": 0.5,
+        "instl": 0
+      }
+    ]
+  };
+
+
 export const SampleBanner = {
   "id": "35c22289-06e2-48e9-a0cd-94aeb79fab43",
 	"at": 2,

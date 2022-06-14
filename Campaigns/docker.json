@@ -69,6 +69,7 @@
     "template" : {
       "default" : "{creative_forward_url}",
       "exchange" : {
+        "azerion" : "{creative_forward_url}",
         "adx" : "<a href='$EXTERNAL/rtb/win/{pub_id}/%%WINNING_PRICE%%/{lat}/{lon}/{ad_id}/{creative_id}/{bid_id}'}'></a><a href='%%CLICK_URL_UNESC%%{redirect_url}></a>{creative_forward_url}",
         "mopub" : "<a href='mopub template here' </a>",
         "mobclix" : "<a href='mobclix template here' </a>",
@@ -102,7 +103,16 @@
       "e_key" : "$GOOGLE_EKEY",
       "i_key" : "$GOOGLE_IKEY"
     }
-  }, {
+  },
+  {
+    "name" : "azerion",
+    "id" : "azerion-id",
+    "bid" : "/rtb/bids/azerion=com.jacamars.dsp.rtb.exchanges.azerion.Azerion",
+    "extension" : {
+      "e_key" : "$AZERION_EKEY",
+      "i_key" : "$AZERION_IKEY"
+    }
+  },  {
     "name" : "openx",
     "id" : "openx-id",
     "bid" : "/rtb/bids/openx=com.jacamars.dsp.rtb.exchanges.openx.OpenX",

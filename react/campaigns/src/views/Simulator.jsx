@@ -4,7 +4,7 @@ import http from 'http';
 import Endpoint from './simulator/Endpoint';
 import Bideditor from './simulator/Bideditor';
 import Windisplay from './simulator/Windisplay';
-import { Logo, Tips, SampleBanner, SampleVideo, SampleAudio, SampleNative, Clipboard } from './simulator/Utils';
+import { Logo, Tips, SampleBanner, SampleBannerAzerion, SampleVideo, SampleAudio, SampleNative, Clipboard } from './simulator/Utils';
 import { SSL_OP_LEGACY_SERVER_CONNECT } from 'constants';
 import { useViewContext } from "../ViewContext";
 
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 });
 const cannedResponse = {"response": "will go here"};
 
-let ssp = "Nexage";
+let ssp = "Azerion";
 var undef;
 
 const Simulator = (props) =>  {
@@ -29,8 +29,8 @@ const Simulator = (props) =>  {
 
   const [vars, setVars] = useState({
     exchanges: [
+      { name: 'Azerion', uri: '/rtb/bids/azerion' },
       { name: 'Nexage', uri: '/rtb/bids/nexage' },
-      { name: 'Bidswitch', uri: '/rtb/bids/bidswitch' },
       { name: 'Admedia', uri: '/rtb/bids/admedia'},
       { name: 'Adprudence', uri: '/rtb/bids/adprudence' },
       { name: 'Appnexus', uri: '/rtb/bids/appnexus' },
@@ -70,7 +70,7 @@ const Simulator = (props) =>  {
       { name: 'Wideorbit', uri: '/rtb/bids/wideorbit' }
     ],
     bidTypes: [
-      { name: "Banner", file: SampleBanner },
+      { name: "Banner", file: SampleBannerAzerion },
       { name: "Video", file: SampleVideo },
       { name: "Audio", file: SampleAudio },
       { name: "Native", file: SampleNative },
@@ -245,19 +245,21 @@ const Simulator = (props) =>  {
           alert("Has multiples");
         }
       }
+
       if (response.status !== 200) {
         alert("NOBID: Response was: " + response.status + ", rtt: " + (performance.now()-rtt) + ", xtime: " + xtime +
           "\n" + reason);
         return;
       }
-      //console.log("RESPONSE: " + JSON.stringify(response.data));
-      vx.changeBidresponse(response.data);
+      // alert("RESPONSE: " + JSON.stringify(response.data));
+
       vars.nurl =  response.data.seatbid[0].bid[0].nurl;
       vx.changeNurl(vars.nurl);
       vars.response = response.data;
       vars.adm = response.data.seatbid[0].bid[0].adm;
       vars.creative = response.data.seatbid[0].bid[0].adm;
       vx.changeAdm(response.data.seatbid[0].bid[0].adm);
+      vx.changeBidresponse(response.data)
       setVars(vars);
       redraw();
     } catch (error) {

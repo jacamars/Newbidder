@@ -139,11 +139,21 @@ const  addNewCampaign = async () => {
     }
 
     // signal creatives to modify
+  if (campaign.banners.length !== 0) {
     x.banners_delete = copy.banners.filter(x => !campaign.banners.includes(x));
+  }
+  if (campaign.videos.length !== 0) {
     x.videos_delete = copy.videos.filter(x => !campaign.videos.includes(x));
+  } 
+
+  if (campaign.audios.length !== 0) {
     x.audios_delete = copy.audios.filter(x => !campaign.audios.includes(x));
+  }
+
+  if (campaign.natives.length != 0) {
     x.natives_delete = copy.natives.filter(x => !campaign.natives.includes(x));
-   
+  }
+
     if (x.name === "") { alert("Name cannot be blank"); return; }
 
     if (forensiq === "true") 

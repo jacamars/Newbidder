@@ -126,6 +126,8 @@ const SuperUser = (props) => {
   const editUser = async(id) => {
     var u = getUserById(id);
 
+    alert("USER: " + JSON.stringify(u,null,2));
+
     if (u.username === '') {
       alert("User name can't be blank");
       return;
@@ -138,6 +140,7 @@ const SuperUser = (props) => {
       alert("User already exists, choose another name");
       return;
     }
+
 
     await vx.addNewUser(u);
     alert("User: " + u.username + " saved");

@@ -99,7 +99,7 @@ public enum  Env {
 
         while(address.contains("$AWSSECRETKEY"))
             address = GetEnvironmentVariable(address,"$AWSSECRETKEY", null);
-
+        
         while(address.contains("$AWSREGION"))
             address = GetEnvironmentVariable(address,"$AWSREGION", Regions.US_EAST_1.getName());
 
@@ -120,6 +120,12 @@ public enum  Env {
         
     	while (address.contains("$FREQGOV"))
 			address = GetEnvironmentVariable(address, "$FREQGOV", "true");
+    	
+        while(address.contains("$AZERION_EKEY"))
+            address = GetEnvironmentVariable(address,"$AZERION_EKEY", null);
+        
+        while(address.contains("$AZERION_IKEY"))
+            address = GetEnvironmentVariable(address,"$AZERION_IKEY", null);
 
 		while (address.contains("$GDPR_MODE"))
 			address = GetEnvironmentVariable(address, "$GDPR_MODE", "false");

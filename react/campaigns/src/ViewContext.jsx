@@ -2,7 +2,7 @@ import {useState} from 'react';
 import createUseContext from "constate"; // State Context Object Creator
 import http from 'http';
 import axios from 'axios';
-import { SampleBanner} from './views/simulator/Utils';
+import { SampleBanner, SampleBannerAzerion} from './views/simulator/Utils';
 
 var undef;
 
@@ -16,12 +16,12 @@ var jwt;
 
 const  ViewContext = () => {
 
-    const [ssp, setSsp] = useState('Nexage')
-    const [uri, setUri] = useState('/rtb/bids/nexage');
+    const [ssp, setSsp] = useState('Azerion')
+    const [uri, setUri] = useState('/rtb/bids/azerion');
     const [url, setUrl] = useState('http://' + window.location.hostname + ':8080');
     const [bidtype, setBidtype] = useState('Banner');
-    const [bidvalue, setBidvalue] = useState(JSON.stringify(SampleBanner,null,2));
-    const [bidobject, setBidobject] = useState(SampleBanner);
+    const [bidvalue, setBidvalue] = useState(JSON.stringify(SampleBannerAzerion,null,2));
+    const [bidobject, setBidobject] = useState(SampleBannerAzerion);
     const [bidresponse, setBidresponse] = useState({"response": "will go here"})
     const [nurl, setNurl] = useState('');
     const [xtime, setXtime] = useState('xtime: 0, rtt: 0');
