@@ -79,7 +79,7 @@ public class BidCacheStore implements MapStore<String, RecordedBid> {
     
     public BidCacheStore()  {
         try {
-        	Class.forName(Configuration.getInstance().mapstoredriver); 
+
             con = DriverManager.getConnection(Configuration.getInstance().mapstorejdbc);
             con.createStatement().executeUpdate(
                     "create table if not exists recordedbids (id text not null, capkey text not null, captimeout bigint not null, captimeunit text not null, price text not null, adtype text not null, frequencycap text not null, endtime bigint not null,  primary key (id))");
