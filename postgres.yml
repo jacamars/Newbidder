@@ -1,9 +1,12 @@
+#
+# Contains the full stack of the RTB4FREe stack (not including elk))
+# Does contain zookeeper and kafka, postgres and minio
+#
 version: "3"
 
 services:
-        
-  postgres:
-    image: postgres:latest
+  sqldb:
+    image: "postgres"
     environment:
       - "POSTGRES_PASSWORD=postgres"
     ports:
