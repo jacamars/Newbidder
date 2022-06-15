@@ -61,7 +61,6 @@ public class SQLDeleteTargetCmd extends ApiCommand {
 					st = CrosstalkConfig.getInstance().getConnection().
 							prepareStatement("delete from targets where id=?");
 					st.setInt(1, id);
-					st.setString(2,  tokenData.customer);
 					st.executeUpdate();
 				}
 				st.close();

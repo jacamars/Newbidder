@@ -824,7 +824,6 @@ const  ViewContext = () => {
         id: id,
         key: key
       };
-
       var result = await execute(cmd);
       if (!result)
         return;

@@ -1663,7 +1663,12 @@ public class Configuration {
 	 * @return List. The list of campaigns.
 	 */
 	public List<Campaign> getCampaignsList() {
-		return shadow.getCampaigns();
+		try {
+			return Crosstalk.getInstance().shadow.getCampaigns();
+		} catch (Exception error) {
+			error.printStackTrace();
+			return new ArrayList();
+		}
 	}
 
 	/**

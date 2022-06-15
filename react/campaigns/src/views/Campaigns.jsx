@@ -225,6 +225,7 @@ var undef;
     } else {
         x.status = "runnable";
     }
+    x.attributes = [];
     vx.addNewCampaign(JSON.stringify(x));
 
     setTimeout(refresh,3000);
@@ -336,6 +337,7 @@ var undef;
         campaign.name = "*** Imported *** " + campaign.name;
         campaign.id = 0;
         campaign.customer_id = vx.customer_id;
+        campaign.attributes = [];
         rc = await vx.addNewCampaign(JSON.stringify(campaign));
       } catch (e) {
           alert("ERROR: " + e);
@@ -389,6 +391,7 @@ var undef;
       setCampaign(null);
       if (e !== null) {
         //alert("NEW CAMPAIGN: " + JSON.stringify(e,null,2));
+        e.attributes = [];
         vx.addNewCampaign(JSON.stringify(e));
         setCampaign(null);
 

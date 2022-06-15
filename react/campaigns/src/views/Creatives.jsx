@@ -73,17 +73,22 @@ var undef;
     }
     if (c.campaign_id !== 0) {
       var camp = await vx.getDbCampaign(c.campaign_id);
-      c.campaign_name = camp.name;
+      if (camp === undef) {                             // constraint error
+        c.campaign_name = "Unassigned";
+        c.campaign_id = 0;
+        await vx.addNewCreative(c);
+      } else 
+        c.campaign_name = camp.name;
     } else {
       c.campaign_name = "Unassigned";
     }
-
 
     if (mode === 'VIEW')
       c.readOnly = true;
 
     // Rewrite the deals so we cn deal with them. Also, set the dealType which is used by the
     // DealEditor, 1 is no deal, 2 is private (price is 0) and 3 is preferred.
+
     if (c.dealSpec !== undef) {
       var rc = c.dealSpec.split(",");
       var array = [];
@@ -100,6 +105,8 @@ var undef;
       c.dealType = 1;
       c.deals = undef;
     }
+
+    //alert("HERE");
 
     if (c.ext_spec !== undef) {
       var map = {};
