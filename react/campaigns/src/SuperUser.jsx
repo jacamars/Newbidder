@@ -126,7 +126,10 @@ const SuperUser = (props) => {
   const editUser = async(id) => {
     var u = getUserById(id);
 
-    alert("USER: " + JSON.stringify(u,null,2));
+    if (u.customer_id === "") {
+      alert("Customer ID not selected!");
+      return;
+    }
 
     if (u.username === '') {
       alert("User name can't be blank");
