@@ -320,6 +320,7 @@ const  ViewContext = () => {
         return;
       
       var user = JSON.parse(data.user);
+      user.customer = data.customer;
       setUser(user);
       return user;
     }

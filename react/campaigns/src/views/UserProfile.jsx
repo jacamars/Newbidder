@@ -175,7 +175,7 @@ const UserProfile = () => {
                             <Input style={(document.body.classList.contains("white-content")) 
                                   ? blackStyle : whiteStyle}
                             defaultValue={vx.user.company}
-                            disabled
+                            disabled={true}
                             placeholder="Company"
                             type="text"
                             id="company"/>

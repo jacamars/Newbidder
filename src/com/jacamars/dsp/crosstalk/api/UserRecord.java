@@ -67,6 +67,15 @@ public class UserRecord {
 		title = rs.getString("title");
 		description = rs.getString("description");
 		
+		if (company == null) {
+			sql = "select * from companies where customer_id=?";
+			p = conn.prepareStatement(sql);
+			p.setString(1, customer_id);
+			rs = p.executeQuery();
+			if (rs.next())
+				company = rs.getString("customer_name");
+		}
+		
 	}
 	
 	public void toSql() throws Exception {
