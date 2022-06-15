@@ -108,6 +108,7 @@ export const customerIds = (cids,value) => {
     var items = [];
     if (cids === undef) 
         return items;
+    items.push(<option></option>);
     cids.map(row => {
         items.push(<option selected={row.customer_id === value} value={row.customer_id}>{row.customer_id}</option>);
     })
