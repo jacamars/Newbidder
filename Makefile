@@ -1,3 +1,6 @@
+#
+# Makefile for rtb4free
+#
 .PHONY: clean local docker react react-campaigns backup-db restore-db minio realS3 firsttime
 
 build: application
