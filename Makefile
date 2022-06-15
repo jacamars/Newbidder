@@ -18,10 +18,14 @@ help:
 firsttime:
 	./firsttime.sh
 
-react-campaigns:
+react-install:
 	rm react/campaigns/package-lock.json|| true
 	rm react/campaigns/yarn.lock || true
 	cd react/campaigns && npm update --force
+
+react-campaigns:
+	rm react/campaigns/package-lock.json|| true
+	rm react/campaigns/yarn.lock || true
 	cd react/campaigns && yarn install
 	cd react/campaigns && npm run-script build
 	rm -r www/campaigns || true
