@@ -4,7 +4,11 @@ import java.io.InputStream;
 
 import java.util.Map;
 
+import com.jacamars.dsp.rtb.common.Campaign;
+import com.jacamars.dsp.rtb.common.Creative;
 import com.jacamars.dsp.rtb.pojo.BidRequest;
+import com.jacamars.dsp.rtb.pojo.BidResponse;
+import com.jacamars.dsp.rtb.pojo.Impression;
 
 /**
  * A class to handle Azerion ad exchange. Not much different, except, Azerion uses encrypted pricing.
@@ -92,6 +96,7 @@ public class Azerion extends BidRequest {
             logger.error("Error setting OpenX ekey: '{}'. ikey: '{}'. reason: {}",ekey,ikey,error.toString());
         }
     }
+  
 }
 
 

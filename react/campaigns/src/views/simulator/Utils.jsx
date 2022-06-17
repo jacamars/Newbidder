@@ -70,11 +70,17 @@ export const SampleBannerAzerion = {
       "id": "123456",
       "domain": "SampleDomain",
       "page": "SampleSitePage",
+      "cat": [
+        "IAB1", "IAB2", "IAB3"
+      ],
       "publisher": {
         "id": "671"
       },
       "name": "SampleSiteName"
     },
+    "bcat": [
+			"IAB9"
+		],
     "regs": {
       "coppa": 0,
       "ext": {

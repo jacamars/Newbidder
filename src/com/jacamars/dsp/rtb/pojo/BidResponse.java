@@ -283,6 +283,9 @@ public class BidResponse {
 		response.append(adid);
 		response.append("\",\"crid\":\"");
 		response.append(creat.impid);
+		
+		BcatProcessor.process(creat.categories,br.bcat,response);
+		
 		if (dealId != null) {
 			response.append("\",\"dealid\":\"");
 			response.append(dealId);
@@ -714,13 +717,16 @@ public class BidResponse {
 		response.append(adid);
 		response.append("\",\"crid\":\"");
 		response.append(creat.impid);
+		response.append("\"");
 		
+		BcatProcessor.process(creat.categories,br.bcat,response);		
 
 		if (dealId != null) {
-			response.append("\",\"dealid\":\"");
+			response.append(",\"dealid\":\"");
 			response.append(dealId);
+			response.append("\"");
 		}
-		response.append("\",\"iurl\":\"");
+		response.append(",\"iurl\":\"");
 		response.append(imageUrl);
 		response.append("\",\"adomain\": [\"");
 		response.append(camp.ad_domain);

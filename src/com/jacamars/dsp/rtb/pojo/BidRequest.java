@@ -96,6 +96,8 @@ public class BidRequest {
 	/** Forensiq fraud record */
 	public FraudLog fraudRecord;
 
+	public List<String> bcat;
+	
 	// The impressions objects;
 	protected List<Impression> impressions;
 
@@ -437,6 +439,15 @@ public class BidRequest {
 		StringBuilder item = new StringBuilder("id"); // a fast way to keep up
 														// with required fields
 														// Im looking for
+		
+		var blacklistCat = rootNode.path("bcat");
+		if (blacklistCat != null) {
+			ArrayNode array = (ArrayNode)blacklistCat;
+			bcat = new ArrayList();
+			array.forEach(a->{
+				bcat.add(a.asText());
+			});
+		}
 		try {
 			for (int i = 0; i < keys.size(); i++) {
 				String key = keys.get(i);

@@ -50,6 +50,7 @@ public class Probe {
 	public static final String SITE_OR_APP_DOMAIN = new String("site.domain OR app.domain");
 	public static final String FORMAT_NOMATCH = new String("Format in impression does not match any creative size");
 	public static final String BID_CREAT_IS_AUDIO = new String("Creative is audio, request is not\n");
+	public static final String CATEGORY_MISMATCH = "Creative has a blocked category";
 	public static final String AUDIO_MISSING_MIME = new String("Audio creative missing mimeTypes\n");
 	public static final String AUDIO_MIME_MISMATCH = new String("Audio creative mimetype mismatch\n");
 	public static final String AUDIO_MISSING_DURATION = new String("Audio creative missing duration\n");

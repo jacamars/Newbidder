@@ -22,7 +22,7 @@ import NativeEditor from "./NativeEditor";
 import SiteOrAppEditor from "./SiteOrAppEditor";
 import CreativeSizeEditor from "./CreativeSizeEditor";
 import { useViewContext } from "../../ViewContext";
-import {attrOptions, blackStyle, whiteStyle} from "../../Utils"
+import {attrOptions, blackStyle, whiteStyle, IAB} from "../../Utils"
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -247,7 +247,7 @@ const getSelectedRules = () => {
     var avn = getValue(document.getElementById("avn"));
     var cnames = [...document.getElementById("categories").options]
         .filter((x) => x.selected)
-        .map((x)=>x.value);
+        .map((x)=>x.value.split(" ")[0]);
 
     if (appnexus_crid !== "") ext.push("appnexus_crid:#:"+appnexus_crid);
     if (agency_name !== "") ext.push("agency_name"+":#:"+agency_name);
@@ -361,12 +361,12 @@ const getSelectedRules = () => {
       checks = creative.categories;
 
     var items = []; 
-    for (var i=1;i<26;i++) {
-      var iab = "IAB"+i;
-      if (checks.indexOf(iab)>-1)
-        items.push(<option key={"iab-"+i} selected>{iab}</option>);
+    for (var key in IAB) {
+      var value = IAB[key];
+     if (checks.indexOf(key)>-1)
+        items.push(<option key={key} selected>{key}{' '}{value}</option>)
       else
-        items.push(<option key={"iab-"+i}>{iab}</option>)
+       items.push(<option key={key}>{key}{' '}{value}</option>)
     }
     return(items);  
   }

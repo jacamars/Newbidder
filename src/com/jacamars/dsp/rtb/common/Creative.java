@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1345,7 +1347,7 @@ public class Creative implements Serializable {
 	 */
 	public SelectedCreative process(BidRequest br, String adId, StringBuilder errorString, Probe probe)
 			throws Exception {
-
+			
 		List<Deal> list = new ArrayList();
 		/**
 		 * Fixed nodes do not access deals or the br impressions
@@ -1385,6 +1387,20 @@ public class Creative implements Serializable {
 		String dealId = null;
 		double xprice = price;
 		String impid = this.impid;
+		
+		if (br.bcat != null && (this.categories != null && this.categories.size()>0)) {
+			Set<String> result = br.bcat.stream()
+					  .distinct()
+					  .filter(categories::contains)
+					  .collect(Collectors.toSet());
+			
+			if (result.size()>0) {
+				if (errorString != null)
+					errorString.append("Category/Blocked category mismatch\n");
+				probe.process(br.getExchange(), adId, impid, Probe.CATEGORY_MISMATCH);
+				return null;
+			}
+		}
 
 		//System.out.println("HERE: " + adId + "/" + impid + ": " + fixedNodes.size());
 		Node n = null;
@@ -1729,6 +1745,7 @@ public class Creative implements Serializable {
 		handleDeals();
 		doRules();
 		doBATTR();
+		BcatProcessor.expandCategories(categories);
 	}
 
 	/**
