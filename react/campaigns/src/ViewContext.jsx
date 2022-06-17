@@ -723,6 +723,7 @@ const  ViewContext = () => {
       };
 
       console.log("==========>" + JSON.stringify(cmd,null,2));
+      alert(JSON.stringify(cmd,null,2));
       var result = await execute(cmd);
       if (!result)
         return;

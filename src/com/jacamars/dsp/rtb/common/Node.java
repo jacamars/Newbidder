@@ -404,6 +404,10 @@ public class Node implements Serializable {
 	
 	static String getValue(Node n) {
 		String str = "";
+		
+		if (n.value == null)
+			n.value = n.operand;
+		
 		if (n.value instanceof Object[]) {
 			Object[] list = (Object[])n.value;
 			for (int i=0; i<list.length;i++) {
