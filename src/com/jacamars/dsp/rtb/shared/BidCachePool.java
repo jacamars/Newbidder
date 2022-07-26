@@ -455,11 +455,11 @@ public enum BidCachePool {
 
 	public void increment(String key, long timeout, String units) {
 		RecordedMisc x = miscCache.get(key);
-		Long y = null;
+		Integer y = null;
 		if (x == null) {
-			y = 1L;
+			y = 1;
 		} else {
-			y = (Long) x.getValue();
+			y = (Integer) x.getValue();
 			y++;
 			timeout =  x.getEndtime() - System.currentTimeMillis();
 			timeout /= 1000;

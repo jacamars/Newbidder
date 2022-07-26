@@ -1603,7 +1603,7 @@ public class Creative implements Serializable {
 				spend = budget.dailyCost.getDoubleValue();
 				logger.debug("Creative check -------> ID: {}. DAILY {}/{} budget: {} vs spend: {}", c.id, id, type,
 						budget, spend);
-				if (spend >= bdget)
+				if (bdget != 0 && spend >= bdget)
 					return true;
 
 				bdget = budget.hourlyBudget.getDoubleValue();
@@ -1611,7 +1611,7 @@ public class Creative implements Serializable {
 
 				logger.debug("Creative check ------->ID: {}. HOURLY {}/{}, budet: {} vs spend: {}", c.id, id, type,
 						budget, spend);
-				if (spend >= bdget)
+				if (bdget != 0 && spend >= bdget)
 					return true;
 				
 				if (budget.daypart != null) {

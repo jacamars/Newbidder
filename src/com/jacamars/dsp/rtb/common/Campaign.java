@@ -272,7 +272,7 @@ public class Campaign implements Comparable, Portable {
 
 		ObjectNode y = (ObjectNode) inner.get(0);
 		Campaign c = new Campaign(y);
-		// c.processCreatives();
+		c.processCreatives();
 
 		if (td != null && td.isAuthorized(c.customer_id) == false)
 			return null;

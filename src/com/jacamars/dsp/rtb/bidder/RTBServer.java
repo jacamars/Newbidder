@@ -1910,7 +1910,7 @@ class AdminHandler extends Handler {
 		response.setHeader("X-INSTANCE", config.instanceName);
 
 		
-		System.out.println("+++++++++++++++>" + target);
+		// System.out.println("+++++++++++++++>" + target);
 		
 		try {
 			if (request.getHeader("Content-Encoding") != null && request.getHeader("Content-Encoding").equals("gzip"))

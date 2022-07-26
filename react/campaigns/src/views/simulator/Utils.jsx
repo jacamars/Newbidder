@@ -3,6 +3,119 @@ import React from "react";
 export const Clipboard = "fromClipBoard";
 
 export const SampleBannerAzerion = {
+  "source": {
+    "tid": "e6667c2b-90b5-4ea5-abbd-ce1435d4ab85",
+    "ext": {
+      "schain": {
+        "ver": "1.0",
+        "nodes": [
+          {
+            "asi": "headerlift.com",
+            "hp": 1,
+            "sid": "5410"
+          },
+          {
+            "rid": "98affc7e-486d-4b0b-b9a7-fbf99bdae790",
+            "hp": 1,
+            "asi": "improvedigital.com",
+            "sid": "545"
+          }
+        ],
+        "complete": 1
+      }
+    }
+  },
+  "user": {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "ext": {
+      "consent": "CPMd8p0PMd8p0AcABBENBiCsAP_AAH_AAChQIENf_X__b3_j-_59f_t0eY1P9_7_v-0zjhfdt-8N2f_X_L8X42M7vF36pq4KuR4Eu3LBIQdlHOHcTUmw6okVrzPsbk2Mr7NKJ7PEmnMbO2dYGH9_n93TuZKY7__8___z__-v_v____f_r-3_3__59X---_e_V399zLv9_____9nN__wQEAJMNS-AC7EscGTaNKoUQIwrCQ6AUAFFAMLRNYQMrgp2VwEeoIWACE1ARgRAgxBRiwCAAQCAJCIgJADwQCIAiAQAAgBUgIQAEbAILACwMAgAFANCxAigCECQgyOCo5TAgIkWignsrAEou9jTCEMosAKBR_RUYCJQggWBkJCwcxwBIAAA.f_gAD_gAAAAA"
+    }
+  },
+  "id": "98affc7e-486d-4b0b-b9a7-fbf99bdae790",
+  "device": {
+    "w": 1440,
+    "ip": "217.39.48.179",
+    "geo": {
+      "type": 2,
+      "city": "Gainsborough",
+      "zip": "DN21",
+      "country": "GB",
+      "region": "GB-LIN"
+    },
+    "h": 900,
+    "os": "OSX",
+    "osv": "10.15",
+    "model": "Mac",
+    "devicetype": 2,
+    "carrier": "British Telecommunications PLC",
+    "make": "Apple",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
+    "language": "en"
+  },
+  "tmax": 170,
+  "at": 1,
+  "site": {
+    "pagecat": [
+      "IAB9"
+    ],
+    "id": "330750",
+    "domain": "localhost",
+    "page": "https://localhost:3000/test-banners.html",
+    "publisher": {
+      "id": "545"
+    },
+    "name": "myrealpersonality.com"
+  },
+  "bcat": [
+    "IAB9-7",
+    "IAB23",
+    "IAB23-8",
+    "IAB23-4",
+    "IAB14-1",
+    "IAB7-10",
+    "IAB14-3",
+    "IAB23-10",
+    "IAB11-4",
+    "IAB23-6",
+    "IAB7-11",
+    "IAB23-3",
+    "IAB23-7",
+    "IAB8-18",
+    "IAB23-5",
+    "IAB26",
+    "IAB23-2",
+    "IAB7-39",
+    "IAB25-3",
+    "IAB23-1"
+  ],
+  "regs": {
+    "coppa": 0,
+    "ext": {
+      "gdpr": 1
+    }
+  },
+  "imp": [
+    {
+      "tagid": "22272109",
+      "id": "1",
+      "banner": {
+        "h": 250,
+        "format": [
+          {
+            "w": 300,
+            "h": 250
+          }
+        ],
+        "w": 300,
+        "pos": 0
+      },
+      "secure": 1,
+      "bidfloor": 0.0307,
+      "instl": 0
+    }
+  ]
+};
+export const SampleBannerAzerionOLD = {
     "source": {
       "ext": {
         "schain": {

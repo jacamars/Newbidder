@@ -56,6 +56,7 @@ minio:
 	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=rtb4free-big-data&filename=www/images/azerion-1.gif&key=images/azerion-1.gif"
 	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=rtb4free-big-data&filename=www/contact.html/&key=landing/rtb4free/contact.html"
 	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=rtb4free-big-data&filename=www/images/trump.mp4&key=video/trump.mp4"
+	./tools/copy2s3 "endpoint=http://localhost:9000&aws_access_key=AKIAIOSFODNN7EXAMPLE&aws_secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&bucket=rtb4free-big-data&filename=www/images/hhgame300x250.jpg&key=images/300x250/hhgame.jpg"
 	
 realS3:
 	./tools/copy2s3 "aws_access_key=$(aws_access_key)&aws_secret_key=$(aws_secret_key)&aws_region=$(aws_region)&bucket=$(bucket)&filename=data/METHBOT.txt&key=cidr/METHBOT.txt"
@@ -66,6 +67,7 @@ realS3:
 	./tools/copy2s3 "aws_access_key=$(aws_access_key)&aws_secret_key=$(aws_secret_key)&aws_region=$(aws_region)&bucket=$(bucket)&filename=www/images/320x50.jpg&key=images/320x50/tunein.jpg"
 	./tools/copy2s3 "aws_access_key=$(aws_access_key)&aws_secret_key=$(aws_secret_key)&aws_region=$(aws_region)&bucket=$(bucket)&filename=www/contact.html/&key=landing/rtb4free/contact.html"
 	./tools/copy2s3 "aws_access_key=$(aws_access_key)&aws_secret_key=$(aws_secret_key)&aws_region=$(aws_region)&bucket=$(bucket)&filename=www/images/trump.mp4&key=video/trump.mp4"
+	./tools/copy2s3 "aws_access_key=$(aws_access_key)&aws_secret_key=$(aws_secret_key)&aws_region=$(aws_region)&bucket=$(bucket)&filename=www/images/hhgame300x250.jpg&key=images/300x250/hhgame.jpg"
 
 
 docker:
