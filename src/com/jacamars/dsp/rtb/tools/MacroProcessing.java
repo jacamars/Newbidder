@@ -40,7 +40,7 @@ public class MacroProcessing {
 	static final String APP = "APP";
 	static final String SITE = "SITE";
 
-	static String external = Env.GetEnvironment("$EXTERNAL", "http://localhost:8080");
+	static String external = Env.GetEnvironment("EXTERNAL", "http://localhost:8080");
 
 	static Set<String> macroList = new HashSet();
 
