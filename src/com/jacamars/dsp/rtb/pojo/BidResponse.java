@@ -697,6 +697,12 @@ public class BidResponse {
 
 		response.append(",\"price\":");
 		response.append(price);
+		
+		response.append(",\"w\":");
+		response.append(creat.width);
+		response.append(",\"h\":");
+		response.append(creat.height);
+		
 		response.append(",\"adid\":\"");
 		
 		if (creat.alternateAdId == null)
