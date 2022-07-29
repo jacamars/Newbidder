@@ -62,6 +62,7 @@ public class Azerion extends BidRequest {
         public boolean parseSpecial() {
                 setExchange(AZERION);
                 usesEncodedAdm = false;
+                BidRequest.setUsesPiggyBackWins(AZERION); 
                 return true;
         }
         
