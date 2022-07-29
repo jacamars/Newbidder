@@ -715,7 +715,10 @@ public class BidResponse {
 		if (BidRequest.usesPiggyBackedWins(exchange)) {
 			// don't do anything
 		} else {
-			response.append("\",\"nurl\":\"");
+			if (br.getExchange().equals("azerion"))
+				response.append("\",\"burl\":\"");
+			else
+				response.append("\",\"nurl\":\"");
 			response.append(snurl);
 		}
 		

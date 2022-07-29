@@ -67,6 +67,17 @@ public enum AccountingCache {
 		ac.add(creative, value);
 	}
 	
+	public void resetBudget(String campaign) {
+		if (hz == null)
+			return;
+		AccountRecord ac = map.get(campaign);
+		if (ac == null)
+			return;
+		
+		ac.hardReset();
+		map.put(campaign, ac);
+	}
+	
 	/**
 	 * For incrementing .bids, .wins, .pixels, .clicks, .postback
 	 * @param campaign
@@ -242,6 +253,14 @@ class AccountRecord {
 		counters.forEach((k,v)->{
 			if (!k.contains("."))
 				v.set(Double.valueOf(0));
+		});
+		counter.set(Double.valueOf(0));
+	}
+	
+	public void hardReset() {
+		Double value = Double.valueOf(0);
+		counters.forEach((k,v)->{
+			v.set(Double.valueOf(0));
 		});
 		counter.set(Double.valueOf(0));
 	}

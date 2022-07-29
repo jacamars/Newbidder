@@ -44,4 +44,10 @@ public class Budget {
 	public void setDailyBudget(double d) {
 		dailyBudget = new AtomicBigDecimal(d);
 	}
+	
+	public void resetBudget() {
+		totalCost = new AtomicBigDecimal(0); 
+		dailyCost = new AtomicBigDecimal(0);
+		hourlyCost = new AtomicBigDecimal(0);
+	}
 }

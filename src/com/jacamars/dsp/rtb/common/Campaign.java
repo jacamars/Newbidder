@@ -1463,6 +1463,20 @@ public class Campaign implements Comparable, Portable {
 
 		st.execute();
 	}
+	
+	public static void resetTotalCost(Campaign campaign) throws Exception {
+		if (campaign.budget == null)
+			return;
+		
+		String sql = "update campaigns set cost=0.0, daily_cost=0.0, hourly_cost=0.0 where id="+campaign.id;
+		campaign.budget.resetBudget();
+		PreparedStatement p = CrosstalkConfig.getInstance().getConnection().prepareStatement(sql);
+		p.execute();
+		campaign.reloadBudgetFromDb();
+		CampaignCache.getInstance().addCampaign(campaign);
+		AccountingCache.getInstance().resetBudget(""+campaign.id);
+		Crosstalk.shadow.add(campaign);;
+	}
 
 	public static PreparedStatement toSql(Campaign c, Connection conn) throws Exception {
 		if (c.id == 0)

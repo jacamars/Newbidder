@@ -139,6 +139,24 @@ const  ViewContext = () => {
       return data.token;
     }
   
+    const resetBudget = async(campaignId, creativeId) => {
+      var cmd = {
+        token: jwt,
+        type: "ResetBudget#",
+        campaign: campaignId
+      }
+
+      var data = await execute(cmd);
+
+      if (data === undef) {
+        alert("Execution failed");
+        return;
+      }
+      
+      console.log("ResetBudget returns: " + JSON.stringify(data,null,2));
+      return data;
+    }
+
     const getBudget = async(campaign,creative,type) => {
       var cmd = {
         token: jwt,
@@ -985,7 +1003,7 @@ const  ViewContext = () => {
 
       creativesAvailable, getCampaignNameById, getTargetNameById, getCampaignNameByTargetId,
 
-      getBudget, getValues,
+      getBudget, getValues, resetBudget,
 
       user, getUser, setNewUser, deleteUser, listUsers, listAffiliates, deleteAffiliate, addNewUser, addNewAffiliate
     };

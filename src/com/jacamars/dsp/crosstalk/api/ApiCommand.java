@@ -202,6 +202,8 @@ public class ApiCommand implements Serializable {
     public static final String CREATIVESAVAILABLE = "CREATIVESAVAILABLE#";
     
     public static final String PROBE = "PROBE#";
+    
+    public static final String RESET_BUDGET = "ResetBudget#";
    
     /**
      * This class'es sl4j log object
@@ -573,6 +575,10 @@ public class ApiCommand implements Serializable {
             case PROBE:
                 cmd = mapper.readValue(data, GetProbeCmd.class);
                 break;
+                
+            case RESET_BUDGET:
+            	cmd = mapper.readValue(data,  ResetBudgetCmd.class);
+            	break;
             	
             default:
                 cmd = new UnknownCmd(token);

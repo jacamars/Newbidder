@@ -254,6 +254,7 @@ const Simulator = (props) =>  {
       // alert("RESPONSE: " + JSON.stringify(response.data));
 
       vars.nurl =  response.data.seatbid[0].bid[0].nurl;
+      vars.burl =  response.data.seatbid[0].bid[0].burl;
       vx.changeNurl(vars.nurl);
       vars.response = response.data;
       vars.adm = response.data.seatbid[0].bid[0].adm;
@@ -323,6 +324,9 @@ const sendPixel = async () => {
 
   const sendWinNotice = async (event, id) => {
     var nurl = vars.nurl
+    if (nurl == undef) {
+      nurl = vars.burl;
+    }
     if (nurl !== undef) {
       nurl = nurl.replace("${AUCTION_PRICE}", "1.23")
       vx.changeNurl(nurl);

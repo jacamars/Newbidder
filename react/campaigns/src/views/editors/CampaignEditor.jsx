@@ -234,6 +234,12 @@ const getSelectedRules = () => {
   return(items);
 }
 
+const resetBudget = async() => {
+  await vx.resetBudget(campaign.id);
+  props.campaign.totalCost = 0;
+  redraw();
+}
+
 const getSelectedTargets = () => {
   var items = []; 
   items.push(<option key={"target-none"}></option>);
@@ -279,7 +285,7 @@ const getSelectedRegions = () => {
 
         return (
             <>
-              <div className="content">
+              <div  key={"xxx-"+count} className="content">
                 <Row>
                   <Col>
                     <Card>
@@ -441,6 +447,17 @@ const getSelectedRegions = () => {
                                 <Input placeholder="0" type="number" id="hourlyBudget" defaultValue={campaign.budget.hourlyBudget}/>
                               </FormGroup>
                             </Col>
+                            <Col>
+                              <FormGroup key={"spend-"+count}>
+                                <label>Total Spend: {campaign.budget.totalCost}</label>
+                                <Button className="btn-fill"
+                                  color="primary" 
+                                  onClick={() => resetBudget()} disabled={campaign.readOnly}>
+                                  RESET
+                                </Button>
+                              </FormGroup>
+                          </Col>
+
                         </Row>
 
                         <Row>
