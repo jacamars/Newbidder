@@ -933,7 +933,7 @@ public enum Controller {
 				domain, bidType);
 		if (winsQueue != null)
 			winsQueue.add(win);
-		AccountingCache.getInstance().increment(adId,cridId,price);
+		AccountingCache.getInstance().incrementWin(adId,cridId,price);
 		AccountingCache.getInstance().incrementEvent(adId, ".wins");
 	}
 

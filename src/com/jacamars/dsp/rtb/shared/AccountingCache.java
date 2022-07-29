@@ -56,6 +56,20 @@ public enum AccountingCache {
 		ac.add(creative, Double.valueOf(value));
 	}
 	
+	public void incrementWin(String campaign, String creative, String value) {
+		if (hz == null)
+			return;
+		
+		AccountRecord ac = map.get(campaign);
+		if (ac == null) {
+			ac = new AccountRecord(hz.getCPSubsystem(),campaign);
+			map.put(campaign, ac);
+		}
+		ac.addWin(creative, Double.valueOf(value));
+	}
+	
+	
+	
 	public void increment(String campaign, String creative, String type,  Double value) {
 		if (hz == null)
 			return;
@@ -206,6 +220,17 @@ class AccountRecord {
 	}
 	
 	public  void add(String creative, Double value) {
+		IAtomicReference<Double> ref = counters.get(creative);
+		if (ref == null) {
+			ref = cp.getAtomicReference(campaign+creative);
+			counters.put(creative, ref);
+		}
+		var v = new IncFunction(value);
+		ref.alter(v);
+	//	counter.alter(v);
+	}
+	
+	public  void addWin(String creative, Double value) {
 		IAtomicReference<Double> ref = counters.get(creative);
 		if (ref == null) {
 			ref = cp.getAtomicReference(campaign+creative);
