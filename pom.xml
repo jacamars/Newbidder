@@ -48,7 +48,7 @@
 		<aws.sdk.version>1.12.101</aws.sdk.version>
 		<antlr.runtime.version>4.7</antlr.runtime.version>
 		<elastic.rest.version>7.6.1</elastic.rest.version>
-		<jetty.server.version>9.4.41.v20210516</jetty.server.version>
+		<jetty.server.version>10.0.14</jetty.server.version>
 		<socket.io.version>1.0.10</socket.io.version>
 		<bucket4j.version>4.9.0</bucket4j.version>
 		<ipaddress.version>5.3.4</ipaddress.version>
